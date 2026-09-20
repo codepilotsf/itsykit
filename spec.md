@@ -385,7 +385,8 @@ nanoweb rollback
 `nanoweb new <site-name>`
 
 - Creates the standard folder structure and a polished minimal starter site.
-- Creates default `_/nanoweb.config`, a default snip, layout, partials, error pages, CSS, and placeholder assets.
+- Creates default `_/nanoweb.config`, a default snip, a layout with inline header/footer, error pages, and a minimal Nanoweb welcome page with its SVG mark.
+- Bundles local Prewind 1.3.1 and Preflight-inspired theme, typography, native form, button, and application styles. CSS layers are ordered reset, styles, prewind. No CSS build step or CDN is required; form styling does not implement submission handling.
 
 `nanoweb dev`
 

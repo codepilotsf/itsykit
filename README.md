@@ -42,14 +42,32 @@ my-site/
     _layout.html         optional global wrapper
     _404.html            optional standalone error document
     _500.html            optional standalone error document
-    _header.html
     index.html           /
-    about/index.html     /about
     css/style.css        /css/style.css
     images/mark.svg       /images/mark.svg
 ```
 
-`html/` and `_/` are required. `_/snips/` is optional. The starter includes both directories, a responsive studio site with two pages, local CSS/SVG, partials, error documents, and editable sample content. It loads no external fonts or services.
+`html/` and `_/` are required. `_/snips/` is optional. The starter includes a minimal, responsive Nanoweb welcome page, an SVG logo, local CSS, a layout containing the header and footer directly, error documents, and a JSON snip for the welcome text. It loads no external fonts or services.
+
+## Styling with Prewind
+
+The starter bundles Prewind 1.3.1 locally and adapts Preflight's global-first
+stylesheet structure. There is no CSS build step, CDN, external font request,
+or Rails dependency. The entry point `html/css/style.css` declares
+`@layer reset, styles, prewind` and imports:
+
+- `theme.css`: colors, fonts, fluid spacing and text scales.
+- `prewind-1.3.1.css`: the unmodified library, including its reset.
+- `typography.css`: headings, prose, links, lists, code, and tables.
+- `forms.css`: native controls and optional `.form-field` / `.form-row` wrappers.
+- `ui.css`: buttons, including `.ui-button.ui-brand-1`.
+- `application.css`: the Nanoweb starter's layout and site-specific styles.
+
+Keep shared rules in `@layer styles` and use utilities such as `flex gap-sm`,
+`mt-lg`, or `text-brand-1` for one-off adjustments. Utilities override shared
+styles through the layer order. Customize the theme rather than editing the
+vendored library. Form styling does not add submission processing. CSS is
+embedded from `internal/cli/starter/css/` into the executable when built.
 
 ## JSON configuration and content
 
@@ -58,7 +76,7 @@ my-site/
 ```json
 {
   "site": {
-    "name": "Fieldwork Studio",
+    "name": "Nanoweb",
     "email": "hello@example.com"
   }
 }

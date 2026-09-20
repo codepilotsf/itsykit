@@ -37,7 +37,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if err := Create(args[1]); err != nil {
 			return fail(err)
 		}
-		fmt.Fprintf(out, "Created %s\nRun: cd %s && nanoweb dev\n", args[1], args[1])
+		fmt.Fprintf(out, "\nCreated new project: %s\n\nNext steps:\n---------------\ncd %s\nnanoweb dev\n\n", args[1], args[1])
 		return 0
 	case "status":
 		if len(args) != 1 {
@@ -83,7 +83,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		go func() { defer close(watchDone); handler.Watch(watchCtx, p.Root, log.New(errOut, "", 0)) }()
 		done := make(chan error, 1)
 		go func() { done <- server.Serve(listener) }()
-		fmt.Fprintf(out, "Nanoweb running at http://%s\nWatching templates, assets, configuration and snips. Press Ctrl-C to stop.\n", listener.Addr())
+		fmt.Fprintf(out, "\nNanoweb running at http://%s\nWatching templates, assets, configuration and snips.\n\nPress Ctrl-C to stop.\n", listener.Addr())
 		select {
 		case <-ctx.Done():
 			shutdownCtx, stop := context.WithTimeout(context.Background(), 5*time.Second)

@@ -78,7 +78,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	run(temp, "new", "smoke")
 	root := filepath.Join(temp, "smoke")
-	if got := run(root, "status"); !strings.Contains(got, "2 pages, 2 assets, 1 snips") {
+	if got := run(root, "status"); !strings.Contains(got, "1 pages, 8 assets, 1 snips") {
 		t.Fatal(got)
 	}
 	cmd := exec.Command(binary, "dev", "-port", "0")
@@ -108,16 +108,21 @@ func TestExecutableWorkflow(t *testing.T) {
 		close(lines)
 	}()
 	var address string
-	select {
-	case line, ok := <-lines:
-		if !ok {
-			err := cmd.Wait()
-			stopped = true
-			t.Fatalf("dev exited: %v: %s", err, stderr.String())
+	startupTimeout := time.After(10 * time.Second)
+	for address == "" {
+		select {
+		case line, ok := <-lines:
+			if !ok {
+				err := cmd.Wait()
+				stopped = true
+				t.Fatalf("dev exited: %v: %s", err, stderr.String())
+			}
+			if strings.HasPrefix(line, "Nanoweb running at ") {
+				address = strings.TrimPrefix(line, "Nanoweb running at ")
+			}
+		case <-startupTimeout:
+			t.Fatal("dev did not start")
 		}
-		address = strings.TrimPrefix(line, "Nanoweb running at ")
-	case <-time.After(10 * time.Second):
-		t.Fatal("dev did not start")
 	}
 	client := &http.Client{Timeout: 2 * time.Second}
 	get := func(url string) (int, string) {
@@ -133,9 +138,14 @@ func TestExecutableWorkflow(t *testing.T) {
 		}
 		return response.StatusCode, string(b)
 	}
-	for url, want := range map[string]int{"/": 200, "/about": 200, "/css/style.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/_/nanoweb.config": 404, "/_header.html": 404, "/%2e%2e/_/nanoweb.config": 404} {
+	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/style.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/_/nanoweb.config": 404, "/_header.html": 404, "/%2e%2e/_/nanoweb.config": 404} {
 		if code, _ := get(url); code != want {
 			t.Errorf("%s: %d", url, code)
+		}
+	}
+	for _, name := range []string{"theme.css", "prewind-1.3.1.css", "typography.css", "forms.css", "ui.css", "application.css"} {
+		if code, body := get("/css/" + name); code != 200 || !strings.Contains(body, "{") {
+			t.Errorf("starter CSS %s: status %d, body %q", name, code, body)
 		}
 	}
 	edit := func(name, body string) {
