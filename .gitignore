@@ -1,0 +1,11 @@
+/bin/
+*.test
+
+# macOS metadata
+.DS_Store
+._*
+
+# Local editor files
+*.swp
+*.swo
+*~

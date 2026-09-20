@@ -1,0 +1,520 @@
+# Nanoweb
+
+## Product and build specification
+
+**Status:** first implementation specification  
+**Audience:** developer building Nanoweb in Go  
+**Core promise:** a developer can create, run, and deploy a small editable website with one CLI, one server executable, plain HTML, JSON-backed content, and automatic HTTPS. No Node, Ruby, PHP, database server, Docker, or separately configured web server is required.
+
+**Phase-one implementation boundary:** The current implementation provides local `new`, `dev`, and `status`, routing, escaped templates, JSON snips, assets, and automatic reloads. Production, deployment, editor/authentication, forms, schemas, content writes/revisions, managed snip image publishing, and raw HTML are deferred. The sections below describe the broader product direction, not shipped capabilities. See README.md for the implemented contract and exact commands. Configuration is JSON only.
+
+Nanoweb is for brochure-style sites: small businesses, restaurants, consultants, event services, portfolios, and similar sites where a conventional application framework or WordPress installation is disproportionate to the job.
+
+It is not intended to become a general application platform, a no-code site builder, or a WordPress replacement with plugins.
+
+## Product principles
+
+1. **The site remains an understandable folder.** A developer should be able to open it in a text editor or file browser and understand its structure immediately.
+2. **HTML is primary.** Pages are ordinary HTML files. Nanoweb adds a small templating layer but does not require a component framework or a build toolchain.
+3. **Public routes come from files.** No route file is needed for normal pages. URLs are clean and extensionless.
+4. **The owner edits structured content, not templates.** Developers own templates and partials; owners manage snips and their images through a simple editor.
+5. **One install, one operational unit.** The production host is a Nanoweb Go executable running as a system service. It owns HTTP(S), site selection, TLS certificates, static serving, the editor, deployments, and limited server-side actions.
+6. **No separate Caddy requirement.** Nanoweb must not ask users to install, configure, or operate Caddy. It may use mature Go libraries for ACME/TLS internally; it must not implement TLS certificate management from scratch.
+7. **Safe by default.** Releases are atomic and reversible; content writes are validated and atomic; private files are never served; arbitrary code execution is not a feature.
+
+## User experience
+
+The intended local workflow:
+
+```sh
+brew install nanoweb
+nanoweb new my-site
+cd my-site
+nanoweb dev
+```
+
+The intended initial production workflow:
+
+```sh
+nanoweb deploy
+```
+
+On a first deployment, the CLI asks for the domain and SSH target, then provisions a supported blank Ubuntu LTS server. It installs the Nanoweb host executable as a system service, configures the minimal network/firewall requirements, deploys a release, and obtains HTTPS certificates. Later `nanoweb deploy` commands deploy the current site atomically.
+
+The initial server target is **Ubuntu LTS only**. Do not support Arch or multiple distributions until the Ubuntu flow is stable and tested.
+
+## Non-goals for v1
+
+- A JavaScript runtime or arbitrary JavaScript expressions in templates
+- Arbitrary server-side Go, Ruby, Python, shell, or user-provided code
+- A plugin marketplace or plugin API
+- A database requirement for site content
+- Multi-user collaborative editing or merge/conflict resolution
+- Docker as a required local or production dependency
+- Kubernetes, PaaS, or container orchestration deployment targets
+- Dynamic route parameters such as `/posts/:slug`
+- WordPress-style page builders, themes, blocks, or WYSIWYG HTML authoring
+
+## Site structure
+
+Every site follows this shape. `html/` is the public document root. `_/` is Nanoweb private data and configuration.
+
+```text
+my-site/
+  _/
+    nanoweb.config
+    snips/
+      about-us.json
+      about-us-images/
+        foo.png
+
+  html/
+    _layout.html
+    _404.html
+    _500.html
+    _header.html
+    _footer.html
+    _nav.html
+    index.html
+    about-us/
+      index.html
+      history.html
+    css/
+      theme.css
+      global.css
+      typography.css
+    images/
+      logo.svg
+```
+
+### Ownership and visibility
+
+| Location            | Owner                                   | Served publicly?               | Purpose                                           |
+| ------------------- | --------------------------------------- | ------------------------------ | ------------------------------------------------- |
+| `html/`             | Developer                               | Yes, except reserved `_` names | Pages and public assets                           |
+| `html/_layout.html` | Developer                               | No                             | Default page wrapper                              |
+| `html/**/_name.html` | Developer                              | No                             | Reusable partial templates, except reserved names |
+| `html/_404.html`    | Developer                               | Only as the 404 response       | Not-found document                                |
+| `html/_500.html`    | Developer                               | Only as the 500 response       | Server-error document                             |
+| `_/nanoweb.config`  | Developer                               | No                             | Site configuration                                |
+| `_/snips/`          | Site owner through editor, or developer | No direct file serving         | Editable structured content and associated images |
+
+Any file or directory whose basename begins with `_` is private/reserved and must never be reachable through a public URL. `_/` is additionally reserved as Nanoweb's private workspace.
+
+## File-based routing
+
+Nanoweb maps page files in `html/` to extensionless routes.
+
+| File                         | Route               |
+| ---------------------------- | ------------------- |
+| `html/index.html`            | `/`                 |
+| `html/about.html`            | `/about`            |
+| `html/about-us/index.html`   | `/about-us`         |
+| `html/about-us/history.html` | `/about-us/history` |
+| `html/css/global.css`        | `/css/global.css`   |
+| `html/images/logo.svg`       | `/images/logo.svg`  |
+
+Rules:
+
+1. `index.html` represents its containing directory.
+2. Any other `.html` page represents the same URL without `.html`.
+3. URLs containing `.html` are not alternate routes and return 404. Nanoweb does not redirect `/about.html` to `/about`.
+4. An asset retains its filename and extension.
+5. Reserved/private underscore paths are not routes.
+6. A duplicate route, such as both `html/about.html` and `html/about/index.html`, is a build error. `nanoweb dev` reports it and `nanoweb deploy` refuses it.
+7. An unmatched route returns `html/_404.html` with HTTP status 404.
+8. An unexpected request-time/internal rendering failure returns `html/_500.html` with HTTP status 500. This fallback must remain deliberately simple.
+
+The first version has no `routes.json`. Add redirects only when there is a real need, through `_/nanoweb.config`.
+
+## Templates
+
+Nanoweb borrows the structural readability of Svelte templates but does not execute JavaScript. It uses single curly braces.
+
+### Layouts and slots
+
+`html/_layout.html` is the default layout for normal pages. A page's rendered body replaces `{slot}`.
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{page.title} | {site.name}</title>
+    <link rel="stylesheet" href="/css/global.css">
+  </head>
+  <body>
+    {render header}
+    {slot}
+    {render footer}
+  </body>
+</html>
+```
+
+Pages use the default layout without configuration in v1:
+
+```html
+<main>
+  <h1>About us</h1>
+  {snip "about-us"}
+</main>
+```
+
+Do not add page-specific or nested layouts in the first implementation. A global layout plus partials is enough, keeps behavior obvious, and leaves room to add an explicit layout directive later if experience justifies it.
+
+### Partials
+
+Partials are developer-owned, underscore-prefixed HTML templates anywhere under `html/`. They can be reused on multiple pages and can render data, other partials, and snips.
+
+```html
+<!-- html/_header.html -->
+<header>
+  <a href="/">{site.name}</a>
+  {render nav}
+</header>
+```
+
+```html
+<!-- html/_nav.html -->
+<nav>
+  <a href="/about-us">About us</a>
+  <a href="/contact">Contact</a>
+</nav>
+```
+
+`{render header}` resolves to `_header.html` beside the calling template. `{render /foo/bar/footer}` resolves to `html/foo/bar/_footer.html`. Paths are unquoted and omit the filename's leading underscore and `.html`. Relative directories, including `./` and `../`, resolve from the calling template, including inside nested partials. Paths escaping `html/` are invalid. The root `_layout.html`, `_404.html`, and `_500.html` are reserved and cannot be rendered as partials. A missing partial or recursive partial inclusion is a dev/build error, even in unused partials.
+
+### Snips
+
+Snips are user-editable, named pieces of content stored under `_/snips/`. They are distinct from partials:
+
+- A partial is a reusable developer template.
+- A snip is owner-supplied content, structured according to a schema and managed in the editor.
+
+For simple rich-text or HTML fragment content:
+
+```html
+{snip "about-us"}
+```
+
+For a structured snip, paths can be referenced directly:
+
+```html
+<h1>{snip.about-us.title}</h1>
+<p>{snip.about-us.introduction}</p>
+```
+
+An associated image folder lives alongside the snip JSON:
+
+```text
+_/snips/
+  about-us.json
+  about-us-images/
+    foo.png
+```
+
+The editor should write image references into the snip JSON using stable public URLs such as `/snips/about-us-images/foo.png` only if Nanoweb intentionally publishes managed snip assets through a defined safe route. It must never expose raw access to `_/` as a directory. A more explicit alternative is a virtual public prefix, such as `/_assets/snips/about-us-images/foo.png`; choose one prefix and keep it stable.
+
+### Values, conditions, and loops
+
+Initial supported syntax:
+
+```html
+{site.name}
+{page.title}
+{snip.about-us.title}
+
+{#if site.phone}
+  <a href="tel:{site.phone}">{site.phone}</a>
+{/if}
+
+{#each snip.about-us.team as member}
+  <article>
+    <img src="{member.photo}" alt="{member.name}">
+    <h2>{member.name}</h2>
+    <p>{member.role}</p>
+  </article>
+{/each}
+```
+
+The expression model is intentionally constrained:
+
+- Value lookup: dotted paths only, for example `{site.name}` and `{member.photo}`.
+- Condition: a dotted-path truthiness check only, for example `{#if site.phone}`.
+- Loop: a collection dotted path and one alias only, for example `{#each team.members as member}`.
+- An empty loop renders nothing.
+- No function calls, arithmetic, comparisons, `.length`, filters, inline JavaScript, or arbitrary expressions in v1.
+- Nanoweb does not parse template directives inside `<script>` or `<style>` elements.
+
+HTML escaping rules must be explicit in implementation. Values interpolated by `{path}` are HTML-escaped by default. Raw HTML must have a distinct opt-in directive and should be restricted to explicitly schema-approved rich-text/snippet fields.
+
+## Snip format and schemas
+
+The exact schema file convention is a small deferred implementation choice, but the data model should be developer-defined and owner-editable.
+
+Example snip data:
+
+```json
+{
+  "title": "About us",
+  "introduction": "We make wood-fired pizza for events.",
+  "team": [
+    {
+      "name": "Sam Lee",
+      "role": "Founder",
+      "photo": "/_assets/snips/about-us-images/sam-lee.png"
+    }
+  ]
+}
+```
+
+Recommended schema goals:
+
+- Text, textarea/rich text, number, boolean, URL, image, select, object, and repeatable-list fields
+- Required fields and basic validation
+- Labels and help text for editors
+- Image constraints such as allowed file type and maximum file size
+- No arbitrary form generation from untrusted data
+
+Nanoweb validates a snip before writing it. It writes content atomically: create a temporary file in the same directory, fsync as appropriate, then rename it over the existing JSON file. It retains prior revisions/snapshots for rollback.
+
+## Configuration
+
+`_/nanoweb.config` contains JSON only. Comments and trailing commas are not supported. The phase-one implementation reads the `site` object; deployment and redirect settings are deferred.
+
+Example:
+
+```json
+{
+  "site": {
+    "name": "Acme Catering",
+    "email": "hello@example.com"
+  }
+}
+```
+
+Configuration should not contain private server credentials. The CLI stores deploy target credentials/settings locally outside version control, or uses standard SSH configuration and keys. The deploy target can be recorded in a `.gitignore`d local file if the developer wants convenience.
+
+## Editor
+
+The editor is a small protected Nanoweb interface served by the same host, preferably at `/admin` initially. It is not part of the public site route tree.
+
+Editor capabilities for v1:
+
+- Authentication with secure password hashing and session cookies
+- List available snips
+- Edit schema-defined fields
+- Upload and select images for a snip
+- Preview the updated site locally/on the host
+- Validate before saving
+- View and restore a prior content revision
+
+Editor exclusions for v1:
+
+- Editing HTML, layouts, or partials
+- Arbitrary filesystem browsing
+- Arbitrary HTML/script injection
+- Multiple-editor collaboration
+- A visual drag-and-drop page builder
+
+## Server and TLS
+
+The installed Nanoweb server is a single Go executable and system service. A separate Caddy process is not part of the required architecture.
+
+Responsibilities:
+
+- Listen on HTTP port 80 and HTTPS port 443
+- Redirect HTTP to HTTPS except as required for ACME challenges
+- Obtain and renew certificates through a mature Go ACME/TLS implementation
+- Map request hostnames to deployed sites
+- Serve assets and rendered pages
+- Serve `/admin` and a restricted set of internal APIs
+- Enforce request size limits, upload limits, and secure headers
+- Write structured logs
+- Support multiple independent sites on one server
+
+Do not hand-roll ACME, TLS certificate renewal, password storage, cookie signing, or multipart upload parsing. These are implementation dependencies, not user-visible operational dependencies.
+
+## Deployments and releases
+
+Each deployment creates an immutable release. The host switches to it atomically.
+
+```text
+/var/lib/nanoweb/sites/acmecatering.com/
+  releases/
+    20260920-153012/
+    20260919-102417/
+  current -> releases/20260920-153012
+  shared/
+    content-revisions/
+    uploads/
+```
+
+The exact treatment of editable snips during a developer deployment needs a defined policy before implementation. Recommended default:
+
+- HTML, partials, layouts, CSS, JavaScript, and developer-provided default snips ship in releases.
+- Owner edits and uploaded files are stored in a host-managed mutable content layer with revision history.
+- On deploy, Nanoweb preserves existing owner-edited snips and uploads unless the developer intentionally runs an explicit content migration/reset command.
+
+This avoids accidentally erasing an owner’s edits every time a developer redeploys HTML.
+
+Required deployment properties:
+
+- Validate routes, templates, snips, and configuration before activating a release.
+- Upload a staged release before changing `current`.
+- Switch releases atomically.
+- Preserve the prior active release.
+- Provide `nanoweb rollback`.
+- Report the deployed domain, release identifier, and any certificate state clearly.
+
+## CLI surface
+
+Keep the initial command surface small:
+
+```text
+nanoweb new <site-name>
+nanoweb dev
+nanoweb deploy
+nanoweb status
+nanoweb logs
+nanoweb rollback
+```
+
+### Command behavior
+
+`nanoweb new <site-name>`
+
+- Creates the standard folder structure and a polished minimal starter site.
+- Creates default `_/nanoweb.config`, a default snip, layout, partials, error pages, CSS, and placeholder assets.
+
+`nanoweb dev`
+
+- Must run without Docker or a database.
+- Watches source files and snip content.
+- Runs a local server with the same route and rendering behavior as production.
+- Reports template errors, invalid route collisions, missing partials, schema errors, and unsafe/unserved paths clearly.
+- Provides local editor access.
+
+`nanoweb deploy`
+
+- For a configured target, builds/validates, uploads, stages, and atomically activates a release.
+- On first use against a blank supported server, asks for necessary information and clearly confirms the intended remote changes before provisioning.
+- Uses SSH; never asks the user to manually install a language runtime.
+
+`nanoweb status`
+
+- Shows local project validity or remote deployment/certificate/release status, depending on flags/context.
+
+`nanoweb logs`
+
+- Streams or retrieves host logs without requiring the developer to know system-service commands.
+
+`nanoweb rollback`
+
+- Lists/selects or defaults to the immediately previous release, then atomically reactivates it.
+
+## Docker
+
+Docker is not required for local development or the first production path. The core product must work on a blank Ubuntu LTS host using the Nanoweb executable and OS service management.
+
+Later, Docker can be an optional deployment target for users who already operate containers. It must not dictate the local project format or force every customer to understand containers.
+
+## Server-side features
+
+The first server-side feature should be a constrained contact-form action, not arbitrary application code.
+
+A form can declare a named Nanoweb endpoint and validation configuration. Nanoweb handles rate limiting, spam defenses, payload validation, delivery/storage, and logging. The implementation may later offer email or webhook destinations, but those credentials live in host configuration, never in public site files.
+
+Do not add custom server functions in v1. They turn a small static host into a multi-tenant code-execution and security platform.
+
+## Security requirements
+
+- Private/reserved file paths cannot be fetched over HTTP.
+- Content JSON and template data are escaped by default.
+- Raw HTML is an explicit, schema-controlled capability.
+- Editor passwords use a current secure password hash algorithm.
+- Cookies are `HttpOnly`, `Secure`, and have appropriate `SameSite` policy.
+- Uploads enforce size and MIME/type validation; stored filenames are sanitized/randomized as appropriate.
+- Uploads are served with safe headers and must not be executable.
+- The host has per-site separation in paths and authorization checks.
+- Form actions include rate limiting and abuse/spam protections.
+- Deploy archives are validated to prevent path traversal.
+- Logs avoid credentials, session tokens, and sensitive form contents.
+- Certificate private keys and host operational state have restrictive filesystem permissions.
+
+## Suggested implementation milestones
+
+### Milestone 1: local static Nanoweb
+
+- CLI skeleton and `nanoweb new`
+- Parse project layout and configuration
+- File route generation with collision detection
+- Local HTTP server
+- Static asset serving
+- `_404.html` and `_500.html` status handling
+
+### Milestone 2: template renderer
+
+- Root layout and `{slot}`
+- Partials
+- Value lookup, `#if`, and `#each`
+- Clear parse/render error reporting
+- Escaping and script/style parser boundaries
+
+### Milestone 3: snips
+
+- JSON snip loading
+- Basic schema format and validation
+- Associated image directories and safe public asset mapping
+- Local editor authentication and edit UI
+- Atomic writes and content revisions
+
+### Milestone 4: production host
+
+- Single host daemon serving multiple sites
+- Domain-to-site lookup
+- ACME TLS integration and renewal
+- System service installation on Ubuntu LTS
+- Host-level users/sessions/site registry in SQLite
+
+### Milestone 5: deployment
+
+- SSH bootstrap of a blank Ubuntu LTS host
+- Staged immutable releases
+- Atomic release activation and rollback
+- `status` and `logs`
+
+### Milestone 6: constrained forms
+
+- Form declarations
+- Validation, spam controls, rate limits, logging
+- One delivery mechanism, chosen deliberately
+
+## Open decisions to resolve before their milestone
+
+These are intentionally not blockers for the initial routing/template prototype:
+
+1. **Snip schema filename and syntax:** colocated `about-us.schema.json`, a central schema folder, or schema inside the snip JSON.
+2. **Public URL prefix for snip-managed images:** use a stable virtual prefix and do not expose `_/` directly.
+3. **Rich text model:** sanitized HTML versus a constrained Markdown-like format.
+4. **First form destination:** email, host inbox, webhook, or a combination.
+5. **Editor user model:** one site-owner account initially versus host-managed multiple editor accounts.
+6. **Default-content deploy policy:** preserve live editor changes by default, with explicit content migration/reset commands.
+
+## Acceptance criteria for the first usable release
+
+Nanoweb is meaningfully usable when a developer can:
+
+1. Install the CLI through Homebrew.
+2. Run `nanoweb new my-site` and receive a working starter site.
+3. Run `nanoweb dev` with no language runtime, Node modules, database, Docker, or external web-server setup.
+4. Add `html/about-us/history.html` and see it at `/about-us/history`.
+5. Confirm `/about-us/history.html` returns 404.
+6. Reuse a developer partial in several pages.
+7. Wrap pages with `html/_layout.html` using `{slot}`.
+8. Render values, simple conditions, and loops from a JSON snip.
+9. Edit a schema-defined snip and associated image from a protected editor without editing source HTML.
+10. Deploy to a blank supported Ubuntu server with one command after entering the initial domain/server details.
+11. Receive a valid automatically managed HTTPS certificate.
+12. Deploy a second release and roll back safely.
+13. Host more than one domain/site from the same Nanoweb server.
