@@ -1,6 +1,6 @@
 # Nanoweb
 
-A small local website server: plain HTML, JSON content, clean URLs, and automatic browser reloads. Phase one has no dependencies outside the Go standard library. Once built, the executable needs no Go installation, Node, Docker, database, or external web server.
+A small website server: plain HTML, JSON content, clean URLs, and automatic local browser reloads. The runtime uses Go's standard library and needs no Node, Docker, database, or external web server. Local site commands need no Go installation after building; `setup` needs Go and the source checkout on your Mac to cross-compile the server.
 
 ## Build and run
 
@@ -30,6 +30,100 @@ export PATH="$HOME/.local/bin:$PATH"
 Add that PATH setting to your shell profile if desired. No Homebrew package is published by this project.
 
 `new` accepts a simple name containing letters, digits, underscores, and hyphens, starting with a letter or digit. It refuses existing destinations, including empty directories and symlinks. An interrupted creation may leave a partial new directory for inspection. `status` validates configuration, routes, templates, and current content without listening on a port. Exit codes are 0 for success, 1 for project or runtime failures, and 2 for invalid CLI usage.
+
+## Set up an Ubuntu server from your Mac
+
+From any directory, run `nanoweb setup`:
+
+```text
+Target hostname or IP? ubuntu@1.2.3.4
+
+Building Nanoweb server...
+Uploading Nanoweb server...
+Installing Nanoweb service...
+Checking Nanoweb service...
+Nanoweb server is running on ubuntu@1.2.3.4 (HTTP port 80).
+```
+
+Enter a hostname, IP, SSH config alias, or `user@host`. A bare hostname uses
+the username from `~/.ssh/config`, otherwise your local username, just like SSH.
+Use `root@1.2.3.4` for root. Custom ports and keys belong in `~/.ssh/config`.
+Nanoweb uses the installed `ssh` and `scp`: keys, agents, passphrases, normal
+host-key checks, and interactive password authentication are handled by SSH.
+Password login must be enabled on the server. Passwords are never stored by
+Nanoweb, and host-key verification is not disabled. Non-root installation uses
+`sudo` with a remote terminal for its password prompt. A temporary SSH control
+connection reuses authentication and is closed when setup finishes.
+
+Targets: Ubuntu LTS 22.04, 24.04, or 26.04 with systemd, on amd64 or arm64.
+The target needs OpenSSH/SFTP and standard Ubuntu tools including `ss` (iproute2),
+plus sudo for non-root users. Go is needed only on your Mac (1.25 or newer).
+Setup checks SSH and the remote OS/architecture before building. A failed
+connection stops setup with an error. It builds a static Linux executable.
+
+Source discovery works with the development symlink to this repo's `bin/nanoweb`.
+For a standalone copy, supply the source checkout explicitly:
+
+```sh
+nanoweb setup -source /Users/sean/Projects/nanoweb
+```
+
+Setup installs `/usr/local/bin/nanoweb-server`, `/etc/nanoweb/server.json`, and
+`/etc/systemd/system/nanoweb.service`. It creates a dedicated non-login `nanoweb`
+account and `/var/lib/nanoweb`. The service starts at boot and restarts on failure.
+Setup verifies systemd activity and HTTP readiness before reporting success.
+It refuses existing installation paths/accounts and an occupied port 80.
+This is first-install setup, not an update command. It does not modify firewalls,
+SSH settings, packages, or existing sites. If installation fails, its newly
+installed service/binary/config files are removed; any created account and data
+directory remain for inspection. After a connection loss, inspect remote state
+before retrying, since interrupted installs may leave partial state.
+
+The host listens publicly on HTTP port 80 and has no sites configured:
+
+```json
+{
+  "listen": ":80",
+  "sites": {}
+}
+```
+
+The `sites` object maps hostnames to absolute site directories, for example
+`"example.com": "/var/lib/nanoweb/sites/example"`. The service account must be
+able to read them. Sites/configuration load at startup; restart after changes.
+The host serves validated snapshots without browser reload scripts, file watching,
+or icon downloads. Resolve icons locally before copying a site. Unknown hosts
+return 404, including requests to the server IP unless that IP is a configured
+site key. `/_nanoweb/health` publicly reports only the service name and readiness.
+The empty listen address binds all available interfaces; explicit IPv4/IPv6
+addresses and numeric ports 1-65535 are also accepted. The service remains
+non-root, with only `CAP_NET_BIND_SERVICE` granted for binding low ports.
+Local `nanoweb dev` remains loopback-only.
+
+Allow inbound TCP 80 in your server and cloud firewalls. Setup does not change
+either firewall, and its local readiness check does not prove public reachability.
+From your Mac, test public access (replace the example IP):
+
+```sh
+curl http://1.2.3.4/_nanoweb/health
+```
+
+On the server:
+
+```sh
+sudo systemctl status nanoweb --no-pager
+sudo journalctl -u nanoweb -f
+sudo systemctl restart nanoweb
+```
+
+HTTP is unencrypted. Do not use it for passwords or sensitive information.
+HTTPS, automated domain configuration, deployment, updates, and rollback remain
+deferred. Existing loopback installations are not upgraded by rerunning setup;
+they need the updated server binary and service unit, the new listen setting,
+and a systemd daemon-reload/restart.
+Tests simulate SSH/SCP and installation failures, cross-build both Linux targets,
+and exercise HTTP/readiness locally. They do not provision a real Ubuntu machine;
+real SSH/password/systemd verification needs a server supplied by you.
 
 ## Project structure
 
@@ -220,4 +314,4 @@ The executable smoke test builds the binary, creates a fresh starter, runs statu
 
 ## Current limitations
 
-This release is local development only. Browser editing and authentication, production hosting/HTTPS, deployment/rollback, remote logs/status, forms, snip schemas, managed content writes and revisions, and managed snip image publishing are deferred. Put developer-managed images under `html/images/` and reference their public URLs in JSON. `_/snips/` never becomes a public image directory. Raw HTML remains deferred until there is a schema-approved, sanitized design. JSON parsing validates syntax and object shape, not content schemas. No production release or security review is implied by the broader roadmap in spec.md.
+This release provides local development and initial SSH setup of a public HTTP persistent server. Browser editing and authentication, HTTPS, deployment/rollback, remote logs/status, forms, snip schemas, managed content writes and revisions, and managed snip image publishing are deferred. Put developer-managed images under `html/images/` and reference their public URLs in JSON. `_/snips/` never becomes a public image directory. Raw HTML remains deferred until there is a schema-approved, sanitized design. JSON parsing validates syntax and object shape, not content schemas. No production release or security review is implied by the broader roadmap in spec.md.

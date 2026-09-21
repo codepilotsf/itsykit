@@ -16,9 +16,11 @@ library. Sites use plain HTML, local assets, and JSON content. Keep the design
 simple and avoid adding dependencies or a frontend build system without a
 concrete need.
 
-Currently implemented: `nanoweb new <site-name>`, `nanoweb status`, and
-`nanoweb dev [-port 3000]`, with local automatic browser reloads. Run status
-and dev from a generated site's root. The server listens on IPv4 loopback.
+Currently implemented: `nanoweb new <site-name>`, `nanoweb status`,
+`nanoweb dev [-port 3000]`, and `nanoweb setup [-source /path/to/nanoweb]`.
+Run status/dev from a generated site. Setup runs from the Mac over native SSH.
+The dev server listens on loopback; the persistent host defaults to public HTTP
+port 80. TLS remains deferred.
 
 README.md describes the current implementation. spec.md also contains future
 plans: do not assume its editor, deployment, HTTPS, forms, schemas, revisions,
@@ -28,6 +30,9 @@ Verify current code and tests when documentation disagrees.
 ## Repository map
 
 - `cmd/nanoweb/main.go`: executable entry point.
+- `cmd/nanoweb-server/main.go`: standalone persistent server entry point.
+- `internal/host/`: strict server JSON config, hostname routing, readiness, and shutdown.
+- `internal/setup/`: interactive SSH bootstrap, cross-build, installer, and systemd unit.
 - `internal/cli/cli.go`: command handling and site creation.
 - `templates/`: canonical starter files, mirroring the generated site structure.
 - `templates/embed.go`: embeds HTML, CSS, SVG, JSON, and README files in the binary.
@@ -163,6 +168,35 @@ with the intended result. Keep local agent instructions out of that comparison
 unless they are deliberately part of the generated starter.
 
 ## Development checks
+
+### Remote setup
+
+Setup prompts for a hostname/IP (also user@host or an SSH alias), verifies SSH,
+Ubuntu LTS 22.04/24.04/26.04 and amd64/arm64, then prints the build message.
+Use the native SSH/SCP clients for agents, keys, host verification, and interactive
+passwords. Do not store passwords or disable host-key checks. Bare hostnames keep
+normal SSH username selection. Non-root installs use sudo with a remote PTY.
+The temporary control connection and staged files are cleaned up on completion.
+
+Cross-build cmd/nanoweb-server with GOOS=linux, detected GOARCH, CGO_ENABLED=0.
+Source is found through the executable's resolved symlink or the explicit -source
+flag. Go is required locally for setup, never on the target. Setup refuses existing
+installation paths/accounts and occupied port 80, and does not change SSH,
+firewalls, packages, or existing sites. It installs a dedicated non-login service
+account, hardened systemd unit, and JSON config. Failure cleanup preserves data
+and accounts. This is a first install, not an upgrade or deployment workflow.
+
+The initial persistent host binds :80, uses /etc/nanoweb/server.json,
+and has no sites by default. Config maps hostnames to absolute site roots.
+It uses site.NewProductionServer: no development reload script/endpoint, watcher,
+or icon fetching. Config/site edits require restart. TLS is not implemented yet.
+The non-root service receives only CAP_NET_BIND_SERVICE to bind low ports.
+Readiness probes wildcard listeners via loopback before setup succeeds; this
+does not verify public firewall access. Administrators must allow inbound TCP 80.
+Tests mock SSH/SCP, verify both Linux ELF builds, and exercise HTTP locally.
+Do not claim real Ubuntu/password/systemd installation was tested without a target.
+
+### Checks
 
 Inspect the current worktree before editing and preserve unrelated changes.
 Format changed Go files with gofmt. For implementation changes, run:

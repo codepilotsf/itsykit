@@ -18,12 +18,13 @@ import (
 // Server publishes complete validated snapshots. Failed edits produce a 500
 // rather than silently serving an apparently up-to-date site.
 type Server struct {
-	reloadMu sync.Mutex
-	mu       sync.RWMutex
-	project  *Project
-	err      error
-	revision uint64
-	logger   *log.Logger
+	reloadMu   sync.Mutex
+	mu         sync.RWMutex
+	project    *Project
+	err        error
+	revision   uint64
+	logger     *log.Logger
+	production bool
 }
 
 func NewServer(p *Project, loggers ...*log.Logger) *Server {
@@ -31,6 +32,12 @@ func NewServer(p *Project, loggers ...*log.Logger) *Server {
 	if len(loggers) > 0 {
 		s.logger = loggers[0]
 	}
+	return s
+}
+
+func NewProductionServer(p *Project, logger *log.Logger) *Server {
+	s := NewServer(p, logger)
+	s.production = true
 	return s
 }
 
@@ -202,7 +209,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mu.RLock()
 	p, loadErr, revision := s.project, s.err, s.revision
 	s.mu.RUnlock()
-	if r.URL.Path == reloadPath && r.URL.RawPath == "" {
+	if !s.production && r.URL.Path == reloadPath && r.URL.RawPath == "" {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		if r.Method != "HEAD" {
 			fmt.Fprint(w, revision)
@@ -210,27 +217,30 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !safeURL(r.URL.Path) {
-		serveReloadError(w, r, p, 404, revision)
+		serveReloadError(w, r, p, 404, revision, !s.production)
 		return
 	}
 	if loadErr != nil {
-		serveReloadError(w, r, p, 500, revision)
+		serveReloadError(w, r, p, 500, revision, !s.production)
 		return
 	}
 	if t, ok := p.Pages[r.URL.Path]; ok {
 		body, err := p.render(t, r.URL.Path)
 		if err != nil {
-			serveReloadError(w, r, p, 500, revision)
+			serveReloadError(w, r, p, 500, revision, !s.production)
 			return
 		}
-		writeHTML(w, r, 200, withReload(body, revision))
+		if !s.production {
+			body = withReload(body, revision)
+		}
+		writeHTML(w, r, 200, body)
 		return
 	}
 	if data, ok := p.AssetData[r.URL.Path]; ok {
 		http.ServeContent(w, r, path.Base(r.URL.Path), time.Time{}, bytes.NewReader(data))
 		return
 	}
-	serveReloadError(w, r, p, 404, revision)
+	serveReloadError(w, r, p, 404, revision, !s.production)
 }
 
 type statusWriter struct {
@@ -259,7 +269,7 @@ func (w *statusWriter) Write(body []byte) (int, error) {
 
 func (w *statusWriter) Unwrap() http.ResponseWriter { return w.ResponseWriter }
 
-func serveReloadError(w http.ResponseWriter, r *http.Request, p *Project, code int, revision uint64) {
+func serveReloadError(w http.ResponseWriter, r *http.Request, p *Project, code int, revision uint64, reload bool) {
 	body := []byte("<!doctype html><title>" + http.StatusText(code) + "</title><h1>" + http.StatusText(code) + "</h1>")
 	if p != nil {
 		if t, ok := p.Errors[code]; ok {
@@ -268,7 +278,10 @@ func serveReloadError(w http.ResponseWriter, r *http.Request, p *Project, code i
 			}
 		}
 	}
-	writeHTML(w, r, code, withReload(body, revision))
+	if reload {
+		body = withReload(body, revision)
+	}
+	writeHTML(w, r, code, body)
 }
 
 func writeHTML(w http.ResponseWriter, r *http.Request, code int, body []byte) {

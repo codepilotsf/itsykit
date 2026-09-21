@@ -6,7 +6,7 @@
 **Audience:** developer building Nanoweb in Go  
 **Core promise:** a developer can create, run, and deploy a small editable website with one CLI, one server executable, plain HTML, JSON-backed content, and automatic HTTPS. No Node, Ruby, PHP, database server, Docker, or separately configured web server is required.
 
-**Phase-one implementation boundary:** The current implementation provides local `new`, `dev`, and `status`, routing, escaped templates, JSON snips, assets, and automatic reloads. Production, deployment, editor/authentication, forms, schemas, content writes/revisions, managed snip image publishing, and raw HTML are deferred. The sections below describe the broader product direction, not shipped capabilities. See README.md for the implemented contract and exact commands. Configuration is JSON only.
+**Current implementation boundary:** The implementation provides local `new`, `dev`, and `status`, routing, escaped templates, JSON snips, assets, automatic reloads, and `setup` over SSH to install a public HTTP persistent host. HTTPS, deployment, editor/authentication, forms, schemas, content writes/revisions, managed snip image publishing, and raw HTML remain deferred. The sections below also describe future product direction, not just shipped capabilities. See README.md for the implemented contract and exact commands. Configuration is JSON only.
 
 Nanoweb is for brochure-style sites: small businesses, restaurants, consultants, event services, portfolios, and similar sites where a conventional application framework or WordPress installation is disproportionate to the job.
 
@@ -36,10 +36,11 @@ nanoweb dev
 The intended initial production workflow:
 
 ```sh
+nanoweb setup
 nanoweb deploy
 ```
 
-On a first deployment, the CLI asks for the domain and SSH target, then provisions a supported blank Ubuntu LTS server. It installs the Nanoweb host executable as a system service, configures the minimal network/firewall requirements, deploys a release, and obtains HTTPS certificates. Later `nanoweb deploy` commands deploy the current site atomically.
+`nanoweb setup` runs from the Mac, prompts for an SSH target, verifies the connection, and builds a Linux server for the detected architecture. It uses native SSH keys/agents or interactive password authentication, uploads the executable, installs its systemd service, and checks readiness. The current first-install implementation supports Ubuntu LTS 22.04/24.04/26.04 on amd64/arm64 and listens publicly on HTTP port 80, with an empty JSON host configuration. It does not open firewall ports or configure domains/TLS. A future `nanoweb deploy` will publish sites and configure domains/HTTPS; those steps remain deferred.
 
 The initial server target is **Ubuntu LTS only**. Do not support Arch or multiple distributions until the Ubuntu flow is stable and tested.
 
@@ -392,6 +393,7 @@ Keep the initial command surface small:
 ```text
 nanoweb new <site-name>
 nanoweb dev
+nanoweb setup
 nanoweb deploy
 nanoweb status
 nanoweb logs
@@ -399,6 +401,15 @@ nanoweb rollback
 ```
 
 ### Command behavior
+
+`nanoweb setup`
+
+- Prompt `Target hostname or IP?`; accept user@host and SSH config aliases too.
+- Fail on SSH/OS checks before printing `Building Nanoweb server...`.
+- Cross-build locally, upload through SSH/SCP, install as a dedicated systemd user,
+  and verify readiness. Support native key and interactive password authentication.
+- Refuse existing installations; preserve unrelated services/data and SSH settings.
+- Initial host listens publicly on HTTP port 80. No deployment, public TLS, or firewall changes yet.
 
 `nanoweb new <site-name>`
 

@@ -14,11 +14,12 @@ import (
 	"regexp"
 	"time"
 
+	"nanoweb/internal/setup"
 	"nanoweb/internal/site"
 	"nanoweb/templates"
 )
 
-const usage = "Usage: nanoweb new <site-name> | dev [-port 3000] | status\n"
+const usage = "Usage: nanoweb new <site-name> | dev [-port 3000] | status | setup [-source /path/to/nanoweb]\n"
 
 // Run returns 0 on success, 1 on project/runtime failure, 2 on usage errors.
 func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
@@ -28,6 +29,24 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	}
 	fail := func(err error) int { fmt.Fprintln(errOut, "nanoweb:", err); return 1 }
 	switch args[0] {
+	case "setup":
+		flags := flag.NewFlagSet("setup", flag.ContinueOnError)
+		flags.SetOutput(errOut)
+		source := flags.String("source", "", "Nanoweb source checkout for the Linux build")
+		if err := flags.Parse(args[1:]); err != nil {
+			if err == flag.ErrHelp {
+				return 0
+			}
+			return 2
+		}
+		if flags.NArg() != 0 {
+			fmt.Fprint(errOut, usage)
+			return 2
+		}
+		if err := setup.Run(ctx, *source, os.Stdin, out, errOut); err != nil {
+			return fail(err)
+		}
+		return 0
 	case "help", "-h", "--help":
 		fmt.Fprint(out, usage)
 		return 0

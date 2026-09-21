@@ -59,7 +59,7 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 
 func TestCLI(t *testing.T) {
 	t.Chdir(t.TempDir())
-	for _, args := range [][]string{nil, {"unknown"}, {"new"}, {"new", "../escape"}, {"dev", "-port", "-1"}, {"status", "extra"}} {
+	for _, args := range [][]string{nil, {"unknown"}, {"new"}, {"new", "../escape"}, {"dev", "-port", "-1"}, {"status", "extra"}, {"setup", "extra"}} {
 		if code := Run(context.Background(), args, io.Discard, io.Discard); code != 2 {
 			t.Fatalf("%v returned %d", args, code)
 		}
