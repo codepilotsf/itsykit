@@ -23,14 +23,31 @@ type Server struct {
 	project  *Project
 	err      error
 	revision uint64
+	logger   *log.Logger
 }
 
-func NewServer(p *Project) *Server { return &Server{project: p} }
+func NewServer(p *Project, loggers ...*log.Logger) *Server {
+	s := &Server{project: p}
+	if len(loggers) > 0 {
+		s.logger = loggers[0]
+	}
+	return s
+}
 
 func (s *Server) Reload(root string) error {
+	return s.reload(context.Background(), root, false)
+}
+
+func (s *Server) reload(ctx context.Context, root string, resolveIcons bool) error {
 	s.reloadMu.Lock()
 	defer s.reloadMu.Unlock()
-	p, err := Load(root)
+	var p *Project
+	var err error
+	if resolveIcons {
+		p, err = LoadDev(ctx, root)
+	} else {
+		p, err = Load(root)
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if err == nil {
@@ -58,7 +75,18 @@ func (s *Server) Watch(ctx context.Context, root string, logger *log.Logger) {
 				continue
 			}
 			last = next
-			err := s.Reload(root)
+			err := s.reload(ctx, root, true)
+			if err == nil {
+				s.mu.RLock()
+				project := s.project
+				last = project.signature
+				s.mu.RUnlock()
+				if logger != nil {
+					for _, warning := range project.Warnings {
+						logger.Printf("Warning: %s", warning)
+					}
+				}
+			}
 			message := ""
 			if err != nil {
 				message = err.Error()
@@ -143,6 +171,26 @@ func safeURL(p string) bool {
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if s.logger != nil {
+		recorded := &statusWriter{ResponseWriter: w}
+		w = recorded
+		defer func() {
+			status := recorded.status
+			if status == 0 {
+				status = http.StatusOK
+			}
+			// Successful browser reload polls are internal housekeeping.
+			if r.URL.Path == reloadPath && r.URL.RawPath == "" && status == http.StatusOK {
+				return
+			}
+			route := r.URL.EscapedPath() // No query strings or control characters in logs.
+			if status == http.StatusOK {
+				s.logger.Printf("%s %s", r.Method, route)
+			} else {
+				s.logger.Printf("%d %s %s", status, r.Method, route)
+			}
+		}()
+	}
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 	w.Header().Set("Cache-Control", "no-store")
@@ -184,6 +232,32 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	serveReloadError(w, r, p, 404, revision)
 }
+
+type statusWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *statusWriter) WriteHeader(status int) {
+	if status >= 100 && status < 200 {
+		w.ResponseWriter.WriteHeader(status)
+		return
+	}
+	if w.status != 0 {
+		return
+	}
+	w.status = status
+	w.ResponseWriter.WriteHeader(status)
+}
+
+func (w *statusWriter) Write(body []byte) (int, error) {
+	if w.status == 0 {
+		w.WriteHeader(http.StatusOK)
+	}
+	return w.ResponseWriter.Write(body)
+}
+
+func (w *statusWriter) Unwrap() http.ResponseWriter { return w.ResponseWriter }
 
 func serveReloadError(w http.ResponseWriter, r *http.Request, p *Project, code int, revision uint64) {
 	body := []byte("<!doctype html><title>" + http.StatusText(code) + "</title><h1>" + http.StatusText(code) + "</h1>")

@@ -122,7 +122,7 @@ Rules:
 4. An asset retains its filename and extension.
 5. Reserved/private underscore paths are not routes.
 6. A duplicate route, such as both `html/about.html` and `html/about/index.html`, is a build error. `nanoweb dev` reports it and `nanoweb deploy` refuses it.
-7. An unmatched route returns `html/_404.html` with HTTP status 404.
+7. An unmatched route returns `html/_404.html` with HTTP status 404, wrapped in `_layout.html` when present. The 404 template contains page content for `{slot}`, not a separate HTML document.
 8. An unexpected request-time/internal rendering failure returns `html/_500.html` with HTTP status 500. This fallback must remain deliberately simple.
 
 The first version has no `routes.json`. Add redirects only when there is a real need, through `_/nanoweb.config`.
@@ -183,6 +183,24 @@ Partials are developer-owned, underscore-prefixed HTML templates anywhere under 
 ```
 
 `{render header}` resolves to `_header.html` beside the calling template. `{render /foo/bar/footer}` resolves to `html/foo/bar/_footer.html`. Paths are unquoted and omit the filename's leading underscore and `.html`. Relative directories, including `./` and `../`, resolve from the calling template, including inside nested partials. Paths escaping `html/` are invalid. The root `_layout.html`, `_404.html`, and `_500.html` are reserved and cannot be rendered as partials. A missing partial or recursive partial inclusion is a dev/build error, even in unused partials.
+
+### Icons
+
+`{icon arrow-right}` renders an inline Lucide SVG. Optional attributes use
+quoted HTML syntax, for example `{icon search size="20" aria-label="Search"}`.
+Names are literal lowercase kebab-case. Attribute values support escaped
+dotted-path interpolation. Icons inherit currentColor and are decorative by
+default; labeled icons use role img.
+
+Do not bundle the library. Phase-one dev resolves missing referenced icons
+from pinned lucide-static 1.47.0 into `_/icons/lucide-1.47.0/` before serving,
+including during reloads. Cache the upstream license too. Status is read-only
+and reports missing icons as warnings without a failing exit code. Missing icons
+or download failures render nothing and do not cause a 500 response. Malformed
+directives and unsafe SVGs remain errors. Downloads are bounded, cancellable, and atomic;
+SVGs are reconstructed from a strict geometry-only vocabulary. No runtime
+browser library or request-time downloads. Future build/deploy commands should
+resolve icons before publishing. See README.md for supported attributes.
 
 ### Snips
 
@@ -392,6 +410,8 @@ nanoweb rollback
 
 - Must run without Docker or a database.
 - Watches source files and snip content.
+- Logs requests as `GET /test` for 200 or `404 GET /missing` for non-200.
+  Include assets and HEAD, but omit successful internal reload polls and query strings.
 - Runs a local server with the same route and rendering behavior as production.
 - Reports template errors, invalid route collisions, missing partials, schema errors, and unsafe/unserved paths clearly.
 - Provides local editor access.

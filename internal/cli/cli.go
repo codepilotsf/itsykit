@@ -51,6 +51,9 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		fmt.Fprintf(out, "Valid local project: %s\n%d pages, %d assets, %d snips\n", p.Site["name"], len(p.Pages), len(p.Assets), len(p.Snips))
+		for _, warning := range p.Warnings {
+			fmt.Fprintf(errOut, "Warning: %s\n", warning)
+		}
 		for _, route := range p.Routes() {
 			fmt.Fprintln(out, " ", route)
 		}
@@ -69,7 +72,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			fmt.Fprint(errOut, usage)
 			return 2
 		}
-		p, err := site.Load(".")
+		p, err := site.LoadDev(ctx, ".")
 		if err != nil {
 			return fail(err)
 		}
@@ -77,12 +80,16 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if err != nil {
 			return fail(err)
 		}
-		handler := site.NewServer(p)
+		logger := log.New(errOut, "", 0)
+		for _, warning := range p.Warnings {
+			logger.Printf("Warning: %s", warning)
+		}
+		handler := site.NewServer(p, logger)
 		server := &http.Server{Handler: handler, ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 30 * time.Second}
 		watchCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		watchDone := make(chan struct{})
-		go func() { defer close(watchDone); handler.Watch(watchCtx, p.Root, log.New(errOut, "", 0)) }()
+		go func() { defer close(watchDone); handler.Watch(watchCtx, p.Root, logger) }()
 		done := make(chan error, 1)
 		go func() { done <- server.Serve(listener) }()
 		fmt.Fprintf(out, "\nNanoweb running at http://%s\nWatching templates, assets, configuration and snips.\n\nPress Ctrl-C to stop.\n", listener.Addr())

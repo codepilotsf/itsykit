@@ -14,16 +14,19 @@ import (
 )
 
 type Project struct {
-	Root      string
-	Site      map[string]any
-	Snips     map[string]map[string]any
-	Partials  map[string]string
-	Pages     map[string]*template.Template
-	Assets    map[string]string
-	AssetData map[string][]byte
-	Errors    map[int]*template.Template
-	files     map[string]string
-	signature string
+	Root         string
+	Site         map[string]any
+	Snips        map[string]map[string]any
+	Partials     map[string]string
+	Pages        map[string]*template.Template
+	Assets       map[string]string
+	AssetData    map[string][]byte
+	Errors       map[int]*template.Template
+	files        map[string]string
+	signature    string
+	icons        map[string]string
+	Warnings     []string
+	missingIcons map[string]string
 }
 
 // Open each path component through pinned directory handles. Comparing lstat
@@ -238,7 +241,7 @@ func Load(root string) (*Project, error) {
 	}
 	for code, name := range map[int]string{404: "_404.html", 500: "_500.html"} {
 		if _, ok := p.files[name]; ok {
-			t, e := p.buildTemplate(name, false)
+			t, e := p.buildTemplate(name, code == 404)
 			if e != nil {
 				return nil, e
 			}
@@ -262,6 +265,14 @@ func Load(root string) (*Project, error) {
 		if _, err = p.render(t, fmt.Sprintf("/%d", code)); err != nil {
 			return nil, err
 		}
+	}
+	names := make([]string, 0, len(p.missingIcons))
+	for name := range p.missingIcons {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		p.Warnings = append(p.Warnings, p.missingIcons[name])
 	}
 	return p, nil
 }

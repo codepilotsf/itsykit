@@ -21,16 +21,19 @@
     text-decoration: none;
     cursor: pointer;
   }
+
   .ui-brand-1 {
     background: var(--brand-1);
     border-color: var(--brand-1);
     color: var(--white);
   }
+
   .ui-brand-2 {
     background: var(--brand-2);
     border-color: var(--brand-2);
     color: var(--white);
   }
+
   :is(
       .ui-button,
       button,
@@ -40,6 +43,7 @@
     ):hover:not(:disabled, [aria-disabled="true"]) {
     filter: brightness(0.95);
   }
+
   :is(.ui-button, button, input):disabled,
   .ui-button[aria-disabled="true"] {
     opacity: 0.55;

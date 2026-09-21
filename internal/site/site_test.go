@@ -285,6 +285,40 @@ func TestReloadAndConcurrentRequests(t *testing.T) {
 	wg.Wait()
 }
 
+func TestErrorPageLayouts(t *testing.T) {
+	root := fixture(t)
+	put(t, root, "html/_layout.html", `<!doctype html><html><body><header>{site.name}</header>{slot}<footer>Shared footer</footer></body></html>`)
+	s := NewServer(mustLoad(t, root))
+	for _, url := range []string{"/missing", "/_private"} {
+		w := request(s, "GET", url)
+		if w.Code != 404 || !strings.Contains(w.Body.String(), "<header>Test</header>Not here<footer>Shared footer</footer>") {
+			t.Fatalf("404 layout: %d %s", w.Code, w.Body.String())
+		}
+		if w := request(s, "HEAD", url); w.Code != 404 || w.Body.Len() != 0 {
+			t.Fatal("HEAD error response must have no body")
+		}
+	}
+	put(t, root, "html/index.html", "{broken syntax}")
+	if err := s.Reload(root); err == nil {
+		t.Fatal("expected invalid edit")
+	}
+	w := request(s, "GET", "/")
+	if w.Code != 500 || !strings.HasPrefix(w.Body.String(), "Try later") || strings.Contains(w.Body.String(), "Shared footer") {
+		t.Fatal("500 must stay standalone")
+	}
+	if err := os.Remove(filepath.Join(root, "html/_layout.html")); err != nil {
+		t.Fatal(err)
+	}
+	put(t, root, "html/index.html", "fixed")
+	if err := s.Reload(root); err != nil {
+		t.Fatal(err)
+	}
+	w = request(s, "GET", "/missing")
+	if w.Code != 404 || !strings.HasPrefix(w.Body.String(), "Not here") {
+		t.Fatal("404 without layout must still work")
+	}
+}
+
 func TestRenderingFailureFallback(t *testing.T) {
 	root := fixture(t)
 	put(t, root, "html/index.html", `{#each snip.team.members as m}{m.name}{/each}`)

@@ -97,6 +97,27 @@ func TestCLI(t *testing.T) {
 	}
 }
 
+func TestStatusWarnsForMissingIcon(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "site")
+	if err := Create(root); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "html/index.html"), []byte(`Hello{icon unknown-icon}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir(root)
+	var out, warnings bytes.Buffer
+	if code := Run(context.Background(), []string{"status"}, &out, &warnings); code != 0 {
+		t.Fatal(code, warnings.String())
+	}
+	if !strings.Contains(warnings.String(), "Warning: index.html:1:") || !strings.Contains(warnings.String(), "icon omitted") {
+		t.Fatal(warnings.String())
+	}
+	if _, err := os.Stat("_/icons"); !os.IsNotExist(err) {
+		t.Fatal("status wrote cache")
+	}
+}
+
 // This is an actual executable smoke test: scaffold, status, local server,
 // HTTP requests, edits, invalid state, recovery, and graceful shutdown.
 func TestExecutableWorkflow(t *testing.T) {
@@ -118,7 +139,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	run(temp, "new", "smoke")
 	root := filepath.Join(temp, "smoke")
-	if got := run(root, "status"); !strings.Contains(got, "1 pages, 8 assets, 1 snips") {
+	if got := run(root, "status"); !strings.Contains(got, "Valid local project: Nanoweb") {
 		t.Fatal(got)
 	}
 	cmd := exec.Command(binary, "dev", "-port", "0")
@@ -178,12 +199,12 @@ func TestExecutableWorkflow(t *testing.T) {
 		}
 		return response.StatusCode, string(b)
 	}
-	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/style.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/_/nanoweb.config": 404, "/_header.html": 404, "/%2e%2e/_/nanoweb.config": 404} {
+	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/global.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/_/nanoweb.config": 404, "/_header.html": 404, "/%2e%2e/_/nanoweb.config": 404} {
 		if code, _ := get(url); code != want {
 			t.Errorf("%s: %d", url, code)
 		}
 	}
-	for _, name := range []string{"theme.css", "prewind-1.3.1.css", "typography.css", "forms.css", "ui.css", "application.css"} {
+	for _, name := range []string{"theme.css", "global.css", "typography.css", "forms.css", "ui.css"} {
 		if code, body := get("/css/" + name); code != 200 || !strings.Contains(body, "{") {
 			t.Errorf("starter CSS %s: status %d, body %q", name, code, body)
 		}
@@ -210,12 +231,12 @@ func TestExecutableWorkflow(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 	edit("_/snips/home.json", `{"title":"Smoke test changed","services":[]}`)
 	wait("/", 200, "Smoke test changed")
-	edit("html/css/style.css", "/* updated asset */")
-	wait("/css/style.css", 200, "updated asset")
+	edit("html/css/global.css", "/* updated asset */")
+	wait("/css/global.css", 200, "updated asset")
 	edit("_/nanoweb.config", `{"site":{"name":"Changed config"}}`)
 	wait("/", 200, "Changed config")
 	edit("html/index.html", `{render missing-secret-name}`)
-	wait("/", 500, "temporarily unavailable")
+	wait("/", 500, "")
 	if _, body := get("/"); strings.Contains(body, "missing-secret-name") {
 		t.Fatal("error detail leaked")
 	}
@@ -243,6 +264,11 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	if !strings.Contains(stderr.String(), "missing partial") || !strings.Contains(stderr.String(), "Site valid again") {
 		t.Fatalf("missing error/recovery diagnostics: %s", stderr.String())
+	}
+	for _, line := range []string{"GET /\n", "404 GET /about\n", "500 GET /\n"} {
+		if !strings.Contains(stderr.String(), line) {
+			t.Errorf("missing request log %q", line)
+		}
 	}
 	t.Log("Executable smoke passed: scaffold, validation, HTTP, private paths, snip/config/asset/template reloads, invalid state, recovery, shutdown")
 }

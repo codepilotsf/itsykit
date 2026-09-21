@@ -34,6 +34,9 @@ Verify current code and tests when documentation disagrees.
 - `internal/cli/cli_test.go`: CLI tests and executable/server smoke test.
 - `internal/site/project.go`: loading, validation, routes, snapshots, and rendering.
 - `internal/site/template.go`: template parser, partial resolution, and data lookup.
+- `internal/site/icons.go`: on-demand pinned Lucide downloads, private cache,
+  geometry-only SVG validation, and icon directive compilation.
+- `internal/site/icons_test.go`: offline icon resolution, escaping, and security tests.
 - `internal/site/server.go`: HTTP serving, reload watching, and URL validation.
 - `internal/site/site_test.go`: rendering, routing, isolation, and reload tests.
 - `bin/nanoweb`: local build output; rebuilding is necessary for CLI changes to take effect.
@@ -59,7 +62,8 @@ Snips are JSON objects in `_/snips/*.json`.
   including inside partials. Paths cannot escape `html/`. Missing and recursive
   includes fail validation, including in unused partials.
 - Root `_layout.html`, `_404.html`, and `_500.html` are reserved, not partials.
-  Error documents render independently of the layout.
+  `_404.html` uses the global layout; write it as page content for `{slot}`.
+  `_500.html` remains standalone so error handling does not depend on the layout.
 - Data uses dotted paths such as `{site.name}` and `{snip.home.title}`.
   Conditions use `{#if site.email}...{/if}`; loops use
   `{#each snip.home.items as item}...{/each}`. Includes inherit loop aliases.
@@ -68,6 +72,32 @@ Snips are JSON objects in `_/snips/*.json`.
   template code. Script and style elements do not support interpolation.
 
 ## Styling
+
+### Icons
+
+Use `{icon arrow-right}` or `{icon search size="20" class="text-dark"}`.
+Names are literal lowercase kebab-case; attributes are quoted HTML-style values.
+Dotted-path values inside attribute quotes inherit loop aliases and use Go's
+contextual escaping. Defaults are 24px, currentColor stroke, and aria-hidden;
+aria-label/aria-labelledby gives the icon role img. Supported attributes and
+limitations are listed in README.md. No event handlers, style, href, or raw HTML.
+
+Do not embed the Lucide library or download it wholesale. `LoadDev` fetches only
+missing referenced icons from pinned lucide-static 1.47.0 at unpkg before serving,
+including on reload. `Load`/status stays read-only and never accesses the network.
+Missing icons produce deduplicated `Project.Warnings` and render nothing.
+Download/network failures are also warnings; status exits 0 when otherwise valid.
+Print warnings at startup/reload, not on every request. Invalid directives and
+unsafe or malformed downloaded/cached SVGs remain validation errors.
+Cache validated SVG files and the upstream LICENSE under `_/icons/lucide-1.47.0/`;
+retain this directory in site version control. Cached icons work offline.
+Downloads are bounded, cancellable, and atomically saved via confined handles.
+Never fetch icons inside request handlers. Reject symlinks and reconstruct SVG
+using the restricted geometry vocabulary before insertion into template source.
+No site build command exists yet; a future build should reuse this resolver.
+Tests use an injected HTTP transport, not live CDN requests.
+
+### CSS
 
 Default to the Prewind method; read `../prewind/README.md` for its philosophy
 and supported classes. Keep HTML readable:
@@ -88,14 +118,15 @@ consistent centered width and theme-controlled padding. For full-width sections,
 put `container` on an inner wrapper. Pair it with `max-w-full` for screens
 narrower than 360px; avoid custom width wrappers that duplicate its purpose.
 
-The starter bundles Prewind 1.3.1 locally, based on the Preflight template's
-global-first CSS conventions. No Node build step, CDN, external fonts, or Rails
-dependencies are required. The main stylesheet is `html/css/style.css`, with
-layer order `reset, styles, prewind`. It imports the vendored Prewind reset and
-utilities, theme tokens, typography, native form styles, button styles, and
-application rules. Put global rules in `@layer styles` so utilities can override
-them. Customize colors and fluid scales in `theme.css`; site rules belong in
-`application.css`. Form styling does not implement submission handling.
+The starter loads Prewind 1.3.1 from unpkg, based on the Preflight template's
+global-first CSS conventions. No Node build step or Rails dependency is required.
+The main stylesheet is `html/css/global.css`, with layer order `reset, styles,
+prewind`. It imports Prewind, theme tokens, typography, native form styles, and
+button styles. Put global rules in `@layer styles` so utilities can override them.
+The first line of `theme.css` imports Google Fonts: Manrope for headings and
+Source Sans 3 for body text, with display=swap and system fallbacks. Customize
+colors, fonts, and fluid scales in `theme.css`; site rules belong in `global.css`.
+Form styling does not implement submission handling.
 
 Keep the vendored `prewind-1.3.1.css` unchanged; customize the other files.
 The theme and general styles are adapted from `../preflight/lib/templates/app/assets/stylesheets/`.
@@ -113,6 +144,11 @@ validation, confined reads, symlink rejection, and immutable asset snapshots.
 Do not replace validated route maps with request-derived filesystem reads.
 Keep detailed errors in the terminal and generic/custom error pages in HTTP
 responses. Invalid edits produce an error state; fixing them restores serving.
+Missing icons are the exception: omit them and warn without making the site invalid.
+Dev request logs use `GET /test` for 200 and `404 GET /missing` for non-200
+responses, including assets and HEAD. Suppress successful internal reload polls.
+Log escaped paths without query strings, using the same concurrency-safe logger
+as reload diagnostics. Capture the actual HTTP status, including partial content.
 
 ## Framework versus example site
 

@@ -1,6 +1,7 @@
 package site
 
 import (
+	"errors"
 	"fmt"
 	"path"
 	"regexp"
@@ -79,14 +80,47 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			i++
 			continue
 		}
-		end := strings.IndexByte(source[i:], '}')
-		if end < 0 {
+		end := i + 1
+		var quote byte
+		for ; end < len(source); end++ {
+			if quote != 0 {
+				if source[end] == quote {
+					quote = 0
+				}
+				continue
+			}
+			if source[end] == '"' || source[end] == '\'' {
+				quote = source[end]
+				continue
+			}
+			if source[end] == '}' {
+				break
+			}
+		}
+		if end == len(source) {
 			return fail(i, fmt.Errorf("unclosed template directive"))
 		}
-		end += i
 		token := strings.TrimSpace(source[i+1 : end])
 		var rendered string
 		switch {
+		case token == "icon" || strings.HasPrefix(token, "icon ") || strings.HasPrefix(token, "icon\t") || strings.HasPrefix(token, "icon\n"):
+			var err error
+			rendered, err = p.compileIcon(token, lookup)
+			if err != nil {
+				var missing *missingIconError
+				if errors.As(err, &missing) {
+					if p.missingIcons == nil {
+						p.missingIcons = map[string]string{}
+					}
+					if _, exists := p.missingIcons[missing.name]; !exists {
+						_, located := fail(i, err)
+						p.missingIcons[missing.name] = located.Error() + "; icon omitted"
+					}
+					rendered = ""
+					break
+				}
+				return fail(i, err)
+			}
 		case token == "slot":
 			if file != "_layout.html" {
 				return fail(i, fmt.Errorf("{slot} is only allowed in _layout.html"))

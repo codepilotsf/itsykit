@@ -4,12 +4,13 @@
   ----------------------------------------
 */
 
-/* System fonts keep the starter self-contained. */
+/* Google Fonts with system fallbacks while loading or offline. */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap");
 
 :root {
   /* Fonts */
-  --font-body: system-ui, sans-serif;
-  --font-heading: system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, sans-serif;
+  --font-heading: "Manrope", system-ui, sans-serif;
   --font-color: var(--black);
   --font-normal: 400;
   --font-semibold: 600;

@@ -40,28 +40,30 @@ my-site/
     snips/home.json      JSON content objects
   html/
     _layout.html         optional global wrapper
-    _404.html            optional standalone error document
+    _404.html            optional not-found page using the layout
     _500.html            optional standalone error document
     index.html           /
     css/style.css        /css/style.css
     images/mark.svg       /images/mark.svg
 ```
 
-`html/` and `_/` are required. `_/snips/` is optional. The starter includes a minimal, responsive Nanoweb welcome page, an SVG logo, local CSS, a layout containing the header and footer directly, error documents, and a JSON snip for the welcome text. It loads no external fonts or services.
+`html/` and `_/` are required. `_/snips/` is optional. The starter includes a minimal, responsive Nanoweb welcome page, an SVG logo, local theme CSS, a layout containing the header and footer directly, error documents, and a JSON snip for the welcome text. It loads Google Fonts and Prewind from external services.
 
 ## Styling with Prewind
 
-The starter bundles Prewind 1.3.1 locally and adapts Preflight's global-first
-stylesheet structure. There is no CSS build step, CDN, external font request,
-or Rails dependency. The entry point `html/css/style.css` declares
+The starter loads Prewind 1.3.1 from unpkg and adapts Preflight's global-first
+stylesheet structure. There is no CSS build step or Rails dependency.
+The first line of `theme.css` imports Manrope for headings and Source Sans 3
+for body text from Google Fonts, with `display=swap` and system fallbacks.
+The entry point `html/css/global.css` declares
 `@layer reset, styles, prewind` and imports:
 
 - `theme.css`: colors, fonts, fluid spacing and text scales.
-- `prewind-1.3.1.css`: the unmodified library, including its reset.
+- `https://unpkg.com/prewindcss@1.3.1`: the utility library, including its reset.
 - `typography.css`: headings, prose, links, lists, code, and tables.
 - `forms.css`: native controls and optional `.form-field` / `.form-row` wrappers.
 - `ui.css`: buttons, including `.ui-button.ui-brand-1`.
-- `application.css`: the Nanoweb starter's layout and site-specific styles.
+- `global.css`: imports and site-specific styles.
 
 Keep shared rules in `@layer styles` and use utilities such as `flex gap-sm`,
 `mt-lg`, or `text-brand-1` for one-off adjustments. Utilities override shared
@@ -102,7 +104,7 @@ Files and directories beginning with `_` or `.` are private, including configura
 
 ## Templates
 
-Pages use `_layout.html` if present. Put `{slot}` in the layout to insert the page. Error templates are standalone and do not use the layout; keep `_500.html` simple and independent of assets. Without custom error templates, plain built-in documents are used. HTTP statuses remain 404 or 500. Errors are detailed in the terminal, not in responses.
+Pages and `_404.html` use `_layout.html` if present. Put `{slot}` in the layout to insert the page. Write `_404.html` as page content without its own HTML document wrapper. `_500.html` stays standalone; keep it simple and independent of assets. Without custom error templates, plain built-in documents are used. HTTP statuses remain 404 or 500. Errors are detailed in the terminal, not in responses. Existing sites with a full-document `_404.html` should remove its outer HTML/head/body wrapper when upgrading.
 
 ```html
 <!-- html/_layout.html -->
@@ -131,7 +133,69 @@ Values and conditions accept dotted paths only. Missing values render empty. Mis
 
 There are no expressions, comparisons, functions, filters, array indexes, `else`, or arbitrary code execution. Braces outside script/style elements are template directives; use `&#123;` and `&#125;` for literal text braces. Script/style bodies and their opening tags are left untouched by the Nanoweb parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; snip JSON is treated as data.
 
+## Lucide icons
+
+Use literal lowercase Lucide names directly in templates, layouts, and partials:
+
+```html
+<a href="/">{icon arrow-left size="18"} Home</a>
+{icon search class="text-dark" size="24" aria-label="Search"}
+{icon check width="20" height="20" stroke-width="3"}
+{#each snip.home.items as item}
+  {icon info aria-label="{item.title}"}
+{/each}
+```
+
+Nanoweb does **not** bundle the Lucide library. Before serving, `nanoweb dev`
+downloads only referenced icons from the pinned `lucide-static@1.47.0` package
+on unpkg. It stores them with the upstream license under
+`_/icons/lucide-1.47.0/`. New references are resolved during template reloads.
+No browser-side icon library, JavaScript, or icon network requests are required:
+the server renders cached geometry as inline SVG. Keep the cache and LICENSE
+in version control for reproducible, offline use. Unused cached files are retained.
+There is no site build/deploy command yet; resolution currently happens in dev.
+
+`nanoweb status` remains read-only and offline. Missing icons are warnings,
+not validation failures: status exits successfully if the rest of the project
+is valid. Missing icons and failed downloads render nothing in their place;
+the rest of the page serves normally, with no browser error message or 500.
+Dev prints one warning per unresolved icon at startup or reload, including the
+template location and download failure when available. Warnings are not repeated
+for every request. Malformed directives and unsafe/invalid SVGs remain errors.
+A first use needs internet access; cached icons work offline. Failed downloads
+do not install incomplete SVGs. Fix the name or connection and save the
+template again (or restart dev) to retry. More than 256 new icons in one load
+requires restarting dev to resolve the next batch. Only literal names are
+supported; dynamic icon names, custom sources, and automatic version upgrades
+are not supported. Icons referenced in unused partials or conditional branches
+are resolved too. Script/style contents and snip strings are never scanned as icons.
+
+Defaults: 24 by 24, `viewBox="0 0 24 24"`, no fill, `currentColor` stroke,
+stroke width 2, rounded joins and caps, and `focusable="false"`.
+Supported quoted attributes are `class`, `id`, `size`, `width`, `height`,
+`fill`, `stroke`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`, `color`,
+`role`, `tabindex`, and `aria-*` / `data-*`. `size` sets both dimensions;
+explicit width/height take precedence. Both single and double quotes work.
+Attributes can contain escaped dotted-path values, including loop aliases.
+Event handlers, inline `style`, links, and structural SVG attributes are rejected.
+Use CSS classes for styling. Each icon has `lucide` and `lucide-<name>` classes.
+
+Icons are decorative (`aria-hidden="true"`) unless given `aria-label` or
+`aria-labelledby`, which defaults their role to `img`. Label an icon-only button
+on the button itself. Unknown icon names are omitted with warnings; invalid name
+syntax, duplicate/invalid attributes, and malformed SVGs are validation errors.
+Downloaded and cached SVGs are reconstructed using
+only basic geometry; scripts, external references, and arbitrary HTML cannot be
+introduced through this feature. Browse names at [Lucide](https://lucide.dev/icons/).
+
 ## Reload behavior
+
+Dev logs requests to the terminal without timestamps. Successful requests use
+`GET /test`; non-200 responses include the status, such as
+`404 GET /no-such-page` or `500 GET /test`. Assets and HEAD requests are logged
+too. Successful internal reload polls are omitted. Logs include the escaped
+route path, not query strings, so query tokens are not printed and encoded
+control characters cannot create extra log lines.
 
 The dev server hashes files under `html/` and `_/` every 500 ms, including configuration, assets, partials, and snips. Changes trigger full validation and a new in-memory snapshot. Served HTML includes a small script that checks the version every 700 ms and refreshes the browser after changes. No WebSocket, bundler, or browser extension is required. With JavaScript disabled, refresh manually. Full reloads do not preserve browser form state.
 
