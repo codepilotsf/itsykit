@@ -29,8 +29,8 @@ Verify current code and tests when documentation disagrees.
 
 - `cmd/nanoweb/main.go`: executable entry point.
 - `internal/cli/cli.go`: command handling and site creation.
-- `internal/cli/starter.go`: canonical generated site files, embedded as Go strings.
-- `internal/cli/starter/css/`: starter stylesheets embedded using go:embed.
+- `templates/`: canonical starter files, mirroring the generated site structure.
+- `templates/embed.go`: embeds HTML, CSS, SVG, JSON, and README files in the binary.
 - `internal/cli/cli_test.go`: CLI tests and executable/server smoke test.
 - `internal/site/project.go`: loading, validation, routes, snapshots, and rendering.
 - `internal/site/template.go`: template parser, partial resolution, and data lookup.
@@ -48,7 +48,8 @@ Snips are JSON objects in `_/snips/*.json`.
 - The starter's header and footer live directly in `_layout.html`. Do not
   generate separate `_header.html` or `_footer.html` files by default.
 - The starter is a minimal Nanoweb welcome page, with local CSS and a simple
-  folded, two-tone violet SVG mark shared by the header and favicon.
+  slate-800 (#1e293b) circled, slanted lowercase n SVG mark with bold rounded strokes,
+  shared by the header and favicon.
 - Optional partials are underscore-prefixed HTML files anywhere under `html/`.
   There is no special `_partials/` directory.
 - `{render footer}` resolves `_footer.html` beside the calling template.
@@ -99,7 +100,7 @@ them. Customize colors and fluid scales in `theme.css`; site rules belong in
 Keep the vendored `prewind-1.3.1.css` unchanged; customize the other files.
 The theme and general styles are adapted from `../preflight/lib/templates/app/assets/stylesheets/`.
 The library matches `../prewind/prewind.css` at version 1.3.1. Preserve the simple
-violet starter and inline header/footer when making styling changes.
+starter with its slate circled lowercase n logo and inline header/footer when making styling changes.
 
 ## Routing and isolation
 
@@ -119,7 +120,7 @@ responses. Invalid edits produce an error state; fixing them restores serving.
 the framework source. When the user requests a Nanoweb feature or starter
 change, implement it here, even if the session begins in Bookworm.
 
-For intentional starter changes, update `internal/cli/starter.go` as well as
+For intentional starter changes, update the ordinary files in `templates/` as well as
 the example site in scope. Do not overwrite unrelated site customizations.
 Generate a fresh site in a temporary directory and compare its relevant files
 with the intended result. Keep local agent instructions out of that comparison

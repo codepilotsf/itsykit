@@ -68,8 +68,15 @@
   --max-w-form: 40rem;
 
   /* Container */
-  --container-max: 768px;
+  --container-max: 1600px;
   --container-padding: 0 var(--space-lg);
+
+  /* Forms */
+  --field-padding: 0.8rem;
+  --field-height: 2.75rem;
+  --field-border: var(--border) solid var(--light);
+  --field-bg: var(--white);
+  --field-focus-color: var(--brand-1);
 
   /* Fluid Text Scale – Generated with: `npx prewindcss text`
      Min viewport: 320px

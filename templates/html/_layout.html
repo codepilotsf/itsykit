@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{page.title} | {site.name}</title>
+    <link rel="icon" href="/images/mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/css/global.css" />
+  </head>
+  <body class="min-h-screen flex flex-col m-0 p-0">
+    <header class="bg-lighter">
+      <nav class="container flex items-center gap-md">
+        <a
+          class="inline-flex items-center gap-3xs text-black no-underline"
+          href="/"
+        >
+          <img src="/images/mark.svg" width="36" height="34" alt="" />
+          <span class="text-xl font-semibold tracking-tight">Nanoweb</span>
+        </a>
+        <a href="/test" class="no-underline">Test</a>
+      </nav>
+    </header>
+    <div class="flex-1">{slot}</div>
+    <footer
+      class="container max-w-full py-sm border-t border-light text-dark text-sm"
+    >
+      A small starting point for your next idea.
+    </footer>
+  </body>
+</html>

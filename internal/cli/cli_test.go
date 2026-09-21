@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"os/exec"
@@ -15,7 +16,46 @@ import (
 	"time"
 
 	"nanoweb/internal/site"
+	"nanoweb/templates"
 )
+
+func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "site")
+	if err := Create(root); err != nil {
+		t.Fatal(err)
+	}
+	err := fs.WalkDir(templates.Files, ".", func(name string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		want, err := templates.Files.ReadFile(name)
+		if err != nil {
+			return err
+		}
+		got, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(name)))
+		if err != nil {
+			return err
+		}
+		if !bytes.Equal(got, want) {
+			t.Errorf("generated %s differs from embedded template", name)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"_/nanoweb.config", "_/snips/home.json", "html/_layout.html", "html/_404.html", "html/_500.html"} {
+		if _, err := os.Stat(filepath.Join(root, name)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(root, "embed.go")); !os.IsNotExist(err) {
+		t.Fatal("embedding code must not be scaffolded")
+	}
+}
 
 func TestCLI(t *testing.T) {
 	t.Chdir(t.TempDir())

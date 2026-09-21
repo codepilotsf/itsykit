@@ -1,4 +1,0 @@
-/* Add shared site rules here in the styles layer. Layout uses Prewind utilities. */
-@layer styles {
-  :root { color-scheme: light; font-synthesis: none; }
-}

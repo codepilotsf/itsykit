@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	"nanoweb/internal/site"
+	"nanoweb/templates"
 )
 
 const usage = "Usage: nanoweb new <site-name> | dev [-port 3000] | status\n"
@@ -115,7 +117,17 @@ func Create(target string) error {
 	if err := os.Mkdir(target, 0755); err != nil {
 		return err
 	}
-	for name, body := range starter {
+	err := fs.WalkDir(templates.Files, ".", func(name string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		body, err := templates.Files.ReadFile(name)
+		if err != nil {
+			return err
+		}
 		dest := filepath.Join(target, filepath.FromSlash(name))
 		if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 			return err
@@ -124,7 +136,7 @@ func Create(target string) error {
 		if err != nil {
 			return err
 		}
-		_, err = f.WriteString(body)
+		_, err = f.Write(body)
 		closeErr := f.Close()
 		if err != nil {
 			return err
@@ -132,7 +144,11 @@ func Create(target string) error {
 		if closeErr != nil {
 			return closeErr
 		}
+		return nil
+	})
+	if err != nil {
+		return err
 	}
-	_, err := site.Load(target)
+	_, err = site.Load(target)
 	return err
 }

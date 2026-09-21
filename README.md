@@ -67,7 +67,15 @@ Keep shared rules in `@layer styles` and use utilities such as `flex gap-sm`,
 `mt-lg`, or `text-brand-1` for one-off adjustments. Utilities override shared
 styles through the layer order. Customize the theme rather than editing the
 vendored library. Form styling does not add submission processing. CSS is
-embedded from `internal/cli/starter/css/` into the executable when built.
+embedded from `templates/html/css/` into the executable when built.
+
+The full starter lives in `templates/`, mirroring a generated site's structure:
+edit `templates/html/*.html` for markup, `templates/html/css/` for styles,
+`templates/html/images/` for assets, and `templates/_/` for JSON defaults.
+`templates/README.md` is the generated site's readme. Rebuild Nanoweb after
+editing these files. They are embedded in the executable, so `nanoweb new`
+works from any directory without access to this repository. The embedding
+includes underscore-prefixed layouts, error pages, and private configuration.
 
 ## JSON configuration and content
 
