@@ -23,7 +23,7 @@ func TestRequestLogging(t *testing.T) {
 	r := httptest.NewRequest("GET", "/css/main.css", nil)
 	r.Header.Set("Range", "bytes=0-3")
 	s.ServeHTTP(httptest.NewRecorder(), r)
-	put(t, root, "html/index.html", "{bad syntax}")
+	put(t, root, "index.html", "{bad syntax}")
 	if err := s.Reload(root); err == nil {
 		t.Fatal("expected validation error")
 	}

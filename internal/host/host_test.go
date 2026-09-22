@@ -19,7 +19,7 @@ func testConfig(t *testing.T, listen string) string {
 	t.Helper()
 	dir := t.TempDir()
 	root := filepath.Join(dir, "site")
-	for path, body := range map[string]string{"_/nanoweb.config": `{"site":{"name":"Host test"}}`, "html/index.html": "<h1>{site.name}</h1>", "html/_404.html": "Custom missing"} {
+	for path, body := range map[string]string{"_/nanoweb.config": `{"site":{"name":"Host test"}}`, "index.html": "<h1>{site.name}</h1>", "_404.html": "Custom missing"} {
 		file := filepath.Join(root, path)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)

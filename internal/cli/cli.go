@@ -10,16 +10,22 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 
+	"nanoweb/internal/buildinfo"
+	"nanoweb/internal/editor"
+	"nanoweb/internal/editstore"
+	"nanoweb/internal/mailer"
 	"nanoweb/internal/setup"
 	"nanoweb/internal/site"
 	"nanoweb/templates"
 )
 
-const usage = "Usage: nanoweb new <site-name> | dev [-port 3000] | status | setup [-source /path/to/nanoweb]\n"
+const usage = "Usage: nanoweb new <site-name> | dev [-port 3000] | status | admin [email] | setup | deploy [options] | https [options] | version\nRun deploy to configure the current Git branch; use -configure to edit its saved destination.\nDeployment requires a clean, committed Git repository. Settings are saved in _/deploy.json.\n"
 
 // Run returns 0 on success, 1 on project/runtime failure, 2 on usage errors.
 func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
@@ -29,10 +35,55 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	}
 	fail := func(err error) int { fmt.Fprintln(errOut, "nanoweb:", err); return 1 }
 	switch args[0] {
-	case "setup":
-		flags := flag.NewFlagSet("setup", flag.ContinueOnError)
+	case "admin":
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprintln(out, "Usage: nanoweb admin [email]\n\nAdds an approved admin email to this site's _/nanoweb.config.\nWithout an email, NanoWeb will ask for one.")
+			return 0
+		}
+		if len(args) > 2 || (len(args) == 2 && strings.HasPrefix(args[1], "-")) {
+			fmt.Fprintln(errOut, "Usage: nanoweb admin [email]")
+			return 2
+		}
+		email := ""
+		if len(args) == 2 {
+			email = args[1]
+		} else {
+			var err error
+			email, err = setup.Prompt(ctx, os.Stdin, out, "Admin email address")
+			if err != nil {
+				return fail(err)
+			}
+		}
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		email, added, err := site.AddAdmin(".", email)
+		if err != nil {
+			return fail(err)
+		}
+		if added {
+			fmt.Fprintf(out, "\nAdded %s to _/nanoweb.config.\n", email)
+		} else {
+			fmt.Fprintf(out, "\n%s is already an admin. Nothing changed.\n", email)
+		}
+		fmt.Fprintln(out, "\nFor local email login, add these to your site's .env file:\n\n  RESEND_API_KEY=\"re_your_api_key\"\n  NANOWEB_EMAIL_FROM=\"login@your-verified-domain.com\"\n\nUse your Resend API key and a sender address from a domain verified in Resend.\nKeep .env out of Git. NanoWeb does not load it automatically.\n\nStop dev, then load the settings and restart:\n\n  set -a\n  source .env\n  set +a\n  nanoweb dev\n\nOpen http://127.0.0.1:3000/admin to sign in with an emailed code.\nFor the live site, run nanoweb deploy; it asks for email settings if needed.")
+		return 0
+	case "version", "--version":
+		fmt.Fprintln(out, "NanoWeb "+buildinfo.Version)
+		return 0
+	case "deploy", "https":
+		var s setup.DeploySettings
+		flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 		flags.SetOutput(errOut)
-		source := flags.String("source", "", "Nanoweb source checkout for the Linux build")
+		flags.StringVar(&s.Target, "target", s.Target, "SSH target (user@host or SSH alias)")
+		flags.StringVar(&s.Domain, "domain", s.Domain, "comma-separated hostnames or HTTP IPv4 addresses")
+		flags.StringVar(&s.Name, "name", s.Name, "stable site identifier (suggested from directory and branch)")
+		flags.BoolVar(&s.HTTPS, "https", s.HTTPS, "enable automatic HTTPS")
+		flags.StringVar(&s.Email, "email", s.Email, "Let's Encrypt contact email")
+		flags.BoolVar(&s.AgreeTOS, "agree-tos", s.AgreeTOS, "accept Let's Encrypt terms: https://letsencrypt.org/repository/")
+		flags.BoolVar(&s.WWWRedirect, "www-redirect", true, "redirect WWW to the primary domain")
+		configure := flags.Bool("configure", false, "confirm and save changes to this branch's deployment settings")
+		expectedIPs := flags.String("expected-ips", "", "expected DNS destination IPs for NAT or proxy setups")
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
 				return 0
@@ -43,7 +94,39 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			fmt.Fprint(errOut, usage)
 			return 2
 		}
-		if err := setup.Run(ctx, *source, os.Stdin, out, errOut); err != nil {
+		provided := map[string]bool{}
+		flags.Visit(func(f *flag.Flag) {
+			if f.Name != "configure" {
+				provided[f.Name] = true
+			}
+		})
+		if *expectedIPs != "" {
+			for _, ip := range strings.Split(*expectedIPs, ",") {
+				s.ExpectedIPs = append(s.ExpectedIPs, strings.TrimSpace(ip))
+			}
+		}
+		s, err := setup.SelectDeployment(ctx, ".", s, provided, *configure, args[0] == "https", os.Stdin, out)
+		if err != nil {
+			return fail(err)
+		}
+		if err := setup.Deploy(ctx, ".", s, args[0] == "https", os.Stdin, out, errOut); err != nil {
+			return fail(err)
+		}
+		return 0
+	case "setup":
+		flags := flag.NewFlagSet("setup", flag.ContinueOnError)
+		flags.SetOutput(errOut)
+		if err := flags.Parse(args[1:]); err != nil {
+			if err == flag.ErrHelp {
+				return 0
+			}
+			return 2
+		}
+		if flags.NArg() != 0 {
+			fmt.Fprint(errOut, usage)
+			return 2
+		}
+		if err := setup.Run(ctx, os.Stdin, out, errOut); err != nil {
 			return fail(err)
 		}
 		return 0
@@ -51,14 +134,49 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		fmt.Fprint(out, usage)
 		return 0
 	case "new":
-		if len(args) != 2 || !regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_-]*$`).MatchString(args[1]) {
+		skipGit := false
+		var names []string
+		for _, arg := range args[1:] {
+			switch arg {
+			case "--skip-git", "-skip-git":
+				skipGit = true
+			case "-h", "--help":
+				fmt.Fprintln(out, "Usage: nanoweb new <site-name> [--skip-git]\n\nCreates a site and starts a Git repository on main.\nUse --skip-git to leave Git setup to you.")
+				return 0
+			default:
+				names = append(names, arg)
+			}
+		}
+		if len(names) != 1 || !regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_-]*$`).MatchString(names[0]) {
 			fmt.Fprint(errOut, usage)
 			return 2
 		}
-		if err := Create(args[1]); err != nil {
+		name := names[0]
+		if err := Create(name); err != nil {
 			return fail(err)
 		}
-		fmt.Fprintf(out, "\nCreated new project: %s\n\nNext steps:\n---------------\ncd %s\nnanoweb dev\n\n", args[1], args[1])
+		fmt.Fprintf(out, "\nCreated your site: %s\n", name)
+		if !skipGit {
+			gitPath, err := exec.LookPath("git")
+			if err != nil {
+				fmt.Fprintln(out, "\nGit isn't installed. You can develop your site now.\nInstall Git before deploying, then run git init -b main in your site folder.")
+			} else {
+				cmd := exec.CommandContext(ctx, gitPath, "init", "--quiet", "-b", "main")
+				cmd.Dir = name
+				// Do not let inherited Git location overrides initialize another repo.
+				for _, entry := range os.Environ() {
+					key, _, _ := strings.Cut(entry, "=")
+					if key != "GIT_DIR" && key != "GIT_WORK_TREE" && key != "GIT_COMMON_DIR" && key != "GIT_INDEX_FILE" {
+						cmd.Env = append(cmd.Env, entry)
+					}
+				}
+				if err := cmd.Run(); err != nil {
+					return fail(fmt.Errorf("Your site was created, but Git setup failed.\n\nOpen the %s folder and run:\n  git init -b main", name))
+				}
+				fmt.Fprintln(out, "\nGit is ready on the main branch. No commit has been made yet.")
+			}
+		}
+		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  nanoweb dev\n\nWhen you're ready to publish:\n  nanoweb deploy\n\nNanoWeb will save your settings and offer to commit your changes before deploying.\n\n", name)
 		return 0
 	case "status":
 		if len(args) != 1 {
@@ -69,7 +187,8 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if err != nil {
 			return fail(err)
 		}
-		fmt.Fprintf(out, "Valid local project: %s\n%d pages, %d assets, %d snips\n", p.Site["name"], len(p.Pages), len(p.Assets), len(p.Snips))
+		content, _ := p.Content.Index()
+		fmt.Fprintf(out, "Valid local project: %s\n%d pages, %d assets, %d snips\n", p.Site["name"], len(p.Pages), len(p.Assets), len(p.Snips)+len(content))
 		for _, warning := range p.Warnings {
 			fmt.Fprintf(errOut, "Warning: %s\n", warning)
 		}
@@ -91,7 +210,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			fmt.Fprint(errOut, usage)
 			return 2
 		}
-		p, err := site.LoadDev(ctx, ".")
+		p, err := site.LoadEditing(ctx, ".")
 		if err != nil {
 			return fail(err)
 		}
@@ -100,11 +219,29 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		logger := log.New(errOut, "", 0)
+		if p.SnipsUpdated {
+			logger.Print("Snips updated in _/snips.json.")
+		}
 		for _, warning := range p.Warnings {
 			logger.Printf("Warning: %s", warning)
 		}
 		handler := site.NewServer(p, logger)
-		server := &http.Server{Handler: handler, ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 30 * time.Second}
+		var httpHandler http.Handler = handler
+		if len(p.Admin.Emails) > 0 {
+			store := &editstore.Store{Root: p.Root, ContentPath: filepath.Join(p.Root, "_", "snips.json"), Emails: p.Admin.Emails, Publish: handler.Publish}
+			dashboard := editor.New(editor.Options{Emails: p.Admin.Emails, Name: fmt.Sprint(p.Site["name"]), Sender: mailer.Env(), Backend: store, Local: true, Logger: logger})
+			httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if editor.IsPath(r.URL.Path) {
+					dashboard.ServeHTTP(w, r)
+				} else {
+					handler.ServeHTTP(w, r)
+				}
+			})
+			if mailer.Env() == nil {
+				logger.Print("Admin login needs RESEND_API_KEY and NANOWEB_EMAIL_FROM in your environment.")
+			}
+		}
+		server := &http.Server{Handler: httpHandler, ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 30 * time.Second}
 		watchCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		watchDone := make(chan struct{})

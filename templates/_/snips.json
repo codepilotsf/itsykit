@@ -1,0 +1,13 @@
+{
+  "pages": {
+    "/": {
+      "title": "Home",
+      "description": "Welcome to your new NanoWeb site.",
+      "snips": {
+        "a7Km2pQ9xB": {"label": "title", "content": "Welcome to Nanoweb."},
+        "b8Ln3rR0yC": {"label": "introduction", "content": "Your new site is ready. Make yourself at home."}
+      }
+    }
+  },
+  "shared": {"snips": {}}
+}

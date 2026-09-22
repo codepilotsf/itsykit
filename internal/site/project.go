@@ -2,18 +2,24 @@ package site
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"html/template"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"nanoweb/internal/sitefiles"
+	"nanoweb/internal/snips"
 )
 
+// Project is a validated serving snapshot. After publishing it to a Server,
+// callers must not mutate its maps or Content; reload builds a new Project.
 type Project struct {
+	Admin        AdminAccess
+	Content      *snips.Store
+	rich         map[string]template.HTML
 	Root         string
 	Site         map[string]any
 	Snips        map[string]map[string]any
@@ -26,72 +32,16 @@ type Project struct {
 	signature    string
 	icons        map[string]string
 	Warnings     []string
+	SnipsUpdated bool // A dev extraction changed templates or the active content index.
 	missingIcons map[string]string
 }
 
-// Open each path component through pinned directory handles. Comparing lstat
-// with the opened handle rejects symlink swaps during a reload as well as
-// symlinks already present at validation time.
-func readFile(root *os.Root, name string) ([]byte, error) {
-	parts := strings.Split(name, "/")
-	current := root
-	for _, part := range parts[:len(parts)-1] {
-		info, err := current.Lstat(part)
-		if err != nil {
-			return nil, err
-		}
-		if !info.IsDir() {
-			return nil, fmt.Errorf("not a real directory: %s", name)
-		}
-		next, err := current.OpenRoot(part)
-		if err != nil {
-			return nil, err
-		}
-		defer next.Close()
-		actual, err := next.Stat(".")
-		if err != nil {
-			return nil, err
-		}
-		if !os.SameFile(info, actual) {
-			return nil, fmt.Errorf("directory changed while loading: %s", name)
-		}
-		current = next
-	}
-	base := parts[len(parts)-1]
-	info, err := current.Lstat(base)
-	if err != nil {
-		return nil, err
-	}
-	if !info.Mode().IsRegular() {
-		return nil, fmt.Errorf("not a regular file (symlinks unsupported): %s", name)
-	}
-	f, err := current.Open(base)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	actual, err := f.Stat()
-	if err != nil {
-		return nil, err
-	}
-	if !os.SameFile(info, actual) {
-		return nil, fmt.Errorf("file changed while loading: %s", name)
-	}
-	return io.ReadAll(f)
-}
-
-func readJSON(root *os.Root, path string, target any) error {
-	data, err := readFile(root, path)
-	if err != nil {
-		return err
-	}
-	if err = json.Unmarshal(data, target); err != nil {
-		return fmt.Errorf("%s: invalid JSON: %w", path, err)
-	}
-	return nil
-}
-
 func Load(root string) (*Project, error) {
+	return LoadWithSnips(root, nil)
+}
+
+// LoadWithSnips loads a code release with a separately managed content snapshot.
+func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 	root, err := filepath.Abs(root)
 	if err != nil {
 		return nil, err
@@ -104,65 +54,87 @@ func Load(root string) (*Project, error) {
 	p := &Project{Root: root, Snips: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
 	p.signature = fingerprint(root)
 	var config struct {
-		Site map[string]any `json:"site"`
+		Site  map[string]any `json:"site"`
+		Admin AdminAccess    `json:"admin"`
 	}
 	// Reject symbolic links throughout the site to keep both public and private
 	// reads within the project. Deployment can reuse this validation boundary.
-	for _, directory := range []string{"_", "html"} {
-		err = fs.WalkDir(boundary.FS(), directory, func(path string, d fs.DirEntry, e error) error {
-			if e != nil {
-				return e
-			}
-			if d.Type()&os.ModeSymlink != 0 {
-				return fmt.Errorf("symlinks are unsupported: %s", path)
-			}
-			if !d.IsDir() && !d.Type().IsRegular() {
-				return fmt.Errorf("unsupported file: %s", path)
+	err = fs.WalkDir(boundary.FS(), ".", func(path string, d fs.DirEntry, e error) error {
+		if e != nil {
+			return e
+		}
+		if !sitefiles.Included(path) {
+			if d.IsDir() {
+				return fs.SkipDir
 			}
 			return nil
-		})
-		if err != nil {
-			return nil, err
 		}
+		if d.Type()&os.ModeSymlink != 0 {
+			return fmt.Errorf("symlinks are unsupported: %s", path)
+		}
+		if !d.IsDir() && !d.Type().IsRegular() {
+			return fmt.Errorf("unsupported file: %s", path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	// Validate the tree before reading configuration or any content.
 	if err = readJSON(boundary, "_/nanoweb.config", &config); err != nil {
 		return nil, err
 	}
 	p.Site = config.Site
+	if err := config.Admin.validate(); err != nil {
+		return nil, err
+	}
+	p.Admin = config.Admin
 	if name, ok := p.Site["name"].(string); !ok || strings.TrimSpace(name) == "" {
 		return nil, fmt.Errorf("_/nanoweb.config: site.name must be a nonempty string")
 	}
-	p.AssetData = map[string][]byte{}
-	entries, err := fs.ReadDir(boundary.FS(), "_/snips")
-	if err != nil && !os.IsNotExist(err) {
-		return nil, err
-	}
-	for _, entry := range entries {
-		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
-			continue
-		}
-		name := strings.TrimSuffix(entry.Name(), ".json")
-		if !namePattern.MatchString(name) {
-			return nil, fmt.Errorf("invalid snip name %q", name)
-		}
-		var data map[string]any
-		if err = readJSON(boundary, "_/snips/"+entry.Name(), &data); err != nil {
+	if content == nil {
+		content, err = readSnipStore(boundary)
+		if err != nil {
 			return nil, err
 		}
-		if data == nil {
-			return nil, fmt.Errorf("snip %s must contain a JSON object", name)
-		}
-		p.Snips[name] = data
 	}
-	err = fs.WalkDir(boundary.FS(), "html", func(path string, d fs.DirEntry, e error) error {
+	p.Content = content
+	p.rich = map[string]template.HTML{}
+	contentIndex, err := content.Index()
+	if err != nil {
+		return nil, err
+	}
+	for id, entry := range contentIndex {
+		clean, e := snips.Sanitize(entry.Content)
+		if e != nil {
+			return nil, fmt.Errorf("snip %s: %w", id, e)
+		}
+		p.rich[id] = template.HTML(clean)
+	}
+	p.AssetData = map[string][]byte{}
+	// Legacy snips and structured data intentionally share a namespace.
+	for _, source := range []struct{ directory, kind string }{
+		{"_/snips", "snip"},
+		{"_/data", "data"},
+	} {
+		if err := loadDataDirectory(boundary, source.directory, source.kind, p.Snips); err != nil {
+			return nil, err
+		}
+	}
+	err = fs.WalkDir(boundary.FS(), ".", func(path string, d fs.DirEntry, e error) error {
 		if e != nil {
 			return e
+		}
+		if !sitefiles.Included(path) || path == "_" {
+			if d.IsDir() {
+				return fs.SkipDir
+			}
+			return nil
 		}
 		if d.IsDir() {
 			return nil
 		}
-		rel := strings.TrimPrefix(path, "html/")
+		rel := path
 		if strings.HasSuffix(rel, ".html") {
 			data, e := readFile(boundary, path)
 			if e != nil {
@@ -182,20 +154,29 @@ func Load(root string) (*Project, error) {
 		return nil, err
 	}
 	// Compile all partials, even unused ones, so broken includes fail validation.
+	if _, err = p.SnipReferences(); err != nil {
+		return nil, err
+	}
 	for name, text := range p.Partials {
 		if _, err = p.compile(text, name, []string{name}, map[string]string{}); err != nil {
 			return nil, err
 		}
 	}
 	routes := map[string]string{}
-	err = fs.WalkDir(boundary.FS(), "html", func(path string, d fs.DirEntry, e error) error {
+	err = fs.WalkDir(boundary.FS(), ".", func(path string, d fs.DirEntry, e error) error {
 		if e != nil {
 			return e
 		}
-		if path == "html" {
+		if path == "." {
 			return nil
 		}
-		rel := strings.TrimPrefix(path, "html/")
+		if !sitefiles.Included(path) {
+			if d.IsDir() {
+				return fs.SkipDir
+			}
+			return nil
+		}
+		rel := path
 		if strings.HasPrefix(d.Name(), "_") || strings.HasPrefix(d.Name(), ".") {
 			if d.IsDir() {
 				return filepath.SkipDir
@@ -208,12 +189,7 @@ func Load(root string) (*Project, error) {
 		route := "/" + rel
 		isPage := strings.HasSuffix(rel, ".html")
 		if isPage {
-			route = strings.TrimSuffix(route, ".html")
-			if route == "/index" {
-				route = "/"
-			} else {
-				route = strings.TrimSuffix(route, "/index")
-			}
+			route = pageRoute(rel)
 		}
 		if !safeURL(route) {
 			return fmt.Errorf("%s: unsupported public URL %q", rel, route)
@@ -290,7 +266,7 @@ func (p *Project) buildTemplate(file string, layout bool) (*template.Template, e
 		}
 		source = `[[NW define "body" NW]]` + body + `[[NW end NW]]` + compiled
 	}
-	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"lookup": lookup, "collection": collection}).Parse(source)
+	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"lookup": lookup, "collection": collection, "richSnip": func(id string) template.HTML { return p.rich[id] }}).Parse(source)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
 	}
@@ -310,7 +286,14 @@ func (p *Project) render(t *template.Template, route string) ([]byte, error) {
 	for k, v := range p.Snips {
 		snips[k] = v
 	}
-	data := map[string]any{"site": p.Site, "page": map[string]any{"title": title, "path": route}, "snip": snips}
+	description := ""
+	if page := p.Content.Pages[route]; page != nil {
+		if page.Title != "" {
+			title = page.Title
+		}
+		description = page.Description
+	}
+	data := map[string]any{"site": p.Site, "page": map[string]any{"title": title, "description": description, "path": route}, "snip": snips, "data": snips}
 	var out bytes.Buffer
 	err := t.Execute(&out, data)
 	return out.Bytes(), err

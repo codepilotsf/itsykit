@@ -3,6 +3,7 @@ package site
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"path"
 	"regexp"
 	"strconv"
@@ -29,7 +30,7 @@ func partialPath(name, caller string) (string, error) {
 		resolved = path.Join(path.Dir(caller), name)
 	}
 	if resolved == ".." || strings.HasPrefix(resolved, "../") || strings.HasPrefix(resolved, "/") {
-		return "", fmt.Errorf("partial path %q escapes html/", name)
+		return "", fmt.Errorf("partial path %q escapes the project root", name)
 	}
 	return path.Join(path.Dir(resolved), "_"+path.Base(resolved)+".html"), nil
 }
@@ -44,8 +45,21 @@ var rawClose = map[string]*regexp.Regexp{
 // Go's contextual escaping also protects URL and attribute contexts.
 func (p *Project) compile(source, file string, stack []string, aliases map[string]string) (string, error) {
 	var out strings.Builder
-	type block struct{ kind, alias, previous string }
+	type block struct {
+		kind, alias, previous string
+		elseSeen              bool
+	}
 	var blocks []block
+	restoreAlias := func(alias, previous string) {
+		if alias == "" {
+			return
+		}
+		if previous == "" {
+			delete(aliases, alias)
+		} else {
+			aliases[alias] = previous
+		}
+	}
 	lookup := func(path string) (string, error) {
 		if !pathPattern.MatchString(path) {
 			return "", fmt.Errorf("unsupported expression %q", path)
@@ -63,6 +77,16 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 		return "", fmt.Errorf("%s:%d: %w", file, strings.Count(source[:pos], "\n")+1, err)
 	}
 	for i := 0; i < len(source); {
+		if strings.HasPrefix(source[i:], "<!--") {
+			end := strings.Index(source[i+4:], "-->")
+			if end < 0 {
+				return fail(i, fmt.Errorf("unclosed HTML comment"))
+			}
+			end = i + 4 + end + 3
+			out.WriteString(source[i:end])
+			i = end
+			continue
+		}
 		if source[i] == '<' {
 			if match := rawElement.FindStringSubmatch(source[i:]); match != nil {
 				close := rawClose[strings.ToLower(match[1])].FindStringIndex(source[i+len(match[0]):])
@@ -140,18 +164,18 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			if !ok {
 				return fail(i, fmt.Errorf("missing partial %q", name))
 			}
-			copyAliases := map[string]string{}
-			for k, v := range aliases {
-				copyAliases[k] = v
-			}
-			rendered, err = p.compile(text, name, append(stack, name), copyAliases)
+			rendered, err = p.compile(text, name, append(stack, name), maps.Clone(aliases))
 			if err != nil {
 				return "", err
 			}
-		case strings.HasPrefix(token, "snip "):
-			name, err := strconv.Unquote(strings.TrimSpace(strings.TrimPrefix(token, "snip ")))
-			if err != nil || !namePattern.MatchString(name) {
-				return fail(i, fmt.Errorf("snip requires a quoted simple name"))
+		case token == "snip" || strings.HasPrefix(token, "snip ") || strings.HasPrefix(token, "snip\t") || strings.HasPrefix(token, "snip\n"):
+			name := strings.TrimSpace(token[4:])
+			if !namePattern.MatchString(name) {
+				return fail(i, fmt.Errorf("use an unquoted snip ID, for example {snip a7Km2pQ9xB}"))
+			}
+			if _, ok := p.rich[name]; ok {
+				rendered = "[[NW richSnip " + strconv.Quote(name) + " NW]]"
+				break
 			}
 			data, ok := p.Snips[name]
 			if !ok {
@@ -173,7 +197,7 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			if len(parts) != 2 || !aliasPattern.MatchString(parts[1]) {
 				return fail(i, fmt.Errorf("expected {#each dotted.path as alias}"))
 			}
-			if parts[1] == "site" || parts[1] == "page" || parts[1] == "snip" {
+			if parts[1] == "site" || parts[1] == "page" || parts[1] == "snip" || parts[1] == "data" {
 				return fail(i, fmt.Errorf("loop alias %q is reserved", parts[1]))
 			}
 			expr, err := lookup(strings.TrimSpace(parts[0]))
@@ -185,19 +209,36 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			blocks = append(blocks, block{kind: "each", alias: parts[1], previous: aliases[parts[1]]})
 			aliases[parts[1]] = variable
 			rendered = "[[NW range " + variable + " := collection " + expr + " NW]]"
+		case token == ":else" || strings.HasPrefix(token, ":else if "):
+			if len(blocks) == 0 {
+				return fail(i, fmt.Errorf("{%s} requires an open if or each block", token))
+			}
+			b := &blocks[len(blocks)-1]
+			if b.elseSeen {
+				return fail(i, fmt.Errorf("{%s} cannot follow {:else}", token))
+			}
+			if token != ":else" {
+				if b.kind != "if" {
+					return fail(i, fmt.Errorf("{:else if} is only allowed in an if block"))
+				}
+				expr, err := lookup(strings.TrimSpace(strings.TrimPrefix(token, ":else if ")))
+				if err != nil {
+					return fail(i, err)
+				}
+				rendered = "[[NW else if " + expr + " NW]]"
+			} else {
+				b.elseSeen = true
+				// An empty loop has no item. Restore any outer alias for its fallback.
+				restoreAlias(b.alias, b.previous)
+				rendered = "[[NW else NW]]"
+			}
 		case token == "/if" || token == "/each":
 			if len(blocks) == 0 || blocks[len(blocks)-1].kind != token[1:] {
 				return fail(i, fmt.Errorf("unmatched {%s}", token))
 			}
 			b := blocks[len(blocks)-1]
 			blocks = blocks[:len(blocks)-1]
-			if b.alias != "" {
-				if b.previous == "" {
-					delete(aliases, b.alias)
-				} else {
-					aliases[b.alias] = b.previous
-				}
-			}
+			restoreAlias(b.alias, b.previous)
 			rendered = "[[NW end NW]]"
 		default:
 			expr, err := lookup(token)

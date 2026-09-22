@@ -19,8 +19,8 @@ func (f iconTransport) RoundTrip(r *http.Request) (*http.Response, error) { retu
 
 func TestIconsResolveOnlyNeededAndWorkOffline(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "html/index.html", `{icon arrow-right}{icon arrow-right size="18"}{render card}`)
-	put(t, root, "html/_card.html", `{icon search aria-label="Search"}`)
+	put(t, root, "index.html", `{icon arrow-right}{icon arrow-right size="18"}{render card}`)
+	put(t, root, "_card.html", `{icon search aria-label="Search"}`)
 	if p, err := Load(root); err != nil || len(p.Warnings) != 2 {
 		t.Fatalf("read-only load must warn for two missing icons: %v, %+v", err, p)
 	}
@@ -67,8 +67,8 @@ func TestIconsResolveOnlyNeededAndWorkOffline(t *testing.T) {
 func TestIconAttributesScopeAndEscaping(t *testing.T) {
 	root := fixture(t)
 	put(t, root, iconCacheDir+"/search.svg", testIconSVG)
-	put(t, root, "html/_card.html", `{icon search class="inline {site.name}" aria-label="{member.name}" size="1em" stroke-width='3' data-note="a}b &amp; c"}`)
-	put(t, root, "html/index.html", `{#each snip.team.members as member}{render card}{/each}{icon search aria-label="{site.unsafe}"}{icon search}`)
+	put(t, root, "_card.html", `{icon search class="inline {site.name}" aria-label="{member.name}" size="1em" stroke-width='3' data-note="a}b &amp; c"}`)
+	put(t, root, "index.html", `{#each snip.team.members as member}{render card}{/each}{icon search aria-label="{site.unsafe}"}{icon search}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
 	if err != nil {
@@ -94,7 +94,7 @@ func TestBadIconDirectives(t *testing.T) {
 		t.Run(source, func(t *testing.T) {
 			root := fixture(t)
 			put(t, root, iconCacheDir+"/search.svg", testIconSVG)
-			put(t, root, "html/index.html", source)
+			put(t, root, "index.html", source)
 			if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "index.html:") {
 				t.Fatalf("expected source error, got %v", err)
 			}
@@ -105,7 +105,7 @@ func TestBadIconDirectives(t *testing.T) {
 func TestIconsDoNotParseContentOrRawElements(t *testing.T) {
 	root := fixture(t)
 	put(t, root, "_/snips/content.json", `{"text":"{icon search}<svg onload=alert(1)>"}`)
-	put(t, root, "html/index.html", `<script>const icon="{icon search}";</script><style>/* {icon search} */</style>{snip.content.text}`)
+	put(t, root, "index.html", `<script>const icon="{icon search}";</script><style>/* {icon search} */</style>{snip.content.text}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
 	if err != nil {
@@ -144,7 +144,7 @@ func TestUnsafeIconSVGs(t *testing.T) {
 
 func TestIconDownloadFailuresAndRecovery(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "html/index.html", `{icon search}`)
+	put(t, root, "index.html", `{icon search}`)
 	for _, tc := range []struct {
 		code int
 		body string
@@ -177,7 +177,7 @@ func TestIconDownloadFailuresAndRecovery(t *testing.T) {
 
 func TestMissingIconsContinueAndRecover(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "html/index.html", `Before{icon absent}{icon search}{icon absent}After`)
+	put(t, root, "index.html", `Before{icon absent}{icon search}{icon absent}After`)
 	requested := map[string]int{}
 	p, err := loadWithIcons(context.Background(), root, func(_ context.Context, name string) error {
 		requested[name]++
@@ -217,7 +217,7 @@ func TestMissingIconsContinueAndRecover(t *testing.T) {
 
 func TestUnsafeDownloadedIconRemainsError(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "html/index.html", `{icon search}`)
+	put(t, root, "index.html", `{icon search}`)
 	client := &http.Client{Transport: iconTransport(func(*http.Request) (*http.Response, error) {
 		return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader(`<svg viewBox="0 0 24 24"><script/></svg>`))}, nil
 	})}

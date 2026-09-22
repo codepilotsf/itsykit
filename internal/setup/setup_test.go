@@ -48,12 +48,91 @@ func TestProbe(t *testing.T) {
 	}
 }
 
-func TestSetupStages(t *testing.T) {
-	source, err := filepath.Abs("../..")
-	if err != nil {
-		t.Fatal(err)
+func TestReinstallRequiresTypedConfirmation(t *testing.T) {
+	for _, answer := range []string{"\n", "yes\n", "WIPE\n", "destroy\n", ""} {
+		var output bytes.Buffer
+		err := run(context.Background(), strings.NewReader("server\n"+answer), &output, io.Discard, func(_ context.Context, c command) error {
+			if c.name == "extract-server" {
+				return nil
+			}
+			args := strings.Join(c.args, " ")
+			if strings.Contains(args, "-O exit") {
+				return nil
+			}
+			if !strings.Contains(args, "NANOWEB_SYSTEM") || !strings.Contains(args, "root@server") {
+				t.Fatalf("unexpected command: %s", args)
+			}
+			fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:0\nNANOWEB_EXISTING=1")
+			return nil
+		})
+		if err == nil || !strings.Contains(output.String(), "Type DESTROY") {
+			t.Fatal(err, output.String())
+		}
 	}
-	for _, failure := range []string{"", "connect", "build", "upload", "install", "check"} {
+}
+
+func TestUnavailableReplacementDoesNotAskToDestroy(t *testing.T) {
+	var output bytes.Buffer
+	want := errors.New("replacement unavailable")
+	err := run(context.Background(), strings.NewReader("server\n"), &output, io.Discard, func(_ context.Context, c command) error {
+		args := strings.Join(c.args, " ")
+		switch {
+		case c.name == "extract-server":
+			return want
+		case strings.Contains(args, "-O exit"):
+			return nil
+		case strings.Contains(args, "NANOWEB_SYSTEM"):
+			fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:0\nNANOWEB_EXISTING=1")
+			return nil
+		default:
+			t.Fatalf("unexpected remote change: %s", args)
+			return nil
+		}
+	})
+	if !errors.Is(err, want) || strings.Contains(output.String(), "DESTROY") || strings.Contains(output.String(), "WARNING") {
+		t.Fatal(err, output.String())
+	}
+}
+
+func TestSetupExtractsRealBundleBeforeResetPrompt(t *testing.T) {
+	if os.Getenv("NANOWEB_REQUIRE_BUNDLE") != "1" {
+		t.Skip("requires generated server bundles")
+	}
+	for _, arch := range []string{"x86_64", "aarch64"} {
+		t.Run(arch, func(t *testing.T) {
+			var output bytes.Buffer
+			prepared := false
+			err := run(context.Background(), strings.NewReader("server\n\n"), &output, io.Discard, func(ctx context.Context, c command) error {
+				args := strings.Join(c.args, " ")
+				switch {
+				case c.name == "extract-server":
+					if strings.Contains(output.String(), "DESTROY") {
+						t.Fatal("prompted before extraction")
+					}
+					if err := execute(ctx, c); err != nil {
+						return err
+					}
+					prepared = true
+					return nil
+				case strings.Contains(args, "NANOWEB_SYSTEM"):
+					fmt.Fprintf(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:%s:0\nNANOWEB_EXISTING=1\n", arch)
+					return nil
+				case strings.Contains(args, "-O exit"):
+					return nil
+				default:
+					t.Fatalf("changed server after cancellation: %s", args)
+					return nil
+				}
+			})
+			if !prepared || err == nil || !strings.Contains(err.Error(), "Setup cancelled") || !strings.Contains(output.String(), "Type DESTROY") {
+				t.Fatal(prepared, err, output.String())
+			}
+		})
+	}
+}
+
+func TestSetupStages(t *testing.T) {
+	for _, failure := range []string{"", "reinstall", "connect", "extract", "upload", "install", "check"} {
 		t.Run(failure, func(t *testing.T) {
 			var output bytes.Buffer
 			var stages []string
@@ -70,6 +149,9 @@ func TestSetupStages(t *testing.T) {
 				case c.name == "ssh" && strings.Contains(joined, "NANOWEB_SYSTEM"):
 					stage = "connect"
 					fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:aarch64:1000")
+					if failure == "reinstall" {
+						fmt.Fprintln(c.out, "NANOWEB_EXISTING=1")
+					}
 				case c.name == "ssh" && strings.Contains(joined, "mktemp"):
 					fmt.Fprintln(c.out, "/tmp/nanoweb-setup.ABCDE12345")
 					return nil
@@ -85,14 +167,17 @@ func TestSetupStages(t *testing.T) {
 					}
 				case c.name == "ssh" && strings.Contains(joined, "install.sh"):
 					stage = "install"
-					if !strings.Contains(joined, "-tt -- ubuntu@server") || !strings.Contains(joined, "sudo -- sh") {
+					if failure == "reinstall" && !strings.Contains(joined, "--reinstall") {
+						t.Fatal(joined)
+					}
+					if !strings.Contains(joined, "-tt -- root@server") || !strings.Contains(joined, "sudo -- sh") {
 						t.Fatal(joined)
 					}
 				case c.name == "ssh" && strings.Contains(joined, "is-active"):
 					stage = "check"
 				default:
-					stage = "build"
-					if c.dir != source || !strings.Contains(strings.Join(c.env, "\n"), "GOARCH=arm64") || !strings.Contains(strings.Join(c.env, "\n"), "CGO_ENABLED=0") {
+					stage = "extract"
+					if c.name != "extract-server" || c.args[0] != "arm64" {
 						t.Fatal(c)
 					}
 				}
@@ -102,17 +187,21 @@ func TestSetupStages(t *testing.T) {
 				}
 				return nil
 			}
-			err := run(context.Background(), source, strings.NewReader("ubuntu@server\n"), &output, io.Discard, fake)
-			if failure == "" {
-				if err != nil || strings.Join(stages, ",") != "connect,build,upload,install,check" || !strings.Contains(output.String(), "Nanoweb server is running") {
+			input := "server\n"
+			if failure == "reinstall" {
+				input += "DESTROY\n"
+			}
+			err := run(context.Background(), strings.NewReader(input), &output, io.Discard, fake)
+			if failure == "" || failure == "reinstall" {
+				if err != nil || strings.Join(stages, ",") != "connect,extract,upload,install,check" || !strings.Contains(output.String(), "Nanoweb server is running") {
 					t.Fatal(stages, err, output.String())
 				}
 			} else {
 				if err == nil || stages[len(stages)-1] != failure || strings.Contains(output.String(), "server is running") {
 					t.Fatal(stages, err, output.String())
 				}
-				if failure == "connect" && strings.Contains(output.String(), "Building") {
-					t.Fatal("built despite failed SSH")
+				if failure == "connect" && strings.Contains(output.String(), "Preparing bundled") {
+					t.Fatal("extracted despite failed SSH")
 				}
 			}
 		})
@@ -125,10 +214,10 @@ func TestCancelledPromptAndInvalidTarget(t *testing.T) {
 	reader, writer := io.Pipe()
 	defer reader.Close()
 	defer writer.Close()
-	if _, err := readTarget(ctx, reader); !errors.Is(err, context.Canceled) {
+	if _, err := ask(ctx, reader, io.Discard, "Server hostname or IP", ""); !errors.Is(err, context.Canceled) {
 		t.Fatal(err)
 	}
-	err := run(context.Background(), "", strings.NewReader("-bad\n"), io.Discard, io.Discard, func(context.Context, command) error { t.Fatal("ran SSH on invalid target"); return nil })
+	err := run(context.Background(), strings.NewReader("-bad\n"), io.Discard, io.Discard, func(context.Context, command) error { t.Fatal("ran SSH on invalid target"); return nil })
 	if err == nil {
 		t.Fatal("invalid target accepted")
 	}
@@ -188,7 +277,7 @@ func TestInstallerSyntaxAndService(t *testing.T) {
 			t.Fatal(setting)
 		}
 	}
-	for _, guard := range []string{"Refusing to replace existing", "Port 80 is already in use", "sport = :80", "systemctl is-active --quiet", "-check", "trap cleanup EXIT"} {
+	for _, guard := range []string{"Refusing to replace existing", "Another service is using port 80 or 443", "sport = :80", "sport = :443", "systemctl is-active --quiet", "-check", "trap cleanup EXIT"} {
 		if !strings.Contains(installer, guard) {
 			t.Fatal(guard)
 		}

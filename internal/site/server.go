@@ -13,11 +13,14 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"nanoweb/internal/sitefiles"
 )
 
 // Server publishes complete validated snapshots. Failed edits produce a 500
 // rather than silently serving an apparently up-to-date site.
 type Server struct {
+	// Serialize writers without holding the request lock during disk/network I/O.
 	reloadMu   sync.Mutex
 	mu         sync.RWMutex
 	project    *Project
@@ -41,17 +44,31 @@ func NewProductionServer(p *Project, logger *log.Logger) *Server {
 	return s
 }
 
+// Publish replaces a fully validated snapshot after a content save.
+func (s *Server) Publish(p *Project) {
+	s.reloadMu.Lock()
+	defer s.reloadMu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.project, s.err = p, nil
+	s.revision++
+}
+
 func (s *Server) Reload(root string) error {
 	return s.reload(context.Background(), root, false)
 }
 
 func (s *Server) reload(ctx context.Context, root string, resolveIcons bool) error {
+	if resolveIcons {
+		unlock := LockContent()
+		defer unlock()
+	}
 	s.reloadMu.Lock()
 	defer s.reloadMu.Unlock()
 	var p *Project
 	var err error
 	if resolveIcons {
-		p, err = LoadDev(ctx, root)
+		p, err = loadEditing(ctx, root)
 	} else {
 		p, err = Load(root)
 	}
@@ -89,6 +106,9 @@ func (s *Server) Watch(ctx context.Context, root string, logger *log.Logger) {
 				last = project.signature
 				s.mu.RUnlock()
 				if logger != nil {
+					if project.SnipsUpdated {
+						logger.Print("Snips updated in _/snips.json.")
+					}
 					for _, warning := range project.Warnings {
 						logger.Printf("Warning: %s", warning)
 					}
@@ -118,32 +138,36 @@ func fingerprint(root string) string {
 	}
 	defer r.Close()
 	h := sha256.New()
-	for _, dir := range []string{"_", "html"} {
-		err = fs.WalkDir(r.FS(), dir, func(name string, d fs.DirEntry, e error) error {
-			if e != nil {
-				return e
-			}
-			fmt.Fprintf(h, "%q:%v;", name, d.Type())
-			if d.Type()&os.ModeSymlink != 0 {
-				return fmt.Errorf("symlink: %s", name)
-			}
-			if d.IsDir() {
-				return nil
-			}
-			if !d.Type().IsRegular() {
-				return fmt.Errorf("unsupported file: %s", name)
-			}
-			b, e := readFile(r, name)
-			if e != nil {
-				return e
-			}
-			fmt.Fprintf(h, "%d:", len(b))
-			h.Write(b)
-			return nil
-		})
-		if err != nil {
-			fmt.Fprint(h, err)
+	err = fs.WalkDir(r.FS(), ".", func(name string, d fs.DirEntry, e error) error {
+		if e != nil {
+			return e
 		}
+		if !sitefiles.Included(name) {
+			if d.IsDir() {
+				return fs.SkipDir
+			}
+			return nil
+		}
+		fmt.Fprintf(h, "%q:%v;", name, d.Type())
+		if d.Type()&os.ModeSymlink != 0 {
+			return fmt.Errorf("symlink: %s", name)
+		}
+		if d.IsDir() {
+			return nil
+		}
+		if !d.Type().IsRegular() {
+			return fmt.Errorf("unsupported file: %s", name)
+		}
+		b, e := readFile(r, name)
+		if e != nil {
+			return e
+		}
+		fmt.Fprintf(h, "%d:", len(b))
+		h.Write(b)
+		return nil
+	})
+	if err != nil {
+		fmt.Fprint(h, err)
 	}
 	return fmt.Sprintf("%x", h.Sum(nil))
 }

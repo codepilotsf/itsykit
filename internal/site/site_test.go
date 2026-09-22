@@ -28,11 +28,11 @@ func fixture(t *testing.T) string {
 	root := t.TempDir()
 	put(t, root, "_/nanoweb.config", `{"site":{"name":"Test","url":"javascript:alert(1)","unsafe":"\"/><script>alert(1)</script>"}}`)
 	put(t, root, "_/snips/team.json", `{"text":"<b>{site.name}</b>","members":[{"name":"Ada","children":[{"name":"Bea"}]},{"name":"Cy","children":[]}],"empty":[],"false":false,"zero":0,"blank":""}`)
-	put(t, root, "html/index.html", "<h1>{site.name}</h1>")
-	put(t, root, "html/about/index.html", "About")
-	put(t, root, "html/css/main.css", "body{color:red}")
-	put(t, root, "html/_404.html", "Not here")
-	put(t, root, "html/_500.html", "Try later")
+	put(t, root, "index.html", "<h1>{site.name}</h1>")
+	put(t, root, "about/index.html", "About")
+	put(t, root, "css/main.css", "body{color:red}")
+	put(t, root, "_404.html", "Not here")
+	put(t, root, "_500.html", "Try later")
 	return root
 }
 func mustLoad(t *testing.T, root string) *Project {
@@ -51,11 +51,11 @@ func request(s *Server, method, url string) *httptest.ResponseRecorder {
 
 func TestRoutingAndSecurity(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "html/_secret.txt", "SECRET")
-	put(t, root, "html/.env", "SECRET")
-	put(t, root, "html/.hidden/file", "SECRET")
-	put(t, root, "html/_private/file", "SECRET")
-	put(t, root, "html/contact.html", "Contact")
+	put(t, root, "_secret.txt", "SECRET")
+	put(t, root, ".env", "SECRET")
+	put(t, root, ".hidden/file", "SECRET")
+	put(t, root, "_private/file", "SECRET")
+	put(t, root, "contact.html", "Contact")
 	s := NewServer(mustLoad(t, root))
 	for _, url := range []string{"/", "/about", "/contact", "/css/main.css"} {
 		if w := request(s, "GET", url); w.Code != 200 {
@@ -77,18 +77,18 @@ func TestRoutingAndSecurity(t *testing.T) {
 			t.Fatalf("HEAD %s has body", url)
 		}
 	}
-	put(t, root, "html/css/main.css", "changed")
+	put(t, root, "css/main.css", "changed")
 	if w := request(s, "GET", "/css/main.css"); w.Body.String() != "body{color:red}" {
 		t.Fatal("asset was not a snapshot")
 	}
 }
 
 func TestCollisionsAndSymlinks(t *testing.T) {
-	for _, name := range []string{"html/about.html", "html/asset"} {
+	for _, name := range []string{"about.html", "asset"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
-			if name == "html/asset" {
-				put(t, root, "html/asset.html", "page")
+			if name == "asset" {
+				put(t, root, "asset.html", "page")
 			}
 			put(t, root, name, "collision")
 			_, err := Load(root)
@@ -97,7 +97,7 @@ func TestCollisionsAndSymlinks(t *testing.T) {
 			}
 		})
 	}
-	for _, name := range []string{"html/link.txt", "html/nested", "_/snips/link.json", "_/nanoweb.config"} {
+	for _, name := range []string{"link.txt", "nested", "_/snips/link.json", "_/nanoweb.config"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
 			target := filepath.Join(t.TempDir(), "secret")
@@ -122,9 +122,9 @@ func TestCollisionsAndSymlinks(t *testing.T) {
 
 func TestRenderingScopeAndEscaping(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "html/_layout.html", `<html><title>{site.name}</title><body>{slot}</body></html>`)
-	put(t, root, "html/_member.html", `[{member.name}:{site.name}:{#each member.children as member}{member.name}/{site.name}{/each}:{member.name}]`)
-	put(t, root, "html/index.html", `{#each snip.team.members as member}{render member}{/each}<p>{site.unsafe}</p><div title="{site.unsafe}"></div><a href="{site.url}">link</a>{snip "team"}{#if snip.team.false}BAD{/if}{#if snip.team.zero}BAD{/if}{#if snip.team.blank}BAD{/if}{#if snip.team.empty}BAD{/if}{#each snip.team.empty as x}BAD{/each}{#each snip.missing as x}BAD{/each}`)
+	put(t, root, "_layout.html", `<html><title>{site.name}</title><body>{slot}</body></html>`)
+	put(t, root, "_member.html", `[{member.name}:{site.name}:{#each member.children as member}{member.name}/{site.name}{/each}:{member.name}]`)
+	put(t, root, "index.html", `{#each snip.team.members as member}{render member}{/each}<p>{site.unsafe}</p><div title="{site.unsafe}"></div><a href="{site.url}">link</a>{snip team}{#if snip.team.false}BAD{/if}{#if snip.team.zero}BAD{/if}{#if snip.team.blank}BAD{/if}{#if snip.team.empty}BAD{/if}{#each snip.team.empty as x}BAD{/each}{#each snip.missing as x}BAD{/each}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
 	if err != nil {
@@ -143,12 +143,12 @@ func TestRenderingScopeAndEscaping(t *testing.T) {
 
 func TestRenderPaths(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "html/_footer.html", "ROOT")
-	put(t, root, "html/about/_footer.html", "LOCAL")
-	put(t, root, "html/foo/bar/_footer.html", "NESTED:{render note}:{render ../../footer}")
-	put(t, root, "html/foo/bar/_note.html", "NOTE")
-	put(t, root, "html/_layout.html", "{slot}|{render footer}")
-	put(t, root, "html/about/index.html", "{render footer}|{render ./footer}|{render /foo/bar/footer}")
+	put(t, root, "_footer.html", "ROOT")
+	put(t, root, "about/_footer.html", "LOCAL")
+	put(t, root, "foo/bar/_footer.html", "NESTED:{render note}:{render ../../footer}")
+	put(t, root, "foo/bar/_note.html", "NOTE")
+	put(t, root, "_layout.html", "{slot}|{render footer}")
+	put(t, root, "about/index.html", "{render footer}|{render ./footer}|{render /foo/bar/footer}")
 	s := NewServer(mustLoad(t, root))
 	w := request(s, "GET", "/about")
 	if w.Code != 200 || !strings.Contains(w.Body.String(), "LOCAL|LOCAL|NESTED:NOTE:ROOT|ROOT") {
@@ -165,7 +165,7 @@ func TestInvalidRenderPaths(t *testing.T) {
 	for _, name := range []string{"", "../footer", "/../footer", "foo/../../footer", "footer.html", "_footer", `"footer"`, "foo\\footer", "foo/", "foo bar", "/layout", "/404", "/500"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
-			put(t, root, "html/index.html", "{render "+name+"}")
+			put(t, root, "index.html", "{render "+name+"}")
 			if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "index.html:1:") {
 				t.Fatalf("expected error with source location, got %v", err)
 			}
@@ -174,7 +174,7 @@ func TestInvalidRenderPaths(t *testing.T) {
 	for _, source := range []string{"{render missing}", "{render /foo/../foo/bar/card}"} {
 		t.Run(source, func(t *testing.T) {
 			root := fixture(t)
-			put(t, root, "html/foo/bar/_card.html", source)
+			put(t, root, "foo/bar/_card.html", source)
 			if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "foo/bar/_card.html:1:") {
 				t.Fatalf("expected unused partial validation error, got %v", err)
 			}
@@ -185,7 +185,7 @@ func TestInvalidRenderPaths(t *testing.T) {
 func TestRawElements(t *testing.T) {
 	root := fixture(t)
 	source := `<script data-value=">">const x={a: "{site.name}"}; const t="{{.Site}}"; const close="</scripture>"; const untouched="{site.name}";</script><STYLE>.x { color:red; }</STYLE><p>{site.name}</p>`
-	put(t, root, "html/index.html", source)
+	put(t, root, "index.html", source)
 	p := mustLoad(t, root)
 	compiled, err := p.compile(source, "index.html", nil, map[string]string{})
 	if err != nil {
@@ -212,12 +212,12 @@ func TestInvalidTemplatesAndData(t *testing.T) {
 		"unmatched": `{/if}`, "bad expression": `{site.name + 1}`, "empty if": `{#if }x{/if}`, "empty each": `{#each }`,
 		"non-array": `{#each site.name as item}x{/each}`, "reserved alias": `{#each snip.team.members as site}{/each}`,
 		"bad alias": `{#each snip.team.members as x-y}{/each}`, "slot": `{slot}`, "unclosed directive": `{site.name`,
-		"missing snip": `{snip "missing"}`, "unclosed script": `<script>{anything}`,
+		"missing snip": `{snip missing}`, "unclosed script": `<script>{anything}`,
 	}
 	for name, source := range cases {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
-			put(t, root, "html/index.html", source)
+			put(t, root, "index.html", source)
 			if _, err := Load(root); err == nil {
 				t.Fatal("expected useful validation error")
 			} else if !strings.Contains(err.Error(), "index.html") {
@@ -227,8 +227,8 @@ func TestInvalidTemplatesAndData(t *testing.T) {
 	}
 	t.Run("recursive", func(t *testing.T) {
 		root := fixture(t)
-		put(t, root, "html/_a.html", `{render b}`)
-		put(t, root, "html/_b.html", `{render a}`)
+		put(t, root, "_a.html", `{render b}`)
+		put(t, root, "_b.html", `{render a}`)
 		if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "recursive") {
 			t.Fatal(err)
 		}
@@ -260,14 +260,14 @@ func TestReloadAndConcurrentRequests(t *testing.T) {
 			}
 		}()
 	}
-	put(t, root, "html/index.html", "UPDATED")
+	put(t, root, "index.html", "UPDATED")
 	if err := s.Reload(root); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(request(s, "GET", "/").Body.String(), "UPDATED") {
 		t.Fatal("edit not loaded")
 	}
-	put(t, root, "html/index.html", `{render private-error-detail}`)
+	put(t, root, "index.html", `{render private-error-detail}`)
 	if err := s.Reload(root); err == nil {
 		t.Fatal("expected reload error")
 	}
@@ -275,7 +275,7 @@ func TestReloadAndConcurrentRequests(t *testing.T) {
 	if w.Code != 500 || !strings.Contains(w.Body.String(), "Try later") || strings.Contains(w.Body.String(), "private-error-detail") {
 		t.Fatal(w)
 	}
-	put(t, root, "html/index.html", "RECOVERED")
+	put(t, root, "index.html", "RECOVERED")
 	if err := s.Reload(root); err != nil {
 		t.Fatal(err)
 	}
@@ -287,7 +287,7 @@ func TestReloadAndConcurrentRequests(t *testing.T) {
 
 func TestErrorPageLayouts(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "html/_layout.html", `<!doctype html><html><body><header>{site.name}</header>{slot}<footer>Shared footer</footer></body></html>`)
+	put(t, root, "_layout.html", `<!doctype html><html><body><header>{site.name}</header>{slot}<footer>Shared footer</footer></body></html>`)
 	s := NewServer(mustLoad(t, root))
 	for _, url := range []string{"/missing", "/_private"} {
 		w := request(s, "GET", url)
@@ -298,7 +298,7 @@ func TestErrorPageLayouts(t *testing.T) {
 			t.Fatal("HEAD error response must have no body")
 		}
 	}
-	put(t, root, "html/index.html", "{broken syntax}")
+	put(t, root, "index.html", "{broken syntax}")
 	if err := s.Reload(root); err == nil {
 		t.Fatal("expected invalid edit")
 	}
@@ -306,10 +306,10 @@ func TestErrorPageLayouts(t *testing.T) {
 	if w.Code != 500 || !strings.HasPrefix(w.Body.String(), "Try later") || strings.Contains(w.Body.String(), "Shared footer") {
 		t.Fatal("500 must stay standalone")
 	}
-	if err := os.Remove(filepath.Join(root, "html/_layout.html")); err != nil {
+	if err := os.Remove(filepath.Join(root, "_layout.html")); err != nil {
 		t.Fatal(err)
 	}
-	put(t, root, "html/index.html", "fixed")
+	put(t, root, "index.html", "fixed")
 	if err := s.Reload(root); err != nil {
 		t.Fatal(err)
 	}
@@ -321,7 +321,7 @@ func TestErrorPageLayouts(t *testing.T) {
 
 func TestRenderingFailureFallback(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "html/index.html", `{#each snip.team.members as m}{m.name}{/each}`)
+	put(t, root, "index.html", `{#each snip.team.members as m}{m.name}{/each}`)
 	p := mustLoad(t, root)
 	p.Snips["team"]["members"] = "wrong type"
 	w := request(NewServer(p), "GET", "/")
@@ -356,23 +356,23 @@ func TestWatchChangesAndRecovery(t *testing.T) {
 	}
 	for _, edit := range []struct{ name, body, url, want string }{
 		{"_/nanoweb.config", `{"site":{"name":"Renamed"}}`, "/", "Renamed"},
-		{"html/index.html", `{snip.team.text}`, "/", "&lt;b&gt;"},
+		{"index.html", `{snip.team.text}`, "/", "&lt;b&gt;"},
 		{"_/snips/team.json", `{"text":"new content"}`, "/", "new content"},
-		{"html/css/main.css", "new css", "/css/main.css", "new css"},
+		{"css/main.css", "new css", "/css/main.css", "new css"},
 	} {
 		put(t, root, edit.name, edit.body)
 		wait(func() bool { return strings.Contains(request(s, "GET", edit.url).Body.String(), edit.want) })
 	}
-	put(t, root, "html/index.html", "{bad syntax}")
+	put(t, root, "index.html", "{bad syntax}")
 	wait(func() bool { return request(s, "GET", "/").Code == 500 })
-	put(t, root, "html/index.html", "fixed")
+	put(t, root, "index.html", "fixed")
 	wait(func() bool { return request(s, "GET", "/").Code == 200 })
-	put(t, root, "html/_live.html", "partial one")
-	put(t, root, "html/new.html", `{render live}`)
+	put(t, root, "_live.html", "partial one")
+	put(t, root, "new.html", `{render live}`)
 	wait(func() bool { return strings.Contains(request(s, "GET", "/new").Body.String(), "partial one") })
-	put(t, root, "html/_live.html", "partial two")
+	put(t, root, "_live.html", "partial two")
 	wait(func() bool { return strings.Contains(request(s, "GET", "/new").Body.String(), "partial two") })
-	if err := os.Remove(filepath.Join(root, "html/new.html")); err != nil {
+	if err := os.Remove(filepath.Join(root, "new.html")); err != nil {
 		t.Fatal(err)
 	}
 	wait(func() bool { return request(s, "GET", "/new").Code == 404 })
@@ -394,16 +394,16 @@ func TestConfinedReads(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer boundary.Close()
-	if err := os.Symlink(filepath.Join(root, "_"), filepath.Join(root, "html", "link")); err != nil {
+	if err := os.Symlink(filepath.Join(root, "_"), filepath.Join(root, "link")); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := readFile(boundary, "html/link/nanoweb.config"); err == nil {
+	if _, err := readFile(boundary, "link/nanoweb.config"); err == nil {
 		t.Fatal("followed a private directory symlink")
 	}
-	if err := os.Symlink(filepath.Join(root, "_", "nanoweb.config"), filepath.Join(root, "html", "secret")); err != nil {
+	if err := os.Symlink(filepath.Join(root, "_", "nanoweb.config"), filepath.Join(root, "secret")); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := readFile(boundary, "html/secret"); err == nil {
+	if _, err := readFile(boundary, "secret"); err == nil {
 		t.Fatal("followed a private file symlink")
 	}
 }

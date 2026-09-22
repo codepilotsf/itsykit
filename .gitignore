@@ -1,5 +1,8 @@
 /bin/
 *.test
+/dist/
+/internal/serverbundle/assets/*.gz
+/internal/serverbundle/assets/*.sha256
 
 # macOS metadata
 .DS_Store

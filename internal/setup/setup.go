@@ -2,7 +2,6 @@
 package setup
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	_ "embed"
@@ -14,9 +13,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"strings"
 	"time"
+
+	"nanoweb/internal/serverbundle"
 )
 
 //go:embed install.sh
@@ -38,21 +38,54 @@ type command struct {
 }
 type runner func(context.Context, command) error
 
+var errHostKeyChanged = errors.New("The server's SSH identity has changed.\n\nConnection stopped to protect your site. This can happen after a server rebuild,\nbut it could also mean you are connecting to a different server.\nVerify the new fingerprint with your server provider before updating its saved\nentry in ~/.ssh/known_hosts. NanoWeb has not removed or replaced the saved key.")
+
+type sshErrorWriter struct {
+	out     io.Writer
+	tail    string
+	changed bool
+}
+
+func (w *sshErrorWriter) Write(p []byte) (int, error) {
+	w.tail += string(p)
+	if strings.Contains(w.tail, "REMOTE HOST IDENTIFICATION HAS CHANGED") || strings.Contains(w.tail, "REVOKED HOST KEY DETECTED") {
+		w.changed = true
+	}
+	if len(w.tail) > 4096 {
+		w.tail = w.tail[len(w.tail)-4096:]
+	}
+	if w.out == nil {
+		return len(p), nil
+	}
+	return w.out.Write(p)
+}
+
 func execute(ctx context.Context, c command) error {
+	if c.name == "extract-server" {
+		return serverbundle.Extract(ctx, c.args[0], c.args[1])
+	}
 	cmd := exec.CommandContext(ctx, c.name, c.args...)
 	cmd.Dir = c.dir
 	cmd.Env = c.env
 	cmd.Stdin = c.in
 	cmd.Stdout = c.out
 	cmd.Stderr = c.errOut
+	var sshErrors *sshErrorWriter
+	if c.name == "ssh" || c.name == "scp" {
+		sshErrors = &sshErrorWriter{out: c.errOut}
+		cmd.Stderr = sshErrors
+	}
 	cmd.WaitDelay = 2 * time.Second
-	return cmd.Run()
+	err := cmd.Run()
+	if err != nil && sshErrors != nil && sshErrors.changed {
+		return errHostKeyChanged
+	}
+	return err
 }
 
-// Run is independent of the current site directory. Source may be empty when
-// the executable is linked to a development checkout's bin/ directory.
-func Run(ctx context.Context, source string, in io.Reader, out, errOut io.Writer) error {
-	return run(ctx, source, in, out, errOut, execute)
+// Run installs the bundled server independently of the site directory.
+func Run(ctx context.Context, in io.Reader, out, errOut io.Writer) error {
+	return run(ctx, in, out, errOut, execute)
 }
 
 func targetName(input string) (string, error) {
@@ -77,27 +110,24 @@ func targetName(input string) (string, error) {
 
 func shellQuote(s string) string { return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'" }
 
-func readTarget(ctx context.Context, in io.Reader) (string, error) {
-	type result struct {
-		text string
-		err  error
+func run(ctx context.Context, in io.Reader, out, errOut io.Writer, runCommand runner) error {
+	target, err := ask(ctx, in, out, "Server hostname or IP", "")
+	if err != nil {
+		return err
 	}
-	done := make(chan result, 1)
-	go func() { line, err := bufio.NewReader(in).ReadString('\n'); done <- result{line, err} }()
-	select {
-	case <-ctx.Done():
-		return "", ctx.Err()
-	case r := <-done:
-		if r.err != nil && (r.err != io.EOF || strings.TrimSpace(r.text) == "") {
-			return "", fmt.Errorf("read target: %w", r.err)
-		}
-		return targetName(r.text)
+	target, err = targetName(target)
+	if err != nil {
+		return err
 	}
+	if at := strings.LastIndex(target, "@"); at >= 0 {
+		target = target[at+1:]
+	}
+	target = "root@" + target
+	return runTarget(ctx, target, in, out, errOut, runCommand)
 }
 
-func run(ctx context.Context, source string, in io.Reader, out, errOut io.Writer, runCommand runner) error {
-	fmt.Fprint(out, "Target hostname or IP? ")
-	target, err := readTarget(ctx, in)
+func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.Writer, runCommand runner) error {
+	target, err := targetName(target)
 	if err != nil {
 		return err
 	}
@@ -106,7 +136,7 @@ func run(ctx context.Context, source string, in io.Reader, out, errOut io.Writer
 		return err
 	}
 	defer os.RemoveAll(temp)
-	sshOptions := []string{"-o", "ConnectTimeout=10", "-o", "ConnectionAttempts=1", "-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=3", "-o", "ControlMaster=auto", "-o", "ControlPersist=60", "-o", "ControlPath=" + filepath.Join(temp, "ssh")}
+	sshOptions := connectionOptions(temp)
 	ssh := func(commandText string, tty bool, output io.Writer) error {
 		args := append([]string{}, sshOptions...)
 		if tty {
@@ -124,26 +154,32 @@ func run(ctx context.Context, source string, in io.Reader, out, errOut io.Writer
 		_ = runCommand(cleanup, command{name: "ssh", args: args, out: io.Discard, errOut: io.Discard})
 	}()
 	var probeOutput bytes.Buffer
-	if err := ssh("sh -c "+shellQuote(probe), false, &probeOutput); err != nil {
+	if err := ssh("sh -c "+shellQuote(probe+`; if test -f /usr/local/bin/nanoweb-server && test -f /etc/nanoweb/server.json; then printf 'NANOWEB_EXISTING=1\n'; fi`), false, &probeOutput); err != nil {
+		if errors.Is(err, errHostKeyChanged) {
+			return err
+		}
 		return fmt.Errorf("SSH connection or server check failed for %s: %w", target, err)
 	}
 	arch, isRoot, err := parseProbe(probeOutput.String())
 	if err != nil {
 		return err
 	}
-	// Check local build prerequisites only after a successful connection.
-	source, err = findSource(source)
-	if err != nil {
+	reinstall := strings.Contains(probeOutput.String(), "NANOWEB_EXISTING=1\n")
+	// Verify the replacement before asking permission to reset a working server.
+	// Extraction failures must never lead to remote installation changes.
+	fmt.Fprintln(out, "\nPreparing bundled Nanoweb server...")
+	if err := runCommand(ctx, command{name: "extract-server", args: []string{arch, filepath.Join(temp, "nanoweb-server")}}); err != nil {
 		return err
 	}
-	goBinary, err := findGo()
-	if err != nil {
-		return err
-	}
-	fmt.Fprintln(out, "\nBuilding Nanoweb server...")
-	buildArgs := []string{"build", "-trimpath", "-o", filepath.Join(temp, "nanoweb-server"), "./cmd/nanoweb-server"}
-	if err := runCommand(ctx, command{name: goBinary, args: buildArgs, dir: source, env: buildEnv(arch), out: out, errOut: errOut}); err != nil {
-		return fmt.Errorf("server build failed: %w", err)
+	if reinstall {
+		fmt.Fprint(out, "\nWARNING: NanoWeb is already installed on this server.\nReinstalling will take ALL existing sites offline and replace the installation,\nincluding site configuration and certificates, with an empty installation.\nThe previous files will be kept in a root-only backup on the server.\nThere is no automatic undo.\n\n")
+		answer, err := ask(ctx, in, out, "Type DESTROY to replace this installation (Enter cancels)", "")
+		if err != nil {
+			return err
+		}
+		if answer != "DESTROY" {
+			return fmt.Errorf("Setup cancelled. The existing installation was not changed.")
+		}
 	}
 	for name, body := range map[string]string{"install.sh": installer, "nanoweb.service": service, "server.json": defaultConfig} {
 		if err := os.WriteFile(filepath.Join(temp, name), []byte(body), 0600); err != nil {
@@ -167,10 +203,7 @@ func run(ctx context.Context, source string, in io.Reader, out, errOut io.Writer
 		_ = runCommand(cleanup, command{name: "ssh", args: args, out: io.Discard, errOut: io.Discard})
 	}()
 	fmt.Fprintln(out, "Uploading Nanoweb server...")
-	scpTarget := target
-	if at := strings.LastIndex(target, "@"); strings.Contains(target[at+1:], ":") {
-		scpTarget = target[:at+1] + "[" + target[at+1:] + "]"
-	}
+	scpTarget := scpHost(target)
 	args := append([]string{}, sshOptions...)
 	args = append(args, "--", filepath.Join(temp, "nanoweb-server"), filepath.Join(temp, "install.sh"), filepath.Join(temp, "nanoweb.service"), filepath.Join(temp, "server.json"), scpTarget+":"+stage+"/")
 	if err := runCommand(ctx, command{name: "scp", args: args, in: in, out: out, errOut: errOut}); err != nil {
@@ -178,6 +211,9 @@ func run(ctx context.Context, source string, in io.Reader, out, errOut io.Writer
 	}
 	fmt.Fprintln(out, "Installing Nanoweb service...")
 	installCommand := "sh " + shellQuote(stage+"/install.sh") + " " + shellQuote(stage)
+	if reinstall {
+		installCommand += " --reinstall"
+	}
 	if !isRoot {
 		installCommand = "sudo -- " + installCommand
 	}
@@ -189,7 +225,7 @@ func run(ctx context.Context, source string, in io.Reader, out, errOut io.Writer
 	if err := ssh(verify, false, out); err != nil {
 		return fmt.Errorf("server installed but readiness check failed: %w", err)
 	}
-	fmt.Fprintf(out, "Nanoweb server is running on %s (HTTP port 80).\nConfiguration: /etc/nanoweb/server.json\nLocal readiness verified. Allow inbound TCP port 80 in your server/cloud firewall for public access.\nNo sites configured yet. Deployment and HTTPS are not enabled yet.\n", target)
+	fmt.Fprintf(out, "Nanoweb server is running on %s (HTTP port 80).\nConfiguration: /etc/nanoweb/server.json\nLocal readiness verified. Allow inbound TCP ports 80 and 443 for HTTP and HTTPS.\nNext: run nanoweb deploy -target %s -domain YOUR_DOMAIN from your site.\n", target, target)
 	return nil
 }
 
@@ -220,63 +256,4 @@ func parseProbe(output string) (string, bool, error) {
 		return arch, parts[3] == "0", nil
 	}
 	return "", false, fmt.Errorf("could not identify remote Ubuntu version and architecture")
-}
-
-func findGo() (string, error) {
-	if binary, err := exec.LookPath("go"); err == nil {
-		return binary, nil
-	}
-	for _, path := range []string{"/usr/local/go/bin/go", filepath.Join(runtime.GOROOT(), "bin", "go")} {
-		if info, err := os.Stat(path); err == nil && !info.IsDir() {
-			return path, nil
-		}
-	}
-	return "", errors.New("Go 1.25 or newer is required on the Mac to build the server")
-}
-
-func findSource(explicit string) (string, error) {
-	starts := []string{}
-	if explicit != "" {
-		starts = append(starts, explicit)
-	} else {
-		if exe, err := os.Executable(); err == nil {
-			if resolved, err := filepath.EvalSymlinks(exe); err == nil {
-				starts = append(starts, filepath.Dir(resolved))
-			}
-		}
-		if cwd, err := os.Getwd(); err == nil {
-			starts = append(starts, cwd)
-		}
-	}
-	for _, start := range starts {
-		dir, err := filepath.Abs(start)
-		if err != nil {
-			continue
-		}
-		for {
-			mod, err := os.ReadFile(filepath.Join(dir, "go.mod"))
-			if err == nil && strings.HasPrefix(string(mod), "module nanoweb\n") {
-				if _, err := os.Stat(filepath.Join(dir, "cmd/nanoweb-server/main.go")); err == nil {
-					return dir, nil
-				}
-			}
-			parent := filepath.Dir(dir)
-			if parent == dir || explicit != "" {
-				break
-			}
-			dir = parent
-		}
-	}
-	return "", errors.New("Nanoweb source checkout not found; use nanoweb setup -source /path/to/nanoweb")
-}
-
-func buildEnv(arch string) []string {
-	var env []string
-	for _, entry := range os.Environ() {
-		key, _, _ := strings.Cut(entry, "=")
-		if key != "GOOS" && key != "GOARCH" && key != "CGO_ENABLED" && key != "GOFLAGS" {
-			env = append(env, entry)
-		}
-	}
-	return append(env, "GOOS=linux", "GOARCH="+arch, "CGO_ENABLED=0", "GOFLAGS=")
 }

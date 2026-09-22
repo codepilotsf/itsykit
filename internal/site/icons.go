@@ -3,8 +3,6 @@ package site
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -243,31 +241,6 @@ func openIconCache(rootPath string) (*os.Root, error) {
 	return root, nil
 }
 
-func writeIconFile(root *os.Root, name string, data []byte) error {
-	var random [16]byte
-	if _, err := rand.Read(random[:]); err != nil {
-		return err
-	}
-	temp := ".download-" + hex.EncodeToString(random[:])
-	f, err := root.OpenFile(temp, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
-	if err != nil {
-		return err
-	}
-	defer root.Remove(temp)
-	_, err = f.Write(data)
-	if err == nil {
-		err = f.Sync()
-	}
-	closeErr := f.Close()
-	if err != nil {
-		return err
-	}
-	if closeErr != nil {
-		return closeErr
-	}
-	return root.Rename(temp, name)
-}
-
 func downloadIcon(ctx context.Context, rootPath, name string, client *http.Client) error {
 	if len(name) > 80 || !iconNamePattern.MatchString(name) {
 		return fmt.Errorf("invalid icon name %q", name)
@@ -311,13 +284,13 @@ func downloadIcon(ctx context.Context, rootPath, name string, client *http.Clien
 		if err != nil {
 			return err
 		}
-		if err := writeIconFile(cache, "LICENSE", license); err != nil {
+		if err := writeSiteFile(cache, "LICENSE", license); err != nil {
 			return err
 		}
 	} else if err != nil {
 		return err
 	}
-	return writeIconFile(cache, name+".svg", data)
+	return writeSiteFile(cache, name+".svg", data)
 }
 
 // Icon attributes use quoted HTML-style values. Only value lookups may appear
