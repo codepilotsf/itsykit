@@ -12,12 +12,12 @@ import (
 func TestAddAdminPreservesConfigAndAvoidsDuplicates(t *testing.T) {
 	for _, admin := range []string{"", `,"admin":null`, `,"admin":{}`, `,"admin":{"emails":null}`, `,"admin":{"emails":["first@example.com"],"custom":true}`} {
 		root := fixture(t)
-		put(t, root, "_/nanoweb.config", `{"site":{"name":"Keep","custom":9007199254740993},"other":{"enabled":true}`+admin+`}`)
+		put(t, root, "_/flea.config", `{"site":{"name":"Keep","custom":9007199254740993},"other":{"enabled":true}`+admin+`}`)
 		email, added, err := AddAdmin(root, " New@Example.com ")
 		if err != nil || !added || email != "new@example.com" {
 			t.Fatal(email, added, err)
 		}
-		file := filepath.Join(root, "_", "nanoweb.config")
+		file := filepath.Join(root, "_", "flea.config")
 		before, _ := os.ReadFile(file)
 		if !strings.Contains(string(before), "9007199254740993") || !strings.Contains(string(before), `"other"`) {
 			t.Fatal(string(before))
@@ -47,11 +47,11 @@ func TestAddAdminPreservesConfigAndAvoidsDuplicates(t *testing.T) {
 func TestAddAdminRejectsInvalidInputWithoutWrites(t *testing.T) {
 	for _, config := range []string{`{`, `null`, `[]`, `{}`, `{"site":{"name":""}}`, `{"site":{"name":"Test"},"admin":[]}`, `{"site":{"name":"Test"},"admin":{"emails":"bad"}}`, `{"site":{"name":"Test"},"admin":{"emails":["bad"]}}`} {
 		root := fixture(t)
-		put(t, root, "_/nanoweb.config", config)
+		put(t, root, "_/flea.config", config)
 		if _, _, err := AddAdmin(root, "owner@example.com"); err == nil {
 			t.Fatal(config)
 		}
-		got, _ := os.ReadFile(filepath.Join(root, "_", "nanoweb.config"))
+		got, _ := os.ReadFile(filepath.Join(root, "_", "flea.config"))
 		if string(got) != config {
 			t.Fatal("changed invalid config")
 		}
@@ -77,7 +77,7 @@ func TestAddAdminRejectsInvalidInputWithoutWrites(t *testing.T) {
 
 func TestAddAdminRejectsConfigSymlink(t *testing.T) {
 	root := fixture(t)
-	file := filepath.Join(root, "_", "nanoweb.config")
+	file := filepath.Join(root, "_", "flea.config")
 	outside := filepath.Join(t.TempDir(), "config")
 	const body = `{"site":{"name":"Keep"}}`
 	if err := os.WriteFile(outside, []byte(body), 0600); err != nil {

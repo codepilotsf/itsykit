@@ -64,24 +64,24 @@ func TestDeployOffersSetupOnlyForMissingServer(t *testing.T) {
 				switch {
 				case strings.Contains(args, "-O exit") || strings.Contains(args, "rm -f --"):
 					return nil
-				case strings.Contains(args, "NANOWEB_SYSTEM"):
+				case strings.Contains(args, "FLEA_SYSTEM"):
 					if mode == "auth-failed" {
 						return errors.New("exit status 255")
 					}
-					fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:0")
+					fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0")
 					if installed {
-						fmt.Fprintln(c.out, "NANOWEB_DEPLOY=7")
+						fmt.Fprintln(c.out, "FLEA_DEPLOY=8")
 					} else if mode == "outdated" {
-						fmt.Fprintln(c.out, "NANOWEB_DEPLOY=1")
+						fmt.Fprintln(c.out, "FLEA_DEPLOY=1")
 					} else {
-						fmt.Fprintln(c.out, "NANOWEB_MISSING=1")
+						fmt.Fprintln(c.out, "FLEA_MISSING=1")
 					}
 					return nil
 				case strings.Contains(args, "-check-dns"):
 					dns = true
 					return nil
 				case strings.Contains(args, "mktemp"):
-					fmt.Fprintln(c.out, "/tmp/nanoweb-deploy.ABCDE12345")
+					fmt.Fprintln(c.out, "/tmp/flea-deploy.ABCDE12345")
 					return nil
 				case c.name == "scp":
 					return nil
@@ -121,7 +121,7 @@ func TestDeployOffersSetupOnlyForMissingServer(t *testing.T) {
 				if mode != "setup-failed" && installs != 0 {
 					t.Fatal("installed without consent or verified absence")
 				}
-				if mode == "auth-failed" && (strings.Contains(err.Error(), "255") || strings.Contains(out.String(), "Install Nanoweb")) {
+				if mode == "auth-failed" && (strings.Contains(err.Error(), "255") || strings.Contains(out.String(), "Install Flea CMS")) {
 					t.Fatal(err, out.String())
 				}
 			}

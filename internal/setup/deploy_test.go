@@ -17,7 +17,7 @@ func TestDeploySSHWorkflow(t *testing.T) {
 	os.Mkdir(filepath.Join(root, "."), 0755)
 	os.Mkdir(filepath.Join(root, "_"), 0755)
 	os.WriteFile(filepath.Join(root, "index.html"), []byte("Hello"), 0644)
-	os.WriteFile(filepath.Join(root, "_", "nanoweb.config"), []byte(`{"site":{"name":"test"}}`), 0644)
+	os.WriteFile(filepath.Join(root, "_", "flea.config"), []byte(`{"site":{"name":"test"}}`), 0644)
 	initRepo(t, root)
 	for _, fail := range []string{"", "connect", "dns", "upload", "activate"} {
 		t.Run(fail, func(t *testing.T) {
@@ -33,13 +33,13 @@ func TestDeploySSHWorkflow(t *testing.T) {
 				}
 				stage := ""
 				switch {
-				case strings.Contains(args, "NANOWEB_SYSTEM"):
+				case strings.Contains(args, "FLEA_SYSTEM"):
 					stage = "connect"
-					fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:1000\nNANOWEB_DEPLOY=7")
+					fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:1000\nFLEA_DEPLOY=8")
 				case strings.Contains(args, "-check-dns"):
 					stage = "dns"
 				case strings.Contains(args, "mktemp"):
-					fmt.Fprintln(c.out, "/tmp/nanoweb-deploy.ABCDE12345")
+					fmt.Fprintln(c.out, "/tmp/flea-deploy.ABCDE12345")
 					return nil
 				case c.name == "scp":
 					stage = "upload"
@@ -77,8 +77,8 @@ func TestHTTPSCommandAndInvalidInput(t *testing.T) {
 	var commandText string
 	runner := func(_ context.Context, c command) error {
 		text := strings.Join(c.args, " ")
-		if strings.Contains(text, "NANOWEB_SYSTEM") {
-			fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:0\nNANOWEB_DEPLOY=7")
+		if strings.Contains(text, "FLEA_SYSTEM") {
+			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=8")
 			return nil
 		}
 		if strings.Contains(text, "-O exit") {
@@ -110,8 +110,8 @@ func TestDirtyDuringDNSStopsUpload(t *testing.T) {
 		switch {
 		case strings.Contains(text, "-O exit"):
 			return nil
-		case strings.Contains(text, "NANOWEB_SYSTEM"):
-			fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:0\nNANOWEB_DEPLOY=7")
+		case strings.Contains(text, "FLEA_SYSTEM"):
+			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=8")
 			return nil
 		case strings.Contains(text, "-check-dns"):
 			return os.WriteFile(filepath.Join(root, "new-file"), []byte("changed during preflight"), 0644)

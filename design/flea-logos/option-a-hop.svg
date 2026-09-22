@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Flea CMS option A: Hop, a happy flea in profile</title>
+  <g stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Tall, wingless body and folded jumping legs give the flea its silhouette. -->
+    <path d="M80 38C69 25 48 30 39 48C29 69 39 87 58 89C74 91 85 79 85 63"/>
+    <path d="M47 43C40 58 43 72 53 79M60 36C51 50 53 68 63 75"/>
+    <path d="M81 38C85 28 99 30 103 40C107 48 103 61 94 65C87 68 79 64 77 58"/>
+    <path d="M88 31L86 22M98 31L102 24"/>
+    <path d="M94 53Q99 57 103 51"/>
+    <path d="M47 78L27 88L40 104L23 108M59 87L52 101L66 108M78 74L92 78L103 70"/>
+  </g>
+  <circle cx="96" cy="43" r="3.2" fill="#1e293b"/>
+</svg>

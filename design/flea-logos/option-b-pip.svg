@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Flea CMS option B: Pip, a cheerful compact flea</title>
+  <g stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- No wings or wing seam: a small head, segmented body and large hind legs. -->
+    <path d="M45 58C31 64 31 82 41 91C52 101 76 101 87 91C97 82 97 64 83 58"/>
+    <path d="M40 76Q64 88 88 76M44 87Q64 97 84 87"/>
+    <path d="M43 47C43 33 51 27 64 27C77 27 85 33 85 47C85 62 76 69 64 69C52 69 43 62 43 47Z"/>
+    <path d="M55 27L50 18M73 27L78 18M58 55Q64 62 70 55"/>
+    <path d="M40 66L28 60L23 50M88 66L100 60L105 50M35 78L22 82M93 78L106 82"/>
+    <path d="M41 91L26 100L36 111L20 111M87 91L102 100L92 111L108 111"/>
+  </g>
+  <g fill="#1e293b">
+    <circle cx="55" cy="45" r="3.2"/>
+    <circle cx="73" cy="45" r="3.2"/>
+  </g>
+</svg>

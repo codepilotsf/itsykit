@@ -2,9 +2,9 @@
   "pages": {
     "/": {
       "title": "Home",
-      "description": "Welcome to your new NanoWeb site.",
+      "description": "Welcome to your new Flea CMS site.",
       "snips": {
-        "a7Km2pQ9xB": {"label": "title", "content": "Welcome to Nanoweb."},
+        "a7Km2pQ9xB": {"label": "title", "content": "Welcome to Flea CMS."},
         "b8Ln3rR0yC": {"label": "introduction", "content": "Your new site is ready. Make yourself at home."}
       }
     }

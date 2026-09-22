@@ -9,8 +9,8 @@ import (
 	"os"
 	"strings"
 
-	"nanoweb/internal/sitefiles"
-	"nanoweb/internal/snips"
+	"flea/internal/sitefiles"
+	"flea/internal/snips"
 )
 
 // LoadEditing extracts new regions only for the local dev server.

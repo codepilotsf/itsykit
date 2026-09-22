@@ -4,7 +4,7 @@ import (
 	"os"
 	"sync"
 
-	"nanoweb/internal/snips"
+	"flea/internal/snips"
 )
 
 var localContentMu sync.Mutex

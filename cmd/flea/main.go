@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"nanoweb/internal/cli"
+	"flea/internal/cli"
 )
 
 func main() {

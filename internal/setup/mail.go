@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"nanoweb/internal/mailer"
+	"flea/internal/mailer"
 )
 
 func askSecret(ctx context.Context, in io.Reader, out io.Writer) (string, error) {
@@ -54,17 +54,17 @@ func ensureMail(ctx context.Context, target string, options []string, isRoot boo
 		return run(ctx, command{name: "ssh", args: args, in: input, out: output, errOut: errOut})
 	}
 	var output bytes.Buffer
-	if err := ssh(ctx, prefix+"/usr/local/bin/nanoweb-server -mail-status", true, in, &output); err != nil {
+	if err := ssh(ctx, prefix+"/usr/local/bin/flea-server -mail-status", true, in, &output); err != nil {
 		return fmt.Errorf("Could not check the server's email settings. Nothing was deployed.")
 	}
-	if strings.Contains(output.String(), "NANOWEB_MAIL=ready") {
+	if strings.Contains(output.String(), "FLEA_MAIL=ready") {
 		return nil
 	}
-	if !strings.Contains(output.String(), "NANOWEB_MAIL=missing") {
+	if !strings.Contains(output.String(), "FLEA_MAIL=missing") {
 		return fmt.Errorf("The server did not report its email settings. Please update the server.")
 	}
-	fmt.Fprintln(out, "\nAdmin login needs email delivery. These settings are saved only on the server, not in Git.")
-	s := mailer.Settings{APIKey: os.Getenv("RESEND_API_KEY"), From: os.Getenv("NANOWEB_EMAIL_FROM")}
+	fmt.Fprintln(out, "\nThis site needs email delivery. These settings are saved only on the server, not in Git.")
+	s := mailer.Settings{APIKey: os.Getenv("RESEND_API_KEY"), From: os.Getenv("FLEA_EMAIL_FROM")}
 	var err error
 	if s.APIKey == "" {
 		s.APIKey, err = askSecret(ctx, in, out)
@@ -82,11 +82,11 @@ func ensureMail(ctx context.Context, target string, options []string, isRoot boo
 		return err
 	}
 	output.Reset()
-	if err = ssh(ctx, "umask 077; mktemp -d /tmp/nanoweb-mail.XXXXXXXXXX", false, in, &output); err != nil {
+	if err = ssh(ctx, "umask 077; mktemp -d /tmp/flea-mail.XXXXXXXXXX", false, in, &output); err != nil {
 		return fmt.Errorf("Could not prepare email settings on the server.")
 	}
 	stage := strings.TrimSpace(output.String())
-	if !regexp.MustCompile(`^/tmp/nanoweb-mail\.[A-Za-z0-9]{10}$`).MatchString(stage) {
+	if !regexp.MustCompile(`^/tmp/flea-mail\.[A-Za-z0-9]{10}$`).MatchString(stage) {
 		return fmt.Errorf("Unexpected email staging directory.")
 	}
 	defer func() {
@@ -100,7 +100,7 @@ func ensureMail(ctx context.Context, target string, options []string, isRoot boo
 	if err = ssh(ctx, "umask 077; cat > "+shellQuote(stage+"/mail.json"), false, bytes.NewReader(data), io.Discard); err != nil {
 		return fmt.Errorf("Could not transfer email settings securely.")
 	}
-	if err = ssh(ctx, prefix+"/usr/local/bin/nanoweb-server -configure-mail < "+shellQuote(stage+"/mail.json"), true, in, out); err != nil {
+	if err = ssh(ctx, prefix+"/usr/local/bin/flea-server -configure-mail < "+shellQuote(stage+"/mail.json"), true, in, out); err != nil {
 		return fmt.Errorf("Could not save the server's email settings.")
 	}
 	fmt.Fprintln(out, "Email settings saved. They will take effect when this deployment restarts the server.")

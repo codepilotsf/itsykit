@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"nanoweb/internal/host"
-	"nanoweb/internal/release"
+	"flea/internal/host"
+	"flea/internal/release"
 )
 
 func fixture(t *testing.T) (Manager, Options) {
@@ -31,7 +31,7 @@ func fixture(t *testing.T) (Manager, Options) {
 func archive(t *testing.T, title string) string {
 	t.Helper()
 	root := t.TempDir()
-	for name, body := range map[string]string{"_/nanoweb.config": `{"site":{"name":"` + title + `"}}`, "index.html": "<h1>{site.name}</h1>", "style.css": "body{}"} {
+	for name, body := range map[string]string{"_/flea.config": `{"site":{"name":"` + title + `"}}`, "index.html": "<h1>{site.name}</h1>", "style.css": "body{}"} {
 		file := filepath.Join(root, name)
 		os.MkdirAll(filepath.Dir(file), 0755)
 		os.WriteFile(file, []byte(body), 0644)
@@ -251,7 +251,7 @@ func TestDeploymentHTTPWorkflow(t *testing.T) {
 			path   string
 			status int
 			body   string
-		}{{"/", 200, title}, {"/style.css", 200, "body{}"}, {"/_/nanoweb.config", 404, ""}, {"/index.html", 404, ""}} {
+		}{{"/", 200, title}, {"/style.css", 200, "body{}"}, {"/_/flea.config", 404, ""}, {"/index.html", 404, ""}} {
 			req, _ := http.NewRequest("GET", "http://"+address+tc.path, nil)
 			req.Host = "example.test"
 			res, err := http.DefaultClient.Do(req)

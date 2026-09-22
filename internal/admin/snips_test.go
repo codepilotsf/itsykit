@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"nanoweb/internal/editor"
-	"nanoweb/internal/editstore"
-	"nanoweb/internal/host"
-	"nanoweb/internal/release"
-	"nanoweb/internal/site"
-	"nanoweb/internal/snips"
+	"flea/internal/editor"
+	"flea/internal/editstore"
+	"flea/internal/host"
+	"flea/internal/release"
+	"flea/internal/site"
+	"flea/internal/snips"
 )
 
 func richArchive(t *testing.T, include bool) string {
@@ -26,7 +26,7 @@ func richArchive(t *testing.T, include bool) string {
 	store.Page("/").Snips["a7Km2pQ9xB"] = snips.Entry{Label: "title", Content: "Local seed"}
 	data, _ := store.Bytes()
 	os.WriteFile(filepath.Join(root, "_/snips.json"), data, 0644)
-	os.WriteFile(filepath.Join(root, "_/nanoweb.config"), []byte(`{"site":{"name":"Test"}}`), 0644)
+	os.WriteFile(filepath.Join(root, "_/flea.config"), []byte(`{"site":{"name":"Test"}}`), 0644)
 	page := `<p>No region</p>`
 	if include {
 		page = `<h1 snip="title">{snip a7Km2pQ9xB}</h1>`

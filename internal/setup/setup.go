@@ -16,17 +16,17 @@ import (
 	"strings"
 	"time"
 
-	"nanoweb/internal/serverbundle"
+	"flea/internal/serverbundle"
 )
 
 //go:embed install.sh
 var installer string
 
-//go:embed nanoweb.service
+//go:embed flea.service
 var service string
 
 const defaultConfig = "{\n  \"listen\": \":80\",\n  \"sites\": {}\n}\n"
-const probe = `set -eu; . /etc/os-release; command -v systemctl >/dev/null; test -d /run/systemd/system; printf 'NANOWEB_SYSTEM=%s:%s:%s:%s\n' "$ID" "$VERSION_ID" "$(uname -m)" "$(id -u)"`
+const probe = `set -eu; . /etc/os-release; command -v systemctl >/dev/null; test -d /run/systemd/system; printf 'FLEA_SYSTEM=%s:%s:%s:%s\n' "$ID" "$VERSION_ID" "$(uname -m)" "$(id -u)"`
 
 type command struct {
 	name        string
@@ -38,7 +38,7 @@ type command struct {
 }
 type runner func(context.Context, command) error
 
-var errHostKeyChanged = errors.New("The server's SSH identity has changed.\n\nConnection stopped to protect your site. This can happen after a server rebuild,\nbut it could also mean you are connecting to a different server.\nVerify the new fingerprint with your server provider before updating its saved\nentry in ~/.ssh/known_hosts. NanoWeb has not removed or replaced the saved key.")
+var errHostKeyChanged = errors.New("The server's SSH identity has changed.\n\nConnection stopped to protect your site. This can happen after a server rebuild,\nbut it could also mean you are connecting to a different server.\nVerify the new fingerprint with your server provider before updating its saved\nentry in ~/.ssh/known_hosts. Flea CMS has not removed or replaced the saved key.")
 
 type sshErrorWriter struct {
 	out     io.Writer
@@ -131,7 +131,7 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 	if err != nil {
 		return err
 	}
-	temp, err := os.MkdirTemp("/tmp", "nanoweb-setup-")
+	temp, err := os.MkdirTemp("/tmp", "flea-setup-")
 	if err != nil {
 		return err
 	}
@@ -154,7 +154,7 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 		_ = runCommand(cleanup, command{name: "ssh", args: args, out: io.Discard, errOut: io.Discard})
 	}()
 	var probeOutput bytes.Buffer
-	if err := ssh("sh -c "+shellQuote(probe+`; if test -f /usr/local/bin/nanoweb-server && test -f /etc/nanoweb/server.json; then printf 'NANOWEB_EXISTING=1\n'; fi`), false, &probeOutput); err != nil {
+	if err := ssh("sh -c "+shellQuote(probe+`; if test -f /usr/local/bin/flea-server && test -f /etc/flea/server.json; then printf 'FLEA_EXISTING=1\n'; fi`), false, &probeOutput); err != nil {
 		if errors.Is(err, errHostKeyChanged) {
 			return err
 		}
@@ -164,15 +164,15 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 	if err != nil {
 		return err
 	}
-	reinstall := strings.Contains(probeOutput.String(), "NANOWEB_EXISTING=1\n")
+	reinstall := strings.Contains(probeOutput.String(), "FLEA_EXISTING=1\n")
 	// Verify the replacement before asking permission to reset a working server.
 	// Extraction failures must never lead to remote installation changes.
-	fmt.Fprintln(out, "\nPreparing bundled Nanoweb server...")
-	if err := runCommand(ctx, command{name: "extract-server", args: []string{arch, filepath.Join(temp, "nanoweb-server")}}); err != nil {
+	fmt.Fprintln(out, "\nPreparing bundled Flea CMS server...")
+	if err := runCommand(ctx, command{name: "extract-server", args: []string{arch, filepath.Join(temp, "flea-server")}}); err != nil {
 		return err
 	}
 	if reinstall {
-		fmt.Fprint(out, "\nWARNING: NanoWeb is already installed on this server.\nReinstalling will take ALL existing sites offline and replace the installation,\nincluding site configuration and certificates, with an empty installation.\nThe previous files will be kept in a root-only backup on the server.\nThere is no automatic undo.\n\n")
+		fmt.Fprint(out, "\nWARNING: Flea CMS is already installed on this server.\nReinstalling will take ALL existing sites offline and replace the installation,\nincluding site configuration and certificates, with an empty installation.\nThe previous files will be kept in a root-only backup on the server.\nThere is no automatic undo.\n\n")
 		answer, err := ask(ctx, in, out, "Type DESTROY to replace this installation (Enter cancels)", "")
 		if err != nil {
 			return err
@@ -181,35 +181,35 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 			return fmt.Errorf("Setup cancelled. The existing installation was not changed.")
 		}
 	}
-	for name, body := range map[string]string{"install.sh": installer, "nanoweb.service": service, "server.json": defaultConfig} {
+	for name, body := range map[string]string{"install.sh": installer, "flea.service": service, "server.json": defaultConfig} {
 		if err := os.WriteFile(filepath.Join(temp, name), []byte(body), 0600); err != nil {
 			return err
 		}
 	}
 	var stageOutput bytes.Buffer
-	if err := ssh("umask 077; mktemp -d /tmp/nanoweb-setup.XXXXXXXXXX", false, &stageOutput); err != nil {
+	if err := ssh("umask 077; mktemp -d /tmp/flea-setup.XXXXXXXXXX", false, &stageOutput); err != nil {
 		return fmt.Errorf("create remote staging directory: %w", err)
 	}
 	stage := strings.TrimSpace(stageOutput.String())
-	if !regexp.MustCompile(`^/tmp/nanoweb-setup\.[A-Za-z0-9]{10}$`).MatchString(stage) {
+	if !regexp.MustCompile(`^/tmp/flea-setup\.[A-Za-z0-9]{10}$`).MatchString(stage) {
 		return fmt.Errorf("unexpected remote staging path %q", stage)
 	}
 	defer func() {
 		cleanup, stop := context.WithTimeout(context.Background(), 5*time.Second)
 		defer stop()
 		// Remove only the four files staged by this invocation, then the empty directory.
-		text := "rm -f -- " + shellQuote(stage+"/nanoweb-server") + " " + shellQuote(stage+"/install.sh") + " " + shellQuote(stage+"/nanoweb.service") + " " + shellQuote(stage+"/server.json") + "; rmdir -- " + shellQuote(stage)
+		text := "rm -f -- " + shellQuote(stage+"/flea-server") + " " + shellQuote(stage+"/install.sh") + " " + shellQuote(stage+"/flea.service") + " " + shellQuote(stage+"/server.json") + "; rmdir -- " + shellQuote(stage)
 		args := append(append([]string{}, sshOptions...), "-T", "--", target, text)
 		_ = runCommand(cleanup, command{name: "ssh", args: args, out: io.Discard, errOut: io.Discard})
 	}()
-	fmt.Fprintln(out, "Uploading Nanoweb server...")
+	fmt.Fprintln(out, "Uploading Flea CMS server...")
 	scpTarget := scpHost(target)
 	args := append([]string{}, sshOptions...)
-	args = append(args, "--", filepath.Join(temp, "nanoweb-server"), filepath.Join(temp, "install.sh"), filepath.Join(temp, "nanoweb.service"), filepath.Join(temp, "server.json"), scpTarget+":"+stage+"/")
+	args = append(args, "--", filepath.Join(temp, "flea-server"), filepath.Join(temp, "install.sh"), filepath.Join(temp, "flea.service"), filepath.Join(temp, "server.json"), scpTarget+":"+stage+"/")
 	if err := runCommand(ctx, command{name: "scp", args: args, in: in, out: out, errOut: errOut}); err != nil {
 		return fmt.Errorf("upload failed: %w", err)
 	}
-	fmt.Fprintln(out, "Installing Nanoweb service...")
+	fmt.Fprintln(out, "Installing Flea CMS service...")
 	installCommand := "sh " + shellQuote(stage+"/install.sh") + " " + shellQuote(stage)
 	if reinstall {
 		installCommand += " --reinstall"
@@ -220,21 +220,21 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 	if err := ssh(installCommand, true, out); err != nil {
 		return fmt.Errorf("server installation failed: %w", err)
 	}
-	fmt.Fprintln(out, "Checking Nanoweb service...")
-	verify := "systemctl is-active --quiet nanoweb && /usr/local/bin/nanoweb-server -config /etc/nanoweb/server.json -check"
+	fmt.Fprintln(out, "Checking Flea CMS service...")
+	verify := "systemctl is-active --quiet flea && /usr/local/bin/flea-server -config /etc/flea/server.json -check"
 	if err := ssh(verify, false, out); err != nil {
 		return fmt.Errorf("server installed but readiness check failed: %w", err)
 	}
-	fmt.Fprintf(out, "Nanoweb server is running on %s (HTTP port 80).\nConfiguration: /etc/nanoweb/server.json\nLocal readiness verified. Allow inbound TCP ports 80 and 443 for HTTP and HTTPS.\nNext: run nanoweb deploy -target %s -domain YOUR_DOMAIN from your site.\n", target, target)
+	fmt.Fprintf(out, "Flea CMS server is running on %s (HTTP port 80).\nConfiguration: /etc/flea/server.json\nLocal readiness verified. Allow inbound TCP ports 80 and 443 for HTTP and HTTPS.\nNext: run flea deploy -target %s -domain YOUR_DOMAIN from your site.\n", target, target)
 	return nil
 }
 
 func parseProbe(output string) (string, bool, error) {
 	for _, line := range strings.Split(output, "\n") {
-		if !strings.HasPrefix(line, "NANOWEB_SYSTEM=") {
+		if !strings.HasPrefix(line, "FLEA_SYSTEM=") {
 			continue
 		}
-		parts := strings.Split(strings.TrimSpace(strings.TrimPrefix(line, "NANOWEB_SYSTEM=")), ":")
+		parts := strings.Split(strings.TrimSpace(strings.TrimPrefix(line, "FLEA_SYSTEM=")), ":")
 		if len(parts) != 4 {
 			break
 		}

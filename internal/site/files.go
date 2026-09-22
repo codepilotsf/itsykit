@@ -124,7 +124,7 @@ func replaceFile(root *os.Root, name string, data []byte) error {
 	if _, err := rand.Read(random[:]); err != nil {
 		return err
 	}
-	temp := ".nanoweb-" + hex.EncodeToString(random[:])
+	temp := ".flea-" + hex.EncodeToString(random[:])
 	f, err := root.OpenFile(temp, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
 	if err != nil {
 		return err

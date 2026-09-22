@@ -18,14 +18,15 @@ import (
 	"strconv"
 	"time"
 
-	"nanoweb/internal/editor"
-	"nanoweb/internal/editstore"
-	"nanoweb/internal/mailer"
-	"nanoweb/internal/site"
-	"nanoweb/internal/snips"
+	"flea/internal/contact"
+	"flea/internal/editor"
+	"flea/internal/editstore"
+	"flea/internal/mailer"
+	"flea/internal/site"
+	"flea/internal/snips"
 )
 
-const HealthPath = "/_nanoweb/health"
+const HealthPath = "/_flea/health"
 
 type Config struct {
 	Content      map[string]string `json:"content,omitempty"`
@@ -39,6 +40,10 @@ type Config struct {
 }
 
 func Load(configPath string, logger *log.Logger) (Config, http.Handler, error) {
+	return load(configPath, logger, mailer.Env())
+}
+
+func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, http.Handler, error) {
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		return Config{}, nil, err
@@ -70,6 +75,12 @@ func Load(configPath string, logger *log.Logger) (Config, http.Handler, error) {
 	// release would make deployment preservation depend on map iteration order.
 	byRoot := map[string]http.Handler{}
 	contentPaths := map[string]string{}
+	contactBudget := &contact.Budget{}
+	type owner struct {
+		root string
+		file os.FileInfo
+	}
+	var contentOwners []owner
 	for host, root := range config.Sites {
 		if !ValidHost(host) {
 			return config, nil, fmt.Errorf("invalid site hostname %q", host)
@@ -81,6 +92,16 @@ func Load(configPath string, logger *log.Logger) (Config, http.Handler, error) {
 		contentPath := config.Content[host]
 		if contentPath != "" {
 			contentPath = filepath.Clean(contentPath)
+			info, e := os.Stat(contentPath)
+			if e != nil {
+				return config, nil, e
+			}
+			for _, previous := range contentOwners {
+				if previous.root != key && os.SameFile(previous.file, info) {
+					return config, nil, fmt.Errorf("different sites must not share a content file")
+				}
+			}
+			contentOwners = append(contentOwners, owner{key, info})
 		}
 		if handler, ok := byRoot[key]; ok {
 			if contentPaths[key] != contentPath {
@@ -115,12 +136,23 @@ func Load(configPath string, logger *log.Logger) (Config, http.Handler, error) {
 				return config, nil, fmt.Errorf("site %s: admin requires a managed content snapshot; deploy this site first", host)
 			}
 			store := &editstore.Store{Root: root, ContentPath: contentPath, ConfigPath: configPath, Emails: project.Admin.Emails, Publish: public.Publish}
-			dashboard := editor.New(editor.Options{Emails: project.Admin.Emails, Name: fmt.Sprint(project.Site["name"]), Sender: mailer.Env(), Backend: store, Logger: logger})
+			dashboard := editor.New(editor.Options{Emails: project.Admin.Emails, Name: fmt.Sprint(project.Site["name"]), Sender: sender, Backend: store, Logger: logger})
 			handlers[host] = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if editor.IsPath(r.URL.Path) {
 					dashboard.ServeHTTP(w, r)
 				} else {
 					public.ServeHTTP(w, r)
+				}
+			})
+		}
+		if project.Contact.To != "" {
+			form := contact.New(project.Contact, key, sender, contactBudget, false, logger)
+			next := handlers[host]
+			handlers[host] = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == contact.Path {
+					form.ServeHTTP(w, r)
+				} else {
+					next.ServeHTTP(w, r)
 				}
 			})
 		}
@@ -130,9 +162,9 @@ func Load(configPath string, logger *log.Logger) (Config, http.Handler, error) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == HealthPath {
 			w.Header().Set("Cache-Control", "no-store")
-			w.Header().Set("X-Nanoweb-Revision", config.Revision)
+			w.Header().Set("X-Flea-Revision", config.Revision)
 			if _, ok := handlers[requestHost(r)]; ok {
-				w.Header().Set("X-Nanoweb-Site", requestHost(r))
+				w.Header().Set("X-Flea-Site", requestHost(r))
 			}
 			w.Header().Set("Content-Type", "application/json")
 			if r.Method != "GET" && r.Method != "HEAD" {
@@ -141,7 +173,7 @@ func Load(configPath string, logger *log.Logger) (Config, http.Handler, error) {
 				return
 			}
 			if r.Method == "GET" {
-				_, _ = io.WriteString(w, `{"service":"nanoweb","status":"ready"}`)
+				_, _ = io.WriteString(w, `{"service":"flea","status":"ready"}`)
 			}
 			return
 		}
@@ -208,7 +240,7 @@ func serve(ctx context.Context, config Config, handler http.Handler, logger *log
 	}
 	go func() { done <- server.Serve(listener) }()
 	if logger != nil {
-		logger.Printf("Nanoweb server listening on %s", listener.Addr())
+		logger.Printf("Flea CMS server listening on %s", listener.Addr())
 	}
 	var result error
 	remaining := len(servers)
@@ -275,10 +307,10 @@ func Probe(ctx context.Context, config Config, domain string, secure bool) error
 	if err != nil {
 		return err
 	}
-	if response.StatusCode != 200 || string(body) != `{"service":"nanoweb","status":"ready"}` {
-		return fmt.Errorf("Nanoweb server readiness check failed")
+	if response.StatusCode != 200 || string(body) != `{"service":"flea","status":"ready"}` {
+		return fmt.Errorf("Flea CMS server readiness check failed")
 	}
-	if response.Header.Get("X-Nanoweb-Revision") != config.Revision || (domain != "" && response.Header.Get("X-Nanoweb-Site") != domain) {
+	if response.Header.Get("X-Flea-Revision") != config.Revision || (domain != "" && response.Header.Get("X-Flea-Site") != domain) {
 		return fmt.Errorf("server is not serving the expected release/hostname")
 	}
 	return nil

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"nanoweb/internal/snips"
+	"flea/internal/snips"
 )
 
 func TestEditableRegionsExtractRenderAndReload(t *testing.T) {

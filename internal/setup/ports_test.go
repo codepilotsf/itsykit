@@ -22,10 +22,10 @@ func TestInstallerPortOwnership(t *testing.T) {
 		{name: "https-ipv6", tcp: `LISTEN 0 128 [::]:443 [::]:* users:(("apache",pid=42,fd=1))`, fail: true},
 		{name: "quic", udp: `UNCONN 0 0 *:443 *:* users:(("server",pid=42,fd=1))`, fail: true},
 		{name: "unknown-owner", tcp: `LISTEN 0 128 *:80 *:*`, fail: true},
-		{name: "nanoweb-reinstall", tcp: `LISTEN 0 128 *:80 *:* users:(("nanoweb-server",pid=42,fd=1))`, pid: "42", exe: "/usr/local/bin/nanoweb-server", mode: "--reinstall"},
-		{name: "nanoweb-fresh", tcp: `LISTEN 0 128 *:80 *:* users:(("nanoweb-server",pid=42,fd=1))`, pid: "42", exe: "/usr/local/bin/nanoweb-server", fail: true},
+		{name: "flea-reinstall", tcp: `LISTEN 0 128 *:80 *:* users:(("flea-server",pid=42,fd=1))`, pid: "42", exe: "/usr/local/bin/flea-server", mode: "--reinstall"},
+		{name: "flea-fresh", tcp: `LISTEN 0 128 *:80 *:* users:(("flea-server",pid=42,fd=1))`, pid: "42", exe: "/usr/local/bin/flea-server", fail: true},
 		{name: "wrong-executable", tcp: `LISTEN 0 128 *:80 *:* users:(("server",pid=42,fd=1))`, pid: "42", exe: "/usr/sbin/nginx", mode: "--reinstall", fail: true},
-		{name: "shared-socket", tcp: `LISTEN 0 128 *:443 *:* users:(("nanoweb-server",pid=42,fd=1),("other",pid=43,fd=2))`, pid: "42", exe: "/usr/local/bin/nanoweb-server", mode: "--reinstall", fail: true},
+		{name: "shared-socket", tcp: `LISTEN 0 128 *:443 *:* users:(("flea-server",pid=42,fd=1),("other",pid=43,fd=2))`, pid: "42", exe: "/usr/local/bin/flea-server", mode: "--reinstall", fail: true},
 		{name: "ss-error", tcp: "ERROR", fail: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

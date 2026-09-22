@@ -12,10 +12,10 @@ import (
 	"slices"
 	"unicode/utf8"
 
-	"nanoweb/internal/editor"
-	"nanoweb/internal/site"
-	"nanoweb/internal/snips"
-	"nanoweb/internal/state"
+	"flea/internal/editor"
+	"flea/internal/site"
+	"flea/internal/snips"
+	"flea/internal/state"
 )
 
 type Store struct {

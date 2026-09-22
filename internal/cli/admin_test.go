@@ -19,7 +19,7 @@ func TestAdminCommand(t *testing.T) {
 	if code := Run(context.Background(), []string{"admin", "owner@example.com"}, &out, &out); code != 0 || !strings.Contains(out.String(), "Added owner@example.com") {
 		t.Fatal(code, out.String())
 	}
-	for _, text := range []string{"RESEND_API_KEY", "NANOWEB_EMAIL_FROM", "domain verified in Resend", "Keep .env out of Git", "source .env", "http://127.0.0.1:3000/admin"} {
+	for _, text := range []string{"RESEND_API_KEY", "FLEA_EMAIL_FROM", "domain verified in Resend", "Keep .env out of Git", "source .env", "http://127.0.0.1:3000/admin"} {
 		if !strings.Contains(out.String(), text) {
 			t.Fatalf("missing login setup instruction %q", text)
 		}

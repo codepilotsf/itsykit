@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
+	"flea/internal/snips"
 	"golang.org/x/net/html"
-	"nanoweb/internal/snips"
 )
 
 var richRef = regexp.MustCompile(`\{\s*snip\s+([A-Za-z0-9]{10})\s*\}`)
@@ -200,7 +200,7 @@ func (p *Project) CheckExtractedSnips() error {
 		}
 		for _, r := range regions {
 			if r.id == "" {
-				return fmt.Errorf("%s: new snip region %q needs extraction. Run nanoweb dev, then commit the generated files before deploying.", file, r.label)
+				return fmt.Errorf("%s: new snip region %q needs extraction. Run flea dev, then commit the generated files before deploying.", file, r.label)
 			}
 		}
 	}

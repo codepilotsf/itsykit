@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"nanoweb/internal/mailer"
+	"flea/internal/mailer"
 )
 
 func MailReady(configPath string) bool {
@@ -35,7 +35,7 @@ func MailReady(configPath string) bool {
 		switch k {
 		case "RESEND_API_KEY":
 			s.APIKey = value
-		case "NANOWEB_EMAIL_FROM":
+		case "FLEA_EMAIL_FROM":
 			s.From = value
 		}
 	}
@@ -62,6 +62,6 @@ func (m Manager) ConfigureMail(input io.Reader) error {
 	if err = s.Validate(); err != nil {
 		return err
 	}
-	data := []byte("RESEND_API_KEY=" + strconv.Quote(s.APIKey) + "\nNANOWEB_EMAIL_FROM=" + strconv.Quote(s.From) + "\n")
+	data := []byte("RESEND_API_KEY=" + strconv.Quote(s.APIKey) + "\nFLEA_EMAIL_FROM=" + strconv.Quote(s.From) + "\n")
 	return atomicWrite(filepath.Join(filepath.Dir(m.ConfigPath), "mail.env"), data, 0600)
 }

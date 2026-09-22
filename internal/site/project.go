@@ -10,14 +10,16 @@ import (
 	"sort"
 	"strings"
 
-	"nanoweb/internal/sitefiles"
-	"nanoweb/internal/snips"
+	"flea/internal/contact"
+	"flea/internal/sitefiles"
+	"flea/internal/snips"
 )
 
 // Project is a validated serving snapshot. After publishing it to a Server,
 // callers must not mutate its maps or Content; reload builds a new Project.
 type Project struct {
 	Admin        AdminAccess
+	Contact      contact.Config
 	Content      *snips.Store
 	rich         map[string]template.HTML
 	Root         string
@@ -54,8 +56,9 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 	p := &Project{Root: root, Snips: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
 	p.signature = fingerprint(root)
 	var config struct {
-		Site  map[string]any `json:"site"`
-		Admin AdminAccess    `json:"admin"`
+		Site    map[string]any `json:"site"`
+		Admin   AdminAccess    `json:"admin"`
+		Contact contact.Config `json:"contact"`
 	}
 	// Reject symbolic links throughout the site to keep both public and private
 	// reads within the project. Deployment can reuse this validation boundary.
@@ -81,7 +84,7 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 		return nil, err
 	}
 	// Validate the tree before reading configuration or any content.
-	if err = readJSON(boundary, "_/nanoweb.config", &config); err != nil {
+	if err = readJSON(boundary, "_/flea.config", &config); err != nil {
 		return nil, err
 	}
 	p.Site = config.Site
@@ -89,8 +92,12 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 		return nil, err
 	}
 	p.Admin = config.Admin
+	if err := config.Contact.Validate(); err != nil {
+		return nil, err
+	}
+	p.Contact = config.Contact
 	if name, ok := p.Site["name"].(string); !ok || strings.TrimSpace(name) == "" {
-		return nil, fmt.Errorf("_/nanoweb.config: site.name must be a nonempty string")
+		return nil, fmt.Errorf("_/flea.config: site.name must be a nonempty string")
 	}
 	if content == nil {
 		content, err = readSnipStore(boundary)

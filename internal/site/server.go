@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"nanoweb/internal/sitefiles"
+	"flea/internal/sitefiles"
 )
 
 // Server publishes complete validated snapshots. Failed edits produce a 500
@@ -172,10 +172,10 @@ func fingerprint(root string) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-const reloadPath = "/_nanoweb/reload"
+const reloadPath = "/_flea/reload"
 
 func reloadScript(revision uint64) []byte {
-	return []byte(fmt.Sprintf(`<script>(()=>{const version=%q;setInterval(()=>fetch('/_nanoweb/reload',{cache:'no-store'}).then(r=>r.text()).then(v=>{if(v!==version)location.reload()}).catch(()=>{}),700)})();</script>`, fmt.Sprint(revision)))
+	return []byte(fmt.Sprintf(`<script>(()=>{const version=%q;setInterval(()=>fetch('/_flea/reload',{cache:'no-store'}).then(r=>r.text()).then(v=>{if(v!==version)location.reload()}).catch(()=>{}),700)})();</script>`, fmt.Sprint(revision)))
 }
 
 func withReload(body []byte, revision uint64) []byte {

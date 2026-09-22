@@ -17,11 +17,11 @@ import (
 	"strings"
 	"time"
 
-	"nanoweb/internal/host"
-	"nanoweb/internal/release"
-	"nanoweb/internal/site"
-	"nanoweb/internal/snips"
-	"nanoweb/internal/state"
+	"flea/internal/host"
+	"flea/internal/release"
+	"flea/internal/site"
+	"flea/internal/snips"
+	"flea/internal/state"
 )
 
 type Options struct {
@@ -84,8 +84,8 @@ type Manager struct {
 }
 
 func System() Manager {
-	return Manager{ConfigPath: "/etc/nanoweb/server.json", DataDir: "/var/lib/nanoweb", Restart: func(ctx context.Context) error {
-		output, err := exec.CommandContext(ctx, "systemctl", "restart", "nanoweb.service").CombinedOutput()
+	return Manager{ConfigPath: "/etc/flea/server.json", DataDir: "/var/lib/flea", Restart: func(ctx context.Context) error {
+		output, err := exec.CommandContext(ctx, "systemctl", "restart", "flea.service").CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("restart: %w: %s", err, output)
 		}
@@ -132,7 +132,7 @@ func (m Manager) pending() string {
 }
 
 func atomicWrite(name string, data []byte, mode os.FileMode) error {
-	f, err := os.CreateTemp(filepath.Dir(name), ".nanoweb-")
+	f, err := os.CreateTemp(filepath.Dir(name), ".flea-")
 	if err != nil {
 		return err
 	}
@@ -171,7 +171,7 @@ func (m Manager) Apply(ctx context.Context, o Options) (string, error) {
 	}
 	defer unlock()
 	if _, err := os.Lstat(m.pending()); !os.IsNotExist(err) {
-		return "", fmt.Errorf("unfinished deployment; run sudo nanoweb-server -recover before retrying")
+		return "", fmt.Errorf("unfinished deployment; run sudo flea-server -recover before retrying")
 	}
 	old, err := os.ReadFile(m.ConfigPath)
 	if err != nil {
@@ -244,8 +244,8 @@ func (m Manager) Apply(ctx context.Context, o Options) (string, error) {
 		if err = project.CheckExtractedSnips(); err != nil {
 			return "", err
 		}
-		if len(project.Admin.Emails) > 0 && !o.HTTPS {
-			return "", fmt.Errorf("sites with admin access require HTTPS")
+		if (len(project.Admin.Emails) > 0 || project.Contact.To != "") && !o.HTTPS {
+			return "", fmt.Errorf("sites with admin access or contact forms require HTTPS")
 		}
 		contentPath, activeContent, err = m.prepareContent(c, o.Name, id, dest, project)
 		if err != nil {
@@ -344,7 +344,7 @@ func (m Manager) Apply(ctx context.Context, o Options) (string, error) {
 		recovery, cancel := context.WithTimeout(context.Background(), 45*time.Second)
 		defer cancel()
 		if restoreErr := m.restore(recovery); restoreErr != nil {
-			return "", fmt.Errorf("activation failed: %w; recovery also failed: %v; run sudo nanoweb-server -recover", err, restoreErr)
+			return "", fmt.Errorf("activation failed: %w; recovery also failed: %v; run sudo flea-server -recover", err, restoreErr)
 		}
 		return "", fmt.Errorf("activation failed; previous configuration restored: %w", err)
 	}

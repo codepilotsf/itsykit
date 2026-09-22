@@ -41,7 +41,7 @@ var rawClose = map[string]*regexp.Regexp{
 	"style":  regexp.MustCompile(`(?is)</style(?:\s[^>]*|/?)>`),
 }
 
-// compile translates the deliberately small Nanoweb language to html/template.
+// compile translates the deliberately small Flea CMS language to html/template.
 // Go's contextual escaping also protects URL and attribute contexts.
 func (p *Project) compile(source, file string, stack []string, aliases map[string]string) (string, error) {
 	var out strings.Builder

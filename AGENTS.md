@@ -1,8 +1,8 @@
-# Working on Nanoweb
+# Working on Flea CMS
 
 ## Keep this guide current
 
-Update this file as part of any change that affects Nanoweb's architecture,
+Update this file as part of any change that affects Flea CMS's architecture,
 template language, CLI, starter conventions, supported features, or development
 workflow. Update the relevant sections in the same task, remove stale guidance,
 and keep this a practical guide rather than a running changelog. No separate
@@ -11,20 +11,33 @@ spec.md consistent with behavior changes too.
 
 ## Product and scope
 
-Nanoweb is a small website server built with Go 1.26 or newer, the standard
+### Backward compatibility policy
+
+Flea CMS is early in development. Do not add backward compatibility, legacy
+aliases, format fallbacks, migration layers, or support for superseded behavior
+by default. Prefer the current design, even when it introduces a breaking change.
+Ask the user before adding any backward compatibility layer. This applies to
+commands, configuration, templates, stored data, deployment, and server protocols.
+Existing legacy support is not a precedent for adding more.
+
+Flea CMS is a small website server built with Go 1.26 or newer, the standard
 library, and pinned golang.org/x/crypto/acme/autocert for managed TLS. Sites use plain HTML, local assets, and JSON content. Keep the design
 simple and avoid adding dependencies or a frontend build system without a
 concrete need.
 
-Currently implemented: `nanoweb new <site-name>`, `nanoweb status`,
-`nanoweb dev [-port 3000]`, `nanoweb setup`, `nanoweb version`,
-`nanoweb deploy`, `nanoweb admin [email]`, and `nanoweb https`.
+Currently implemented: `flea new <site-name>`, `flea status`,
+`flea dev [-port 3000]`, `flea setup`, `flea version`,
+`flea deploy`, `flea admin [email]`, and `flea https`.
 Run status/dev from a generated site. Setup runs from the Mac over native SSH.
+Bare `flea`, `flea help`, `flea -h`, and `flea --help` show the grouped command
+overview on stdout and exit successfully. Each command supports `--help` and
+`-h` without requiring a site or starting work. Keep the overview spacious;
+put flags and deployment requirements in command-specific help.
 The dev server listens on loopback; the persistent host defaults to public HTTP
 port 80, with opt-in automatic HTTPS on port 443 per domain.
 
 README.md describes the current implementation. spec.md also contains future
-plans: do not assume its rollback CLI, forms, schemas, content revisions,
+plans: do not assume its rollback CLI, general-purpose forms, schemas, content revisions,
 or managed images are implemented. Rich snips use sanitized HTML; unrestricted
 raw HTML rendering is not implemented.
 Verify current code and tests when documentation disagrees.
@@ -34,8 +47,8 @@ Verify current code and tests when documentation disagrees.
 Read `ARCHITECTURE.md` for dependency direction, trust boundaries, transaction
 ordering, and review follow-ups. Keep it current when those responsibilities change.
 
-- `cmd/nanoweb/main.go`: executable entry point.
-- `cmd/nanoweb-server/main.go`: standalone persistent server entry point.
+- `cmd/flea/main.go`: executable entry point.
+- `cmd/flea-server/main.go`: standalone persistent server entry point.
 - `internal/host/`: strict server JSON config, hostname routing, readiness, and shutdown.
 - `internal/setup/`: interactive SSH bootstrap, installer, and systemd unit.
 - `internal/serverbundle/`: compressed embedded Linux servers and verified extraction.
@@ -65,12 +78,12 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `internal/site/icons_test.go`: offline icon resolution, escaping, and security tests.
 - `internal/site/server.go`: HTTP serving, reload watching, and URL validation.
 - `internal/site/site_test.go`: rendering, routing, isolation, and reload tests.
-- `bin/nanoweb`: local build output; rebuilding is necessary for CLI changes to take effect.
+- `bin/flea`: local build output; rebuilding is necessary for CLI changes to take effect.
 
 ## Sites and templates
 
 A generated site has the project root for templates/assets and `_/` for configuration
-and content. `_/nanoweb.config` is JSON and requires a nonempty `site.name`.
+and content. `_/flea.config` is JSON and requires a nonempty `site.name`.
 Owner-editable snips live in _/snips.json: pages map canonical routes to title,
 description, and snips; shared.snips holds reusable regions; archive holds removed
 IDs. Entries have label/content. IDs are 10 case-sensitive alphanumeric chars,
@@ -108,10 +121,10 @@ Git snapshots, and archives. Exclude dotpaths, node_modules, and project metadat
 (README.md, AGENTS.md, ARCHITECTURE.md, spec.md, next-steps.md, LICENSE, LICENSE.md, go.mod, go.sum).
 Only config, snips, structured data, and icons are runtime files inside _/. No legacy html/
 document-root fallback exists. Existing sites require an explicit, collision-checked
-move of html/ contents to the root. Deployment protocol 7 prevents old servers
+move of html/ contents to the root. Deployment protocol 8 prevents old servers
 from receiving incompatible root-level archives.
 
-`nanoweb new` initializes Git on main without staging files or creating a commit.
+`flea new` initializes Git on main without staging files or creating a commit.
 Support --skip-git before or after the site name for existing repositories.
 If Git is unavailable, still create the site and explain how to initialize Git
 before deployment. Embed the starter .gitignore explicitly; retain deployment
@@ -120,9 +133,10 @@ settings and icon caches in version control by default.
 - `_layout.html` is the optional global wrapper; `{slot}` inserts the page.
 - The starter's header and footer live directly in `_layout.html`. Do not
   generate separate `_header.html` or `_footer.html` files by default.
-- The starter is a minimal Nanoweb welcome page, with local CSS and a simple
-  slate-800 (#1e293b) circled, slanted lowercase n SVG mark with bold rounded strokes,
-  shared by the header and favicon.
+- The starter is a minimal Flea CMS welcome page. Its logo is the selected
+  option C (Skip): a happy side-profile flea with a folded jumping leg, in
+  slate-800 rounded line art. templates/images/mark.svg is the shipped logo,
+  shared by the header and favicon. Keep the selected design unchanged.
 - Optional partials are underscore-prefixed HTML files anywhere under the project root.
   There is no special `_partials/` directory.
 - `{render footer}` resolves `_footer.html` beside the calling template.
@@ -207,9 +221,20 @@ Form styling does not implement submission handling.
 Keep the vendored `prewind-1.3.1.css` unchanged; customize the other files.
 The theme and general styles are adapted from `../preflight/lib/templates/app/assets/stylesheets/`.
 The library matches `../prewind/prewind.css` at version 1.3.1. Preserve the simple
-starter with its slate circled lowercase n logo and inline header/footer when making styling changes.
+starter with its inline header/footer when making styling changes.
 
 ## Routing and isolation
+
+Email-only contact forms live in internal/contact. Configure contact.to in site
+JSON; POST /_flea/contact accepts only name/email/message/website. Bind handlers
+and recipients to the loaded site, never request-selected IDs or addresses.
+Aliases share limits; distinct roots must not share a content file, including
+hardlinks. Keep exact Origin checks, production HTTPS, bounded bodies, per-site/IP
+limits and a shared server contact budget. Visitor email is Reply-To only; send
+plain text through mailer.Sender. Do not store submissions or queue work.
+Local contact settings require restarting dev. Deployment configures mail for
+contact-only sites too. See README for limits and setup. Protocol 8 requires
+the contact runtime. Test cross-site recipients and aliases without live email.
 
 `index.html` maps to `/`. `about.html` and `about/index.html`
 both map to `/about`; providing both is a route collision. Explicit `.html`
@@ -232,7 +257,7 @@ as reload diagnostics. Capture the actual HTTP status, including partial content
 ## Framework versus example site
 
 `../bookworm` is a local generated site used to try starter changes. It is not
-the framework source. When the user requests a Nanoweb feature or starter
+the framework source. When the user requests a Flea CMS feature or starter
 change, implement it here, even if the session begins in Bookworm.
 
 For intentional starter changes, update the ordinary files in `templates/` as well as
@@ -242,6 +267,18 @@ with the intended result. Keep local agent instructions out of that comparison
 unless they are deliberately part of the generated starter.
 
 ## Development checks
+
+### Versioning and changelog
+
+Use Semantic Versioning, starting at 0.1.0. The canonical version is
+`internal/buildinfo/version.go`; local builds and both server bundles use it.
+Local VERSION overrides must be valid SemVer without a leading v. Release tags
+must be v plus the recorded version; release and publish scripts validate this.
+Keep user-facing changes in CHANGELOG.md under Unreleased until preparing the
+next version, then move them into a dated version section. During 0.x, use patch
+versions for fixes and minor versions for features or breaking changes. This
+does not change the policy requiring approval before adding compatibility layers.
+Do not create or push release tags or publish artifacts unless requested.
 
 ### Remote setup
 
@@ -274,10 +311,10 @@ under /var/backups before recreating an empty installation; refuse symlinked
 paths and retain the service account. This is not an in-place upgrade.
 Before any reset/install changes, check TCP/UDP 80 and 443 on IPv4/IPv6.
 Only confirmed reinstall may exempt the systemd MainPID whose /proc executable
-is /usr/local/bin/nanoweb-server. Reject unknown owners, other PIDs, and failed
-checks. Never stop another service. Recheck after stopping NanoWeb.
+is /usr/local/bin/flea-server. Reject unknown owners, other PIDs, and failed
+checks. Never stop another service. Recheck after stopping Flea CMS.
 
-The initial persistent host binds :80, uses /etc/nanoweb/server.json,
+The initial persistent host binds :80, uses /etc/flea/server.json,
 and has no sites by default. Config maps hostnames to absolute site roots.
 It uses site.NewProductionServer: no development reload script/endpoint, watcher,
 or icon fetching. Config/site edits require restart. TLS is opt-in per domain.
@@ -328,7 +365,7 @@ upload, and activation; fail if the branch/commit changes during deploy. Build
 the snapshot from immutable Git objects, including when the site is a subfolder.
 Resolve missing icons in the temporary snapshot, never the working directory.
 This JSON file contains settings only, never credentials, and is not uploaded.
-Deploy packages committed root-level pages/assets/partials, _/nanoweb.config,
+Deploy packages committed root-level pages/assets/partials, _/flea.config,
 _/snips.json, _/data/, legacy _/snips/, and _/icons/ only. Validate
 the actual packaged snapshot locally and the extracted release remotely.
 Reject symlinks, hard links, special files, duplicate/traversing archive paths,
@@ -336,9 +373,9 @@ and releases exceeding 100 MiB or 10,000 entries.
 
 Deployment administration runs through SSH/sudo via the installed server binary,
 never HTTP. The browser editor has content-only permissions, not deployment powers.
-Protocol version 7 identifies the current unquoted-only snip syntax contract.
+Protocol version 8 requires the contact-form runtime and unquoted snip syntax.
 Setup does not upgrade existing installations.
-If an authenticated server probe confirms that Nanoweb is absent, offer setup
+If an authenticated server probe confirms that Flea CMS is absent, offer setup
 and continue deployment after a successful install and fresh server check. Reuse
 the deployment SSH connection and target. Do not offer installation after failed
 SSH authentication or when an old/incomplete server executable already exists.
@@ -348,12 +385,12 @@ and WWW alias using the server resolver and fail on lookup errors, no answers,
 or any mismatched A/AAAA address. Expected IPs default to non-loopback server
 interfaces; explicitly saved expected_ips supports NAT/proxies. IP destinations
 skip DNS. No public reachability guarantee is implied by this resolver check.
-Use fresh releases under /var/lib/nanoweb/sites/<name>/releases/<id> and absolute
+Use fresh releases under /var/lib/flea/sites/<name>/releases/<id> and absolute
 config paths, without current symlinks. Move all aliases of a site together and
 refuse hostnames owned by another site. Preserve unrelated sites and old releases.
 Activation locks operations, journals the prior config, atomically replaces
 server.json, restarts, and probes the active revision/hostname. Failure restores
-the prior config; interrupted operations require nanoweb-server -recover.
+the prior config; interrupted operations require flea-server -recover.
 Retain releases and server.previous.json; rollback CLI and pruning are deferred.
 Rich snips are committed seeds only. Preserve remote content by ID and remote
 page metadata, seed new IDs, and restore reintroduced IDs from archived content.
@@ -376,14 +413,14 @@ and explicit terms acceptance. No IP/wildcard certificates or custom production
 ACME endpoints yet. Keep HTTP :80 and HTTPS :443 for ACME, redirect enabled
 domains with 308, preserve path/query, and keep generic readiness on HTTP.
 Reject TLS Host/SNI mismatches. Tests use a local CA without weakening production
-verification. Keep certificates in /var/lib/nanoweb/certs (nanoweb-owned 0700);
+verification. Keep certificates in /var/lib/flea/certs (flea-owned 0700);
 the data parent and releases are root-owned. Only certificates, managed content
 directories and the precreated deployment lock are writable by the service.
 Never include keys in archives or logs.
 
 ### Owner login and editing
 
-nanoweb admin [email] appends to admin.emails, prompting when the argument is
+flea admin [email] appends to admin.emails, prompting when the argument is
 omitted. Use the shared AdminAccess validator, skip case-insensitive duplicates,
 and retain unrelated JSON fields with RawMessage and confined atomic writes.
 Do not send email, commit, or deploy. Remind the developer to restart dev and
@@ -393,7 +430,7 @@ sender requirement, .env Git warning, shell loading/restart commands and login U
 Local /admin must show actionable environment setup instructions when email is
 unconfigured; production keeps an owner-facing message without local shell steps.
 
-`admin.emails` in _/nanoweb.config is a developer-owned list (max 20), empty by
+`admin.emails` in _/flea.config is a developer-owned list (max 20), empty by
 default. The editor at /admin supports email OTP, page title/description and rich
 snip HTML-textarea edits, not templates, schemas, images, archived entries or settings.
 Codes use crypto/rand, expire in 10 minutes and allow five attempts. Store hashed
@@ -405,16 +442,16 @@ address, actual client IP and site. Do not reveal allowlist membership or log co
 
 Resend uses mailer.Sender, not an SDK-specific dependency in auth code. Delivery is
 asynchronous with a timeout, and bounded by the send limits; errors never contain
-provider bodies, tokens or recipients. Deployment prompts only for admin-enabled
+provider bodies, tokens or recipients. Deployment prompts for admin-enabled or contact-enabled
 sites lacking saved mail settings. Stream secrets over SSH without a PTY into a
 private staging file; sudo may then consume it with an interactive terminal.
-Store /etc/nanoweb/mail.env root-only (0600), loaded by systemd EnvironmentFile.
+Store /etc/flea/mail.env root-only (0600), loaded by systemd EnvironmentFile.
 No secrets in site config, deploy settings or Git. Local dev reads environment
 variables, not dotenv files. Restart dev when admin addresses change.
 
-Protocol 7 also requires the new service unit and lock/content permissions, not
+Protocol 8 also requires the new service unit and lock/content permissions, not
 just a binary swap. Do not reset a live installation as an upgrade. Setup creates
-the lock owned by nanoweb, and activation grants write access only to each content
+the lock owned by flea, and activation grants write access only to each content
 directory. Keep release/config parents root-owned. Browser edits and extraction
 share an in-process mutex; remote edits and activation share deploy.lock and refuse
 pending recovery journals. Test stale forms, single-use codes, CSRF, isolation,
@@ -445,10 +482,12 @@ Add meaningful regression coverage for changed behavior. Documentation-only
 changes do not need the runtime suite.
 
 On the current Mac, Go is available at `/usr/local/go/bin/go`. If the default
-build cache is restricted, use `GOCACHE=/tmp/nanoweb-go-cache`. The installed
-`/usr/local/bin/nanoweb` currently links to this repo's `bin/nanoweb`; verify
-the link before relying on it. Rebuild after implementation or starter changes,
-then run `nanoweb status` in the example/generated site. Restart an existing
+build cache is restricted, use `GOCACHE=/tmp/flea-go-cache`. This checkout is now
+at `/Users/sean/Projects/flea`.
+`/usr/local/bin/flea` points to `/Users/sean/Projects/flea/bin/flea` and was
+verified with `flea version`. See README for the installation command.
+Rebuild after implementation or starter changes,
+then run `flea status` in the example/generated site. Restart an existing
 dev process when the executable changes; site-file reloads do not reload Go code.
 
 ## Communication

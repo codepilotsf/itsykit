@@ -26,7 +26,7 @@ func put(t *testing.T, root, name, body string) {
 func fixture(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
-	put(t, root, "_/nanoweb.config", `{"site":{"name":"Test","url":"javascript:alert(1)","unsafe":"\"/><script>alert(1)</script>"}}`)
+	put(t, root, "_/flea.config", `{"site":{"name":"Test","url":"javascript:alert(1)","unsafe":"\"/><script>alert(1)</script>"}}`)
 	put(t, root, "_/snips/team.json", `{"text":"<b>{site.name}</b>","members":[{"name":"Ada","children":[{"name":"Bea"}]},{"name":"Cy","children":[]}],"empty":[],"false":false,"zero":0,"blank":""}`)
 	put(t, root, "index.html", "<h1>{site.name}</h1>")
 	put(t, root, "about/index.html", "About")
@@ -62,7 +62,7 @@ func TestRoutingAndSecurity(t *testing.T) {
 			t.Errorf("%s: %d", url, w.Code)
 		}
 	}
-	for _, url := range []string{"/index.html", "/about.html", "/about/index.html", "/about/", "/missing", "/_secret.txt", "/.env", "/.hidden/file", "/_private/file", "/_/nanoweb.config", "/../_/nanoweb.config", "/%2e%2e/_/nanoweb.config", "/%5fsecret.txt", "/%252e%252e/secret", "//about", "/css/../_secret.txt", "/css%5c..%5c_secret.txt", "/%00"} {
+	for _, url := range []string{"/index.html", "/about.html", "/about/index.html", "/about/", "/missing", "/_secret.txt", "/.env", "/.hidden/file", "/_private/file", "/_/flea.config", "/../_/flea.config", "/%2e%2e/_/flea.config", "/%5fsecret.txt", "/%252e%252e/secret", "//about", "/css/../_secret.txt", "/css%5c..%5c_secret.txt", "/%00"} {
 		w := request(s, "GET", url)
 		if w.Code != 404 || strings.Contains(w.Body.String(), "SECRET") {
 			t.Errorf("unsafe route %s: %d %s", url, w.Code, w.Body.String())
@@ -97,7 +97,7 @@ func TestCollisionsAndSymlinks(t *testing.T) {
 			}
 		})
 	}
-	for _, name := range []string{"link.txt", "nested", "_/snips/link.json", "_/nanoweb.config"} {
+	for _, name := range []string{"link.txt", "nested", "_/snips/link.json", "_/flea.config"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
 			target := filepath.Join(t.TempDir(), "secret")
@@ -105,7 +105,7 @@ func TestCollisionsAndSymlinks(t *testing.T) {
 				t.Fatal(err)
 			}
 			dest := filepath.Join(root, name)
-			if name == "_/nanoweb.config" {
+			if name == "_/flea.config" {
 				if err := os.Remove(dest); err != nil {
 					t.Fatal(err)
 				}
@@ -199,7 +199,7 @@ func TestRawElements(t *testing.T) {
 		t.Fatal(err)
 	}
 	// html/template normalizes this literal to an equivalent JS escape; the
-	// Nanoweb parser must leave both it and subsequent braces untouched.
+	// Flea CMS parser must leave both it and subsequent braces untouched.
 	want := strings.Replace(source, "</scripture>", `\x3C/scripture>`, 1)
 	if string(b) != strings.Replace(want, "<p>{site.name}</p>", "<p>Test</p>", 1) {
 		t.Fatalf("raw content changed: %s", b)
@@ -233,7 +233,7 @@ func TestInvalidTemplatesAndData(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
-	for _, name := range []string{"_/nanoweb.config", "_/snips/team.json"} {
+	for _, name := range []string{"_/flea.config", "_/snips/team.json"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
 			put(t, root, name, "{bad}")
@@ -355,7 +355,7 @@ func TestWatchChangesAndRecovery(t *testing.T) {
 		t.Fatal("watch did not publish change")
 	}
 	for _, edit := range []struct{ name, body, url, want string }{
-		{"_/nanoweb.config", `{"site":{"name":"Renamed"}}`, "/", "Renamed"},
+		{"_/flea.config", `{"site":{"name":"Renamed"}}`, "/", "Renamed"},
 		{"index.html", `{snip.team.text}`, "/", "&lt;b&gt;"},
 		{"_/snips/team.json", `{"text":"new content"}`, "/", "new content"},
 		{"css/main.css", "new css", "/css/main.css", "new css"},
@@ -397,10 +397,10 @@ func TestConfinedReads(t *testing.T) {
 	if err := os.Symlink(filepath.Join(root, "_"), filepath.Join(root, "link")); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := readFile(boundary, "link/nanoweb.config"); err == nil {
+	if _, err := readFile(boundary, "link/flea.config"); err == nil {
 		t.Fatal("followed a private directory symlink")
 	}
-	if err := os.Symlink(filepath.Join(root, "_", "nanoweb.config"), filepath.Join(root, "secret")); err != nil {
+	if err := os.Symlink(filepath.Join(root, "_", "flea.config"), filepath.Join(root, "secret")); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := readFile(boundary, "secret"); err == nil {

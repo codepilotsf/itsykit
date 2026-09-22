@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"nanoweb/internal/host"
-	"nanoweb/internal/site"
-	"nanoweb/internal/snips"
+	"flea/internal/host"
+	"flea/internal/site"
+	"flea/internal/snips"
 )
 
 // prepareContent stages a new snapshot without modifying the active one. The
@@ -48,8 +48,8 @@ func (m Manager) prepareContent(c host.Config, name, id, dest string, project *s
 	}
 	// Only content directories become writable by the service. Code releases,
 	// site parents and host configuration remain administrator-owned.
-	if m.ConfigPath == "/etc/nanoweb/server.json" {
-		account, e := user.Lookup("nanoweb")
+	if m.ConfigPath == "/etc/flea/server.json" {
+		account, e := user.Lookup("flea")
 		if e != nil {
 			return "", nil, e
 		}

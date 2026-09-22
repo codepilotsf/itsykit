@@ -33,15 +33,15 @@ func TestProbe(t *testing.T) {
 		data, arch string
 		root       bool
 	}{
-		{"NANOWEB_SYSTEM=ubuntu:24.04:x86_64:0\n", "amd64", true},
-		{"banner\nNANOWEB_SYSTEM=ubuntu:26.04:aarch64:1000\n", "arm64", false},
+		{"FLEA_SYSTEM=ubuntu:24.04:x86_64:0\n", "amd64", true},
+		{"banner\nFLEA_SYSTEM=ubuntu:26.04:aarch64:1000\n", "arm64", false},
 	} {
 		arch, root, err := parseProbe(test.data)
 		if err != nil || arch != test.arch || root != test.root {
 			t.Fatal(arch, root, err)
 		}
 	}
-	for _, data := range []string{"", "NANOWEB_SYSTEM=debian:12:x86_64:0", "NANOWEB_SYSTEM=ubuntu:25.10:x86_64:0", "NANOWEB_SYSTEM=ubuntu:24.04:riscv64:0", "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:bad"} {
+	for _, data := range []string{"", "FLEA_SYSTEM=debian:12:x86_64:0", "FLEA_SYSTEM=ubuntu:25.10:x86_64:0", "FLEA_SYSTEM=ubuntu:24.04:riscv64:0", "FLEA_SYSTEM=ubuntu:24.04:x86_64:bad"} {
 		if _, _, err := parseProbe(data); err == nil {
 			t.Fatal(data)
 		}
@@ -59,10 +59,10 @@ func TestReinstallRequiresTypedConfirmation(t *testing.T) {
 			if strings.Contains(args, "-O exit") {
 				return nil
 			}
-			if !strings.Contains(args, "NANOWEB_SYSTEM") || !strings.Contains(args, "root@server") {
+			if !strings.Contains(args, "FLEA_SYSTEM") || !strings.Contains(args, "root@server") {
 				t.Fatalf("unexpected command: %s", args)
 			}
-			fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:0\nNANOWEB_EXISTING=1")
+			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_EXISTING=1")
 			return nil
 		})
 		if err == nil || !strings.Contains(output.String(), "Type DESTROY") {
@@ -81,8 +81,8 @@ func TestUnavailableReplacementDoesNotAskToDestroy(t *testing.T) {
 			return want
 		case strings.Contains(args, "-O exit"):
 			return nil
-		case strings.Contains(args, "NANOWEB_SYSTEM"):
-			fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:0\nNANOWEB_EXISTING=1")
+		case strings.Contains(args, "FLEA_SYSTEM"):
+			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_EXISTING=1")
 			return nil
 		default:
 			t.Fatalf("unexpected remote change: %s", args)
@@ -95,7 +95,7 @@ func TestUnavailableReplacementDoesNotAskToDestroy(t *testing.T) {
 }
 
 func TestSetupExtractsRealBundleBeforeResetPrompt(t *testing.T) {
-	if os.Getenv("NANOWEB_REQUIRE_BUNDLE") != "1" {
+	if os.Getenv("FLEA_REQUIRE_BUNDLE") != "1" {
 		t.Skip("requires generated server bundles")
 	}
 	for _, arch := range []string{"x86_64", "aarch64"} {
@@ -114,8 +114,8 @@ func TestSetupExtractsRealBundleBeforeResetPrompt(t *testing.T) {
 					}
 					prepared = true
 					return nil
-				case strings.Contains(args, "NANOWEB_SYSTEM"):
-					fmt.Fprintf(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:%s:0\nNANOWEB_EXISTING=1\n", arch)
+				case strings.Contains(args, "FLEA_SYSTEM"):
+					fmt.Fprintf(c.out, "FLEA_SYSTEM=ubuntu:24.04:%s:0\nFLEA_EXISTING=1\n", arch)
 					return nil
 				case strings.Contains(args, "-O exit"):
 					return nil
@@ -146,14 +146,14 @@ func TestSetupStages(t *testing.T) {
 				}
 				stage := ""
 				switch {
-				case c.name == "ssh" && strings.Contains(joined, "NANOWEB_SYSTEM"):
+				case c.name == "ssh" && strings.Contains(joined, "FLEA_SYSTEM"):
 					stage = "connect"
-					fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:aarch64:1000")
+					fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:aarch64:1000")
 					if failure == "reinstall" {
-						fmt.Fprintln(c.out, "NANOWEB_EXISTING=1")
+						fmt.Fprintln(c.out, "FLEA_EXISTING=1")
 					}
 				case c.name == "ssh" && strings.Contains(joined, "mktemp"):
-					fmt.Fprintln(c.out, "/tmp/nanoweb-setup.ABCDE12345")
+					fmt.Fprintln(c.out, "/tmp/flea-setup.ABCDE12345")
 					return nil
 				case c.name == "scp":
 					stage = "upload"
@@ -193,7 +193,7 @@ func TestSetupStages(t *testing.T) {
 			}
 			err := run(context.Background(), strings.NewReader(input), &output, io.Discard, fake)
 			if failure == "" || failure == "reinstall" {
-				if err != nil || strings.Join(stages, ",") != "connect,extract,upload,install,check" || !strings.Contains(output.String(), "Nanoweb server is running") {
+				if err != nil || strings.Join(stages, ",") != "connect,extract,upload,install,check" || !strings.Contains(output.String(), "Flea CMS server is running") {
 					t.Fatal(stages, err, output.String())
 				}
 			} else {
@@ -237,8 +237,8 @@ func TestLinuxServerBuilds(t *testing.T) {
 	}
 	for _, arch := range []string{"amd64", "arm64"} {
 		t.Run(arch, func(t *testing.T) {
-			binary := filepath.Join(t.TempDir(), "nanoweb-server")
-			cmd := exec.Command(goBinary, "build", "-o", binary, "./cmd/nanoweb-server")
+			binary := filepath.Join(t.TempDir(), "flea-server")
+			cmd := exec.Command(goBinary, "build", "-o", binary, "./cmd/flea-server")
 			cmd.Dir = source
 			cmd.Env = buildEnv(arch)
 			if output, err := cmd.CombinedOutput(); err != nil {
@@ -272,7 +272,7 @@ func TestInstallerSyntaxAndService(t *testing.T) {
 	if output, err := cmd.CombinedOutput(); err != nil {
 		t.Fatal(err, string(output))
 	}
-	for _, setting := range []string{"User=nanoweb", "NoNewPrivileges=true", "AmbientCapabilities=CAP_NET_BIND_SERVICE", "CapabilityBoundingSet=CAP_NET_BIND_SERVICE", "ProtectSystem=strict", "ExecStart=/usr/local/bin/nanoweb-server"} {
+	for _, setting := range []string{"User=flea", "NoNewPrivileges=true", "AmbientCapabilities=CAP_NET_BIND_SERVICE", "CapabilityBoundingSet=CAP_NET_BIND_SERVICE", "ProtectSystem=strict", "ExecStart=/usr/local/bin/flea-server"} {
 		if !strings.Contains(service, setting) {
 			t.Fatal(setting)
 		}

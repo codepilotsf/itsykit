@@ -5,10 +5,10 @@ package release
 import (
 	"archive/tar"
 	"compress/gzip"
+	"flea/internal/sitefiles"
 	"fmt"
 	"io"
 	"io/fs"
-	"nanoweb/internal/sitefiles"
 	"os"
 	"path"
 )

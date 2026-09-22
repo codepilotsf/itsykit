@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"nanoweb/internal/release"
+	"flea/internal/release"
 )
 
 type gitState struct{ Branch, Commit, Prefix string }

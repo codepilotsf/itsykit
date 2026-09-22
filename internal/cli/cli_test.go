@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"nanoweb/internal/site"
-	"nanoweb/templates"
+	"flea/internal/site"
+	"flea/templates"
 )
 
 func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
@@ -47,7 +47,7 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"_/nanoweb.config", "_/snips.json", "_layout.html", "_404.html", "_500.html"} {
+	for _, name := range []string{"_/flea.config", "_/snips.json", "_layout.html", "_404.html", "_500.html"} {
 		if _, err := os.Stat(filepath.Join(root, name)); err != nil {
 			t.Fatal(err)
 		}
@@ -57,9 +57,27 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 	}
 }
 
+func TestHelpWithoutSite(t *testing.T) {
+	t.Chdir(t.TempDir())
+	for _, args := range [][]string{nil, {"help"}, {"--help"}, {"-h"}} {
+		var out, errOut bytes.Buffer
+		if code := Run(context.Background(), args, &out, &errOut); code != 0 || errOut.Len() != 0 || out.String() != usage {
+			t.Fatalf("%v: code=%d stdout=%q stderr=%q", args, code, out.String(), errOut.String())
+		}
+	}
+	for _, command := range []string{"new", "dev", "status", "admin", "setup", "deploy", "https", "version"} {
+		for _, flag := range []string{"--help", "-h"} {
+			var out, errOut bytes.Buffer
+			if code := Run(context.Background(), []string{command, flag}, &out, &errOut); code != 0 || errOut.Len() != 0 || !strings.Contains(out.String(), "Usage: flea "+command) {
+				t.Fatalf("%s %s: code=%d stdout=%q stderr=%q", command, flag, code, out.String(), errOut.String())
+			}
+		}
+	}
+}
+
 func TestCLI(t *testing.T) {
 	t.Chdir(t.TempDir())
-	for _, args := range [][]string{nil, {"unknown"}, {"new"}, {"new", "../escape"}, {"dev", "-port", "-1"}, {"status", "extra"}, {"setup", "extra"}, {"deploy", "extra"}, {"https", "extra"}} {
+	for _, args := range [][]string{{"unknown"}, {"new"}, {"new", "../escape"}, {"dev", "-port", "-1"}, {"status", "extra"}, {"setup", "extra"}, {"deploy", "extra"}, {"https", "extra"}} {
 		if code := Run(context.Background(), args, io.Discard, io.Discard); code != 2 {
 			t.Fatalf("%v returned %d", args, code)
 		}
@@ -122,8 +140,8 @@ func TestStatusWarnsForMissingIcon(t *testing.T) {
 // HTTP requests, edits, invalid state, recovery, and graceful shutdown.
 func TestExecutableWorkflow(t *testing.T) {
 	temp := t.TempDir()
-	binary := filepath.Join(temp, "nanoweb")
-	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/nanoweb")
+	binary := filepath.Join(temp, "flea")
+	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/flea")
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build: %v\n%s", err, output)
 	}
@@ -139,7 +157,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	run(temp, "new", "smoke")
 	root := filepath.Join(temp, "smoke")
-	if got := run(root, "status"); !strings.Contains(got, "Valid local project: Nanoweb") {
+	if got := run(root, "status"); !strings.Contains(got, "Valid local project: Flea CMS") {
 		t.Fatal(got)
 	}
 	cmd := exec.Command(binary, "dev", "-port", "0")
@@ -178,8 +196,8 @@ func TestExecutableWorkflow(t *testing.T) {
 				stopped = true
 				t.Fatalf("dev exited: %v: %s", err, stderr.String())
 			}
-			if strings.HasPrefix(line, "Nanoweb running at ") {
-				address = strings.TrimPrefix(line, "Nanoweb running at ")
+			if strings.HasPrefix(line, "Flea CMS running at ") {
+				address = strings.TrimPrefix(line, "Flea CMS running at ")
 			}
 		case <-startupTimeout:
 			t.Fatal("dev did not start")
@@ -199,7 +217,7 @@ func TestExecutableWorkflow(t *testing.T) {
 		}
 		return response.StatusCode, string(b)
 	}
-	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/global.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/_/nanoweb.config": 404, "/_header.html": 404, "/%2e%2e/_/nanoweb.config": 404} {
+	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/global.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/_/flea.config": 404, "/_header.html": 404, "/%2e%2e/_/flea.config": 404} {
 		if code, _ := get(url); code != want {
 			t.Errorf("%s: %d", url, code)
 		}
@@ -251,7 +269,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	edit("css/global.css", "/* updated asset */")
 	wait("/css/global.css", 200, "updated asset")
-	edit("_/nanoweb.config", `{"site":{"name":"Changed config"}}`)
+	edit("_/flea.config", `{"site":{"name":"Changed config"}}`)
 	wait("/", 200, "Changed config")
 	edit("index.html", `{render missing-secret-name}`)
 	wait("/", 500, "")

@@ -12,7 +12,7 @@ import (
 )
 
 // Sanitize reconstructs a small formatting vocabulary. No source tag or
-// attribute is trusted, and content is never reparsed as NanoWeb template code.
+// attribute is trusted, and content is never reparsed as Flea CMS template code.
 func Sanitize(source string) (string, error) {
 	if len(source) > 1<<20 {
 		return "", fmt.Errorf("snip content exceeds 1 MiB")

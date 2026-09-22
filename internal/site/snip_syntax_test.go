@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"nanoweb/internal/snips"
+	"flea/internal/snips"
 )
 
 func TestSnipsRequireUnquotedSyntax(t *testing.T) {

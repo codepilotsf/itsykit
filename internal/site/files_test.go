@@ -59,7 +59,7 @@ func TestConfinedWritesAndReads(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, entry := range entries {
-		if strings.HasPrefix(entry.Name(), ".nanoweb-") {
+		if strings.HasPrefix(entry.Name(), ".flea-") {
 			t.Fatal("temporary file retained")
 		}
 	}

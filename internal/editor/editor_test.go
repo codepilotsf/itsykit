@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"nanoweb/internal/mailer"
-	"nanoweb/internal/snips"
+	"flea/internal/mailer"
+	"flea/internal/snips"
 )
 
 type inbox chan mailer.Message
@@ -25,7 +25,7 @@ func TestMissingEmailSettingsInstructions(t *testing.T) {
 		if w.Code != http.StatusServiceUnavailable || !strings.HasPrefix(w.Header().Get("Content-Type"), "text/plain") {
 			t.Fatal(w.Code, w.Header())
 		}
-		for _, text := range []string{"RESEND_API_KEY", "NANOWEB_EMAIL_FROM", "source .env", "nanoweb dev", "domain verified in Resend"} {
+		for _, text := range []string{"RESEND_API_KEY", "FLEA_EMAIL_FROM", "source .env", "flea dev", "domain verified in Resend"} {
 			if strings.Contains(w.Body.String(), text) != local {
 				t.Fatalf("local=%v, unexpected instructions for %q: %s", local, text, w.Body.String())
 			}

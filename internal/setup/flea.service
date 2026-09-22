@@ -1,24 +1,24 @@
 [Unit]
-Description=Nanoweb server
+Description=Flea CMS server
 After=network.target
 
 [Service]
 Type=exec
-User=nanoweb
-Group=nanoweb
-ExecStart=/usr/local/bin/nanoweb-server -config /etc/nanoweb/server.json
-EnvironmentFile=-/etc/nanoweb/mail.env
+User=flea
+Group=flea
+ExecStart=/usr/local/bin/flea-server -config /etc/flea/server.json
+EnvironmentFile=-/etc/flea/mail.env
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=10
-WorkingDirectory=/var/lib/nanoweb
+WorkingDirectory=/var/lib/flea
 NoNewPrivileges=true
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/var/lib/nanoweb/certs /var/lib/nanoweb/sites /etc/nanoweb/deploy.lock
+ReadWritePaths=/var/lib/flea/certs /var/lib/flea/sites /etc/flea/deploy.lock
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
 UMask=0027
 

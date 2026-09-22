@@ -16,32 +16,61 @@ import (
 	"strings"
 	"time"
 
-	"nanoweb/internal/buildinfo"
-	"nanoweb/internal/editor"
-	"nanoweb/internal/editstore"
-	"nanoweb/internal/mailer"
-	"nanoweb/internal/setup"
-	"nanoweb/internal/site"
-	"nanoweb/templates"
+	"flea/internal/buildinfo"
+	"flea/internal/contact"
+	"flea/internal/editor"
+	"flea/internal/editstore"
+	"flea/internal/mailer"
+	"flea/internal/setup"
+	"flea/internal/site"
+	"flea/templates"
 )
 
-const usage = "Usage: nanoweb new <site-name> | dev [-port 3000] | status | admin [email] | setup | deploy [options] | https [options] | version\nRun deploy to configure the current Git branch; use -configure to edit its saved destination.\nDeployment requires a clean, committed Git repository. Settings are saved in _/deploy.json.\n"
+const usage = `Flea CMS
+Small websites. Plain HTML. Editable content.
+
+Usage
+  flea <command>
+
+Build your site
+  new <site-name>  Create a new site
+  dev              Start the local development server
+  status           Check your site for errors
+  admin [email]    Add an owner who can edit content
+
+Publish your site
+  setup            Install Flea on your server
+  deploy           Publish the current Git branch
+  https            Configure HTTPS for your site
+
+Other commands
+  version          Show the installed version
+  help             Show this help
+
+Get started
+  flea new my-site
+  cd my-site
+  flea dev
+
+Command details
+  flea <command> --help
+`
 
 // Run returns 0 on success, 1 on project/runtime failure, 2 on usage errors.
 func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	if len(args) == 0 {
-		fmt.Fprint(errOut, usage)
-		return 2
+		fmt.Fprint(out, usage)
+		return 0
 	}
-	fail := func(err error) int { fmt.Fprintln(errOut, "nanoweb:", err); return 1 }
+	fail := func(err error) int { fmt.Fprintln(errOut, "flea:", err); return 1 }
 	switch args[0] {
 	case "admin":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: nanoweb admin [email]\n\nAdds an approved admin email to this site's _/nanoweb.config.\nWithout an email, NanoWeb will ask for one.")
+			fmt.Fprintln(out, "Usage: flea admin [email]\n\nAdds an approved admin email to this site's _/flea.config.\nWithout an email, Flea CMS will ask for one.")
 			return 0
 		}
 		if len(args) > 2 || (len(args) == 2 && strings.HasPrefix(args[1], "-")) {
-			fmt.Fprintln(errOut, "Usage: nanoweb admin [email]")
+			fmt.Fprintln(errOut, "Usage: flea admin [email]")
 			return 2
 		}
 		email := ""
@@ -62,19 +91,30 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		if added {
-			fmt.Fprintf(out, "\nAdded %s to _/nanoweb.config.\n", email)
+			fmt.Fprintf(out, "\nAdded %s to _/flea.config.\n", email)
 		} else {
 			fmt.Fprintf(out, "\n%s is already an admin. Nothing changed.\n", email)
 		}
-		fmt.Fprintln(out, "\nFor local email login, add these to your site's .env file:\n\n  RESEND_API_KEY=\"re_your_api_key\"\n  NANOWEB_EMAIL_FROM=\"login@your-verified-domain.com\"\n\nUse your Resend API key and a sender address from a domain verified in Resend.\nKeep .env out of Git. NanoWeb does not load it automatically.\n\nStop dev, then load the settings and restart:\n\n  set -a\n  source .env\n  set +a\n  nanoweb dev\n\nOpen http://127.0.0.1:3000/admin to sign in with an emailed code.\nFor the live site, run nanoweb deploy; it asks for email settings if needed.")
+		fmt.Fprintln(out, "\nFor local email login, add these to your site's .env file:\n\n  RESEND_API_KEY=\"re_your_api_key\"\n  FLEA_EMAIL_FROM=\"login@your-verified-domain.com\"\n\nUse your Resend API key and a sender address from a domain verified in Resend.\nKeep .env out of Git. Flea CMS does not load it automatically.\n\nStop dev, then load the settings and restart:\n\n  set -a\n  source .env\n  set +a\n  flea dev\n\nOpen http://127.0.0.1:3000/admin to sign in with an emailed code.\nFor the live site, run flea deploy; it asks for email settings if needed.")
 		return 0
 	case "version", "--version":
-		fmt.Fprintln(out, "NanoWeb "+buildinfo.Version)
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprintln(out, "Usage: flea version\n\nShow the installed version.")
+			return 0
+		}
+		fmt.Fprintln(out, "Flea CMS "+buildinfo.Version)
 		return 0
 	case "deploy", "https":
 		var s setup.DeploySettings
 		flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 		flags.SetOutput(errOut)
+		flags.Usage = func() {
+			fmt.Fprintf(flags.Output(), "Usage: flea %s [options]\n\nConfigure the current Git branch's destination and publish it.\nUse -configure to edit saved settings in _/deploy.json.\nDeployment requires a clean, committed Git repository.\n\nOptions\n", args[0])
+			flags.PrintDefaults()
+		}
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			flags.SetOutput(out)
+		}
 		flags.StringVar(&s.Target, "target", s.Target, "SSH target (user@host or SSH alias)")
 		flags.StringVar(&s.Domain, "domain", s.Domain, "comma-separated hostnames or HTTP IPv4 addresses")
 		flags.StringVar(&s.Name, "name", s.Name, "stable site identifier (suggested from directory and branch)")
@@ -116,6 +156,12 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	case "setup":
 		flags := flag.NewFlagSet("setup", flag.ContinueOnError)
 		flags.SetOutput(errOut)
+		flags.Usage = func() {
+			fmt.Fprintln(flags.Output(), "Usage: flea setup\n\nInstall Flea on your server over SSH.\nYou will be asked for the server address.")
+		}
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			flags.SetOutput(out)
+		}
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
 				return 0
@@ -141,7 +187,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			case "--skip-git", "-skip-git":
 				skipGit = true
 			case "-h", "--help":
-				fmt.Fprintln(out, "Usage: nanoweb new <site-name> [--skip-git]\n\nCreates a site and starts a Git repository on main.\nUse --skip-git to leave Git setup to you.")
+				fmt.Fprintln(out, "Usage: flea new <site-name> [--skip-git]\n\nCreates a site and starts a Git repository on main.\nUse --skip-git to leave Git setup to you.")
 				return 0
 			default:
 				names = append(names, arg)
@@ -176,9 +222,13 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				fmt.Fprintln(out, "\nGit is ready on the main branch. No commit has been made yet.")
 			}
 		}
-		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  nanoweb dev\n\nWhen you're ready to publish:\n  nanoweb deploy\n\nNanoWeb will save your settings and offer to commit your changes before deploying.\n\n", name)
+		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\nWhen you're ready to publish:\n  flea deploy\n\nFlea CMS will save your settings and offer to commit your changes before deploying.\n\n", name)
 		return 0
 	case "status":
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprintln(out, "Usage: flea status\n\nCheck the current site's configuration, templates, and content.\nRun this command from your site folder.")
+			return 0
+		}
 		if len(args) != 1 {
 			fmt.Fprint(errOut, usage)
 			return 2
@@ -199,6 +249,13 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	case "dev":
 		flags := flag.NewFlagSet("dev", flag.ContinueOnError)
 		flags.SetOutput(errOut)
+		flags.Usage = func() {
+			fmt.Fprintln(flags.Output(), "Usage: flea dev [options]\n\nStart the local development server from your site folder.\nChanges reload automatically.\n\nOptions")
+			flags.PrintDefaults()
+		}
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			flags.SetOutput(out)
+		}
 		port := flags.Int("port", 3000, "local HTTP port (0 selects an available port)")
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
@@ -238,17 +295,31 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				}
 			})
 			if mailer.Env() == nil {
-				logger.Print("Admin login needs RESEND_API_KEY and NANOWEB_EMAIL_FROM in your environment.")
+				logger.Print("Admin login needs RESEND_API_KEY and FLEA_EMAIL_FROM in your environment.")
 			}
 		}
-		server := &http.Server{Handler: httpHandler, ReadHeaderTimeout: 5 * time.Second, IdleTimeout: 30 * time.Second}
+		if p.Contact.To != "" {
+			form := contact.New(p.Contact, p.Root, mailer.Env(), &contact.Budget{}, true, logger)
+			next := httpHandler
+			httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == contact.Path {
+					form.ServeHTTP(w, r)
+				} else {
+					next.ServeHTTP(w, r)
+				}
+			})
+			if mailer.Env() == nil {
+				logger.Print("Contact forms need RESEND_API_KEY and FLEA_EMAIL_FROM. Load your .env settings and restart dev.")
+			}
+		}
+		server := &http.Server{Handler: httpHandler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 30 * time.Second}
 		watchCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
 		watchDone := make(chan struct{})
 		go func() { defer close(watchDone); handler.Watch(watchCtx, p.Root, logger) }()
 		done := make(chan error, 1)
 		go func() { done <- server.Serve(listener) }()
-		fmt.Fprintf(out, "\nNanoweb running at http://%s\nWatching templates, assets, configuration and snips.\n\nPress Ctrl-C to stop.\n", listener.Addr())
+		fmt.Fprintf(out, "\nFlea CMS running at http://%s\nWatching templates, assets, configuration and snips.\n\nPress Ctrl-C to stop.\n", listener.Addr())
 		select {
 		case <-ctx.Done():
 			shutdownCtx, stop := context.WithTimeout(context.Background(), 5*time.Second)

@@ -56,9 +56,9 @@ func authority(r *http.Request) string { return strings.ToLower(r.Host) }
 
 func (h *Handler) cookieName(kind string) string {
 	if h.options.Local {
-		return "nanoweb_dev_" + kind
+		return "flea_dev_" + kind
 	}
-	return "__Host-nanoweb-" + kind
+	return "__Host-flea-" + kind
 }
 func (h *Handler) cookie(w http.ResponseWriter, kind, value string, age int) {
 	http.SetCookie(w, &http.Cookie{Name: h.cookieName(kind), Value: value, Path: "/", HttpOnly: true, Secure: !h.options.Local, SameSite: http.SameSiteStrictMode, MaxAge: age})

@@ -1,12 +1,12 @@
-# Nanoweb next steps
+# Flea CMS next steps
 
 ## Backlog: independent site runtime versions
 
-Deferred by agreement: keep the current single shared NanoWeb server for now.
+Deferred by agreement: keep the current single shared Flea CMS server for now.
 Do not introduce proxy/runtime separation as part of current work.
 
 Future option: a lightweight host handles HTTP/HTTPS, certificates and domain
-routing, while each deployed site carries its matching NanoWeb runtime for
+routing, while each deployed site carries its matching Flea CMS runtime for
 templates, snips and /admin. Separate systemd-managed processes could communicate
 through private Unix sockets, allowing sites to use different runtime versions.
 Deployments could health-check a replacement before switching traffic and retain
@@ -19,9 +19,9 @@ This is a backlog proposal, not implemented behavior.
 ## Owner dashboard
 
 Implemented /admin email-code login and basic page/snippet editing. Configure
-admin.emails in _/nanoweb.config. Resend credentials are server-only in
-/etc/nanoweb/mail.env, prompted on deployment when missing. Local dev uses
-RESEND_API_KEY and NANOWEB_EMAIL_FROM environment variables. No real email was
+admin.emails in _/flea.config. Resend credentials are server-only in
+/etc/flea/mail.env, prompted on deployment when missing. Local dev uses
+RESEND_API_KEY and FLEA_EMAIL_FROM environment variables. No real email was
 sent during implementation; live Resend and Ubuntu/systemd checks are still needed.
 Protocol 7 requires the new binary, service unit, service-owned deploy.lock and
 managed content-directory permissions. Do not reset an existing server as an
@@ -40,7 +40,7 @@ implemented. New starters use _/snips.json; legacy named JSON stays supported.
 Structured data now uses _/data/*.json with data.*. Deployment protocol 7 is
 required; update the server binary before deploying rich snips. No live server
 or example site was modified. A rollback CLI, remote sync,
-schema migrations, and consolidation of deploy settings into nanoweb.config
+schema migrations, and consolidation of deploy settings into flea.config
 are still pending.
 
 Latest change: setup extracts its matching compressed Linux binary from the CLI,
@@ -57,41 +57,41 @@ and saved WWW/HTTPS preferences.
 
 ## Current state
 
-Nanoweb has a runnable local site workflow:
+Flea CMS has a runnable local site workflow:
 
-- `nanoweb new <site-name>` creates the embedded starter site and initializes Git
+- `flea new <site-name>` creates the embedded starter site and initializes Git
   on main without committing. --skip-git supports existing parent repositories.
   A starter .gitignore is included; missing Git does not block site creation.
-- `nanoweb status` validates a local project.
-- `nanoweb dev` serves a local site with automatic reloads.
+- `flea status` validates a local project.
+- `flea dev` serves a local site with automatic reloads.
 - File-based routes, static assets, layouts and `{slot}`, partials, escaped JSON
   snips, dotted paths, conditions, loops, custom error pages, and on-demand
   pinned Lucide icons are implemented.
 - The starter templates are ordinary files under the repository's `templates/`
-  directory. They use the slate circled lowercase `n` logo and the current
+  directory. They use the selected slate line-art Skip flea logo and the current
   Prewind/Google-font theme.
-- `/usr/local/bin/nanoweb` is a symlink to this checkout's `bin/nanoweb`, so
-  rebuilding `bin/nanoweb` updates the global command without reinstalling it.
+- `/usr/local/bin/flea` is a symlink to this checkout's `bin/flea`, so
+  rebuilding `bin/flea` updates the global command without reinstalling it.
 
 The persistent server, deployment, and HTTPS are implemented. They have not yet
 been exercised against a real remote Ubuntu machine or live Let's Encrypt:
 
-- `nanoweb setup` prompts for an SSH target, verifies supported Ubuntu/systemd
-  and architecture, extracts the bundled `nanoweb-server`, uploads it, and installs a
-  hardened `nanoweb` systemd service.
+- `flea setup` prompts for an SSH target, verifies supported Ubuntu/systemd
+  and architecture, extracts the bundled `flea-server`, uploads it, and installs a
+  hardened `flea` systemd service.
 - New installations default to public HTTP on port 80 (`"listen": ":80"`).
   The service is non-root and receives only `CAP_NET_BIND_SERVICE` to bind the
   low port.
-- `nanoweb deploy` validates/packages the site, uploads over SSH/SCP, and invokes
+- `flea deploy` validates/packages the site, uploads over SSH/SCP, and invokes
   the installed server to activate a release. `_/deploy.json` saves approved
   destinations per Git branch. The server validates again, atomically switches configuration,
   restarts, and checks the revision/hostname. Failure restores the prior config.
-- `nanoweb https` enables automatic Let's Encrypt certificates for deployed
-  domains. `nanoweb deploy -https` combines the two. Contact email and explicit
+- `flea https` enables automatic Let's Encrypt certificates for deployed
+  domains. `flea deploy -https` combines the two. Contact email and explicit
   acceptance of the CA terms are required.
-- Host configuration lives at `/etc/nanoweb/server.json`. Its `sites` map
+- Host configuration lives at `/etc/flea/server.json`. Its `sites` map
   connects a request hostname to an absolute site directory. It starts empty,
-  so only `/_nanoweb/health` works immediately after setup; other requests
+  so only `/_flea/health` works immediately after setup; other requests
   return 404 until a site is deployed.
 - Setup does not change cloud or host firewalls. TCP 80 and 443 must be allowed
   by the administrator. DNS records must point at the server. Setup remains a
@@ -102,7 +102,7 @@ been exercised against a real remote Ubuntu machine or live Let's Encrypt:
 With a current server installed, run from a committed site on a named Git branch:
 
 ```sh
-nanoweb deploy
+flea deploy
 ```
 
 First use asks for the server/domain, uses the branch name directly, and saves
@@ -112,7 +112,7 @@ The remote site name is generated automatically; there is no environment or
 remote-name question. To change the mapping:
 
 ```sh
-nanoweb deploy -configure
+flea deploy -configure
 ```
 
 Deploy asks for an SSH username (default root) if the target has no user@ prefix.
@@ -166,11 +166,11 @@ IP literals skip DNS. This is not a public firewall/reachability test.
 The current implementation passed:
 
 ```sh
-GOCACHE=/tmp/nanoweb-go-cache /usr/local/go/bin/go test ./...
-GOCACHE=/tmp/nanoweb-go-cache /usr/local/go/bin/go test -race ./...
-GOCACHE=/tmp/nanoweb-go-cache /usr/local/go/bin/go vet ./...
-GOCACHE=/tmp/nanoweb-go-cache bash scripts/build.sh
-GOCACHE=/tmp/nanoweb-go-cache /usr/local/go/bin/go build -o bin/nanoweb-server ./cmd/nanoweb-server
+GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go test ./...
+GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go test -race ./...
+GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go vet ./...
+GOCACHE=/tmp/flea-go-cache bash scripts/build.sh
+GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go build -o bin/flea-server ./cmd/flea-server
 ```
 
 The full suite includes the executable starter/dev/reload smoke test, Linux
@@ -191,32 +191,32 @@ or renewal over a real certificate lifetime.
 
 ## Decisions made while you were away
 
-- HTTPS lives inside Nanoweb using pinned `golang.org/x/crypto/acme/autocert`
+- HTTPS lives inside Flea CMS using pinned `golang.org/x/crypto/acme/autocert`
   v0.57.0, as required by spec.md. No reverse proxy or certificate shell scripts.
   This dependency raises the build requirement to Go 1.26; the installed Mac Go
   is 1.27.1. The dependency versions are recorded in go.mod/go.sum.
 - HTTPS is enabled explicitly per domain. HTTP-only sites can coexist on the
   same host. HTTPS-enabled domains redirect with 308; unknown TLS hostnames and
   Host/SNI mismatches are rejected. No HSTS, wildcard, or IP certificates yet.
-- Certificates/account keys persist under `/var/lib/nanoweb/certs`, owned by
-  nanoweb with mode 0700. The daemon can write only that directory; the data
+- Certificates/account keys persist under `/var/lib/flea/certs`, owned by
+  flea with mode 0700. The daemon can write only that directory; the data
   parent, releases, and host configuration are administrator-owned.
 - Deploy uses separate release directories and an atomic host config switch,
   followed by a brief service restart. It does not promise zero downtime.
 
 ```text
-/var/lib/nanoweb/sites/<site-name>/releases/<timestamp-random-id>/
+/var/lib/flea/sites/<site-name>/releases/<timestamp-random-id>/
 ```
 
 - All aliases belonging to the same site move together. Deploy cannot steal a
   hostname from another site. Removing aliases is a manual config change.
-- Only runtime files are uploaded: , _/nanoweb.config, _/snips/, _/icons/.
+- Only runtime files are uploaded: , _/flea.config, _/snips/, _/icons/.
   Archives are bounded at 100 MiB and 10,000 entries, with no links or traversal.
 - Committed snips ship as a complete snapshot. Remote content edits are not merged;
   per-edit content history and visual rich-text controls remain deferred.
 - A lock serializes activation. A durable recovery journal preserves the old
-  config through interruption. If `/etc/nanoweb/deploy.pending.json` remains,
-  further deploys stop until `sudo /usr/local/bin/nanoweb-server -recover` succeeds.
+  config through interruption. If `/etc/flea/deploy.pending.json` remains,
+  further deploys stop until `sudo /usr/local/bin/flea-server -recover` succeeds.
 - Prior releases and server.previous.json remain available. There is no release
   pruning, rollback CLI, or automated server upgrade in this change.
 
@@ -224,13 +224,13 @@ or renewal over a real certificate lifetime.
 
 The remaining operational check needs an actual target and domain:
 
-1. Run `nanoweb setup` against it.
+1. Run `flea setup` against it.
 2. Allow inbound TCP 80/443 in the provider and host firewall, and point the
    domain's A record at the server. Any AAAA record must also work.
 3. Deploy a test site with the commands above, then enable HTTPS.
-4. Confirm `http://SERVER_IP/_nanoweb/health`, HTTP-to-HTTPS redirect, valid HTTPS,
+4. Confirm `http://SERVER_IP/_flea/health`, HTTP-to-HTTPS redirect, valid HTTPS,
    pages/assets, and private-path rejection from another machine.
-5. Check `sudo systemctl status nanoweb --no-pager` and service logs.
+5. Check `sudo systemctl status flea --no-pager` and service logs.
 6. Redeploy changed content, verify restart/cache reuse, and check recovery.
 7. Monitor real certificate renewal. Avoid repeatedly requesting certificates
    while debugging DNS/firewalls because CA issuance limits apply.

@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"nanoweb/internal/sitefiles"
-	"nanoweb/internal/snips"
+	"flea/internal/sitefiles"
+	"flea/internal/snips"
 )
 
 type snipEdit struct{ Before, After string }

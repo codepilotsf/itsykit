@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"nanoweb/internal/mailer"
-	"nanoweb/internal/snips"
+	"flea/internal/mailer"
+	"flea/internal/snips"
 )
 
 type Document struct {
@@ -52,7 +52,7 @@ func New(o Options) *Handler {
 	return h
 }
 func emailMessage(email, code, host string) mailer.Message {
-	return mailer.Message{To: email, Subject: "Your NanoWeb sign-in code", Text: fmt.Sprintf("Your sign-in code for %s is:\n\n%s\n\nIt expires in 10 minutes and can only be used once.\nIf you did not request it, ignore this email.", host, code)}
+	return mailer.Message{To: email, Subject: "Your Flea CMS sign-in code", Text: fmt.Sprintf("Your sign-in code for %s is:\n\n%s\n\nIt expires in 10 minutes and can only be used once.\nIf you did not request it, ignore this email.", host, code)}
 }
 func IsPath(path string) bool { return path == "/admin" || strings.HasPrefix(path, "/admin/") }
 
@@ -116,7 +116,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if h.options.Sender == nil {
 		message := "Sign-in emails are not set up for this site.\n\nAsk the person who manages this site's server to configure email delivery."
 		if h.options.Local {
-			message = "Email login needs valid Resend settings.\n\nAdd these to your site's .env file:\n\nRESEND_API_KEY=\"re_your_api_key\"\nNANOWEB_EMAIL_FROM=\"login@your-verified-domain.com\"\n\nUse your Resend API key and a sender address from a domain verified in Resend.\nKeep .env out of Git. NanoWeb does not load it automatically.\n\nStop dev, then run these commands from your site's folder:\n\nset -a\nsource .env\nset +a\nnanoweb dev\n\nReturn to /admin to sign in."
+			message = "Email login needs valid Resend settings.\n\nAdd these to your site's .env file:\n\nRESEND_API_KEY=\"re_your_api_key\"\nFLEA_EMAIL_FROM=\"login@your-verified-domain.com\"\n\nUse your Resend API key and a sender address from a domain verified in Resend.\nKeep .env out of Git. Flea CMS does not load it automatically.\n\nStop dev, then run these commands from your site's folder:\n\nset -a\nsource .env\nset +a\nflea dev\n\nReturn to /admin to sign in."
 		}
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		http.Error(w, message, http.StatusServiceUnavailable)

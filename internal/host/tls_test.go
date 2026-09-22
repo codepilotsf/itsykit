@@ -158,7 +158,8 @@ func TestDualListenersAndShutdown(t *testing.T) {
 	}()
 	deadline := time.Now().Add(3 * time.Second)
 	for {
-		conn, err := net.DialTimeout("tcp", c.Listen, 100*time.Millisecond)
+		// HTTP readiness does not imply the separately started TLS listener is ready.
+		conn, err := net.DialTimeout("tcp", c.TLS.Listen, 100*time.Millisecond)
 		if err == nil {
 			conn.Close()
 			break

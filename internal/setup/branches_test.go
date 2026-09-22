@@ -23,7 +23,7 @@ func testGit(t *testing.T, root string, args ...string) string {
 func initRepo(t *testing.T, root string) {
 	t.Helper()
 	testGit(t, root, "init", "-b", "main")
-	testGit(t, root, "config", "user.name", "Nanoweb Test")
+	testGit(t, root, "config", "user.name", "Flea CMS Test")
 	testGit(t, root, "config", "user.email", "test@example.test")
 	testGit(t, root, "add", ".")
 	testGit(t, root, "commit", "--allow-empty", "-m", "fixture")
@@ -34,7 +34,7 @@ func repoSite(t *testing.T) string {
 	os.Mkdir(filepath.Join(root, "."), 0755)
 	os.Mkdir(filepath.Join(root, "_"), 0755)
 	os.WriteFile(filepath.Join(root, "index.html"), []byte("committed"), 0644)
-	os.WriteFile(filepath.Join(root, "_", "nanoweb.config"), []byte(`{"site":{"name":"test"}}`), 0644)
+	os.WriteFile(filepath.Join(root, "_", "flea.config"), []byte(`{"site":{"name":"test"}}`), 0644)
 	initRepo(t, root)
 	return root
 }
@@ -169,7 +169,7 @@ func TestNestedCommittedSnapshotAndIgnoredFiles(t *testing.T) {
 	os.MkdirAll(filepath.Join(sub, "."), 0755)
 	os.MkdirAll(filepath.Join(sub, "_"), 0755)
 	os.WriteFile(filepath.Join(sub, "index.html"), []byte("nested commit"), 0644)
-	os.WriteFile(filepath.Join(sub, "_/nanoweb.config"), []byte(`{"site":{"name":"nested"}}`), 0644)
+	os.WriteFile(filepath.Join(sub, "_/flea.config"), []byte(`{"site":{"name":"nested"}}`), 0644)
 	os.WriteFile(filepath.Join(root, ".gitignore"), []byte("sites/demo/ignored.txt\n"), 0644)
 	initRepo(t, root)
 	os.WriteFile(filepath.Join(sub, "ignored.txt"), []byte("not committed"), 0644)

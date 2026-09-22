@@ -13,7 +13,7 @@ import (
 
 func TestMailSetupKeepsSecretsOutOfArgumentsAndOutput(t *testing.T) {
 	t.Setenv("RESEND_API_KEY", "")
-	t.Setenv("NANOWEB_EMAIL_FROM", "")
+	t.Setenv("FLEA_EMAIL_FROM", "")
 	for _, ready := range []bool{false, true} {
 		var output bytes.Buffer
 		transferred, configured, cleaned := false, false, false
@@ -25,12 +25,12 @@ func TestMailSetupKeepsSecretsOutOfArgumentsAndOutput(t *testing.T) {
 			switch {
 			case strings.Contains(args, "-mail-status"):
 				if ready {
-					fmt.Fprintln(c.out, "NANOWEB_MAIL=ready")
+					fmt.Fprintln(c.out, "FLEA_MAIL=ready")
 				} else {
-					fmt.Fprintln(c.out, "NANOWEB_MAIL=missing")
+					fmt.Fprintln(c.out, "FLEA_MAIL=missing")
 				}
 			case strings.Contains(args, "mktemp"):
-				fmt.Fprintln(c.out, "/tmp/nanoweb-mail.ABCDE12345")
+				fmt.Fprintln(c.out, "/tmp/flea-mail.ABCDE12345")
 			case strings.Contains(args, "cat >"):
 				if strings.Contains(args, "-tt") {
 					t.Fatal("secret transfer has a PTY")
@@ -69,7 +69,7 @@ func TestMailSetupKeepsSecretsOutOfArgumentsAndOutput(t *testing.T) {
 }
 func TestAdminDeployRequiresHTTPSBeforeSSH(t *testing.T) {
 	root := repoSite(t)
-	if err := os.WriteFile(filepath.Join(root, "_", "nanoweb.config"), []byte(`{"site":{"name":"Test"},"admin":{"emails":["owner@example.test"]}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "_", "flea.config"), []byte(`{"site":{"name":"Test"},"admin":{"emails":["owner@example.test"]}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	testGit(t, root, "add", ".")
@@ -82,9 +82,9 @@ func TestAdminDeployRequiresHTTPSBeforeSSH(t *testing.T) {
 
 func TestAdminDeployConfiguresMailBeforeActivation(t *testing.T) {
 	t.Setenv("RESEND_API_KEY", "re_test123456")
-	t.Setenv("NANOWEB_EMAIL_FROM", "login@example.test")
+	t.Setenv("FLEA_EMAIL_FROM", "login@example.test")
 	root := repoSite(t)
-	if err := os.WriteFile(filepath.Join(root, "_", "nanoweb.config"), []byte(`{"site":{"name":"Test"},"admin":{"emails":["owner@example.test"]}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "_", "flea.config"), []byte(`{"site":{"name":"Test"},"admin":{"emails":["owner@example.test"]}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	testGit(t, root, "add", ".")
@@ -96,14 +96,14 @@ func TestAdminDeployConfiguresMailBeforeActivation(t *testing.T) {
 			t.Fatal("secret in argv")
 		}
 		switch {
-		case strings.Contains(args, "NANOWEB_SYSTEM"):
-			fmt.Fprintln(c.out, "NANOWEB_SYSTEM=ubuntu:24.04:x86_64:0\nNANOWEB_DEPLOY=7")
+		case strings.Contains(args, "FLEA_SYSTEM"):
+			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=8")
 		case strings.Contains(args, "-mail-status"):
-			fmt.Fprintln(c.out, "NANOWEB_MAIL=missing")
-		case strings.Contains(args, "mktemp -d /tmp/nanoweb-mail"):
-			fmt.Fprintln(c.out, "/tmp/nanoweb-mail.ABCDE12345")
-		case strings.Contains(args, "mktemp -d /tmp/nanoweb-deploy"):
-			fmt.Fprintln(c.out, "/tmp/nanoweb-deploy.ABCDE12345")
+			fmt.Fprintln(c.out, "FLEA_MAIL=missing")
+		case strings.Contains(args, "mktemp -d /tmp/flea-mail"):
+			fmt.Fprintln(c.out, "/tmp/flea-mail.ABCDE12345")
+		case strings.Contains(args, "mktemp -d /tmp/flea-deploy"):
+			fmt.Fprintln(c.out, "/tmp/flea-deploy.ABCDE12345")
 		case strings.Contains(args, "cat >"):
 			data, _ := io.ReadAll(c.in)
 			if !bytes.Contains(data, []byte("re_test123456")) {

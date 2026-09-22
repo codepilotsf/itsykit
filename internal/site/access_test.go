@@ -14,7 +14,7 @@ func TestAdminAllowlistValidation(t *testing.T) {
 	}
 	root := fixture(t)
 	data, _ := json.Marshal(map[string]any{"site": map[string]string{"name": "Test"}, "admin": AdminAccess{Emails: []string{" Owner@Example.Test "}}})
-	put(t, root, "_/nanoweb.config", string(data))
+	put(t, root, "_/flea.config", string(data))
 	p, err := Load(root)
 	if err != nil {
 		t.Fatal(err)

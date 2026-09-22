@@ -1,30 +1,44 @@
-# Nanoweb
+# Flea CMS
 
 ## Product and build specification
 
-The developer CLI also provides `nanoweb admin [email]`: prompt when omitted,
+Versions follow SemVer, initially 0.1.0, with release notes in CHANGELOG.md.
+The canonical version is internal/buildinfo/version.go; builds use the same
+version for the CLI and bundled servers. The 0.x interface remains unstable.
+
+CLI help: bare `flea` shows the grouped command overview and exits successfully.
+Use `flea <command> --help` for command details without starting the command.
+
+Development policy: prefer the current design over backward compatibility at
+this early stage. Ask the user before adding compatibility or migration layers.
+
+Email-only contact forms are implemented: contact.to fixes the recipient;
+POST /_flea/contact validates name/email/message and sends plain-text mail.
+No submissions are stored. See README for HTTPS, mail setup and abuse limits.
+
+The developer CLI also provides `flea admin [email]`: prompt when omitted,
 create or append to admin.emails in the existing JSON config, skip duplicates,
 validate the 20-address limit, and preserve unrelated settings. It does not
 send email or deploy. Restart dev or deploy to apply changed access settings.
 
 **Status:** first implementation specification  
-**Audience:** developer building Nanoweb in Go  
+**Audience:** developer building Flea CMS in Go
 **Core promise:** a developer can create, run, and deploy a small editable website with one CLI, one server executable, plain HTML, JSON-backed content, and automatic HTTPS. No Node, Ruby, PHP, database server, Docker, or separately configured web server is required.
 
-**Current implementation boundary:** The implementation provides local `new`, `dev`, and `status`, routing, escaped templates, sanitized rich snips with dev extraction and preserved deployment content, assets, automatic reloads, SSH `setup` and `deploy`, and opt-in managed HTTPS through `https` or `deploy -https`. Deployments validate immutable releases, atomically replace host config, restart briefly, verify readiness, and restore the prior config on failure. Email-code login and basic owner edits at /admin are implemented. A rollback CLI, public forms, schemas, per-edit revisions, managed snip image publishing, and unrestricted raw HTML remain deferred. The sections below also describe future product direction, not just shipped capabilities. See README.md for the implemented contract and exact commands. Configuration is JSON only. Build requires Go 1.26 or newer for the pinned ACME library.
+**Current implementation boundary:** The implementation provides local `new`, `dev`, and `status`, routing, escaped templates, sanitized rich snips with dev extraction and preserved deployment content, assets, automatic reloads, SSH `setup` and `deploy`, and opt-in managed HTTPS through `https` or `deploy -https`. Deployments validate immutable releases, atomically replace host config, restart briefly, verify readiness, and restore the prior config on failure. Email-code login and basic owner edits at /admin are implemented. A rollback CLI, general-purpose forms, schemas, per-edit revisions, managed snip image publishing, and unrestricted raw HTML remain deferred. The sections below also describe future product direction, not just shipped capabilities. See README.md for the implemented contract and exact commands. Configuration is JSON only. Build requires Go 1.26 or newer for the pinned ACME library.
 
-Nanoweb is for brochure-style sites: small businesses, restaurants, consultants, event services, portfolios, and similar sites where a conventional application framework or WordPress installation is disproportionate to the job.
+Flea CMS is for brochure-style sites: small businesses, restaurants, consultants, event services, portfolios, and similar sites where a conventional application framework or WordPress installation is disproportionate to the job.
 
 It is not intended to become a general application platform, a no-code site builder, or a WordPress replacement with plugins.
 
 ## Product principles
 
 1. **The site remains an understandable folder.** A developer should be able to open it in a text editor or file browser and understand its structure immediately.
-2. **HTML is primary.** Pages are ordinary HTML files. Nanoweb adds a small templating layer but does not require a component framework or a build toolchain.
+2. **HTML is primary.** Pages are ordinary HTML files. Flea CMS adds a small templating layer but does not require a component framework or a build toolchain.
 3. **Public routes come from files.** No route file is needed for normal pages. URLs are clean and extensionless.
 4. **The owner edits structured content, not templates.** Developers own templates and partials; owners manage snips and their images through a simple editor.
-5. **One install, one operational unit.** The production host is a Nanoweb Go executable running as a system service. It owns HTTP(S), site selection, TLS certificates, static serving, the editor, deployments, and limited server-side actions.
-6. **No separate Caddy requirement.** Nanoweb must not ask users to install, configure, or operate Caddy. It may use mature Go libraries for ACME/TLS internally; it must not implement TLS certificate management from scratch.
+5. **One install, one operational unit.** The production host is a Flea CMS Go executable running as a system service. It owns HTTP(S), site selection, TLS certificates, static serving, the editor, deployments, and limited server-side actions.
+6. **No separate Caddy requirement.** Flea CMS must not ask users to install, configure, or operate Caddy. It may use mature Go libraries for ACME/TLS internally; it must not implement TLS certificate management from scratch.
 7. **Safe by default.** Releases are atomic and reversible; content writes are validated and atomic; private files are never served; arbitrary code execution is not a feature.
 
 ## User experience
@@ -32,20 +46,20 @@ It is not intended to become a general application platform, a no-code site buil
 The intended local workflow:
 
 ```sh
-brew install nanoweb
-nanoweb new my-site
+brew install flea
+flea new my-site
 cd my-site
-nanoweb dev
+flea dev
 ```
 
 The intended initial production workflow:
 
 ```sh
-nanoweb setup
-nanoweb deploy
+flea setup
+flea deploy
 ```
 
-`nanoweb setup` runs from the Mac, prompts for an SSH target, verifies the connection, and extracts the matching bundled Linux server for the detected architecture and verifies its bundled checksum. It uses native SSH keys/agents or interactive password authentication, uploads the executable, installs its systemd service, and checks readiness. The current installation implementation supports Ubuntu LTS 22.04/24.04/26.04 on amd64/arm64 and listens publicly on HTTP port 80, with an empty JSON host configuration. It does not open firewall ports. `nanoweb deploy -target user@host -domain example.com` publishes a validated site. `nanoweb https` enables certificates for deployed domains using an explicit contact email and terms acceptance. DNS and firewalls are configured by the administrator.
+`flea setup` runs from the Mac, prompts for an SSH target, verifies the connection, and extracts the matching bundled Linux server for the detected architecture and verifies its bundled checksum. It uses native SSH keys/agents or interactive password authentication, uploads the executable, installs its systemd service, and checks readiness. The current installation implementation supports Ubuntu LTS 22.04/24.04/26.04 on amd64/arm64 and listens publicly on HTTP port 80, with an empty JSON host configuration. It does not open firewall ports. `flea deploy -target user@host -domain example.com` publishes a validated site. `flea https` enables certificates for deployed domains using an explicit contact email and terms acceptance. DNS and firewalls are configured by the administrator.
 
 The initial server target is **Ubuntu LTS only**. Do not support Arch or multiple distributions until the Ubuntu flow is stable and tested.
 
@@ -63,12 +77,12 @@ The initial server target is **Ubuntu LTS only**. Do not support Arch or multipl
 
 ## Site structure
 
-Every site follows this shape. the project root is the public document root. `_/` is Nanoweb private data and configuration.
+Every site follows this shape. the project root is the public document root. `_/` is Flea CMS private data and configuration.
 
 ```text
 my-site/
   _/
-    nanoweb.config
+    flea.config
     snips.json
     data/
       team.json
@@ -100,14 +114,14 @@ my-site/
 | `**/_name.html` | Developer                              | No                             | Reusable partial templates, except reserved names |
 | `_404.html`    | Developer                               | Only as the 404 response       | Not-found document                                |
 | `_500.html`    | Developer                               | Only as the 500 response       | Server-error document                             |
-| `_/nanoweb.config`  | Developer                               | No                             | Site configuration                                |
+| `_/flea.config`  | Developer                               | No                             | Site configuration                                |
 | `_/snips/`          | Site owner through editor, or developer | No direct file serving         | Editable structured content and associated images |
 
-Any file or directory whose basename begins with `_` is private/reserved and must never be reachable through a public URL. `_/` is additionally reserved as Nanoweb's private workspace.
+Any file or directory whose basename begins with `_` is private/reserved and must never be reachable through a public URL. `_/` is additionally reserved as Flea CMS's private workspace.
 
 ## File-based routing
 
-Nanoweb maps page files in the project root to extensionless routes.
+Flea CMS maps page files in the project root to extensionless routes.
 
 | File                         | Route               |
 | ---------------------------- | ------------------- |
@@ -122,18 +136,18 @@ Rules:
 
 1. `index.html` represents its containing directory.
 2. Any other `.html` page represents the same URL without `.html`.
-3. URLs containing `.html` are not alternate routes and return 404. Nanoweb does not redirect `/about.html` to `/about`.
+3. URLs containing `.html` are not alternate routes and return 404. Flea CMS does not redirect `/about.html` to `/about`.
 4. An asset retains its filename and extension.
 5. Reserved/private underscore paths are not routes.
-6. A duplicate route, such as both `about.html` and `about/index.html`, is a build error. `nanoweb dev` reports it and `nanoweb deploy` refuses it.
+6. A duplicate route, such as both `about.html` and `about/index.html`, is a build error. `flea dev` reports it and `flea deploy` refuses it.
 7. An unmatched route returns `_404.html` with HTTP status 404, wrapped in `_layout.html` when present. The 404 template contains page content for `{slot}`, not a separate HTML document.
 8. An unexpected request-time/internal rendering failure returns `_500.html` with HTTP status 500. This fallback must remain deliberately simple.
 
-The first version has no `routes.json`. Add redirects only when there is a real need, through `_/nanoweb.config`.
+The first version has no `routes.json`. Add redirects only when there is a real need, through `_/flea.config`.
 
 ## Templates
 
-Nanoweb borrows the structural readability of Svelte templates but does not execute JavaScript. It uses single curly braces.
+Flea CMS borrows the structural readability of Svelte templates but does not execute JavaScript. It uses single curly braces.
 
 ### Layouts and slots
 
@@ -218,7 +232,7 @@ They are distinct from partials and structured developer data:
 Create an editable region while dev runs:
 
 ```html
-<h1 snip="title">Welcome to NanoWeb</h1>
+<h1 snip="title">Welcome to Flea CMS</h1>
 ```
 
 Dev extracts inner HTML and inserts a stable reference:
@@ -230,7 +244,7 @@ Dev extracts inner HTML and inserts a stable reference:
 Storage groups entries by route, with shared regions for layouts/partials:
 
 ```json
-{"pages":{"/":{"title":"Home","description":"Welcome","snips":{"a7Km2pQ9xB":{"label":"title","content":"Welcome to NanoWeb"}}}},"shared":{"snips":{}}}
+{"pages":{"/":{"title":"Home","description":"Welcome","snips":{"a7Km2pQ9xB":{"label":"title","content":"Welcome to Flea CMS"}}}},"shared":{"snips":{}}}
 ```
 
 Extraction is dev-only, journaled and serialized. Content is persisted before
@@ -252,7 +266,7 @@ Aliases pointing to the same release must select the same content snapshot;
 conflicting paths are rejected and valid aliases share a loaded serving snapshot.
 After successful activation, unreferenced entries move to an archive map, retaining
 last remote content. References are lexical, including false/empty branches and
-unused partials. Failed activation leaves previous content untouched. Protocol 7
+unused partials. Failed activation leaves previous content untouched. Protocol 8
 is required. No automatic archive deletion or rollback command exists yet.
 
 ### Values, conditions, and loops
@@ -293,7 +307,7 @@ The expression model is intentionally constrained:
 - Loop: a collection dotted path and one alias only, for example `{#each team.members as member}`.
 - An empty loop renders nothing.
 - No function calls, arithmetic, comparisons, `.length`, filters, inline JavaScript, or arbitrary expressions in v1.
-- Nanoweb does not parse template directives inside `<script>` or `<style>` elements.
+- Flea CMS does not parse template directives inside `<script>` or `<style>` elements.
 
 Values interpolated by `{path}` are contextually escaped. Short-ID snips render
 sanitized HTML by default; unrestricted raw HTML is not supported.
@@ -329,11 +343,11 @@ Recommended schema goals:
 - Image constraints such as allowed file type and maximum file size
 - No arbitrary form generation from untrusted data
 
-Nanoweb validates a snip before writing it. It writes content atomically: create a temporary file in the same directory, fsync as appropriate, then rename it over the existing JSON file. It retains prior revisions/snapshots for rollback.
+Flea CMS validates a snip before writing it. It writes content atomically: create a temporary file in the same directory, fsync as appropriate, then rename it over the existing JSON file. It retains prior revisions/snapshots for rollback.
 
 ## Configuration
 
-`_/nanoweb.config` contains JSON only. Comments and trailing commas are not supported. The site loader reads the `site` object. Local `_/deploy.json` stores a `branches` map of confirmed deployment settings (target, domain, name, www_redirect, https, email, agree_tos, expected_ips). First deploy prompts and saves; later deploys select only the current branch. Changed settings require `-configure` confirmation. It contains no credentials and is excluded from uploads. Use branch names directly without environment labels or questions. Generate the internal site name automatically; staging suggests a subdomain. General page redirect settings remain deferred; WWW-to-primary redirects are supported.
+`_/flea.config` contains JSON only. Comments and trailing commas are not supported. The site loader reads the `site` object. Local `_/deploy.json` stores a `branches` map of confirmed deployment settings (target, domain, name, www_redirect, https, email, agree_tos, expected_ips). First deploy prompts and saves; later deploys select only the current branch. Changed settings require `-configure` confirmation. It contains no credentials and is excluded from uploads. Use branch names directly without environment labels or questions. Generate the internal site name automatically; staging suggests a subdomain. General page redirect settings remain deferred; WWW-to-primary redirects are supported.
 
 Example:
 
@@ -379,7 +393,7 @@ Editor exclusions for v1:
 
 ## Server and TLS
 
-The installed Nanoweb server is a single Go executable and system service. A separate Caddy process is not part of the required architecture.
+The installed Flea CMS server is a single Go executable and system service. A separate Caddy process is not part of the required architecture.
 
 Responsibilities:
 
@@ -401,7 +415,7 @@ Current implementation: release directories use a stable site name and random
 timestamped IDs. The host config points directly at the selected absolute release
 directory, without a `current` symlink. Config switching is atomic but service
 restart causes a brief interruption. A lock and durable recovery journal protect
-activation; interrupted transactions can be restored with `nanoweb-server -recover`.
+activation; interrupted transactions can be restored with `flea-server -recover`.
 Old releases are retained, with no pruning or rollback CLI yet. Committed rich
 snips seed missing IDs; existing remote content/metadata wins. Content snapshots
 live separately under content/<release-id>.json, selected by the host config.
@@ -411,7 +425,7 @@ the prior code and content paths. The rollback workflow below is future work.
 Each deployment creates an immutable release. The host switches to it atomically.
 
 ```text
-/var/lib/nanoweb/sites/acmecatering.com/
+/var/lib/flea/sites/acmecatering.com/
   releases/
     20260920-153012/
     20260919-102417/
@@ -425,7 +439,7 @@ The exact treatment of editable snips during a developer deployment needs a defi
 
 - HTML, partials, layouts, CSS, JavaScript, and developer-provided default snips ship in releases.
 - Owner edits and uploaded files are stored in a host-managed mutable content layer with revision history.
-- On deploy, Nanoweb preserves existing owner-edited snips and uploads unless the developer intentionally runs an explicit content migration/reset command.
+- On deploy, Flea CMS preserves existing owner-edited snips and uploads unless the developer intentionally runs an explicit content migration/reset command.
 
 This avoids accidentally erasing an owner’s edits every time a developer redeploys HTML.
 
@@ -435,7 +449,7 @@ Required deployment properties:
 - Upload a staged release before changing `current`.
 - Switch releases atomically.
 - Preserve the prior active release.
-- Provide `nanoweb rollback`.
+- Provide `flea rollback`.
 - Report the deployed domain, release identifier, and any certificate state clearly.
 
 ## CLI surface
@@ -443,18 +457,18 @@ Required deployment properties:
 Keep the initial command surface small:
 
 ```text
-nanoweb new <site-name>
-nanoweb dev
-nanoweb setup
-nanoweb deploy
-nanoweb status
-nanoweb logs
-nanoweb rollback
+flea new <site-name>
+flea dev
+flea setup
+flea deploy
+flea status
+flea logs
+flea rollback
 ```
 
 ### Command behavior
 
-`nanoweb setup`
+`flea setup`
 
 - Prompt `Server hostname or IP`; standalone setup connects as root.
 - Fail on SSH/OS checks before extracting the matching bundled Linux server.
@@ -466,19 +480,19 @@ nanoweb rollback
 - Extract and verify the replacement before requesting reset confirmation.
 - Recognized existing installations require typed DESTROY confirmation and retain
   a root-only backup. Check TCP/UDP 80/443 before changing anything, exempting
-  only the verified NanoWeb service during reinstall. Preserve unrelated services.
+  only the verified Flea CMS service during reinstall. Preserve unrelated services.
 - Initial host listens publicly on HTTP port 80. Deploy and HTTPS are subsequent
   explicit commands; no firewall changes are made.
 
-`nanoweb new <site-name>`
+`flea new <site-name>`
 
 - Creates the standard folder structure and a polished minimal starter site.
 - Initializes Git on main without making a commit. --skip-git skips initialization;
   missing Git does not prevent site creation. Includes a starter .gitignore.
-- Creates default `_/nanoweb.config`, a default snip, a layout with inline header/footer, error pages, and a minimal Nanoweb welcome page with its SVG mark.
+- Creates default `_/flea.config`, a default snip, a layout with inline header/footer, error pages, and a minimal Flea CMS welcome page with its SVG mark.
 - Bundles local Prewind 1.3.1 and Preflight-inspired theme, typography, native form, button, and application styles. CSS layers are ordered reset, styles, prewind. No CSS build step or CDN is required; form styling does not implement submission handling.
 
-`nanoweb dev`
+`flea dev`
 
 - Must run without Docker or a database.
 - Watches source files and snip content.
@@ -488,13 +502,13 @@ nanoweb rollback
 - Reports template errors, invalid route collisions, missing partials, schema errors, and unsafe/unserved paths clearly.
 - Provides local editor access.
 
-`nanoweb deploy`
+`flea deploy`
 
 - Before deployment, offer to commit pending changes with a file preview,
   confirmation, and commit message. Respect Git hooks and signing. Declining or
   failure stops deployment. Sites within larger repositories commit manually.
 
-- Requires deployment protocol 7 before upload, offering first-time setup when absent. Validates the
+- Requires deployment protocol 8 before upload, offering first-time setup when absent. Validates the
   packaged site, uploads over SSH/SCP, stages, and atomically switches host config.
 - Restarts and verifies revision/hostname; restores the prior config on failure.
 - Uses native SSH and the saved current-branch mapping in _/deploy.json. The first
@@ -514,7 +528,7 @@ nanoweb rollback
 - Enforces distinct site names and hostnames per branch, with server-side ownership.
 - Optional -https, -email, and -agree-tos enable managed certificates too.
 
-`nanoweb https`
+`flea https`
 
 - Enables Let's Encrypt certificates for existing domains. Uses autocert for
   issuance, cache and renewal, with exact host allowlists and TLS Host/SNI checks.
@@ -522,21 +536,21 @@ nanoweb rollback
   acceptance. Redirects HTTP to HTTPS for enabled domains; health stays on HTTP.
 - Tests use a local ACME authority; real Ubuntu/live CA validation is pending.
 
-`nanoweb status`
+`flea status`
 
 - Shows local project validity or remote deployment/certificate/release status, depending on flags/context.
 
-`nanoweb logs`
+`flea logs`
 
 - Streams or retrieves host logs without requiring the developer to know system-service commands.
 
-`nanoweb rollback`
+`flea rollback`
 
 - Lists/selects or defaults to the immediately previous release, then atomically reactivates it.
 
 ## Docker
 
-Docker is not required for local development or the first production path. The core product must work on a blank Ubuntu LTS host using the Nanoweb executable and OS service management.
+Docker is not required for local development or the first production path. The core product must work on a blank Ubuntu LTS host using the Flea CMS executable and OS service management.
 
 Later, Docker can be an optional deployment target for users who already operate containers. It must not dictate the local project format or force every customer to understand containers.
 
@@ -544,7 +558,7 @@ Later, Docker can be an optional deployment target for users who already operate
 
 The first server-side feature should be a constrained contact-form action, not arbitrary application code.
 
-A form can declare a named Nanoweb endpoint and validation configuration. Nanoweb handles rate limiting, spam defenses, payload validation, delivery/storage, and logging. The implementation may later offer email or webhook destinations, but those credentials live in host configuration, never in public site files.
+A form can declare a named Flea CMS endpoint and validation configuration. Flea CMS handles rate limiting, spam defenses, payload validation, delivery/storage, and logging. The implementation may later offer email or webhook destinations, but those credentials live in host configuration, never in public site files.
 
 Do not add custom server functions in v1. They turn a small static host into a multi-tenant code-execution and security platform.
 
@@ -565,9 +579,9 @@ Do not add custom server functions in v1. They turn a small static host into a m
 
 ## Suggested implementation milestones
 
-### Milestone 1: local static Nanoweb
+### Milestone 1: local static Flea CMS
 
-- CLI skeleton and `nanoweb new`
+- CLI skeleton and `flea new`
 - Parse project layout and configuration
 - File route generation with collision detection
 - Local HTTP server
@@ -624,11 +638,11 @@ These are intentionally not blockers for the initial routing/template prototype:
 
 ## Acceptance criteria for the first usable release
 
-Nanoweb is meaningfully usable when a developer can:
+Flea CMS is meaningfully usable when a developer can:
 
 1. Install the CLI through Homebrew.
-2. Run `nanoweb new my-site` and receive a working starter site.
-3. Run `nanoweb dev` with no language runtime, Node modules, database, Docker, or external web-server setup.
+2. Run `flea new my-site` and receive a working starter site.
+3. Run `flea dev` with no language runtime, Node modules, database, Docker, or external web-server setup.
 4. Add `about-us/history.html` and see it at `/about-us/history`.
 5. Confirm `/about-us/history.html` returns 404.
 6. Reuse a developer partial in several pages.
@@ -638,4 +652,4 @@ Nanoweb is meaningfully usable when a developer can:
 10. Deploy to a blank supported Ubuntu server with one command after entering the initial domain/server details.
 11. Receive a valid automatically managed HTTPS certificate.
 12. Deploy a second release and roll back safely.
-13. Host more than one domain/site from the same Nanoweb server.
+13. Host more than one domain/site from the same Flea CMS server.

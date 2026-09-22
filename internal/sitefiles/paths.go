@@ -27,7 +27,7 @@ func Included(name string) bool {
 		if name == "_/data" || strings.HasPrefix(name, "_/data/") {
 			return true
 		}
-		return name == "_" || name == "_/nanoweb.config" || name == "_/snips.json" || name == "_/snips" || strings.HasPrefix(name, "_/snips/") || name == "_/icons" || strings.HasPrefix(name, "_/icons/")
+		return name == "_" || name == "_/flea.config" || name == "_/snips.json" || name == "_/snips" || strings.HasPrefix(name, "_/snips/") || name == "_/icons" || strings.HasPrefix(name, "_/icons/")
 	}
 	return true
 }

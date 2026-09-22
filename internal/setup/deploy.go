@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"nanoweb/internal/admin"
-	"nanoweb/internal/release"
-	"nanoweb/internal/site"
+	"flea/internal/admin"
+	"flea/internal/release"
+	"flea/internal/site"
 )
 
 // DeploySettings contains no secrets. Native SSH configuration owns credentials.
@@ -71,7 +71,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 	if err = opts.Validate(); err != nil {
 		return err
 	}
-	temp, err := os.MkdirTemp("/tmp", "nanoweb-deploy-")
+	temp, err := os.MkdirTemp("/tmp", "flea-deploy-")
 	if err != nil {
 		return err
 	}
@@ -94,9 +94,9 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		if err = p.CheckExtractedSnips(); err != nil {
 			return err
 		}
-		needsMail = len(p.Admin.Emails) > 0
+		needsMail = len(p.Admin.Emails) > 0 || p.Contact.To != ""
 		if needsMail && !opts.HTTPS {
-			return fmt.Errorf("Admin login requires HTTPS. Enable it with nanoweb deploy -configure before deploying this site.")
+			return fmt.Errorf("Admin login requires HTTPS, and so do contact forms. Enable it with flea deploy -configure before deploying this site.")
 		}
 		for _, warning := range p.Warnings {
 			fmt.Fprintln(errOut, "Warning:", warning)
@@ -168,26 +168,26 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		_ = runCommand(c, command{name: "ssh", args: args, out: io.Discard, errOut: io.Discard})
 	}()
 	var output bytes.Buffer
-	serverProbe := probe + `; if test -x /usr/local/bin/nanoweb-server; then /usr/local/bin/nanoweb-server -protocol || printf 'NANOWEB_OUTDATED=1\n'; elif test -e /usr/local/bin/nanoweb-server; then printf 'NANOWEB_OUTDATED=1\n'; else printf 'NANOWEB_MISSING=1\n'; fi`
+	serverProbe := probe + `; if test -x /usr/local/bin/flea-server; then /usr/local/bin/flea-server -protocol || printf 'FLEA_OUTDATED=1\n'; elif test -e /usr/local/bin/flea-server; then printf 'FLEA_OUTDATED=1\n'; else printf 'FLEA_MISSING=1\n'; fi`
 	checkServer := func() error { output.Reset(); return ssh(ctx, "sh -c "+shellQuote(serverProbe), false, &output) }
 	if err = checkServer(); err != nil {
 		if errors.Is(err, errHostKeyChanged) {
 			return err
 		}
-		return fmt.Errorf("Could not connect to or check %s.\n\nCheck your SSH username and key, then try again.\nTo change the saved username, run nanoweb deploy -configure.", target)
+		return fmt.Errorf("Could not connect to or check %s.\n\nCheck your SSH username and key, then try again.\nTo change the saved username, run flea deploy -configure.", target)
 	}
 	_, isRoot, err := parseProbe(output.String())
 	if err != nil {
 		return err
 	}
-	if strings.Contains(output.String(), "NANOWEB_MISSING=1\n") {
-		fmt.Fprint(out, "\nNanoweb isn't installed on this server yet.\nSetup will install the server and start its service.\n\n")
+	if strings.Contains(output.String(), "FLEA_MISSING=1\n") {
+		fmt.Fprint(out, "\nFlea CMS isn't installed on this server yet.\nSetup will install the server and start its service.\n\n")
 		confirmed, err := confirmSetup(ctx, in, out)
 		if err != nil {
 			return err
 		}
 		if !confirmed {
-			return fmt.Errorf("Deployment stopped. You can install the server later with nanoweb setup.")
+			return fmt.Errorf("Deployment stopped. You can install the server later with flea setup.")
 		}
 		if err = install(ctx, target); err != nil {
 			return fmt.Errorf("Server setup did not finish.\n\n%w", err)
@@ -196,7 +196,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			if errors.Is(err, errHostKeyChanged) {
 				return err
 			}
-			return fmt.Errorf("Nanoweb was installed, but the server check failed.\nPlease check the service before deploying again.")
+			return fmt.Errorf("Flea CMS was installed, but the server check failed.\nPlease check the service before deploying again.")
 		}
 		_, isRoot, err = parseProbe(output.String())
 		if err != nil {
@@ -204,10 +204,10 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		}
 	}
 	if !strings.Contains(output.String(), release.Protocol+"\n") {
-		return fmt.Errorf("This server has an older or incomplete Nanoweb installation.\nPlease update the server before deploying.")
+		return fmt.Errorf("This server has an older or incomplete Flea CMS installation.\nPlease update the server before deploying.")
 	}
 	fmt.Fprintln(out, "Checking DNS from the target server...")
-	dnsCommand := "/usr/local/bin/nanoweb-server -check-dns -domain " + shellQuote(strings.Join(opts.Domains, ","))
+	dnsCommand := "/usr/local/bin/flea-server -check-dns -domain " + shellQuote(strings.Join(opts.Domains, ","))
 	if len(s.ExpectedIPs) > 0 {
 		dnsCommand += " -expected-ips " + shellQuote(strings.Join(s.ExpectedIPs, ","))
 	}
@@ -226,14 +226,14 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			return err
 		}
 	}
-	text := "/usr/local/bin/nanoweb-server"
+	text := "/usr/local/bin/flea-server"
 	if !httpsOnly {
 		output.Reset()
-		if err = ssh(ctx, "umask 077; mktemp -d /tmp/nanoweb-deploy.XXXXXXXXXX", false, &output); err != nil {
+		if err = ssh(ctx, "umask 077; mktemp -d /tmp/flea-deploy.XXXXXXXXXX", false, &output); err != nil {
 			return err
 		}
 		stage := strings.TrimSpace(output.String())
-		if !regexp.MustCompile(`^/tmp/nanoweb-deploy\.[A-Za-z0-9]{10}$`).MatchString(stage) {
+		if !regexp.MustCompile(`^/tmp/flea-deploy\.[A-Za-z0-9]{10}$`).MatchString(stage) {
 			return fmt.Errorf("unexpected remote staging path %q", stage)
 		}
 		defer func() {
@@ -275,7 +275,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		fmt.Fprintln(out, "Requesting/verifying HTTPS certificates. DNS must point here; allow inbound 80/443. This may take two minutes.")
 	}
 	if err = ssh(ctx, text, true, out); err != nil {
-		return fmt.Errorf("remote activation failed: %w (if SSH disconnected, inspect the server; use sudo nanoweb-server -recover if a recovery journal remains)", err)
+		return fmt.Errorf("remote activation failed: %w (if SSH disconnected, inspect the server; use sudo flea-server -recover if a recovery journal remains)", err)
 	}
 	scheme := "http"
 	if opts.HTTPS {

@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"nanoweb/internal/editor"
-	"nanoweb/internal/mailer"
+	"flea/internal/editor"
+	"flea/internal/mailer"
 )
 
 type testSender chan mailer.Message

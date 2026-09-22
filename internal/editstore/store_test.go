@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"nanoweb/internal/editor"
-	"nanoweb/internal/site"
-	"nanoweb/internal/state"
+	"flea/internal/editor"
+	"flea/internal/site"
+	"flea/internal/state"
 )
 
 func TestLocalSavesDuringDevReloads(t *testing.T) {
@@ -59,9 +59,9 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 	t.Helper()
 	root := t.TempDir()
 	files := map[string]string{
-		"_/nanoweb.config": `{"site":{"name":"Editor test"},"admin":{"emails":["owner@example.test"]}}`,
-		"index.html":       `<h1>{snip abcdefghij}</h1><p>{page.title}</p><p>{page.description}</p>`,
-		"_/snips.json":     `{"pages":{"/":{"snips":{"abcdefghij":{"label":"Heading","content":"Original"}}}},"shared":{"snips":{}}}`,
+		"_/flea.config": `{"site":{"name":"Editor test"},"admin":{"emails":["owner@example.test"]}}`,
+		"index.html":    `<h1>{snip abcdefghij}</h1><p>{page.title}</p><p>{page.description}</p>`,
+		"_/snips.json":  `{"pages":{"/":{"snips":{"abcdefghij":{"label":"Heading","content":"Original"}}}},"shared":{"snips":{}}}`,
 	}
 	for name, body := range files {
 		file := filepath.Join(root, name)
@@ -171,7 +171,7 @@ func TestRejectUnknownTargetsAndChangedAccess(t *testing.T) {
 			t.Fatal("invalid edit accepted", u)
 		}
 	}
-	if err := os.WriteFile(filepath.Join(s.Root, "_", "nanoweb.config"), []byte(`{"site":{"name":"Changed"},"admin":{"emails":[]}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(s.Root, "_", "flea.config"), []byte(`{"site":{"name":"Changed"},"admin":{"emails":[]}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := s.Read(); err == nil {

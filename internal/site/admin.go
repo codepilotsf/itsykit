@@ -22,20 +22,20 @@ func AddAdmin(directory, email string) (string, bool, error) {
 		return "", false, err
 	}
 	defer root.Close()
-	const name = "_/nanoweb.config"
+	const name = "_/flea.config"
 	original, err := readFile(root, name)
 	if err != nil {
-		return "", false, fmt.Errorf("Could not read _/nanoweb.config. Run this command from your site's folder.")
+		return "", false, fmt.Errorf("Could not read _/flea.config. Run this command from your site's folder.")
 	}
 	var config map[string]json.RawMessage
 	if err := json.Unmarshal(original, &config); err != nil || config == nil {
-		return "", false, fmt.Errorf("Please fix the JSON in _/nanoweb.config before adding an admin.")
+		return "", false, fmt.Errorf("Please fix the JSON in _/flea.config before adding an admin.")
 	}
 	var settings struct {
 		Name string `json:"name"`
 	}
 	if err := json.Unmarshal(config["site"], &settings); err != nil || strings.TrimSpace(settings.Name) == "" {
-		return "", false, fmt.Errorf("Please set site.name in _/nanoweb.config before adding an admin.")
+		return "", false, fmt.Errorf("Please set site.name in _/flea.config before adding an admin.")
 	}
 	admin := map[string]json.RawMessage{}
 	if raw, ok := config["admin"]; ok {

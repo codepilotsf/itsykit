@@ -1,6 +1,15 @@
 # Architecture and review guide
 
-NanoWeb has two entry points: a developer CLI and a persistent website server.
+Email-only forms use internal/contact, configured by contact.to. Host routing
+binds handlers to fixed recipients and shares them across aliases. Validate Origin,
+TLS and bounded fields before synchronous, timed mailer.Send. Visitor input sets
+Reply-To and text, never recipient, sender, site or paths. Per-site/IP limits and
+a shared contact budget bound work. No submission storage exists. Distinct site
+roots cannot share content inodes. These are trusted in-process services, not an
+OS sandbox; provider quota remains shared with login mail. Configuration is
+captured at startup. See README for the implemented limits.
+
+Flea CMS has two entry points: a developer CLI and a persistent website server.
 Both use the same site loader and renderer. There is no application runtime,
 database, background job framework, or administration API exposed over HTTP.
 
@@ -60,7 +69,7 @@ inspection, not concurrent editing. HTTP handlers select from validated maps;
 they never turn request paths into filesystem reads. Template output is buffered
 before sending headers, so a render failure can still produce a proper 500.
 
-The template compiler translates NanoWeb directives into Go `html/template`.
+The template compiler translates Flea CMS directives into Go `html/template`.
 `{snip ID}` becomes a sanitized rich-content call. The HTML region scanner
 recognizes the same unquoted markers for extraction, editor access and deployment
 pruning. Quoted markers are rejected. HTML comments and script/style contents
@@ -190,12 +199,12 @@ Remaining work and limits, not claims of completed sign-off:
 From this repository, using the installed Go executable:
 
 ```sh
-export GOCACHE=/tmp/nanoweb-go-cache
+export GOCACHE=/tmp/flea-go-cache
 /usr/local/go/bin/go test ./...
 /usr/local/go/bin/go test -race ./...
 /usr/local/go/bin/go vet ./...
 bash scripts/build.sh
-/usr/local/go/bin/go build -o bin/nanoweb-server ./cmd/nanoweb-server
+/usr/local/go/bin/go build -o bin/flea-server ./cmd/flea-server
 ```
 
 `TestExecutableWorkflow` creates a site, starts dev, checks pages/assets/private

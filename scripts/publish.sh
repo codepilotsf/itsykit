@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
-version=${CI_COMMIT_TAG:?}
-[[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$ ]] || exit 1
-base="${CI_API_V4_URL:?}/projects/${CI_PROJECT_ID:?}/packages/generic/nanoweb/$version"
-files=(nanoweb-server-linux-amd64 nanoweb-server-linux-arm64 nanoweb-darwin-amd64 nanoweb-darwin-arm64)
+source "$(dirname "$0")/version.sh"
+version="v$(flea_version release)"
+base="${CI_API_V4_URL:?}/projects/${CI_PROJECT_ID:?}/packages/generic/flea/$version"
+files=(flea-server-linux-amd64 flea-server-linux-arm64 flea-darwin-amd64 flea-darwin-arm64)
 for file in "${files[@]}"; do test -s "dist/$file"; done
 for file in "${files[@]}"; do
   curl --fail --silent --show-error --header "JOB-TOKEN: ${CI_JOB_TOKEN:?}" --upload-file "dist/$file" "$base/$file"

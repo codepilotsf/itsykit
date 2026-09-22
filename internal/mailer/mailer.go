@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-type Message struct{ To, Subject, Text string }
+type Message struct{ To, Subject, Text, ReplyTo string }
 type Sender interface {
 	Send(context.Context, Message) error
 }
@@ -38,7 +38,7 @@ func (s Settings) Validate() error {
 // Env is deliberately not a general dotenv interpreter. systemd reads the
 // root-only EnvironmentFile; local development may export the same variables.
 func Env() Sender {
-	s := Settings{APIKey: os.Getenv("RESEND_API_KEY"), From: os.Getenv("NANOWEB_EMAIL_FROM")}
+	s := Settings{APIKey: os.Getenv("RESEND_API_KEY"), From: os.Getenv("FLEA_EMAIL_FROM")}
 	if s.Validate() != nil {
 		return nil
 	}
@@ -60,7 +60,8 @@ func (s *Resend) Send(ctx context.Context, m Message) error {
 		To      []string `json:"to"`
 		Subject string   `json:"subject"`
 		Text    string   `json:"text"`
-	}{s.settings.From, []string{m.To}, m.Subject, m.Text})
+		ReplyTo string   `json:"reply_to,omitempty"`
+	}{s.settings.From, []string{m.To}, m.Subject, m.Text, m.ReplyTo})
 	if err != nil {
 		return fmt.Errorf("Could not prepare the login email.")
 	}

@@ -29,24 +29,24 @@ func extract(ctx context.Context, source fs.FS, arch, destination string) error 
 	if arch != "amd64" && arch != "arm64" {
 		return fmt.Errorf("Unsupported server architecture: %s", arch)
 	}
-	name := "assets/nanoweb-server-linux-" + arch
+	name := "assets/flea-server-linux-" + arch
 	sum, err := fs.ReadFile(source, name+".sha256")
 	if err != nil {
-		return fmt.Errorf("This NanoWeb executable is missing its bundled server.\n\nRebuild from the NanoWeb source with: bash scripts/build.sh\nOr install a complete NanoWeb release.")
+		return fmt.Errorf("This Flea CMS executable is missing its bundled server.\n\nRebuild from the Flea CMS source with: bash scripts/build.sh\nOr install a complete Flea CMS release.")
 	}
 	expected := strings.TrimSpace(string(sum))
 	decoded, err := hex.DecodeString(expected)
 	if err != nil || len(decoded) != sha256.Size {
-		return fmt.Errorf("The bundled server checksum is invalid. Rebuild or reinstall NanoWeb.")
+		return fmt.Errorf("The bundled server checksum is invalid. Rebuild or reinstall Flea CMS.")
 	}
 	compressed, err := source.Open(name + ".gz")
 	if err != nil {
-		return fmt.Errorf("The bundled server is missing. Rebuild or reinstall NanoWeb.")
+		return fmt.Errorf("The bundled server is missing. Rebuild or reinstall Flea CMS.")
 	}
 	defer compressed.Close()
 	z, err := gzip.NewReader(compressed)
 	if err != nil {
-		return fmt.Errorf("The bundled server is damaged. Rebuild or reinstall NanoWeb.")
+		return fmt.Errorf("The bundled server is damaged. Rebuild or reinstall Flea CMS.")
 	}
 	defer z.Close()
 	f, err := os.OpenFile(destination, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
@@ -67,7 +67,7 @@ func extract(ctx context.Context, source fs.FS, arch, destination string) error 
 		return fmt.Errorf("Could not unpack the bundled server: %w", err)
 	}
 	if n > limit || hex.EncodeToString(hash.Sum(nil)) != strings.ToLower(expected) {
-		return fmt.Errorf("The bundled server failed its integrity check. Rebuild or reinstall NanoWeb.")
+		return fmt.Errorf("The bundled server failed its integrity check. Rebuild or reinstall Flea CMS.")
 	}
 	if err := f.Close(); err != nil {
 		return err

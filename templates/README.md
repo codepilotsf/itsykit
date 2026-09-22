@@ -1,20 +1,20 @@
-# Your Nanoweb site
+# Your Flea CMS site
 
-For owner editing, add approved addresses to admin.emails in _/nanoweb.config.
-The empty default list disables /admin. Deploy with HTTPS; NanoWeb prompts for
+For owner editing, add approved addresses to admin.emails in _/flea.config.
+The empty default list disables /admin. Deploy with HTTPS; Flea CMS prompts for
 Resend email settings once and stores them only on the server. Owners sign in at
 /admin using an emailed code, then edit page details and snip text/simple HTML.
-For local login, export RESEND_API_KEY and NANOWEB_EMAIL_FROM before starting dev.
+For local login, export RESEND_API_KEY and FLEA_EMAIL_FROM before starting dev.
 Never commit these secrets. Restart dev after changing the approved addresses.
 
-Run nanoweb status to validate, then nanoweb dev and open http://127.0.0.1:3000.
+Run flea status to validate, then flea dev and open http://127.0.0.1:3000.
 
-Run nanoweb admin to add an approved login email, or nanoweb admin owner@example.com.
+Run flea admin to add an approved login email, or flea admin owner@example.com.
 It preserves existing admins and other settings. Restart dev afterward; live
 access changes need deployment. Resend credentials are still required for login.
 
 Start with index.html. Edit _/snips.json for the welcome text and page metadata, and
-_/nanoweb.config (JSON) for your site name. Saved changes reload your browser.
+_/flea.config (JSON) for your site name. Saved changes reload your browser.
 
 Add <h1 snip="title">Your heading</h1> or a section with formatted HTML while dev
 is running. Dev extracts its inner HTML to _/snips.json and inserts a short-ID
@@ -40,7 +40,7 @@ The _layout.html wraps pages and contains the header and footer directly.
 Optional partials can live anywhere in the project: use {render card} for a local
 _card.html or {render /shared/card} from the project root. The 404 page uses the layout;
 write it as page content. The 500 error page stays standalone.
-Styles and the Nanoweb logo are in
+Styles and the Flea CMS logo are in
 css/ and images/mark.svg; replace them with your own.
 
 Styling uses Prewind 1.3.1 from unpkg with Preflight-inspired defaults, without a
@@ -53,10 +53,10 @@ fluid sizing. Form styles do not add form submission handling.
 New sites start with a Git repository on main, unless you used --skip-git or Git
 was unavailable. No initial commit is made automatically.
 
-After nanoweb setup, run the deployment wizard:
+After flea setup, run the deployment wizard:
 
 ```sh
-nanoweb deploy
+flea deploy
 ```
 
 Point your domain at the server and allow inbound TCP 80/443 before enabling
@@ -65,17 +65,17 @@ HTTPS preferences, then saves _/deploy.json. It offers to commit your changes
 before deploying, showing the file list and asking for a commit message.
 Each branch has its own saved destination; staging suggests staging.example.com.
 Dirty Git status blocks deployment. Only committed content and snips are shipped.
-Use nanoweb deploy -configure to change a mapping. DNS is checked from the target
-before upload. See the Nanoweb framework README for full details.
+Use flea deploy -configure to change a mapping. DNS is checked from the target
+before upload. See the Flea CMS framework README for full details.
 
 Editor, forms, schemas,
 content revisions, managed snip images, and raw HTML rendering are not implemented.
 
 Icons: use {icon arrow-right} or {icon search size="20" aria-label="Search"}.
-nanoweb dev downloads only referenced Lucide 1.47.0 SVGs into
+flea dev downloads only referenced Lucide 1.47.0 SVGs into
 _/icons/lucide-1.47.0/ and renders them inline. Deploy resolves missing icons
 inside its temporary committed snapshot. Keep the cache and its LICENSE
-in version control for offline use. nanoweb status never downloads icons.
+in version control for offline use. flea status never downloads icons.
 Missing icons or failed downloads are omitted with terminal warnings; pages
 still load normally. Invalid icon syntax or unsafe SVGs remain errors.
 Classes, dimensions, stroke attributes, and aria-/data- attributes are supported;

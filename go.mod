@@ -1,4 +1,4 @@
-module nanoweb
+module flea
 
 go 1.26.0
 

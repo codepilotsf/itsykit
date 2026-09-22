@@ -10,15 +10,15 @@ import (
 	"strings"
 	"syscall"
 
-	"nanoweb/internal/admin"
-	"nanoweb/internal/buildinfo"
-	"nanoweb/internal/host"
-	"nanoweb/internal/release"
+	"flea/internal/admin"
+	"flea/internal/buildinfo"
+	"flea/internal/host"
+	"flea/internal/release"
 )
 
 func main() {
-	version := flag.Bool("version", false, "print NanoWeb release version")
-	config := flag.String("config", "/etc/nanoweb/server.json", "server JSON configuration")
+	version := flag.Bool("version", false, "print Flea CMS release version")
+	config := flag.String("config", "/etc/flea/server.json", "server JSON configuration")
 	check := flag.Bool("check", false, "check configuration and running server readiness")
 	protocol := flag.Bool("protocol", false, "print deployment protocol version")
 	mailStatus := flag.Bool("mail-status", false, "check server email configuration (root only)")
@@ -37,7 +37,7 @@ func main() {
 	canonical := flag.String("canonical", "", "primary domain for WWW redirect")
 	flag.Parse()
 	if *version {
-		fmt.Println("NanoWeb " + buildinfo.Version)
+		fmt.Println("Flea CMS " + buildinfo.Version)
 		return
 	}
 	logger := log.New(os.Stderr, "", 0)
@@ -53,15 +53,15 @@ func main() {
 	defer stop()
 	var err error
 	if *mailStatus || *configureMail {
-		if os.Geteuid() != 0 || *config != "/etc/nanoweb/server.json" {
+		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {
 			logger.Print("Email configuration requires root and the installed server config.")
 			os.Exit(1)
 		}
 		if *mailStatus {
 			if admin.MailReady(*config) {
-				fmt.Println("NANOWEB_MAIL=ready")
+				fmt.Println("FLEA_MAIL=ready")
 			} else {
-				fmt.Println("NANOWEB_MAIL=missing")
+				fmt.Println("FLEA_MAIL=missing")
 			}
 		} else {
 			err = admin.System().ConfigureMail(os.Stdin)
@@ -73,7 +73,7 @@ func main() {
 		}
 		err = admin.CheckDNS(ctx, admin.Domains(*domain), ips, os.Stdout)
 	} else if *archive != "" || *https || *recover {
-		if os.Geteuid() != 0 || *config != "/etc/nanoweb/server.json" {
+		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {
 			logger.Print("administration requires root and the installed server config")
 			os.Exit(1)
 		}
