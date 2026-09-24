@@ -4,7 +4,7 @@ import (
 	"os"
 	"sync"
 
-	"flea/internal/snips"
+	"flea/internal/fleas"
 )
 
 var localContentMu sync.Mutex
@@ -16,12 +16,12 @@ func LockContent() func() {
 	localContentMu.Lock()
 	return localContentMu.Unlock
 }
-func SaveContent(directory string, content *snips.Store) error {
+func SaveContent(directory string, content *fleas.Store) error {
 	data, err := content.Bytes()
 	if err != nil {
 		return err
 	}
-	if _, err = snips.Decode(data); err != nil {
+	if _, err = fleas.Decode(data); err != nil {
 		return err
 	}
 	root, err := os.OpenRoot(directory)
@@ -29,5 +29,5 @@ func SaveContent(directory string, content *snips.Store) error {
 		return err
 	}
 	defer root.Close()
-	return writeSiteFile(root, "_/snips.json", data)
+	return writeSiteFile(root, "_/fleas.json", data)
 }

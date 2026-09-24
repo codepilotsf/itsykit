@@ -47,7 +47,7 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"_/flea.config", "_/snips.json", "_layout.html", "_404.html", "_500.html"} {
+	for _, name := range []string{"_/flea.config", "_/fleas.json", "_layout.html", "_404.html", "_500.html"} {
 		if _, err := os.Stat(filepath.Join(root, name)); err != nil {
 			t.Fatal(err)
 		}
@@ -65,7 +65,7 @@ func TestHelpWithoutSite(t *testing.T) {
 			t.Fatalf("%v: code=%d stdout=%q stderr=%q", args, code, out.String(), errOut.String())
 		}
 	}
-	for _, command := range []string{"new", "dev", "status", "admin", "setup", "deploy", "https", "version"} {
+	for _, command := range []string{"new", "dev", "status", "admin", "email", "setup", "deploy", "https", "version"} {
 		for _, flag := range []string{"--help", "-h"} {
 			var out, errOut bytes.Buffer
 			if code := Run(context.Background(), []string{command, flag}, &out, &errOut); code != 0 || errOut.Len() != 0 || !strings.Contains(out.String(), "Usage: flea "+command) {
@@ -157,7 +157,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	run(temp, "new", "smoke")
 	root := filepath.Join(temp, "smoke")
-	if got := run(root, "status"); !strings.Contains(got, "Valid local project: Flea CMS") {
+	if got := run(root, "status"); !strings.Contains(got, "Valid local project: FleaCMS") {
 		t.Fatal(got)
 	}
 	cmd := exec.Command(binary, "dev", "-port", "0")
@@ -196,8 +196,8 @@ func TestExecutableWorkflow(t *testing.T) {
 				stopped = true
 				t.Fatalf("dev exited: %v: %s", err, stderr.String())
 			}
-			if strings.HasPrefix(line, "Flea CMS running at ") {
-				address = strings.TrimPrefix(line, "Flea CMS running at ")
+			if strings.HasPrefix(line, "FleaCMS running at ") {
+				address = strings.TrimPrefix(line, "FleaCMS running at ")
 			}
 		case <-startupTimeout:
 			t.Fatal("dev did not start")
@@ -247,24 +247,24 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	// Ensure the watcher has begun before the first edit.
 	time.Sleep(100 * time.Millisecond)
-	edit("_/snips.json", `{"pages":{"/":{"snips":{"a7Km2pQ9xB":{"label":"title","content":"Smoke test changed"},"b8Ln3rR0yC":{"label":"introduction","content":"Hello"}}}},"shared":{"snips":{}}}`)
+	edit("_/fleas.json", `{"pages":{"/":{"fleas":{"a7Km2pQ9xB":{"label":"title","content":"Smoke test changed"},"b8Ln3rR0yC":{"label":"introduction","content":"Hello"}}}},"shared":{"fleas":{}}}`)
 	wait("/", 200, "Smoke test changed")
-	edit("test.html", `<section snip="intro"><p>Extracted <em>live</em></p></section>`)
+	edit("test.html", `<section flea="intro"><p>Extracted <em>live</em></p></section>`)
 	wait("/test", 200, "Extracted <em>live</em>")
 	extracted, err := os.ReadFile(filepath.Join(root, "test.html"))
-	if err != nil || !strings.Contains(string(extracted), `{snip `) || strings.Contains(string(extracted), `{snip "`) {
+	if err != nil || !strings.Contains(string(extracted), `{flea `) || strings.Contains(string(extracted), `{flea "`) {
 		t.Fatalf("region was not extracted: %s %v", extracted, err)
 	}
 	// Removal is reconciled on save, and undo restores the archived content.
 	edit("test.html", `<h1>Region removed</h1>`)
 	wait("/test", 200, "Region removed")
-	saved, err := os.ReadFile(filepath.Join(root, "_", "snips.json"))
+	saved, err := os.ReadFile(filepath.Join(root, "_", "fleas.json"))
 	if err != nil || !strings.Contains(string(saved), `"archive"`) {
 		t.Fatal("missing archive after removal", err)
 	}
 	edit("test.html", string(extracted))
 	wait("/test", 200, "Extracted <em>live</em>")
-	if _, err := os.Stat(filepath.Join(root, "_", ".snips.lock")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "_", ".fleas.lock")); !os.IsNotExist(err) {
 		t.Fatal("dev created lock file", err)
 	}
 	edit("css/global.css", "/* updated asset */")
@@ -301,10 +301,10 @@ func TestExecutableWorkflow(t *testing.T) {
 	if !strings.Contains(stderr.String(), "missing partial") || !strings.Contains(stderr.String(), "Site valid again") {
 		t.Fatalf("missing error/recovery diagnostics: %s", stderr.String())
 	}
-	for _, line := range []string{"GET /\n", "404 GET /about\n", "500 GET /\n", "Snips updated in _/snips.json.\n"} {
+	for _, line := range []string{"GET /\n", "404 GET /about\n", "500 GET /\n", "Fleas updated in _/fleas.json.\n"} {
 		if !strings.Contains(stderr.String(), line) {
 			t.Errorf("missing request log %q", line)
 		}
 	}
-	t.Log("Executable smoke passed: scaffold, validation, HTTP, private paths, snip/config/asset/template reloads, invalid state, recovery, shutdown")
+	t.Log("Executable smoke passed: scaffold, validation, HTTP, private paths, flea/config/asset/template reloads, invalid state, recovery, shutdown")
 }

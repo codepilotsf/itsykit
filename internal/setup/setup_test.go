@@ -193,7 +193,7 @@ func TestSetupStages(t *testing.T) {
 			}
 			err := run(context.Background(), strings.NewReader(input), &output, io.Discard, fake)
 			if failure == "" || failure == "reinstall" {
-				if err != nil || strings.Join(stages, ",") != "connect,extract,upload,install,check" || !strings.Contains(output.String(), "Flea CMS server is running") {
+				if err != nil || strings.Join(stages, ",") != "connect,extract,upload,install,check" || !strings.Contains(output.String(), "FleaCMS server is running") {
 					t.Fatal(stages, err, output.String())
 				}
 			} else {

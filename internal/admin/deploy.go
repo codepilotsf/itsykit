@@ -17,10 +17,10 @@ import (
 	"strings"
 	"time"
 
+	"flea/internal/fleas"
 	"flea/internal/host"
 	"flea/internal/release"
 	"flea/internal/site"
-	"flea/internal/snips"
 	"flea/internal/state"
 )
 
@@ -211,7 +211,7 @@ func (m Manager) Apply(ctx context.Context, o Options) (string, error) {
 	}
 	id := time.Now().UTC().Format("20060102-150405") + "-" + hex.EncodeToString(idBytes)
 	var contentPath string
-	var activeContent *snips.Store
+	var activeContent *fleas.Store
 	if o.Archive != "" {
 		parent := filepath.Join(m.DataDir, "sites", o.Name, "releases")
 		for _, domain := range o.Domains {
@@ -241,7 +241,7 @@ func (m Manager) Apply(ctx context.Context, o Options) (string, error) {
 		if loadErr != nil {
 			return "", fmt.Errorf("invalid release %s: %w", dest, loadErr)
 		}
-		if err = project.CheckExtractedSnips(); err != nil {
+		if err = project.CheckExtractedFleas(); err != nil {
 			return "", err
 		}
 		if (len(project.Admin.Emails) > 0 || project.Contact.To != "") && !o.HTTPS {
@@ -355,7 +355,7 @@ func (m Manager) Apply(ctx context.Context, o Options) (string, error) {
 			e = atomicWrite(contentPath, data, 0644)
 		}
 		if e != nil {
-			return "", fmt.Errorf("release active, but snip cleanup failed; recovery journal retained: %w", e)
+			return "", fmt.Errorf("release active, but flea cleanup failed; recovery journal retained: %w", e)
 		}
 	}
 	if err = atomicWrite(filepath.Join(filepath.Dir(m.ConfigPath), "server.previous.json"), old, 0600); err != nil {

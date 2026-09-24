@@ -37,6 +37,8 @@ func MailReady(configPath string) bool {
 			s.APIKey = value
 		case "FLEA_EMAIL_FROM":
 			s.From = value
+		case "FLEA_EMAIL_NAME":
+			s.Name = value
 		}
 	}
 	return s.Validate() == nil
@@ -62,6 +64,6 @@ func (m Manager) ConfigureMail(input io.Reader) error {
 	if err = s.Validate(); err != nil {
 		return err
 	}
-	data := []byte("RESEND_API_KEY=" + strconv.Quote(s.APIKey) + "\nFLEA_EMAIL_FROM=" + strconv.Quote(s.From) + "\n")
+	data := []byte("RESEND_API_KEY=" + strconv.Quote(s.APIKey) + "\nFLEA_EMAIL_FROM=" + strconv.Quote(s.From) + "\nFLEA_EMAIL_NAME=" + strconv.Quote(s.Name) + "\n")
 	return atomicWrite(filepath.Join(filepath.Dir(m.ConfigPath), "mail.env"), data, 0600)
 }

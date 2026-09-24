@@ -16,7 +16,6 @@ import (
 )
 
 const codeLife = 10 * time.Minute
-const sessionLife = 8 * time.Hour
 const maxState = 2048
 
 type challenge struct {
@@ -28,6 +27,7 @@ type challenge struct {
 type session struct {
 	email, host, csrf string
 	expires           time.Time
+	lastActive        time.Time
 }
 type bucket struct {
 	count   int
@@ -61,7 +61,11 @@ func (h *Handler) cookieName(kind string) string {
 	return "__Host-flea-" + kind
 }
 func (h *Handler) cookie(w http.ResponseWriter, kind, value string, age int) {
-	http.SetCookie(w, &http.Cookie{Name: h.cookieName(kind), Value: value, Path: "/", HttpOnly: true, Secure: !h.options.Local, SameSite: http.SameSiteStrictMode, MaxAge: age})
+	expires := h.now().Add(time.Duration(age) * time.Second)
+	if age < 0 {
+		expires = time.Unix(1, 0)
+	}
+	http.SetCookie(w, &http.Cookie{Name: h.cookieName(kind), Value: value, Path: "/", HttpOnly: true, Secure: !h.options.Local, SameSite: http.SameSiteStrictMode, MaxAge: age, Expires: expires})
 }
 func (h *Handler) getCookie(r *http.Request, kind string) string {
 	c, err := r.Cookie(h.cookieName(kind))
@@ -112,12 +116,15 @@ func clientIP(r *http.Request) string {
 	}
 	return host
 }
-func (h *Handler) current(r *http.Request) (session, bool) {
+func (h *Handler) current(r *http.Request) (session, bool, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.clean(h.now())
+	if err := h.sessionTransaction(nil); err != nil {
+		return session{}, false, err
+	}
 	s, ok := h.sessions[key(h.getCookie(r, "session"))]
-	return s, ok && s.host == authority(r) && h.allowed[s.email]
+	return s, ok && s.host == authority(r) && h.allowed[s.email], nil
 }
 
 func (h *Handler) requestCode(w http.ResponseWriter, r *http.Request) {
@@ -199,20 +206,28 @@ func (h *Handler) verifyCode(w http.ResponseWriter, r *http.Request) {
 			delete(h.challenges, key(login))
 		}
 	}
-	if valid && len(h.sessions) < maxState {
+	if valid {
 		// Rotate rather than reuse a browser-supplied session identifier.
-		delete(h.sessions, key(h.getCookie(r, "session")))
-		h.sessions[key(t)] = session{email: c.email, host: c.host, csrf: csrf, expires: now.Add(sessionLife)}
-	} else {
-		valid = false
+		err = h.sessionTransaction(func(values map[[32]byte]session) error {
+			delete(values, key(h.getCookie(r, "session")))
+			if len(values) >= maxState {
+				return fmt.Errorf("too many sessions")
+			}
+			values[key(t)] = session{email: c.email, host: c.host, csrf: csrf, expires: now.Add(h.sessionDuration()), lastActive: now}
+			return nil
+		})
 	}
 	h.mu.Unlock()
+	if err != nil {
+		h.sessionError(w, err)
+		return
+	}
 	if !valid {
 		w.WriteHeader(401)
 		h.page(w, view{Mode: "verify", CSRF: login, Message: "That code is invalid or expired. Try again, or request a new code."})
 		return
 	}
-	h.cookie(w, "session", t, int(sessionLife.Seconds()))
+	h.cookie(w, "session", t, int(h.sessionDuration().Seconds()))
 	h.cookie(w, "login", "", -1)
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }

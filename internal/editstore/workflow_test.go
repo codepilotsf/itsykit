@@ -7,6 +7,7 @@ import (
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -23,7 +24,7 @@ func (s testSender) Send(_ context.Context, m mailer.Message) error { s <- m; re
 func TestHTTPSLoginEditAndPublicSnapshot(t *testing.T) {
 	store, public := fixture(t, true)
 	inbox := make(testSender, 1)
-	dashboard := editor.New(editor.Options{Emails: store.Emails, Name: "Test", Sender: inbox, Backend: store})
+	dashboard := editor.New(editor.Options{Emails: store.Emails, SessionPath: filepath.Join(store.Root, "_", "sessions.json"), Name: "Test", Sender: inbox, Backend: store, Render: public.RenderAdmin})
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if editor.IsPath(r.URL.Path) {
 			dashboard.ServeHTTP(w, r)
@@ -98,7 +99,7 @@ func TestHTTPSLoginEditAndPublicSnapshot(t *testing.T) {
 		t.Fatal(status, body)
 	}
 	doc, err := store.Read()
-	if err != nil || doc.Store.Pages["/"].Snips["abcdefghij"].Content != "Live <strong>owner edit</strong>" {
+	if err != nil || doc.Store.Pages["/"].Fleas["abcdefghij"].Content != "Live <strong>owner edit</strong>" {
 		t.Fatal(doc, err)
 	}
 	status, _ = call("POST", "/admin/save", url.Values{"csrf": {csrf}, "version": {version}, "id": {"abcdefghij"}, "content": {"Stale overwrite"}})

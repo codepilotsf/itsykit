@@ -1,6 +1,6 @@
-# Publishing Flea CMS
+# Publishing FleaCMS
 
-End users install only Flea CMS. Setup uses native SSH/SCP and extracts the
+End users install only FleaCMS. Setup uses native SSH/SCP and extracts the
 matching bundled static Linux server; neither machine needs Go or source code.
 Both Linux architectures are gzip-compressed inside each CLI, with SHA-256 hashes.
 Setup needs SSH access, not a release host or package registry connection.
@@ -30,7 +30,7 @@ GitLab package API: https://docs.gitlab.com/user/packages/generic_packages/
 1. Finish and review changes. Update `internal/buildinfo/version.go` and move
    the Unreleased changelog entries into a dated section for that version.
    Commit the changes and run the tests.
-2. Create and push a new immutable tag, for example v0.1.0.
+2. Create and push a new immutable tag, for example v0.2.0.
 3. Both native Linux jobs test and build static server binaries.
 4. Both native Mac jobs embed both Linux artifacts and their hashes using
    scripts/bundle.sh, test extraction and build CLIs with the same version.

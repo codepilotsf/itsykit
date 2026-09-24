@@ -1,0 +1,71 @@
+<!-- flea
+layout: /_layout_admin.html
+-->
+<div class="admin-workspace">
+  <aside class="admin-sidebar bg-lighter border-r border-light p-sm">
+    <h2 class="text-sm text-dark m-0 px-xs py-sm" id="admin-pages-label">PAGES</h2>
+    <nav class="admin-page-list" aria-labelledby="admin-pages-label" tabindex="0">
+      {#each admin.pages as item}
+      <a href="/admin?page={item.route}" class="block py-xs px-sm rounded-sm break-words" {#if item.selected}aria-current="page"{/if}>{item.label}</a>
+      {/each}
+      {#if admin.shared}
+      <a href="/admin?shared=1" class="block py-xs px-sm rounded-sm" {#if admin.sharedSelected}aria-current="page"{/if}>Shared content</a>
+      {/if}
+    </nav>
+    <p class="text-sm text-dark break-words pt-sm">{admin.email}</p>
+  </aside>
+  <div class="admin-content p-lg">
+    {#if admin.message}<p class="bg-success-light p-sm rounded-sm" role="status">{admin.message}</p>{/if}
+    {#each admin.pages as item}
+    {#if item.selected}
+    <section>
+      <div class="flex items-center justify-between gap-sm mb-md">
+        <h1 class="text-2xl m-0">{item.label}</h1>
+        <a href="{item.route}" class="text-sm">View page</a>
+      </div>
+      <p class="text-dark">Save each section before editing another or switching pages. Saves publish immediately.</p>
+      <form method="post" action="/admin/save" class="admin-panel p-md border border-light rounded-sm mb-lg">
+        <h2 class="text-lg mt-0">Page details</h2>
+        <input type="hidden" name="csrf" value="{admin.csrf}" />
+        <input type="hidden" name="version" value="{admin.version}" />
+        <input type="hidden" name="route" value="{item.route}" />
+        <input type="hidden" name="page" value="{item.route}" />
+        <label class="form-field">Page title<input name="title" value="{item.title}" maxlength="200" /></label>
+        <label class="form-field">Search description<textarea name="description" maxlength="500">{item.description}</textarea></label>
+        <button>Save page details</button>
+      </form>
+      <h2 class="text-lg">Page content</h2>
+      {#each item.fleas as region}
+      <form method="post" action="/admin/save" class="admin-panel p-md border border-light rounded-sm mb-md">
+        <input type="hidden" name="csrf" value="{admin.csrf}" />
+        <input type="hidden" name="version" value="{admin.version}" />
+        <input type="hidden" name="id" value="{region.id}" />
+        <input type="hidden" name="page" value="{item.route}" />
+        <label class="form-field">{region.label}<textarea name="content" maxlength="1048576">{region.content}</textarea></label>
+        <p class="form-hint mb-sm">Plain text or simple HTML. Unsupported markup is removed.</p>
+        <button>Save content</button>
+      </form>
+      {:else}
+      <p class="text-dark">This page has no editable content blocks. You can still edit its title and description above.</p>
+      {/each}
+    </section>
+    {/if}
+    {/each}
+    {#if admin.sharedSelected}
+    <section>
+      <h1 class="text-2xl mt-0">Shared content</h1>
+      <p class="text-dark">Content used across multiple pages. Save each section before moving on.</p>
+      {#each admin.shared as region}
+      <form method="post" action="/admin/save" class="admin-panel p-md border border-light rounded-sm mb-md">
+        <input type="hidden" name="csrf" value="{admin.csrf}" />
+        <input type="hidden" name="version" value="{admin.version}" />
+        <input type="hidden" name="id" value="{region.id}" />
+        <input type="hidden" name="shared" value="1" />
+        <label class="form-field">{region.label}<textarea name="content" maxlength="1048576">{region.content}</textarea></label>
+        <button>Save shared content</button>
+      </form>
+      {:else}<p>No shared content yet.</p>{/each}
+    </section>
+    {/if}
+  </div>
+</div>

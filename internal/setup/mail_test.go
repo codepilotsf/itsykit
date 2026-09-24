@@ -52,7 +52,7 @@ func TestMailSetupKeepsSecretsOutOfArgumentsAndOutput(t *testing.T) {
 			}
 			return nil
 		}
-		err := ensureMail(context.Background(), "user@server", connectionOptions("/tmp/test"), false, strings.NewReader("re_test123456\nlogin@example.test\n"), &output, io.Discard, run)
+		err := ensureMail(context.Background(), t.TempDir(), "user@server", connectionOptions("/tmp/test"), false, strings.NewReader("re_test123456\nlogin@example.test\n"), &output, io.Discard, run)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -97,7 +97,7 @@ func TestAdminDeployConfiguresMailBeforeActivation(t *testing.T) {
 		}
 		switch {
 		case strings.Contains(args, "FLEA_SYSTEM"):
-			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=8")
+			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=10")
 		case strings.Contains(args, "-mail-status"):
 			fmt.Fprintln(c.out, "FLEA_MAIL=missing")
 		case strings.Contains(args, "mktemp -d /tmp/flea-mail"):

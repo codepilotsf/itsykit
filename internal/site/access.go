@@ -8,10 +8,17 @@ import (
 
 // AdminAccess is developer-owned. The browser editor cannot change this list.
 type AdminAccess struct {
-	Emails []string `json:"emails"`
+	Emails          []string `json:"emails"`
+	SessionIdleDays int      `json:"session_idle_days,omitempty"`
 }
 
 func (a *AdminAccess) validate() error {
+	if a.SessionIdleDays == 0 {
+		a.SessionIdleDays = 30
+	}
+	if a.SessionIdleDays < 1 || a.SessionIdleDays > 365 {
+		return fmt.Errorf("admin.session_idle_days must be between 1 and 365")
+	}
 	if len(a.Emails) > 20 {
 		return fmt.Errorf("admin.emails supports at most 20 addresses")
 	}

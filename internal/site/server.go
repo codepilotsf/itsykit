@@ -82,54 +82,6 @@ func (s *Server) reload(ctx context.Context, root string, resolveIcons bool) err
 	return err
 }
 
-func (s *Server) Watch(ctx context.Context, root string, logger *log.Logger) {
-	ticker := time.NewTicker(500 * time.Millisecond)
-	defer ticker.Stop()
-	previous := ""
-	s.mu.RLock()
-	last := s.project.signature
-	s.mu.RUnlock()
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			next := fingerprint(root)
-			if next == last {
-				continue
-			}
-			last = next
-			err := s.reload(ctx, root, true)
-			if err == nil {
-				s.mu.RLock()
-				project := s.project
-				last = project.signature
-				s.mu.RUnlock()
-				if logger != nil {
-					if project.SnipsUpdated {
-						logger.Print("Snips updated in _/snips.json.")
-					}
-					for _, warning := range project.Warnings {
-						logger.Printf("Warning: %s", warning)
-					}
-				}
-			}
-			message := ""
-			if err != nil {
-				message = err.Error()
-			}
-			if message != previous && logger != nil {
-				if message == "" {
-					logger.Print("Site valid again; changes loaded")
-				} else {
-					logger.Printf("Site invalid: %s", message)
-				}
-			}
-			previous = message
-		}
-	}
-}
-
 // Hash bytes, not just timestamps, so quick edits and atomic saves are noticed.
 func fingerprint(root string) string {
 	r, err := os.OpenRoot(root)

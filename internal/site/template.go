@@ -41,7 +41,7 @@ var rawClose = map[string]*regexp.Regexp{
 	"style":  regexp.MustCompile(`(?is)</style(?:\s[^>]*|/?)>`),
 }
 
-// compile translates the deliberately small Flea CMS language to html/template.
+// compile translates the deliberately small FleaCMS language to html/template.
 // Go's contextual escaping also protects URL and attribute contexts.
 func (p *Project) compile(source, file string, stack []string, aliases map[string]string) (string, error) {
 	var out strings.Builder
@@ -146,8 +146,8 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 				return fail(i, err)
 			}
 		case token == "slot":
-			if file != "_layout.html" {
-				return fail(i, fmt.Errorf("{slot} is only allowed in _layout.html"))
+			if file != "_layout.html" && !p.layouts[file] {
+				return fail(i, fmt.Errorf("{slot} is only allowed in a layout"))
 			}
 			rendered = `[[NW template "body" $ NW]]`
 		case token == "render" || strings.HasPrefix(token, "render "):
@@ -168,23 +168,23 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			if err != nil {
 				return "", err
 			}
-		case token == "snip" || strings.HasPrefix(token, "snip ") || strings.HasPrefix(token, "snip\t") || strings.HasPrefix(token, "snip\n"):
+		case token == "flea" || strings.HasPrefix(token, "flea ") || strings.HasPrefix(token, "flea\t") || strings.HasPrefix(token, "flea\n"):
 			name := strings.TrimSpace(token[4:])
 			if !namePattern.MatchString(name) {
-				return fail(i, fmt.Errorf("use an unquoted snip ID, for example {snip a7Km2pQ9xB}"))
+				return fail(i, fmt.Errorf("use an unquoted flea ID, for example {flea a7Km2pQ9xB}"))
 			}
 			if _, ok := p.rich[name]; ok {
-				rendered = "[[NW richSnip " + strconv.Quote(name) + " NW]]"
+				rendered = "[[NW richFlea " + strconv.Quote(name) + " NW]]"
 				break
 			}
-			data, ok := p.Snips[name]
+			data, ok := p.Fleas[name]
 			if !ok {
-				return fail(i, fmt.Errorf("missing snip %q", name))
+				return fail(i, fmt.Errorf("missing flea %q", name))
 			}
 			if _, ok := data["text"].(string); !ok {
-				return fail(i, fmt.Errorf("snip %q requires a string 'text' field for {snip}; use dotted paths for structured data", name))
+				return fail(i, fmt.Errorf("flea %q requires a string 'text' field for {flea}; use dotted paths for structured data", name))
 			}
-			rendered = "[[NW lookup $ " + strconv.Quote("snip."+name+".text") + " NW]]"
+			rendered = "[[NW lookup $ " + strconv.Quote("flea."+name+".text") + " NW]]"
 		case strings.HasPrefix(token, "#if "):
 			expr, err := lookup(strings.TrimSpace(token[4:]))
 			if err != nil {
@@ -197,7 +197,7 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			if len(parts) != 2 || !aliasPattern.MatchString(parts[1]) {
 				return fail(i, fmt.Errorf("expected {#each dotted.path as alias}"))
 			}
-			if parts[1] == "site" || parts[1] == "page" || parts[1] == "snip" || parts[1] == "data" {
+			if parts[1] == "site" || parts[1] == "page" || parts[1] == "flea" || parts[1] == "data" {
 				return fail(i, fmt.Errorf("loop alias %q is reserved", parts[1]))
 			}
 			expr, err := lookup(strings.TrimSpace(parts[0]))

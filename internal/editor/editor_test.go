@@ -6,26 +6,89 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
+	"flea/internal/fleas"
 	"flea/internal/mailer"
-	"flea/internal/snips"
+	"flea/internal/site"
+	"flea/templates"
 )
 
 type inbox chan mailer.Message
 
+func testEditor(t *testing.T, options Options) *Handler {
+	t.Helper()
+	root := t.TempDir()
+	if err := os.CopyFS(root, templates.Files); err != nil {
+		t.Fatal(err)
+	}
+	p, err := site.Load(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	options.Render = site.NewServer(p).RenderAdmin
+	if options.SessionPath == "" {
+		options.SessionPath = filepath.Join(root, "_", "sessions.json")
+	}
+	return New(options)
+}
+
+func TestFirstOwnerSetupIsLocalOnly(t *testing.T) {
+	for _, local := range []bool{true, false} {
+		h := testEditor(t, Options{Name: "New site", Local: local})
+		w := request(h, "GET", "/admin", "localhost", nil)
+		if local {
+			if w.Code != 503 || !strings.Contains(w.Body.String(), "flea admin owner@example.com") || strings.Contains(w.Body.String(), "restart flea dev") {
+				t.Fatal(w.Code, w.Body.String())
+			}
+			w = request(h, "GET", "/admin", "external.test", nil)
+			if w.Code != 403 || strings.Contains(w.Body.String(), "flea admin") {
+				t.Fatal("local setup instructions exposed to an external host")
+			}
+		} else if w.Code != 404 {
+			t.Fatal("production without owners must remain disabled", w.Code)
+		}
+	}
+}
+
+func TestOwnerOnboardingDoesNotRevealAccess(t *testing.T) {
+	h, mail := fixture(t)
+	var responses []string
+	for _, email := range []string{"owner@example.test", "unknown@example.test"} {
+		w := request(h, "GET", "/admin", "example.test", nil)
+		if w.Header().Get("Referrer-Policy") != "same-origin" {
+			t.Fatal("browser form POST must retain its Origin")
+		}
+		if !strings.Contains(w.Body.String(), "Sign in to FleaCMS") || !strings.Contains(w.Body.String(), "no password or separate account") {
+			t.Fatal(w.Body.String())
+		}
+		c := cookie(t, w, h.cookieName("login"))
+		w = request(h, "POST", "/admin/code", "example.test", url.Values{"csrf": {c.Value}, "email": {email}}, c)
+		if w.Code != 200 || !strings.Contains(w.Body.String(), "check your spam folder") {
+			t.Fatal(w.Code, w.Body.String())
+		}
+		responses = append(responses, strings.ReplaceAll(w.Body.String(), c.Value, "CSRF"))
+	}
+	if responses[0] != responses[1] {
+		t.Fatal("code-request page reveals whether an address has access")
+	}
+	code(t, mail)
+}
+
 func TestMissingEmailSettingsInstructions(t *testing.T) {
 	for _, local := range []bool{true, false} {
-		h := New(Options{Emails: []string{"owner@example.test"}, Local: local})
+		h := testEditor(t, Options{Emails: []string{"owner@example.test"}, Local: local})
 		w := request(h, "GET", "/admin", "localhost", nil)
-		if w.Code != http.StatusServiceUnavailable || !strings.HasPrefix(w.Header().Get("Content-Type"), "text/plain") {
+		if w.Code != http.StatusServiceUnavailable || !strings.HasPrefix(w.Header().Get("Content-Type"), "text/html") {
 			t.Fatal(w.Code, w.Header())
 		}
-		for _, text := range []string{"RESEND_API_KEY", "FLEA_EMAIL_FROM", "source .env", "flea dev", "domain verified in Resend"} {
+		for _, text := range []string{"flea email", "site&#39;s folder"} {
 			if strings.Contains(w.Body.String(), text) != local {
 				t.Fatalf("local=%v, unexpected instructions for %q: %s", local, text, w.Body.String())
 			}
@@ -41,13 +104,13 @@ type memoryStore struct {
 }
 
 func (s *memoryStore) Read() (Document, error) {
-	return Document{Store: snips.NewStore(), Routes: []string{"/"}, Version: "revision"}, nil
+	return Document{Store: fleas.NewStore(), Routes: []string{"/", "/about"}, Version: "revision"}, nil
 }
 func (s *memoryStore) Save(Update) error { s.mu.Lock(); defer s.mu.Unlock(); s.saves++; return nil }
 func fixture(t *testing.T) (*Handler, inbox) {
 	t.Helper()
 	mail := make(inbox, 20)
-	return New(Options{Emails: []string{"owner@example.test"}, Name: "My site", Sender: mail, Backend: &memoryStore{}}), mail
+	return testEditor(t, Options{Emails: []string{"owner@example.test"}, Name: "My site", Sender: mail, Backend: &memoryStore{}}), mail
 }
 func request(h *Handler, method, path, host string, form url.Values, cookies ...*http.Cookie) *httptest.ResponseRecorder {
 	r := httptest.NewRequest(method, "https://"+host+path, strings.NewReader(form.Encode()))
@@ -110,14 +173,38 @@ func login(t *testing.T, h *Handler, mail inbox) *http.Cookie {
 func TestLoginEditingLogoutAndCookieIsolation(t *testing.T) {
 	h, mail := fixture(t)
 	c := login(t, h, mail)
-	if !c.Secure || !c.HttpOnly || c.SameSite != http.SameSiteStrictMode || c.Path != "/" || c.Domain != "" || c.MaxAge != 28800 {
+	if !c.Secure || !c.HttpOnly || c.SameSite != http.SameSiteStrictMode || c.Path != "/" || c.Domain != "" || c.MaxAge != 30*86400 || c.Expires.IsZero() {
 		t.Fatal(c)
 	}
 	w := request(h, "GET", "/admin", "example.test", nil, c)
+	for _, want := range []string{`aria-labelledby="admin-pages-label"`, `href="/admin?page=%2f"`, `href="/admin?page=%2fabout"`, "Homepage", `name="route" value="/"`, "This page has no editable content blocks"} {
+		if !strings.Contains(w.Body.String(), want) {
+			t.Fatalf("dashboard missing %q", want)
+		}
+	}
+	if strings.Contains(w.Body.String(), `name="route" value="/about"`) {
+		t.Fatal("rendered another page's form")
+	}
+	other := request(h, "GET", "/admin?page=%2Fabout", "example.test", nil, c)
+	if !strings.Contains(other.Body.String(), `name="route" value="/about"`) || strings.Contains(other.Body.String(), `name="route" value="/"`) {
+		t.Fatal("page selection failed", other.Body.String())
+	}
+	missing := request(h, "GET", "/admin?page=%2Fmissing", "example.test", nil, c)
+	if missing.Code != 404 {
+		t.Fatal("unknown page accepted", missing.Code)
+	}
 	if w.Code != 200 || !strings.Contains(w.Body.String(), "Page title") || w.Header().Get("Cache-Control") != "no-store" {
 		t.Fatal(w.Body.String())
 	}
 	s := h.sessions[key(c.Value)]
+	saved := request(h, "POST", "/admin/save", "example.test", url.Values{"csrf": {s.csrf}, "version": {"revision"}, "route": {"/about"}, "page": {"/about"}, "title": {"About"}}, c)
+	if saved.Code != 303 || saved.Header().Get("Location") != "/admin?saved=1&page=%2Fabout" {
+		t.Fatal("save lost selected page", saved.Code, saved.Header())
+	}
+	shared := request(h, "GET", "/admin?shared=1", "example.test", nil, c)
+	if strings.Contains(shared.Body.String(), `name="route"`) || !strings.Contains(shared.Body.String(), "No shared content yet") {
+		t.Fatal("shared editor mixed with page forms")
+	}
 	for _, csrf := range []string{"wrong", s.csrf} {
 		w = request(h, "POST", "/admin/save", "example.test", url.Values{"csrf": {csrf}, "version": {"revision"}, "route": {"/"}, "title": {"Edited"}}, c)
 		want := 303
@@ -185,7 +272,7 @@ func TestConcurrentCodeConsumption(t *testing.T) {
 func TestSessionExpiry(t *testing.T) {
 	h, mail := fixture(t)
 	c := login(t, h, mail)
-	future := time.Now().Add(sessionLife + time.Second)
+	future := time.Now().Add(h.sessionDuration() + time.Second)
 	h.now = func() time.Time { return future }
 	w := request(h, "GET", "/admin", "example.test", nil, c)
 	if strings.Contains(w.Body.String(), "Page title") {

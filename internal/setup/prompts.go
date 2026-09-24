@@ -75,7 +75,7 @@ func sshUsername(ctx context.Context, target string, in io.Reader, out io.Writer
 
 func confirmSetup(ctx context.Context, in io.Reader, out io.Writer) (bool, error) {
 	for {
-		value, err := ask(ctx, in, out, "Install Flea CMS on this server now? (y/n)", "y")
+		value, err := ask(ctx, in, out, "Install FleaCMS on this server now? (y/n)", "y")
 		if err != nil {
 			return false, err
 		}

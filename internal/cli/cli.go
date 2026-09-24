@@ -19,14 +19,13 @@ import (
 	"flea/internal/buildinfo"
 	"flea/internal/contact"
 	"flea/internal/editor"
-	"flea/internal/editstore"
 	"flea/internal/mailer"
 	"flea/internal/setup"
 	"flea/internal/site"
 	"flea/templates"
 )
 
-const usage = `Flea CMS
+const usage = `FleaCMS
 Small websites. Plain HTML. Editable content.
 
 Usage
@@ -37,6 +36,7 @@ Build your site
   dev              Start the local development server
   status           Check your site for errors
   admin [email]    Add an owner who can edit content
+  email            Set up email delivery
 
 Publish your site
   setup            Install Flea on your server
@@ -64,9 +64,22 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	}
 	fail := func(err error) int { fmt.Fprintln(errOut, "flea:", err); return 1 }
 	switch args[0] {
+	case "email":
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprintln(out, "Usage: flea email\n\nSet up Resend email delivery from your site folder.\nPrompts for a hidden API key, sender name, and verified-domain address.\nChecks the connection and saves settings to .env. No email is sent.\nAdmin sign-in loads settings automatically; contact forms need a dev restart.")
+			return 0
+		}
+		if len(args) != 1 {
+			fmt.Fprintln(errOut, "Usage: flea email")
+			return 2
+		}
+		if err := setup.Email(ctx, ".", os.Stdin, out); err != nil {
+			return fail(err)
+		}
+		return 0
 	case "admin":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea admin [email]\n\nAdds an approved admin email to this site's _/flea.config.\nWithout an email, Flea CMS will ask for one.")
+			fmt.Fprintln(out, "Usage: flea admin [email]\n\nAdd an owner and set up email if needed. Local access updates automatically.\nView or remove owners in admin.emails in _/flea.config.\nCommit and deploy to apply live changes. No invitation is sent.")
 			return 0
 		}
 		if len(args) > 2 || (len(args) == 2 && strings.HasPrefix(args[1], "-")) {
@@ -78,7 +91,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			email = args[1]
 		} else {
 			var err error
-			email, err = setup.Prompt(ctx, os.Stdin, out, "Admin email address")
+			email, err = setup.Prompt(ctx, os.Stdin, out, "Site owner email address")
 			if err != nil {
 				return fail(err)
 			}
@@ -93,16 +106,26 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if added {
 			fmt.Fprintf(out, "\nAdded %s to _/flea.config.\n", email)
 		} else {
-			fmt.Fprintf(out, "\n%s is already an admin. Nothing changed.\n", email)
+			fmt.Fprintf(out, "\n%s already has owner access in this site's configuration. Nothing changed.\n", email)
 		}
-		fmt.Fprintln(out, "\nFor local email login, add these to your site's .env file:\n\n  RESEND_API_KEY=\"re_your_api_key\"\n  FLEA_EMAIL_FROM=\"login@your-verified-domain.com\"\n\nUse your Resend API key and a sender address from a domain verified in Resend.\nKeep .env out of Git. Flea CMS does not load it automatically.\n\nStop dev, then load the settings and restart:\n\n  set -a\n  source .env\n  set +a\n  flea dev\n\nOpen http://127.0.0.1:3000/admin to sign in with an emailed code.\nFor the live site, run flea deploy; it asks for email settings if needed.")
+		settings, err := mailer.LocalSettings(".")
+		if err != nil {
+			return fail(err)
+		}
+		if settings.Validate() != nil {
+			fmt.Fprintln(out, "\nEmail needs setting up.")
+			if err := setup.Email(ctx, ".", os.Stdin, out); err != nil {
+				return fail(err)
+			}
+		}
+		fmt.Fprintln(out, "\nSign in at /admin. Local access updates automatically.\nFor the live site, commit and run flea deploy.")
 		return 0
 	case "version", "--version":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			fmt.Fprintln(out, "Usage: flea version\n\nShow the installed version.")
 			return 0
 		}
-		fmt.Fprintln(out, "Flea CMS "+buildinfo.Version)
+		fmt.Fprintln(out, "FleaCMS "+buildinfo.Version)
 		return 0
 	case "deploy", "https":
 		var s setup.DeploySettings
@@ -222,7 +245,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				fmt.Fprintln(out, "\nGit is ready on the main branch. No commit has been made yet.")
 			}
 		}
-		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\nWhen you're ready to publish:\n  flea deploy\n\nFlea CMS will save your settings and offer to commit your changes before deploying.\n\n", name)
+		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\nWhen you're ready to publish:\n  flea deploy\n\nFleaCMS will save your settings and offer to commit your changes before deploying.\n\n", name)
 		return 0
 	case "status":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
@@ -238,7 +261,10 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		content, _ := p.Content.Index()
-		fmt.Fprintf(out, "Valid local project: %s\n%d pages, %d assets, %d snips\n", p.Site["name"], len(p.Pages), len(p.Assets), len(p.Snips)+len(content))
+		fmt.Fprintf(out, "Valid local project: %s\n%d pages, %d assets, %d fleas\n", p.Site["name"], len(p.Pages), len(p.Assets), len(p.Fleas)+len(content))
+		if len(p.Admin.Emails) > 0 {
+			fmt.Fprintf(out, "Local sessions: %s (%d-day idle expiry)\n", filepath.Join(p.Root, "_", "sessions.json"), p.Admin.SessionIdleDays)
+		}
 		for _, warning := range p.Warnings {
 			fmt.Fprintf(errOut, "Warning: %s\n", warning)
 		}
@@ -271,22 +297,32 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if err != nil {
 			return fail(err)
 		}
+		if err := prepareLocalSessions(ctx, p); err != nil {
+			return fail(err)
+		}
+		mailSettings, err := mailer.LocalSettings(".")
+		if err != nil {
+			return fail(err)
+		}
+		var sender mailer.Sender
+		if mailSettings.Validate() == nil {
+			sender = mailer.NewResend(mailSettings)
+		}
 		listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", *port))
 		if err != nil {
 			return fail(err)
 		}
 		logger := log.New(errOut, "", 0)
-		if p.SnipsUpdated {
-			logger.Print("Snips updated in _/snips.json.")
+		if p.FleasUpdated {
+			logger.Print("Fleas updated in _/fleas.json.")
 		}
 		for _, warning := range p.Warnings {
 			logger.Printf("Warning: %s", warning)
 		}
 		handler := site.NewServer(p, logger)
 		var httpHandler http.Handler = handler
-		if len(p.Admin.Emails) > 0 {
-			store := &editstore.Store{Root: p.Root, ContentPath: filepath.Join(p.Root, "_", "snips.json"), Emails: p.Admin.Emails, Publish: handler.Publish}
-			dashboard := editor.New(editor.Options{Emails: p.Admin.Emails, Name: fmt.Sprint(p.Site["name"]), Sender: mailer.Env(), Backend: store, Local: true, Logger: logger})
+		{
+			dashboard := devAdmin(p.Root, fmt.Sprint(p.Site["name"]), handler, logger)
 			httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if editor.IsPath(r.URL.Path) {
 					dashboard.ServeHTTP(w, r)
@@ -294,12 +330,12 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 					handler.ServeHTTP(w, r)
 				}
 			})
-			if mailer.Env() == nil {
-				logger.Print("Admin login needs RESEND_API_KEY and FLEA_EMAIL_FROM in your environment.")
+			if len(p.Admin.Emails) > 0 && sender == nil {
+				logger.Print("Owner sign-in needs email setup. Run flea email.")
 			}
 		}
 		if p.Contact.To != "" {
-			form := contact.New(p.Contact, p.Root, mailer.Env(), &contact.Budget{}, true, logger)
+			form := contact.New(p.Contact, p.Root, sender, &contact.Budget{}, true, logger)
 			next := httpHandler
 			httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == contact.Path {
@@ -308,19 +344,26 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 					next.ServeHTTP(w, r)
 				}
 			})
-			if mailer.Env() == nil {
-				logger.Print("Contact forms need RESEND_API_KEY and FLEA_EMAIL_FROM. Load your .env settings and restart dev.")
+			if sender == nil {
+				logger.Print("Contact forms need email setup. Run flea email, then restart dev.")
 			}
 		}
 		server := &http.Server{Handler: httpHandler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 30 * time.Second}
 		watchCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
-		watchDone := make(chan struct{})
-		go func() { defer close(watchDone); handler.Watch(watchCtx, p.Root, logger) }()
+		watchDone := make(chan error, 1)
+		go func() { watchDone <- handler.Watch(watchCtx, p.Root, logger) }()
 		done := make(chan error, 1)
 		go func() { done <- server.Serve(listener) }()
-		fmt.Fprintf(out, "\nFlea CMS running at http://%s\nWatching templates, assets, configuration and snips.\n\nPress Ctrl-C to stop.\n", listener.Addr())
+		fmt.Fprintf(out, "\nFleaCMS running at http://%s\nWatching templates, assets, configuration and fleas.\n\nPress Ctrl-C to stop.\n", listener.Addr())
 		select {
+		case err := <-watchDone:
+			server.Close()
+			<-done
+			if err != nil {
+				return fail(err)
+			}
+			return 0
 		case <-ctx.Done():
 			shutdownCtx, stop := context.WithTimeout(context.Background(), 5*time.Second)
 			defer stop()

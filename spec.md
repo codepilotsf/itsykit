@@ -1,8 +1,18 @@
-# Flea CMS
+# FleaCMS
 
 ## Product and build specification
 
-Versions follow SemVer, initially 0.1.0, with release notes in CHANGELOG.md.
+`flea email` configures Resend with a hidden API key, separate sender name and
+verified-domain address, a non-sending connection check, and a private .env save.
+Dev reads local .env mail settings automatically; shell variables take precedence.
+Provider delivery and setup checks use separate interfaces for future adapters.
+
+Versions follow SemVer, currently 0.2.0, with release notes in CHANGELOG.md.
+Owner onboarding uses a developer-shared /admin link and email codes, without
+registration or invitations. Local /admin provides first-owner and email setup
+guidance; production with no approved owners remains disabled.
+Admin pages use the site's layout and styles, with scripts disabled. Browser
+form submissions retain their origin through the same-origin referrer policy.
 The canonical version is internal/buildinfo/version.go; builds use the same
 version for the CLI and bundled servers. The 0.x interface remains unstable.
 
@@ -19,26 +29,43 @@ No submissions are stored. See README for HTTPS, mail setup and abuse limits.
 The developer CLI also provides `flea admin [email]`: prompt when omitted,
 create or append to admin.emails in the existing JSON config, skip duplicates,
 validate the 20-address limit, and preserve unrelated settings. It does not
-send email or deploy. Restart dev or deploy to apply changed access settings.
+send email or deploy. It prompts for email settings when needed. Dev reloads
+owner access and sign-in mail without restart; live changes require deployment.
+
+Admin sessions are persistent JSON runtime state, not a database: local
+_/sessions.json and production sites/<name>/_/sessions.json outside releases.
+admin.session_idle_days defaults to 30 (omitted/zero), accepts 1–365, and renews
+on authenticated activity. Active editing renews at most once a minute; idle tabs
+do not. Sessions survive browser closure, restart and deploy. Logout and owner
+removal revoke sessions. Store hashed tokens and host/CSRF/expiry metadata only,
+with private permissions, bounded reads, locking and atomic saves. Never ship
+session state in Git or release archives. Deployment protocol 10 requires the
+private writable runtime directory; OTPs remain memory-only.
 
 **Status:** first implementation specification  
-**Audience:** developer building Flea CMS in Go
+
+The owner dashboard includes every public route in scrollable page navigation,
+labels `/` as Homepage, and allows metadata editing even without fleas. Links
+select one page's editor at a time; shared fleas have their own view. A custom
+admin layout has a full-width header, no footer, and independent sidebar/editor
+scrolling. The sidebar becomes a bounded list above the editor on narrow screens.
+**Audience:** developer building FleaCMS in Go
 **Core promise:** a developer can create, run, and deploy a small editable website with one CLI, one server executable, plain HTML, JSON-backed content, and automatic HTTPS. No Node, Ruby, PHP, database server, Docker, or separately configured web server is required.
 
-**Current implementation boundary:** The implementation provides local `new`, `dev`, and `status`, routing, escaped templates, sanitized rich snips with dev extraction and preserved deployment content, assets, automatic reloads, SSH `setup` and `deploy`, and opt-in managed HTTPS through `https` or `deploy -https`. Deployments validate immutable releases, atomically replace host config, restart briefly, verify readiness, and restore the prior config on failure. Email-code login and basic owner edits at /admin are implemented. A rollback CLI, general-purpose forms, schemas, per-edit revisions, managed snip image publishing, and unrestricted raw HTML remain deferred. The sections below also describe future product direction, not just shipped capabilities. See README.md for the implemented contract and exact commands. Configuration is JSON only. Build requires Go 1.26 or newer for the pinned ACME library.
+**Current implementation boundary:** The implementation provides local `new`, `dev`, and `status`, routing, escaped templates, sanitized rich fleas with dev extraction and preserved deployment content, assets, automatic reloads, SSH `setup` and `deploy`, and opt-in managed HTTPS through `https` or `deploy -https`. Deployments validate immutable releases, atomically replace host config, restart briefly, verify readiness, and restore the prior config on failure. Email-code login and basic owner edits at /admin are implemented. A rollback CLI, general-purpose forms, schemas, per-edit revisions, managed flea image publishing, and unrestricted raw HTML remain deferred. The sections below also describe future product direction, not just shipped capabilities. See README.md for the implemented contract and exact commands. Configuration is JSON only. Build requires Go 1.26 or newer for the pinned ACME library.
 
-Flea CMS is for brochure-style sites: small businesses, restaurants, consultants, event services, portfolios, and similar sites where a conventional application framework or WordPress installation is disproportionate to the job.
+FleaCMS is for brochure-style sites: small businesses, restaurants, consultants, event services, portfolios, and similar sites where a conventional application framework or WordPress installation is disproportionate to the job.
 
 It is not intended to become a general application platform, a no-code site builder, or a WordPress replacement with plugins.
 
 ## Product principles
 
 1. **The site remains an understandable folder.** A developer should be able to open it in a text editor or file browser and understand its structure immediately.
-2. **HTML is primary.** Pages are ordinary HTML files. Flea CMS adds a small templating layer but does not require a component framework or a build toolchain.
+2. **HTML is primary.** Pages are ordinary HTML files. FleaCMS adds a small templating layer but does not require a component framework or a build toolchain.
 3. **Public routes come from files.** No route file is needed for normal pages. URLs are clean and extensionless.
-4. **The owner edits structured content, not templates.** Developers own templates and partials; owners manage snips and their images through a simple editor.
-5. **One install, one operational unit.** The production host is a Flea CMS Go executable running as a system service. It owns HTTP(S), site selection, TLS certificates, static serving, the editor, deployments, and limited server-side actions.
-6. **No separate Caddy requirement.** Flea CMS must not ask users to install, configure, or operate Caddy. It may use mature Go libraries for ACME/TLS internally; it must not implement TLS certificate management from scratch.
+4. **The owner edits structured content, not templates.** Developers own templates and partials; owners manage fleas and their images through a simple editor.
+5. **One install, one operational unit.** The production host is a FleaCMS Go executable running as a system service. It owns HTTP(S), site selection, TLS certificates, static serving, the editor, deployments, and limited server-side actions.
+6. **No separate Caddy requirement.** FleaCMS must not ask users to install, configure, or operate Caddy. It may use mature Go libraries for ACME/TLS internally; it must not implement TLS certificate management from scratch.
 7. **Safe by default.** Releases are atomic and reversible; content writes are validated and atomic; private files are never served; arbitrary code execution is not a feature.
 
 ## User experience
@@ -77,13 +104,13 @@ The initial server target is **Ubuntu LTS only**. Do not support Arch or multipl
 
 ## Site structure
 
-Every site follows this shape. the project root is the public document root. `_/` is Flea CMS private data and configuration.
+Every site follows this shape. the project root is the public document root. `_/` is FleaCMS private data and configuration.
 
 ```text
 my-site/
   _/
     flea.config
-    snips.json
+    fleas.json
     data/
       team.json
 
@@ -115,13 +142,13 @@ my-site/
 | `_404.html`    | Developer                               | Only as the 404 response       | Not-found document                                |
 | `_500.html`    | Developer                               | Only as the 500 response       | Server-error document                             |
 | `_/flea.config`  | Developer                               | No                             | Site configuration                                |
-| `_/snips/`          | Site owner through editor, or developer | No direct file serving         | Editable structured content and associated images |
+| `_/fleas/`          | Site owner through editor, or developer | No direct file serving         | Editable structured content and associated images |
 
-Any file or directory whose basename begins with `_` is private/reserved and must never be reachable through a public URL. `_/` is additionally reserved as Flea CMS's private workspace.
+Any file or directory whose basename begins with `_` is private/reserved and must never be reachable through a public URL. `_/` is additionally reserved as FleaCMS's private workspace.
 
 ## File-based routing
 
-Flea CMS maps page files in the project root to extensionless routes.
+FleaCMS maps page files in the project root to extensionless routes.
 
 | File                         | Route               |
 | ---------------------------- | ------------------- |
@@ -136,7 +163,7 @@ Rules:
 
 1. `index.html` represents its containing directory.
 2. Any other `.html` page represents the same URL without `.html`.
-3. URLs containing `.html` are not alternate routes and return 404. Flea CMS does not redirect `/about.html` to `/about`.
+3. URLs containing `.html` are not alternate routes and return 404. FleaCMS does not redirect `/about.html` to `/about`.
 4. An asset retains its filename and extension.
 5. Reserved/private underscore paths are not routes.
 6. A duplicate route, such as both `about.html` and `about/index.html`, is a build error. `flea dev` reports it and `flea deploy` refuses it.
@@ -147,7 +174,7 @@ The first version has no `routes.json`. Add redirects only when there is a real 
 
 ## Templates
 
-Flea CMS borrows the structural readability of Svelte templates but does not execute JavaScript. It uses single curly braces.
+FleaCMS borrows the structural readability of Svelte templates but does not execute JavaScript. It uses single curly braces.
 
 ### Layouts and slots
 
@@ -174,15 +201,19 @@ Pages use the default layout without configuration in v1:
 ```html
 <main>
   <h1>About us</h1>
-  {snip about-us}
+  {flea about-us}
 </main>
 ```
 
-Do not add page-specific or nested layouts in the first implementation. A global layout plus partials is enough, keeps behavior obvious, and leaves room to add an explicit layout directive later if experience justifies it.
+A leading `<!-- flea` settings comment may select `layout: /_layout_admin.html`
+before its closing `-->`. Root-relative private HTML layouts replace the default
+wrapper for that page and support `{slot}`. Unknown or duplicate settings, missing
+layouts and nesting are errors. Only layout selection is currently supported;
+this is a small key:value format, not YAML. `_500.html` stays standalone.
 
 ### Partials
 
-Partials are developer-owned, underscore-prefixed HTML templates anywhere under the project root. They can be reused on multiple pages and can render data, other partials, and snips.
+Partials are developer-owned, underscore-prefixed HTML templates anywhere under the project root. They can be reused on multiple pages and can render data, other partials, and fleas.
 
 ```html
 <!-- _header.html -->
@@ -220,31 +251,31 @@ SVGs are reconstructed from a strict geometry-only vocabulary. No runtime
 browser library or request-time downloads. Deploy resolves icons before publishing.
 See README.md for supported attributes.
 
-### Snips
+### Fleas
 
-Snips are owner-editable sanitized HTML stored in private `_/snips.json`.
+Fleas are owner-editable sanitized HTML stored in private `_/fleas.json`.
 They are distinct from partials and structured developer data:
 
 - A partial is a reusable developer template.
-- A snip is owner content identified by a stable 10-character alphanumeric ID.
+- A flea is owner content identified by a stable 10-character alphanumeric ID.
 - Structured objects for loops live in `_/data/*.json`, exposed as `data.*`.
 
 Create an editable region while dev runs:
 
 ```html
-<h1 snip="title">Welcome to Flea CMS</h1>
+<h1 flea>Welcome to FleaCMS</h1>
 ```
 
 Dev extracts inner HTML and inserts a stable reference:
 
 ```html
-<h1 snip="title">{snip a7Km2pQ9xB}</h1>
+<h1 flea>{flea a7Km2pQ9xB}</h1>
 ```
 
 Storage groups entries by route, with shared regions for layouts/partials:
 
 ```json
-{"pages":{"/":{"title":"Home","description":"Welcome","snips":{"a7Km2pQ9xB":{"label":"title","content":"Welcome to Flea CMS"}}}},"shared":{"snips":{}}}
+{"pages":{"/":{"title":"Home","description":"Welcome","fleas":{"a7Km2pQ9xB":{"content":"Welcome to FleaCMS"}}}},"shared":{"fleas":{}}}
 ```
 
 Extraction is dev-only, journaled and serialized. Content is persisted before
@@ -252,12 +283,12 @@ rewriting templates; interrupted work resumes or stops on conflicting edits.
 Local serialization is in-process only, with no lock file; run one dev process
 per project. Every relevant save extracts additions, reindexes labels/routes,
 archives removals and restores reintroduced IDs. Existing content and metadata
-are retained. Markers use {snip ID} without quotes; quoted forms are rejected.
-HTML comments do not render snips. IDs contain only ASCII letters and digits.
+are retained. Markers use {flea ID} without quotes; quoted forms are rejected.
+HTML comments do not render fleas. IDs contain only ASCII letters and digits.
 Nested regions and template directives in extracted content are errors. Rendering
 reconstructs a formatting/link allowlist and never interprets JSON as template
 syntax. Rich output is only allowed in element content, not attributes or raw-text
-elements. Page metadata and structured values remain escaped. Legacy named snips
+elements. Page metadata and structured values remain escaped. Legacy named fleas
 remain supported for migration. Basic browser editing is implemented; managed images are deferred.
 
 Deploy preserves remote rich content/metadata and seeds missing IDs. Content
@@ -266,30 +297,30 @@ Aliases pointing to the same release must select the same content snapshot;
 conflicting paths are rejected and valid aliases share a loaded serving snapshot.
 After successful activation, unreferenced entries move to an archive map, retaining
 last remote content. References are lexical, including false/empty branches and
-unused partials. Failed activation leaves previous content untouched. Protocol 8
+unused partials. Failed activation leaves previous content untouched. Protocol 10
 is required. No automatic archive deletion or rollback command exists yet.
 
 ### Values, conditions, and loops
 
 Initial supported syntax:
 
-Owner-editable snip IDs are 10 case-sensitive ASCII alphanumeric
+Owner-editable flea IDs are 10 case-sensitive ASCII alphanumeric
 characters, generated using cryptographic randomness with collision checks
 against active and archived IDs across all routes and shared regions. They are
 content identifiers, not UUIDs, credentials, or access-control tokens. The ID
-allocator, route-based snips.json, extraction, sanitization, and deployment
+allocator, route-based fleas.json, extraction, sanitization, and deployment
 preservation workflow are implemented.
 
 ```html
 {site.name}
 {page.title}
-{snip.about-us.title}
+{flea.about-us.title}
 
 {#if site.phone}
   <a href="tel:{site.phone}">{site.phone}</a>
 {/if}
 
-{#each snip.about-us.team as member}
+{#each flea.about-us.team as member}
   <article>
     <img src="{member.photo}" alt="{member.name}">
     <h2>{member.name}</h2>
@@ -307,19 +338,19 @@ The expression model is intentionally constrained:
 - Loop: a collection dotted path and one alias only, for example `{#each team.members as member}`.
 - An empty loop renders nothing.
 - No function calls, arithmetic, comparisons, `.length`, filters, inline JavaScript, or arbitrary expressions in v1.
-- Flea CMS does not parse template directives inside `<script>` or `<style>` elements.
+- FleaCMS does not parse template directives inside `<script>` or `<style>` elements.
 
-Values interpolated by `{path}` are contextually escaped. Short-ID snips render
+Values interpolated by `{path}` are contextually escaped. Short-ID fleas render
 sanitized HTML by default; unrestricted raw HTML is not supported.
 
-## Snip format and schemas
+## Flea format and schemas
 
 The following schema discussion is future work. The current owner-content
 format is the route/shared store above, with no schema files or image publishing.
 
 The exact schema file convention is a small deferred implementation choice, but the data model should be developer-defined and owner-editable.
 
-Example snip data:
+Example flea data:
 
 ```json
 {
@@ -329,7 +360,7 @@ Example snip data:
     {
       "name": "Sam Lee",
       "role": "Founder",
-      "photo": "/_assets/snips/about-us-images/sam-lee.png"
+      "photo": "/_assets/fleas/about-us-images/sam-lee.png"
     }
   ]
 }
@@ -343,7 +374,7 @@ Recommended schema goals:
 - Image constraints such as allowed file type and maximum file size
 - No arbitrary form generation from untrusted data
 
-Flea CMS validates a snip before writing it. It writes content atomically: create a temporary file in the same directory, fsync as appropriate, then rename it over the existing JSON file. It retains prior revisions/snapshots for rollback.
+FleaCMS validates a flea before writing it. It writes content atomically: create a temporary file in the same directory, fsync as appropriate, then rename it over the existing JSON file. It retains prior revisions/snapshots for rollback.
 
 ## Configuration
 
@@ -374,14 +405,30 @@ EnvironmentFile and are prompted for during deployment when missing.
 Implemented editor capabilities:
 
 - Email-code authentication and secure host-bound session cookies
-- List available snips
-- Edit rich-snippet HTML in textareas and page title/description
+- List available fleas
+- Edit rich-flea HTML in textareas and page title/description
 - Publish validated content without restarting the service
 - Validate before saving
 - Serialize saves with deployment and reject stale forms
 
 Visual rich-text controls, schema-defined fields, images and per-edit revision
 history remain future work. The editor cannot change the email allowlist.
+
+The approved inline-editing direction is being evaluated in the isolated
+`design/inline-editor/` Squire prototype, not the production runtime. Keep `/admin`
+for login and return to the homepage in browsing mode. The signed-in top bar has
+right-aligned Edit and Sign out buttons. Edit starts editing the current page and
+replaces Edit with Cancel and Save changes. Sign out remains visible after a
+vertical divider. Save is disabled until actual
+changes exist. Page details and formatting appear in a second bar only in edit
+mode: normal text, H1–H4, bold, italic, underline, strikethrough, links,
+bullet/numbered lists, and left/center/right alignment. Page details holds title
+and description. Save applies the page's changes together; Cancel discards them,
+with an unsaved-navigation warning. Shared regions are clearly identified.
+Media is separate from rich text; repeatable multi-fleas remain future work.
+The link control opens the current destination for editing, with Remove link in
+the dialog. Undo/redo toolbar buttons are deferred; keyboard history remains.
+Alignment uses three icon buttons. Unlinked-page discovery is deferred.
 
 Editor exclusions for v1:
 
@@ -393,7 +440,7 @@ Editor exclusions for v1:
 
 ## Server and TLS
 
-The installed Flea CMS server is a single Go executable and system service. A separate Caddy process is not part of the required architecture.
+The installed FleaCMS server is a single Go executable and system service. A separate Caddy process is not part of the required architecture.
 
 Responsibilities:
 
@@ -417,7 +464,7 @@ directory, without a `current` symlink. Config switching is atomic but service
 restart causes a brief interruption. A lock and durable recovery journal protect
 activation; interrupted transactions can be restored with `flea-server -recover`.
 Old releases are retained, with no pruning or rollback CLI yet. Committed rich
-snips seed missing IDs; existing remote content/metadata wins. Content snapshots
+fleas seed missing IDs; existing remote content/metadata wins. Content snapshots
 live separately under content/<release-id>.json, selected by the host config.
 Successful activation archives/prunes unreferenced IDs; failed activation restores
 the prior code and content paths. The rollback workflow below is future work.
@@ -435,17 +482,17 @@ Each deployment creates an immutable release. The host switches to it atomically
     uploads/
 ```
 
-The exact treatment of editable snips during a developer deployment needs a defined policy before implementation. Recommended default:
+The exact treatment of editable fleas during a developer deployment needs a defined policy before implementation. Recommended default:
 
-- HTML, partials, layouts, CSS, JavaScript, and developer-provided default snips ship in releases.
+- HTML, partials, layouts, CSS, JavaScript, and developer-provided default fleas ship in releases.
 - Owner edits and uploaded files are stored in a host-managed mutable content layer with revision history.
-- On deploy, Flea CMS preserves existing owner-edited snips and uploads unless the developer intentionally runs an explicit content migration/reset command.
+- On deploy, FleaCMS preserves existing owner-edited fleas and uploads unless the developer intentionally runs an explicit content migration/reset command.
 
 This avoids accidentally erasing an owner’s edits every time a developer redeploys HTML.
 
 Required deployment properties:
 
-- Validate routes, templates, snips, and configuration before activating a release.
+- Validate routes, templates, fleas, and configuration before activating a release.
 - Upload a staged release before changing `current`.
 - Switch releases atomically.
 - Preserve the prior active release.
@@ -480,7 +527,7 @@ flea rollback
 - Extract and verify the replacement before requesting reset confirmation.
 - Recognized existing installations require typed DESTROY confirmation and retain
   a root-only backup. Check TCP/UDP 80/443 before changing anything, exempting
-  only the verified Flea CMS service during reinstall. Preserve unrelated services.
+  only the verified FleaCMS service during reinstall. Preserve unrelated services.
 - Initial host listens publicly on HTTP port 80. Deploy and HTTPS are subsequent
   explicit commands; no firewall changes are made.
 
@@ -489,15 +536,17 @@ flea rollback
 - Creates the standard folder structure and a polished minimal starter site.
 - Initializes Git on main without making a commit. --skip-git skips initialization;
   missing Git does not prevent site creation. Includes a starter .gitignore.
-- Creates default `_/flea.config`, a default snip, a layout with inline header/footer, error pages, and a minimal Flea CMS welcome page with its SVG mark.
+- Creates default `_/flea.config`, a default flea, a layout with inline header/footer, error pages, and a minimal FleaCMS welcome page with its SVG mark.
+- Includes editable `admin/index.html`, `code.html`, `dashboard.html`, `setup.html`, and `error.html`, selecting `_layout_admin.html` and escaped `admin.*` data. The admin directory has no public routes or assets; server-side editor state selects templates after access checks. Missing templates have no embedded fallback.
 - Bundles local Prewind 1.3.1 and Preflight-inspired theme, typography, native form, button, and application styles. CSS layers are ordered reset, styles, prewind. No CSS build step or CDN is required; form styling does not implement submission handling.
 
 `flea dev`
 
 - Must run without Docker or a database.
-- Watches source files and snip content.
+- Watches source files and flea content.
 - Logs requests as `GET /test` for 200 or `404 GET /missing` for non-200.
   Include assets and HEAD, but omit successful internal reload polls and query strings.
+- Use native directory notifications with a 100 ms debounce, including new nested directories and atomic saves. No periodic file scans or polling fallback. Watch errors stop dev; overflow reconciles watches and content. Public browser version polling remains separate.
 - Runs a local server with the same route and rendering behavior as production.
 - Reports template errors, invalid route collisions, missing partials, schema errors, and unsafe/unserved paths clearly.
 - Provides local editor access.
@@ -508,7 +557,7 @@ flea rollback
   confirmation, and commit message. Respect Git hooks and signing. Declining or
   failure stops deployment. Sites within larger repositories commit manually.
 
-- Requires deployment protocol 8 before upload, offering first-time setup when absent. Validates the
+- Requires deployment protocol 10 before upload, offering first-time setup when absent. Validates the
   packaged site, uploads over SSH/SCP, stages, and atomically switches host config.
 - Restarts and verifies revision/hostname; restores the prior config on failure.
 - Uses native SSH and the saved current-branch mapping in _/deploy.json. The first
@@ -550,7 +599,7 @@ flea rollback
 
 ## Docker
 
-Docker is not required for local development or the first production path. The core product must work on a blank Ubuntu LTS host using the Flea CMS executable and OS service management.
+Docker is not required for local development or the first production path. The core product must work on a blank Ubuntu LTS host using the FleaCMS executable and OS service management.
 
 Later, Docker can be an optional deployment target for users who already operate containers. It must not dictate the local project format or force every customer to understand containers.
 
@@ -558,7 +607,7 @@ Later, Docker can be an optional deployment target for users who already operate
 
 The first server-side feature should be a constrained contact-form action, not arbitrary application code.
 
-A form can declare a named Flea CMS endpoint and validation configuration. Flea CMS handles rate limiting, spam defenses, payload validation, delivery/storage, and logging. The implementation may later offer email or webhook destinations, but those credentials live in host configuration, never in public site files.
+A form can declare a named FleaCMS endpoint and validation configuration. FleaCMS handles rate limiting, spam defenses, payload validation, delivery/storage, and logging. The implementation may later offer email or webhook destinations, but those credentials live in host configuration, never in public site files.
 
 Do not add custom server functions in v1. They turn a small static host into a multi-tenant code-execution and security platform.
 
@@ -579,7 +628,7 @@ Do not add custom server functions in v1. They turn a small static host into a m
 
 ## Suggested implementation milestones
 
-### Milestone 1: local static Flea CMS
+### Milestone 1: local static FleaCMS
 
 - CLI skeleton and `flea new`
 - Parse project layout and configuration
@@ -596,9 +645,9 @@ Do not add custom server functions in v1. They turn a small static host into a m
 - Clear parse/render error reporting
 - Escaping and script/style parser boundaries
 
-### Milestone 3: snips
+### Milestone 3: fleas
 
-- JSON snip loading
+- JSON flea loading
 - Basic schema format and validation
 - Associated image directories and safe public asset mapping
 - Local editor authentication and edit UI
@@ -610,7 +659,7 @@ Do not add custom server functions in v1. They turn a small static host into a m
 - Domain-to-site lookup
 - ACME TLS integration and renewal
 - System service installation on Ubuntu LTS
-- Host-level users/sessions/site registry in SQLite
+- Host-level account/site registry design (site sessions already use private JSON)
 
 ### Milestone 5: deployment
 
@@ -629,8 +678,8 @@ Do not add custom server functions in v1. They turn a small static host into a m
 
 These are intentionally not blockers for the initial routing/template prototype:
 
-1. **Snip schema filename and syntax:** colocated `about-us.schema.json`, a central schema folder, or schema inside the snip JSON.
-2. **Public URL prefix for snip-managed images:** use a stable virtual prefix and do not expose `_/` directly.
+1. **Flea schema filename and syntax:** colocated `about-us.schema.json`, a central schema folder, or schema inside the flea JSON.
+2. **Public URL prefix for flea-managed images:** use a stable virtual prefix and do not expose `_/` directly.
 3. **Rich text model:** sanitized HTML versus a constrained Markdown-like format.
 4. **First form destination:** email, host inbox, webhook, or a combination.
 5. **Editor user model:** one site-owner account initially versus host-managed multiple editor accounts.
@@ -638,7 +687,7 @@ These are intentionally not blockers for the initial routing/template prototype:
 
 ## Acceptance criteria for the first usable release
 
-Flea CMS is meaningfully usable when a developer can:
+FleaCMS is meaningfully usable when a developer can:
 
 1. Install the CLI through Homebrew.
 2. Run `flea new my-site` and receive a working starter site.
@@ -647,9 +696,9 @@ Flea CMS is meaningfully usable when a developer can:
 5. Confirm `/about-us/history.html` returns 404.
 6. Reuse a developer partial in several pages.
 7. Wrap pages with `_layout.html` using `{slot}`.
-8. Render values, simple conditions, and loops from a JSON snip.
-9. Edit a schema-defined snip and associated image from a protected editor without editing source HTML.
+8. Render values, simple conditions, and loops from a JSON flea.
+9. Edit a schema-defined flea and associated image from a protected editor without editing source HTML.
 10. Deploy to a blank supported Ubuntu server with one command after entering the initial domain/server details.
 11. Receive a valid automatically managed HTTPS certificate.
 12. Deploy a second release and roll back safely.
-13. Host more than one domain/site from the same Flea CMS server.
+13. Host more than one domain/site from the same FleaCMS server.

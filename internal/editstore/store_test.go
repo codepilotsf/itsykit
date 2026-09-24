@@ -13,6 +13,7 @@ import (
 	"flea/internal/editor"
 	"flea/internal/site"
 	"flea/internal/state"
+	"flea/templates"
 )
 
 func TestLocalSavesDuringDevReloads(t *testing.T) {
@@ -50,8 +51,34 @@ func TestLocalSavesDuringDevReloads(t *testing.T) {
 	case <-time.After(3 * time.Second):
 		t.Fatal("watcher did not stop")
 	}
-	if _, err := os.Stat(filepath.Join(s.Root, "_", ".snips.lock")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(s.Root, "_", ".fleas.lock")); !os.IsNotExist(err) {
 		t.Fatal("local lock file created", err)
+	}
+}
+
+func TestMetadataWithoutFleas(t *testing.T) {
+	s, public := fixture(t, false)
+	if err := os.WriteFile(filepath.Join(s.Root, "about.html"), []byte(`<h1>About</h1><p>{page.title}</p><p>{page.description}</p>`), 0644); err != nil {
+		t.Fatal(err)
+	}
+	doc, err := s.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(strings.Join(doc.Routes, ","), "/about") {
+		t.Fatal(doc.Routes)
+	}
+	if err := s.Save(editor.Update{Version: doc.Version, Route: "/about", Title: "About us", Description: "Our story"}); err != nil {
+		t.Fatal(err)
+	}
+	w := httptest.NewRecorder()
+	public.ServeHTTP(w, httptest.NewRequest("GET", "/about", nil))
+	if w.Code != 200 || !strings.Contains(w.Body.String(), "About us") || !strings.Contains(w.Body.String(), "Our story") {
+		t.Fatal(w.Code, w.Body.String())
+	}
+	doc, err = s.Read()
+	if err != nil || doc.Store.Pages["/about"].Title != "About us" {
+		t.Fatal(doc, err)
 	}
 }
 
@@ -60,8 +87,20 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 	root := t.TempDir()
 	files := map[string]string{
 		"_/flea.config": `{"site":{"name":"Editor test"},"admin":{"emails":["owner@example.test"]}}`,
-		"index.html":    `<h1>{snip abcdefghij}</h1><p>{page.title}</p><p>{page.description}</p>`,
-		"_/snips.json":  `{"pages":{"/":{"snips":{"abcdefghij":{"label":"Heading","content":"Original"}}}},"shared":{"snips":{}}}`,
+		"index.html":    `<h1>{flea abcdefghij}</h1><p>{page.title}</p><p>{page.description}</p>`,
+		"_/fleas.json":  `{"pages":{"/":{"fleas":{"abcdefghij":{"label":"Heading","content":"Original"}}}},"shared":{"fleas":{}}}`,
+	}
+	layout, err := templates.Files.ReadFile("_layout_admin.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+	files["_layout_admin.html"] = string(layout)
+	for _, name := range []string{"index", "code", "dashboard", "setup", "error"} {
+		data, err := templates.Files.ReadFile("admin/" + name + ".html")
+		if err != nil {
+			t.Fatal(err)
+		}
+		files["admin/"+name+".html"] = string(data)
 	}
 	for name, body := range files {
 		file := filepath.Join(root, name)
@@ -77,12 +116,12 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 		t.Fatal(err)
 	}
 	public := site.NewProductionServer(p, nil)
-	s := &Store{Root: root, ContentPath: filepath.Join(root, "_", "snips.json"), Emails: p.Admin.Emails, Publish: public.Publish}
+	s := &Store{Root: root, ContentPath: filepath.Join(root, "_", "fleas.json"), Emails: p.Admin.Emails, Publish: public.Publish}
 	if remote {
 		dir := t.TempDir()
 		s.ConfigPath = filepath.Join(dir, "server.json")
 		s.ContentPath = filepath.Join(dir, "content.json")
-		if err := os.WriteFile(s.ContentPath, []byte(files["_/snips.json"]), 0644); err != nil {
+		if err := os.WriteFile(s.ContentPath, []byte(files["_/fleas.json"]), 0644); err != nil {
 			t.Fatal(err)
 		}
 		c := map[string]any{"sites": map[string]string{"example.test": root}, "content": map[string]string{"example.test": s.ContentPath}}

@@ -20,7 +20,7 @@ done
 bash scripts/bundle.sh "$stage"
 FLEA_REQUIRE_BUNDLE=1 "$GO_BINARY" test ./internal/serverbundle -count=1
 mkdir -p bin
-echo 'Building Flea CMS with both servers bundled...'
+echo 'Building FleaCMS with both servers bundled...'
 "$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/flea" ./cmd/flea
 "$stage/flea" version
 # A fresh inode avoids macOS retaining the previous executable's code signature.

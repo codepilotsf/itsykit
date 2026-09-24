@@ -16,11 +16,15 @@ func TestMailConfigurationIsPrivateAndNotInServerJSON(t *testing.T) {
 	if MailReady(m.ConfigPath) {
 		t.Fatal("unexpected settings")
 	}
-	if err := m.ConfigureMail(strings.NewReader(`{"api_key":"re_test123456","from":"login@example.test"}`)); err != nil {
+	if err := m.ConfigureMail(strings.NewReader(`{"api_key":"re_test123456","from":"login@example.test","name":"MySite Support"}`)); err != nil {
 		t.Fatal(err)
 	}
 	if !MailReady(m.ConfigPath) {
 		t.Fatal("settings not ready")
+	}
+	data, err := os.ReadFile(filepath.Join(filepath.Dir(m.ConfigPath), "mail.env"))
+	if err != nil || !strings.Contains(string(data), `FLEA_EMAIL_NAME="MySite Support"`) {
+		t.Fatal("sender name was not saved", err)
 	}
 	info, err := os.Stat(filepath.Join(filepath.Dir(m.ConfigPath), "mail.env"))
 	if err != nil || info.Mode().Perm() != 0600 {

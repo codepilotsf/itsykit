@@ -38,7 +38,7 @@ func askSecret(ctx context.Context, in io.Reader, out io.Writer) (string, error)
 	return ask(ctx, in, out, "Resend API key (hidden)", "")
 }
 
-func ensureMail(ctx context.Context, target string, options []string, isRoot bool, in io.Reader, out, errOut io.Writer, run runner) error {
+func ensureMail(ctx context.Context, directory, target string, options []string, isRoot bool, in io.Reader, out, errOut io.Writer, run runner) error {
 	prefix := ""
 	if !isRoot {
 		prefix = "sudo -- "
@@ -64,8 +64,10 @@ func ensureMail(ctx context.Context, target string, options []string, isRoot boo
 		return fmt.Errorf("The server did not report its email settings. Please update the server.")
 	}
 	fmt.Fprintln(out, "\nThis site needs email delivery. These settings are saved only on the server, not in Git.")
-	s := mailer.Settings{APIKey: os.Getenv("RESEND_API_KEY"), From: os.Getenv("FLEA_EMAIL_FROM")}
-	var err error
+	s, err := mailer.LocalSettings(directory)
+	if err != nil {
+		return err
+	}
 	if s.APIKey == "" {
 		s.APIKey, err = askSecret(ctx, in, out)
 		if err != nil {

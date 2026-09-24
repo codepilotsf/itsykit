@@ -13,8 +13,8 @@ import (
 	"unicode/utf8"
 
 	"flea/internal/editor"
+	"flea/internal/fleas"
 	"flea/internal/site"
-	"flea/internal/snips"
 	"flea/internal/state"
 )
 
@@ -25,7 +25,7 @@ type Store struct {
 }
 
 func (s *Store) lock() (func(), error) {
-	lock, pending := "", filepath.Join(s.Root, "_", ".snips-pending.json")
+	lock, pending := "", filepath.Join(s.Root, "_", ".fleas-pending.json")
 	if s.ConfigPath != "" {
 		lock = filepath.Join(filepath.Dir(s.ConfigPath), "deploy.lock")
 		pending = filepath.Join(filepath.Dir(s.ConfigPath), "deploy.pending.json")
@@ -64,15 +64,15 @@ func (s *Store) lock() (func(), error) {
 	return unlock, nil
 }
 func (s *Store) load() (*site.Project, error) {
-	var content *snips.Store
+	var content *fleas.Store
 	var err error
 	if s.ConfigPath != "" {
-		content, err = snips.ReadFile(s.ContentPath)
+		content, err = fleas.ReadFile(s.ContentPath)
 		if err != nil {
 			return nil, err
 		}
 	}
-	p, err := site.LoadWithSnips(s.Root, content)
+	p, err := site.LoadWithFleas(s.Root, content)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (s *Store) load() (*site.Project, error) {
 	}
 	return p, nil
 }
-func version(s *snips.Store) string {
+func version(s *fleas.Store) string {
 	b, _ := s.Bytes()
 	hash := sha256.Sum256(b)
 	return hex.EncodeToString(hash[:])
@@ -112,12 +112,12 @@ func (s *Store) Save(u editor.Update) error {
 		return fmt.Errorf("content changed since opening this form")
 	}
 	if u.ID != "" {
-		refs, err := p.SnipReferences()
+		refs, err := p.FleaReferences()
 		if err != nil {
 			return err
 		}
 		if _, ok := refs[u.ID]; !ok {
-			return fmt.Errorf("snip is not referenced by this site")
+			return fmt.Errorf("flea is not referenced by this site")
 		}
 		index, err := p.Content.Index()
 		if err != nil {
@@ -125,18 +125,18 @@ func (s *Store) Save(u editor.Update) error {
 		}
 		entry, ok := index[u.ID]
 		if !ok {
-			return fmt.Errorf("unknown snip")
+			return fmt.Errorf("unknown flea")
 		}
-		entry.Content, err = snips.Sanitize(u.Content)
+		entry.Content, err = fleas.Sanitize(u.Content)
 		if err != nil {
 			return err
 		}
-		if _, ok := p.Content.Shared.Snips[u.ID]; ok {
-			p.Content.Shared.Snips[u.ID] = entry
+		if _, ok := p.Content.Shared.Fleas[u.ID]; ok {
+			p.Content.Shared.Fleas[u.ID] = entry
 		} else {
 			for _, page := range p.Content.Pages {
-				if _, ok := page.Snips[u.ID]; ok {
-					page.Snips[u.ID] = entry
+				if _, ok := page.Fleas[u.ID]; ok {
+					page.Fleas[u.ID] = entry
 				}
 			}
 		}
@@ -152,14 +152,14 @@ func (s *Store) Save(u editor.Update) error {
 		page.Description = u.Description
 	}
 	// Validate the full candidate before making it durable or visible to readers.
-	next, err := site.LoadWithSnips(s.Root, p.Content)
+	next, err := site.LoadWithFleas(s.Root, p.Content)
 	if err != nil {
 		return err
 	}
 	if s.ConfigPath == "" {
 		err = site.SaveContent(s.Root, p.Content)
 	} else {
-		err = snips.WriteFile(s.ContentPath, p.Content)
+		err = fleas.WriteFile(s.ContentPath, p.Content)
 	}
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
 // Package buildinfo contains immutable release metadata set by the release build.
 package buildinfo
 
-var Version = "0.1.0"
+var Version = "0.2.0"

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FleaCMS inline editing prototype</title>
+  <link rel="stylesheet" href="/prototype.css">
+  <script defer src="/vendor/purify-3.4.16.min.js"></script>
+  <script defer src="/vendor/squire-2.4.9.js"></script>
+  <script defer src="/app.js"></script>
+  <script defer src="/checks.js"></script>
+</head>
+<body>
+  <aside id="admin" aria-label="Site administration">
+    <div class="flex items-center flex-wrap gap-sm px-md py-xs">
+      <strong>FleaCMS</strong>
+      <span class="identity">Joe Appleseed <span class="prototype-label">Prototype</span></span>
+      <span id="status" role="status" class="flex-1"></span>
+      <button id="edit" type="button">Edit</button>
+      <button id="cancel" type="button" hidden>Cancel</button>
+      <button id="save" type="button" hidden>Save changes</button>
+      <span class="admin-divider" aria-hidden="true"></span>
+      <button id="sign-out" type="button">Sign out</button>
+    </div>
+    <div id="formatting" class="px-md py-xs" aria-label="Text formatting" hidden>
+      <button id="details-button" type="button">Page details</button>
+      <label class="sr-only" for="block">Text format</label>
+      <select id="block" disabled>
+        <option value="P">Normal text</option>
+        <option value="H1">Heading 1</option><option value="H2">Heading 2</option>
+        <option value="H3">Heading 3</option><option value="H4">Heading 4</option>
+      </select>
+      <button type="button" data-mark="B" aria-label="Bold" aria-pressed="false" disabled><b>B</b></button>
+      <button type="button" data-mark="I" aria-label="Italic" aria-pressed="false" disabled><i>I</i></button>
+      <button type="button" data-mark="U" aria-label="Underline" aria-pressed="false" disabled><u>U</u></button>
+      <button type="button" data-mark="S" aria-label="Strikethrough" aria-pressed="false" disabled><s>S</s></button>
+      <button type="button" id="link-button" aria-label="Add link" title="Add link" aria-pressed="false" disabled><img src="/vendor/lucide/link.svg" alt="" width="18" height="18"></button>
+      <button type="button" data-list="UL" aria-label="Bullet list" title="Bullet list" aria-pressed="false" disabled><img src="/vendor/lucide/list.svg" alt="" width="18" height="18"></button>
+      <button type="button" data-list="OL" aria-label="Numbered list" title="Numbered list" aria-pressed="false" disabled><img src="/vendor/lucide/list-ordered.svg" alt="" width="18" height="18"></button>
+      <button type="button" data-align="left" aria-label="Align left" title="Align left" aria-pressed="false" disabled><img src="/vendor/lucide/align-left.svg" alt="" width="18" height="18"></button>
+      <button type="button" data-align="center" aria-label="Align center" title="Align center" aria-pressed="false" disabled><img src="/vendor/lucide/align-center.svg" alt="" width="18" height="18"></button>
+      <button type="button" data-align="right" aria-label="Align right" title="Align right" aria-pressed="false" disabled><img src="/vendor/lucide/align-right.svg" alt="" width="18" height="18"></button>
+      <span id="region-label">Select an outlined text region.</span>
+    </div>
+  </aside>
+
+  <div class="prototype-notice px-md py-xs">Local experiment. Sign-in is simulated. Save changes updates this tab only; refreshing resets the demo.</div>
+  <header class="border-b border-light">
+    <div class="container flex items-center justify-between gap-md py-md">
+      <a href="?page=/" data-page="/" class="brand flex items-center gap-xs"><img src="/site/images/mark.svg" width="34" height="34" alt="">Little Field Studio</a>
+      <nav class="flex gap-md" aria-label="Website"><a href="?page=/" data-page="/">Home</a><a href="?page=/about" data-page="/about">About</a><a href="?page=/contact" data-page="/contact">Contact</a></nav>
+    </div>
+  </header>
+  <main class="container py-xl">
+    <p id="page-label" class="text-sm text-midtone uppercase tracking-wide"></p>
+    <section id="content" class="max-w-text" aria-label="Page content"></section>
+  </main>
+  <footer class="border-t border-light">
+    <div class="container py-lg">
+      <section id="shared" class="max-w-text" aria-label="Shared footer text"></section>
+    </div>
+  </footer>
+
+  <section class="container py-lg" aria-label="Prototype diagnostics">
+    <details id="diagnostics">
+      <summary>Prototype checks and saved HTML</summary>
+      <p>These checks use Squire in your browser and compare output with Flea's current Go sanitizer. They do not change your site.</p>
+      <button id="run-checks" type="button">Run browser checks</button>
+      <pre id="check-results" aria-live="polite">Not run yet.</pre>
+      <button id="compare" type="button">Check current server compatibility</button>
+      <pre id="compatibility" aria-live="polite">H1 and alignment require server changes before integration.</pre>
+      <h3>Last demo save</h3>
+      <pre id="saved-output">Nothing saved yet.</pre>
+    </details>
+    <button id="sign-in" type="button" hidden>Return as demo admin</button>
+  </section>
+
+  <dialog id="page-details">
+    <form method="dialog">
+      <h2>Page details</h2>
+      <p>Included when you choose Save changes.</p>
+      <label for="page-title">SEO title</label><input id="page-title" maxlength="200">
+      <label for="page-description">Description</label><textarea id="page-description" maxlength="1000"></textarea>
+      <div class="flex items-center justify-between gap-sm mt-md"><button type="button" class="modal-cancel" id="details-cancel">Cancel</button><button value="close">Done</button></div>
+    </form>
+  </dialog>
+  <dialog id="link-dialog">
+    <form id="link-form" autocomplete="off">
+      <h2>Edit link</h2>
+      <label for="link-url">Web address, email, phone, or relative path</label><input id="link-url" autocomplete="off" autocapitalize="off" spellcheck="false" required placeholder="https://example.com">
+      <p id="link-error" role="alert"></p>
+      <label class="flex items-center gap-sm my-sm"><input id="link-new-tab" type="checkbox" role="switch">Open in a new tab</label>
+      <button type="button" class="modal-cancel" id="link-remove" hidden>Remove link</button>
+      <div class="flex items-center justify-between gap-sm mt-md"><button type="button" class="modal-cancel" id="link-cancel">Cancel</button><button type="submit">Apply link</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

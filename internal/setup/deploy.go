@@ -91,7 +91,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		if err != nil {
 			return err
 		}
-		if err = p.CheckExtractedSnips(); err != nil {
+		if err = p.CheckExtractedFleas(); err != nil {
 			return err
 		}
 		needsMail = len(p.Admin.Emails) > 0 || p.Contact.To != ""
@@ -181,7 +181,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		return err
 	}
 	if strings.Contains(output.String(), "FLEA_MISSING=1\n") {
-		fmt.Fprint(out, "\nFlea CMS isn't installed on this server yet.\nSetup will install the server and start its service.\n\n")
+		fmt.Fprint(out, "\nFleaCMS isn't installed on this server yet.\nSetup will install the server and start its service.\n\n")
 		confirmed, err := confirmSetup(ctx, in, out)
 		if err != nil {
 			return err
@@ -196,7 +196,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			if errors.Is(err, errHostKeyChanged) {
 				return err
 			}
-			return fmt.Errorf("Flea CMS was installed, but the server check failed.\nPlease check the service before deploying again.")
+			return fmt.Errorf("FleaCMS was installed, but the server check failed.\nPlease check the service before deploying again.")
 		}
 		_, isRoot, err = parseProbe(output.String())
 		if err != nil {
@@ -204,7 +204,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		}
 	}
 	if !strings.Contains(output.String(), release.Protocol+"\n") {
-		return fmt.Errorf("This server has an older or incomplete Flea CMS installation.\nPlease update the server before deploying.")
+		return fmt.Errorf("This server has an older or incomplete FleaCMS installation.\nPlease update the server before deploying.")
 	}
 	fmt.Fprintln(out, "Checking DNS from the target server...")
 	dnsCommand := "/usr/local/bin/flea-server -check-dns -domain " + shellQuote(strings.Join(opts.Domains, ","))
@@ -222,7 +222,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		return fmt.Errorf("branch or commit changed during deployment; retry")
 	}
 	if needsMail {
-		if err = ensureMail(ctx, target, sshOptions, isRoot, in, out, errOut, runCommand); err != nil {
+		if err = ensureMail(ctx, root, target, sshOptions, isRoot, in, out, errOut, runCommand); err != nil {
 			return err
 		}
 	}

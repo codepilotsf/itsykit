@@ -7,11 +7,11 @@ import (
 	"regexp"
 	"strings"
 
-	"flea/internal/snips"
+	"flea/internal/fleas"
 	"golang.org/x/net/html"
 )
 
-var richRef = regexp.MustCompile(`\{\s*snip\s+([A-Za-z0-9]{10})\s*\}`)
+var richRef = regexp.MustCompile(`\{\s*flea\s+([A-Za-z0-9]{10})\s*\}`)
 
 func richMatches(source string) [][]string {
 	return richRef.FindAllStringSubmatch(source, -1)
@@ -52,14 +52,17 @@ func scanRegions(source string, legacy map[string]bool) ([]region, []string, err
 			label := ""
 			has := false
 			for _, a := range token.Attr {
+				if a.Key == "snip" {
+					return nil, nil, fmt.Errorf("the snip attribute is unsupported; use flea")
+				}
 				for _, match := range richMatches(a.Val) {
 					if !legacy[match[1]] {
-						return nil, nil, fmt.Errorf("rich snips are not allowed in attributes")
+						return nil, nil, fmt.Errorf("rich fleas are not allowed in attributes")
 					}
 				}
-				if a.Key == "snip" {
+				if a.Key == "flea" {
 					if has {
-						return nil, nil, fmt.Errorf("duplicate snip attribute")
+						return nil, nil, fmt.Errorf("duplicate flea attribute")
 					}
 					has = true
 					label = a.Val
@@ -68,13 +71,10 @@ func scanRegions(source string, legacy map[string]bool) ([]region, []string, err
 			void := strings.Contains(" area base br col embed hr img input link meta param source track wbr ", " "+token.Data+" ") || typ == html.SelfClosingTagToken
 			if has {
 				if active != nil {
-					return nil, nil, fmt.Errorf("nested snip regions are not allowed")
-				}
-				if strings.TrimSpace(label) == "" {
-					return nil, nil, fmt.Errorf("snip label must not be empty")
+					return nil, nil, fmt.Errorf("nested flea regions are not allowed")
 				}
 				if void || strings.Contains(" script style textarea title select option head html table tr tbody thead tfoot ", " "+token.Data+" ") {
-					return nil, nil, fmt.Errorf("snip regions are not supported on <%s>", token.Data)
+					return nil, nil, fmt.Errorf("flea regions are not supported on <%s>", token.Data)
 				}
 				active = &region{start: offset, label: label}
 			}
@@ -96,12 +96,12 @@ func scanRegions(source string, legacy map[string]bool) ([]region, []string, err
 			}
 			if at < 0 {
 				if active != nil {
-					return nil, nil, fmt.Errorf("unmatched closing tag inside snip")
+					return nil, nil, fmt.Errorf("unmatched closing tag inside flea")
 				}
 				continue
 			}
 			if active != nil && at != len(stack)-1 {
-				return nil, nil, fmt.Errorf("snip HTML must have explicit, balanced closing tags")
+				return nil, nil, fmt.Errorf("flea HTML must have explicit, balanced closing tags")
 			}
 			if stack[at].region != nil {
 				active.end = start
@@ -110,7 +110,7 @@ func scanRegions(source string, legacy map[string]bool) ([]region, []string, err
 				if len(matches) == 1 && !legacy[matches[0][1]] && strings.TrimSpace(active.content) == matches[0][0] {
 					active.id = matches[0][1]
 				} else if len(matches) > 0 || strings.ContainsAny(active.content, "{}") {
-					return nil, nil, fmt.Errorf("snip content cannot contain template directives; encode literal braces as HTML entities")
+					return nil, nil, fmt.Errorf("flea content cannot contain template directives; encode literal braces as HTML entities")
 				}
 				regions = append(regions, *active)
 				active = nil
@@ -136,11 +136,11 @@ func scanRegions(source string, legacy map[string]bool) ([]region, []string, err
 			matches = filtered
 			if len(matches) > 0 {
 				if len(stack) == 0 {
-					return nil, nil, fmt.Errorf("rich snips must be inside an HTML element")
+					return nil, nil, fmt.Errorf("rich fleas must be inside an HTML element")
 				}
 				for _, f := range stack {
 					if strings.Contains(" script style textarea title select option head ", " "+f.tag+" ") {
-						return nil, nil, fmt.Errorf("rich snips are not allowed in <%s>", f.tag)
+						return nil, nil, fmt.Errorf("rich fleas are not allowed in <%s>", f.tag)
 					}
 				}
 				for _, m := range matches {
@@ -150,11 +150,11 @@ func scanRegions(source string, legacy map[string]bool) ([]region, []string, err
 		}
 	}
 	if active != nil {
-		return nil, nil, fmt.Errorf("unclosed snip region")
+		return nil, nil, fmt.Errorf("unclosed flea region")
 	}
 	return regions, refs, nil
 }
-func snipScope(file string) string {
+func fleaScope(file string) string {
 	for _, part := range strings.Split(file, "/") {
 		if strings.HasPrefix(part, "_") {
 			return ""
@@ -162,26 +162,39 @@ func snipScope(file string) string {
 	}
 	return pageRoute(file)
 }
-func readSnipStore(root *os.Root) (*snips.Store, error) {
-	data, err := readFile(root, "_/snips.json")
+func rejectOldContentPaths(root *os.Root) error {
+	for _, name := range []string{"_/snips.json", "_/snips", "_/.snips-pending.json"} {
+		if _, err := root.Lstat(name); err == nil {
+			return fmt.Errorf("unsupported old content path %s; update the site to the flea format before continuing", name)
+		} else if !os.IsNotExist(err) {
+			return err
+		}
+	}
+	return nil
+}
+func readFleaStore(root *os.Root) (*fleas.Store, error) {
+	if err := rejectOldContentPaths(root); err != nil {
+		return nil, err
+	}
+	data, err := readFile(root, "_/fleas.json")
 	if os.IsNotExist(err) {
-		return snips.NewStore(), nil
+		return fleas.NewStore(), nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	return snips.Decode(data)
+	return fleas.Decode(data)
 }
-func (p *Project) SnipReferences() (map[string]string, error) {
+func (p *Project) FleaReferences() (map[string]string, error) {
 	refs := map[string]string{}
-	legacy := p.legacySnipIDs()
+	legacy := p.legacyFleaIDs()
 	for file, source := range p.files {
 		_, ids, err := scanRegions(source, legacy)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", file, err)
 		}
 		for _, id := range ids {
-			scope := snipScope(file)
+			scope := fleaScope(file)
 			if old, ok := refs[id]; ok && old != scope {
 				scope = ""
 			}
@@ -191,8 +204,8 @@ func (p *Project) SnipReferences() (map[string]string, error) {
 	return refs, nil
 }
 
-func (p *Project) CheckExtractedSnips() error {
-	legacy := p.legacySnipIDs()
+func (p *Project) CheckExtractedFleas() error {
+	legacy := p.legacyFleaIDs()
 	for file, source := range p.files {
 		regions, _, err := scanRegions(source, legacy)
 		if err != nil {
@@ -200,16 +213,16 @@ func (p *Project) CheckExtractedSnips() error {
 		}
 		for _, r := range regions {
 			if r.id == "" {
-				return fmt.Errorf("%s: new snip region %q needs extraction. Run flea dev, then commit the generated files before deploying.", file, r.label)
+				return fmt.Errorf("%s: new flea region %q needs extraction. Run flea dev, then commit the generated files before deploying.", file, r.label)
 			}
 		}
 	}
 	return nil
 }
 
-func (p *Project) legacySnipIDs() map[string]bool {
+func (p *Project) legacyFleaIDs() map[string]bool {
 	legacy := map[string]bool{}
-	for name := range p.Snips {
+	for name := range p.Fleas {
 		if _, rich := p.rich[name]; !rich {
 			legacy[name] = true
 		}

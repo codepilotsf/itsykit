@@ -161,7 +161,7 @@ func SelectDeployment(ctx context.Context, root string, overrides DeploySettings
 			if err = saveDeploymentConfig(root, c); err != nil {
 				return s, err
 			}
-			fmt.Fprintln(out, "\nSaved your SSH username in _/deploy.json.\nFlea CMS will offer to commit this change before deploying.")
+			fmt.Fprintln(out, "\nSaved your SSH username in _/deploy.json.\nFleaCMS will offer to commit this change before deploying.")
 		}
 		s.Branch = state.Branch
 		return s, nil

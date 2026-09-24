@@ -21,9 +21,9 @@ import (
 	"flea/internal/contact"
 	"flea/internal/editor"
 	"flea/internal/editstore"
+	"flea/internal/fleas"
 	"flea/internal/mailer"
 	"flea/internal/site"
-	"flea/internal/snips"
 )
 
 const HealthPath = "/_flea/health"
@@ -75,6 +75,7 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 	// release would make deployment preservation depend on map iteration order.
 	byRoot := map[string]http.Handler{}
 	contentPaths := map[string]string{}
+	sessionOwners := map[string]string{}
 	contactBudget := &contact.Budget{}
 	type owner struct {
 		root string
@@ -91,7 +92,15 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 		key := filepath.Clean(root)
 		contentPath := config.Content[host]
 		if contentPath != "" {
+			if !filepath.IsAbs(contentPath) {
+				return config, nil, fmt.Errorf("content path must be absolute")
+			}
 			contentPath = filepath.Clean(contentPath)
+			sessionPath := managedSessionPath(contentPath)
+			if previous, ok := sessionOwners[sessionPath]; ok && previous != key {
+				return config, nil, fmt.Errorf("different sites must not share session storage")
+			}
+			sessionOwners[sessionPath] = key
 			info, e := os.Stat(contentPath)
 			if e != nil {
 				return config, nil, e
@@ -110,17 +119,17 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 			handlers[host] = handler
 			continue
 		}
-		var content *snips.Store
+		var content *fleas.Store
 		if name := config.Content[host]; name != "" {
 			if !filepath.IsAbs(name) {
 				return config, nil, fmt.Errorf("content path must be absolute")
 			}
-			content, err = snips.ReadFile(name)
+			content, err = fleas.ReadFile(name)
 			if err != nil {
 				return config, nil, err
 			}
 		}
-		project, err := site.LoadWithSnips(root, content)
+		project, err := site.LoadWithFleas(root, content)
 		if err != nil {
 			return config, nil, fmt.Errorf("site %s: %w", host, err)
 		}
@@ -136,7 +145,7 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 				return config, nil, fmt.Errorf("site %s: admin requires a managed content snapshot; deploy this site first", host)
 			}
 			store := &editstore.Store{Root: root, ContentPath: contentPath, ConfigPath: configPath, Emails: project.Admin.Emails, Publish: public.Publish}
-			dashboard := editor.New(editor.Options{Emails: project.Admin.Emails, Name: fmt.Sprint(project.Site["name"]), Sender: sender, Backend: store, Logger: logger})
+			dashboard := editor.New(editor.Options{Emails: project.Admin.Emails, SessionPath: managedSessionPath(contentPath), SessionIdleDays: project.Admin.SessionIdleDays, Name: fmt.Sprint(project.Site["name"]), Sender: sender, Backend: store, Logger: logger, Render: public.RenderAdmin})
 			handlers[host] = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if editor.IsPath(r.URL.Path) {
 					dashboard.ServeHTTP(w, r)
@@ -209,6 +218,9 @@ func Run(ctx context.Context, configPath string, logger *log.Logger) error {
 
 // A supplied TLS configuration is used only by integration tests with a local CA.
 func serve(ctx context.Context, config Config, handler http.Handler, logger *log.Logger, testTLS *tls.Config) error {
+	if err := initializeSessions(config); err != nil {
+		return err
+	}
 	httpHandler, tlsConfig, err := transports(config, handler)
 	if err != nil {
 		return err
@@ -240,7 +252,7 @@ func serve(ctx context.Context, config Config, handler http.Handler, logger *log
 	}
 	go func() { done <- server.Serve(listener) }()
 	if logger != nil {
-		logger.Printf("Flea CMS server listening on %s", listener.Addr())
+		logger.Printf("FleaCMS server listening on %s", listener.Addr())
 	}
 	var result error
 	remaining := len(servers)
@@ -263,6 +275,31 @@ func serve(ctx context.Context, config Config, handler http.Handler, logger *log
 		return nil
 	}
 	return result
+}
+
+// Managed content is <site>/content/<revision>.json; sessions belong beside
+// content, not within either the revision or its immutable release directory.
+func managedSessionPath(contentPath string) string {
+	return filepath.Join(filepath.Dir(filepath.Dir(contentPath)), "_", "sessions.json")
+}
+
+func initializeSessions(config Config) error {
+	seen := map[string]bool{}
+	for hostname, root := range config.Sites {
+		content := config.Content[hostname]
+		if content == "" || seen[root] {
+			continue
+		}
+		seen[root] = true
+		project, err := site.Load(root)
+		if err != nil {
+			return err
+		}
+		if err := editor.PruneSessions(editor.Options{SessionPath: managedSessionPath(content), Emails: project.Admin.Emails, SessionIdleDays: project.Admin.SessionIdleDays}); err != nil {
+			return fmt.Errorf("site %s: session storage: %w", hostname, err)
+		}
+	}
+	return nil
 }
 
 func Check(ctx context.Context, configPath string) error {
@@ -308,7 +345,7 @@ func Probe(ctx context.Context, config Config, domain string, secure bool) error
 		return err
 	}
 	if response.StatusCode != 200 || string(body) != `{"service":"flea","status":"ready"}` {
-		return fmt.Errorf("Flea CMS server readiness check failed")
+		return fmt.Errorf("FleaCMS server readiness check failed")
 	}
 	if response.Header.Get("X-Flea-Revision") != config.Revision || (domain != "" && response.Header.Get("X-Flea-Site") != domain) {
 		return fmt.Errorf("server is not serving the expected release/hostname")

@@ -55,7 +55,10 @@
   }
 
   textarea {
-    min-height: 8rem;
+    field-sizing: content;
+    min-height: var(--field-height);
+    max-height: 400px;
+    overflow-y: auto;
     resize: vertical;
   }
 

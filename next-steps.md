@@ -1,262 +1,194 @@
-# Flea CMS next steps
+# FleaCMS next steps
 
-## Backlog: independent site runtime versions
+This is the working roadmap. Keep priorities and open decisions here, completed
+changes in [CHANGELOG.md](CHANGELOG.md), usage in [README.md](README.md), and
+architecture in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Deferred by agreement: keep the current single shared Flea CMS server for now.
-Do not introduce proxy/runtime separation as part of current work.
+## Proposed order
 
-Future option: a lightweight host handles HTTP/HTTPS, certificates and domain
-routing, while each deployed site carries its matching Flea CMS runtime for
-templates, snips and /admin. Separate systemd-managed processes could communicate
-through private Unix sockets, allowing sites to use different runtime versions.
-Deployments could health-check a replacement before switching traffic and retain
-the previous runtime alongside its release for future rollback.
+1. Improve admin and owner onboarding.
+2. Build the Flea website using Flea.
+3. Verify the full workflow on a fresh Ubuntu server.
+4. Make Flea available through Homebrew.
 
-Revisit only when independent versions justify the added process supervision,
-memory, permissions, stable host/runtime contract and content-migration handling.
-This is a backlog proposal, not implemented behavior.
+Bundled agent skills are also planned and can be developed alongside the website.
+The order above is a proposal, not a commitment to start implementation.
+Live verification should finish before public distribution.
 
-## Owner dashboard
+## Admin and owner onboarding
 
-Implemented /admin email-code login and basic page/snippet editing. Configure
-admin.emails in _/flea.config. Resend credentials are server-only in
-/etc/flea/mail.env, prompted on deployment when missing. Local dev uses
-RESEND_API_KEY and FLEA_EMAIL_FROM environment variables. No real email was
-sent during implementation; live Resend and Ubuntu/systemd checks are still needed.
-Protocol 7 requires the new binary, service unit, service-owned deploy.lock and
-managed content-directory permissions. Do not reset an existing server as an
-upgrade. See README's Owner dashboard section. Visual rich-text controls, image
-uploads, revision history, rollback, and a nondestructive upgrade workflow remain
-next steps. Tests cover auth, CSRF, expiry/replay, content conflicts and locking.
+Current model: each site has approved email addresses in `admin.emails`.
+Developers use `flea admin [email]`; owners sign in at `/admin` with an emailed
+code. There is no separate account, organization, or role-management system.
 
-## Earlier implementation notes
+- [x] Clarify how developers add owners and apply access changes.
+- [x] Make the sign-in URL and first-login instructions easy to find.
+- [x] Ship developer-editable admin/ HTML pages using the normal site layout.
+- [x] Add scrollable page navigation and cover metadata editing without fleas.
+- [x] Add custom layouts and a full-width admin shell with separate page editors.
+- [x] Add persistent per-device admin sessions and configurable rolling idle expiry.
+- [x] Improve wording for requesting a code, signing in, and editing content.
+- [x] Explain missing email configuration and access problems while preserving
+  login privacy and security.
+- [ ] Verify the whole flow with real email delivery.
+- [x] Add a Resend setup wizard with a hidden key, separate sender name/address,
+  connection check, private .env save, and automatic local email configuration.
 
-Snip redesign agreed: extract inner HTML from snip="label" regions during dev
-into private _/snips.json, keyed by route with shared regions and page metadata.
-Use sanitized HTML by default and 10-character crypto-random alphanumeric IDs.
-Extraction, short IDs, sanitized rendering, page metadata, external deployment
-content snapshots, preservation, archived orphan pruning, and recovery tests are
-implemented. New starters use _/snips.json; legacy named JSON stays supported.
-Structured data now uses _/data/*.json with data.*. Deployment protocol 7 is
-required; update the server binary before deploying rich snips. No live server
-or example site was modified. A rollback CLI, remote sync,
-schema migrations, and consolidation of deploy settings into flea.config
-are still pending.
+First pass uses a developer-shared `/admin` link; no invitation emails are sent.
+Developers view or remove owners through `admin.emails` in the site configuration.
+Automated login/editing tests and a browser check of fresh-site setup passed.
+Live email delivery and the deployed end-to-end flow remain to be verified.
+Additional account structures and roles are not currently in scope.
 
-Latest change: setup extracts its matching compressed Linux binary from the CLI,
-checks the bundled SHA-256 and static ELF architecture, then uploads over SSH.
-Build with bash scripts/build.sh to refresh both Linux variants and the native CLI.
-Development setup no longer requires publishing or a release download service.
-This supersedes older runtime cross-build and download notes below. See RELEASING.md.
-Next: test real Ubuntu installation on a disposable server. Release runner setup
-and publication can happen separately when distribution is needed.
-No release or runner configuration has been published by this local work.
+## Inline owner editing
 
-Updated after adding branch-specific deployment, committed snapshots, DNS preflight,
-and saved WWW/HTTPS preferences.
+- [x] Standardize framework, starter, directives and content storage on flea;
+  bare `flea` attributes need no label. Old syntax has no compatibility alias.
 
-## Current state
+- [x] Build an isolated Squire prototype with current-page Edit, explicit
+  Save/Cancel, and a second formatting bar containing Page details.
+- [x] Add current-link editing/removal and individual alignment icons.
+- [ ] Revisit undo/redo toolbar buttons if needed; keyboard history remains.
+- [ ] Revisit discovery of unlinked pages only when needed; no page menu for now.
+- [x] Exercise H1–H4, basic formatting, lists, links, alignment, paste cleanup,
+  undo/redo, shared regions, and site typography in Chrome.
+- [ ] Review the [prototype](design/inline-editor/README.md) before integration.
+- [ ] Verify real clipboard input, keyboard/selection behavior, Safari, Firefox,
+  mobile, and accessibility.
+- [ ] Extend server sanitization for H1 and restricted alignment with regressions.
+- [ ] Integrate authenticated public-page editing with atomic conflict-checked
+  saves, preserving CSRF, session, and deployment-lock protections.
+- [ ] Keep `/admin` for login; return owners to the homepage in browsing mode.
+- [ ] Remove the old dashboard when its replacement is verified. No compatibility
+  layer without approval.
 
-Flea CMS has a runnable local site workflow:
+Media lives outside rich text. Plan repeatable multi-fleas separately for content
+such as team members, with add, edit, reorder, and delete. Small/Large Text and
+advanced rich-text features are deferred. The prototype does not change real sites.
 
-- `flea new <site-name>` creates the embedded starter site and initializes Git
-  on main without committing. --skip-git supports existing parent repositories.
-  A starter .gitignore is included; missing Git does not block site creation.
-- `flea status` validates a local project.
-- `flea dev` serves a local site with automatic reloads.
-- File-based routes, static assets, layouts and `{slot}`, partials, escaped JSON
-  snips, dotted paths, conditions, loops, custom error pages, and on-demand
-  pinned Lucide icons are implemented.
-- The starter templates are ordinary files under the repository's `templates/`
-  directory. They use the selected slate line-art Skip flea logo and the current
-  Prewind/Google-font theme.
-- `/usr/local/bin/flea` is a symlink to this checkout's `bin/flea`, so
-  rebuilding `bin/flea` updates the global command without reinstalling it.
+## Flea website
 
-The persistent server, deployment, and HTTPS are implemented. They have not yet
-been exercised against a real remote Ubuntu machine or live Let's Encrypt:
+Build the public website with Flea to test its own developer and owner workflows.
 
-- `flea setup` prompts for an SSH target, verifies supported Ubuntu/systemd
-  and architecture, extracts the bundled `flea-server`, uploads it, and installs a
-  hardened `flea` systemd service.
-- New installations default to public HTTP on port 80 (`"listen": ":80"`).
-  The service is non-root and receives only `CAP_NET_BIND_SERVICE` to bind the
-  low port.
-- `flea deploy` validates/packages the site, uploads over SSH/SCP, and invokes
-  the installed server to activate a release. `_/deploy.json` saves approved
-  destinations per Git branch. The server validates again, atomically switches configuration,
-  restarts, and checks the revision/hostname. Failure restores the prior config.
-- `flea https` enables automatic Let's Encrypt certificates for deployed
-  domains. `flea deploy -https` combines the two. Contact email and explicit
-  acceptance of the CA terms are required.
-- Host configuration lives at `/etc/flea/server.json`. Its `sites` map
-  connects a request hostname to an absolute site directory. It starts empty,
-  so only `/_flea/health` works immediately after setup; other requests
-  return 404 until a site is deployed.
-- Setup does not change cloud or host firewalls. TCP 80 and 443 must be allowed
-  by the administrator. DNS records must point at the server. Setup remains a
-  first-install operation; there is no automatic server binary upgrade command.
+- [ ] Choose the site location, domain, audience, and initial pages.
+- [ ] Explain the plain-HTML workflow and developer versus owner responsibilities.
+- [ ] Show features through practical examples and an editing demonstration.
+- [ ] Provide getting-started instructions, documentation, and release notes.
+- [ ] Add verified installation instructions when distribution is available.
 
-## Commands to use next
+Use the starter conventions and selected Skip logo. Keep public claims consistent
+with implemented and verified behavior. Hosting and publishing await a chosen
+destination.
 
-With a current server installed, run from a committed site on a named Git branch:
+## Bundled agent skills
 
-```sh
-flea deploy
-```
+Include useful agent skills by default for developers working on Flea sites.
 
-First use asks for the server/domain, uses the branch name directly, and saves
-WWW redirect and HTTPS preferences (HTTPS defaults true). Commit the saved
-settings before retrying. Subsequent deploys use the current branch's mapping.
-The remote site name is generated automatically; there is no environment or
-remote-name question. To change the mapping:
+- [ ] Decide where skills ship, how new sites receive them, and how agents
+  discover them. Avoid assuming a particular agent's directory convention.
+- [ ] Create an initial skill for importing an existing small brochureware website
+  and converting it into a Flea site.
+- [ ] Use very basic Prewind styling, readable HTML, shared layouts/partials,
+  local assets, and Flea's existing content conventions.
+- [ ] Define how the import preserves content, navigation, and useful page
+  structure while handling unsupported interactive or third-party features.
+- [ ] Verify imports with Flea validation and rendered-page checks, including
+  links, assets, and narrow-screen layouts.
+- [ ] Test the skill on a representative small site and document how to use it.
 
-```sh
-flea deploy -configure
-```
+The first skill is planned, not implemented. Choose a source site and resolve
+packaging before building it. Preserve unrelated customizations in existing sites.
 
-Deploy asks for an SSH username (default root) if the target has no user@ prefix.
-Existing bare targets ask only for that missing username and save it. Commit the
-config change before retrying. There is no NAT/proxy IP question in the normal
-wizard; expected_ips remains an advanced config/flag option.
+## Live verification before distribution
 
-Once SSH succeeds, a missing server installation offers setup and then resumes
-deployment using the same target and SSH connection. Go and the source checkout
-are required locally for that installation. Failed SSH authentication does not
-trigger setup, and older installations are not overwritten.
+Local tests cover HTTP/TLS, simulated SSH, recovery, and email logic. They do not
+establish successful live installation, email delivery, or public certificate
+issuance. These checks need a disposable Ubuntu target, domain, and credentials.
 
-Plain HTTP can use an IPv4 address; HTTPS requires DNS names. Example saved
-`_/deploy.json` (see README for a full main/staging example):
+- [ ] Install on a fresh supported Ubuntu server and verify systemd permissions.
+- [ ] Deploy and check DNS, public reachability, pages, assets, and private paths.
+- [ ] Verify HTTPS issuance, HTTP redirects, and certificate cache reuse.
+- [ ] Exercise owner login, editing, and contact-form delivery with real email.
+- [ ] Redeploy code and confirm owner edits survive.
+- [ ] Exercise failed/interrupted deployment recovery on the disposable target.
+- [ ] Record results and remaining limits before publishing.
 
-```json
-{
-  "branches": {
-    "main": {
-      "target": "ubuntu@1.2.3.4",
-      "domain": "example.com",
-      "name": "my-site-main",
-      "www_redirect": true,
-      "https": true,
-      "email": "you@example.com",
-      "agree_tos": true
-    }
-  }
-}
-```
+Monitor certificate renewal after initial verification; issuance alone does not
+prove long-term renewal.
 
-This file is excluded from upload and contains no credentials. Flags seed the
-questions only on first use or with -configure; they cannot silently override
-a saved mapping. Legacy flat config requires confirmation before migration.
+## Homebrew and releases
 
-Git must be clean before SSH/upload/activation, including staged, unstaged, and
-untracked files. The wizard can save settings before the first commit, allowing
-site and settings to be committed together. Upload still requires a commit.
-Detached HEAD and non-Git folders cannot configure deployment.
-Snapshots come from commit objects; missing icons resolve only in the temporary
-snapshot. Ignored working files cannot be uploaded. Subfolder sites are supported.
+Current source version is 0.2.0. Build and publishing scripts exist; remote
+release pipelines and public distribution remain unverified.
 
-New staging mappings suggest staging.<main domain> but require approval. Both
-local config and server metadata prevent cross-branch destination collisions.
-The server checks A/AAAA records, including WWW, before upload. Every answer must
-match its interface addresses or explicitly saved expected_ips for NAT/proxies.
-IP literals skip DNS. This is not a public firewall/reachability test.
+- [ ] Choose the release host and Homebrew tap repository.
+- [ ] Configure and verify the release pipeline and public downloads.
+- [ ] Test Mac artifacts with both Linux server architectures bundled.
+- [ ] Create a formula with versioned URLs and verified checksums.
+- [ ] Test installation and the first-site workflow on a clean Mac.
+- [ ] Publish installation instructions on the Flea website.
 
-## Verification already run
+Follow [RELEASING.md](RELEASING.md). Creating repositories, pushing tags, and
+publishing artifacts require an explicit request; roadmap entries do not
+authorize those actions.
 
-The current implementation passed:
+## Design discussions to schedule
 
-```sh
-GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go test ./...
-GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go test -race ./...
-GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go vet ./...
-GOCACHE=/tmp/flea-go-cache bash scripts/build.sh
-GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go build -o bin/flea-server ./cmd/flea-server
-```
+These topics need a strategy and scope before implementation. They do not change
+the proposed order above.
 
-The full suite includes the executable starter/dev/reload smoke test, Linux
-amd64/arm64 cross-builds, simulated SSH/SCP failures, archive security tests,
-real HTTP deployment/redeployment and recovery tests, and TLS hostname isolation.
-Branch tests cover saved first-use answers, future reuse, staging suggestions,
-detached HEAD, destination collisions, dirty staged/unstaged/untracked changes,
-commit-only snapshots, subfolder sites, ignored files, and committed symlinks.
-DNS tests cover mismatched A/AAAA answers, timeouts, no records, WWW, IP bypass,
-and stopping before upload on failure. Redirect and saved HTTPS preference tests
-verify that other sites are preserved. Full tests, race tests, vet and builds
-were rerun successfully after these additions.
-A local ACME authority tests actual HTTP-01 challenge handling, CSR issuance,
-trusted HTTPS, certificate cache permissions, and cache reuse while the CA is
-offline. Race tests also passed. These tests do not prove a real Ubuntu install,
-SSH password flow, systemd permissions, public reachability, live CA issuance,
-or renewal over a real certificate lifetime.
+### Deployment access for multiple developers
 
-## Decisions made while you were away
+Plan how multiple developers can deploy the same site without giving each person
+root access or unrestricted sudo on the server.
 
-- HTTPS lives inside Flea CMS using pinned `golang.org/x/crypto/acme/autocert`
-  v0.57.0, as required by spec.md. No reverse proxy or certificate shell scripts.
-  This dependency raises the build requirement to Go 1.26; the installed Mac Go
-  is 1.27.1. The dependency versions are recorded in go.mod/go.sum.
-- HTTPS is enabled explicitly per domain. HTTP-only sites can coexist on the
-  same host. HTTPS-enabled domains redirect with 308; unknown TLS hostnames and
-  Host/SNI mismatches are rejected. No HSTS, wildcard, or IP certificates yet.
-- Certificates/account keys persist under `/var/lib/flea/certs`, owned by
-  flea with mode 0700. The daemon can write only that directory; the data
-  parent, releases, and host configuration are administrator-owned.
-- Deploy uses separate release directories and an atomic host config switch,
-  followed by a brief service restart. It does not promise zero downtime.
+- [ ] Separate server-administrator responsibilities from routine site deployment.
+- [ ] Define per-developer identities, access grants, and revocation without shared
+  root credentials.
+- [ ] Decide how deployment permission is limited to specific sites and branches.
+- [ ] Evaluate narrowly authorized server operations, including activation and
+  service restart, without granting arbitrary commands or access to other sites
+  and server secrets.
+- [ ] Plan shared deployment settings, concurrent deploy behavior, and records of
+  who deployed which commit.
+- [ ] Define tests for unauthorized sites, revoked access, and privilege escalation.
 
-```text
-/var/lib/flea/sites/<site-name>/releases/<timestamp-random-id>/
-```
+Choose the authorization design before changing SSH or server permissions.
+Deployment access remains separate from browser owner access.
 
-- All aliases belonging to the same site move together. Deploy cannot steal a
-  hostname from another site. Removing aliases is a manual config change.
-- Only runtime files are uploaded: , _/flea.config, _/snips/, _/icons/.
-  Archives are bounded at 100 MiB and 10,000 entries, with no links or traversal.
-- Committed snips ship as a complete snapshot. Remote content edits are not merged;
-  per-edit content history and visual rich-text controls remain deferred.
-- A lock serializes activation. A durable recovery journal preserves the old
-  config through interruption. If `/etc/flea/deploy.pending.json` remains,
-  further deploys stop until `sudo /usr/local/bin/flea-server -recover` succeeds.
-- Prior releases and server.previous.json remain available. There is no release
-  pruning, rollback CLI, or automated server upgrade in this change.
+### Components alongside partials
 
-## Next work: real-server verification
+Explore whether components would solve concrete reuse problems beyond the
+existing partials. No component syntax or implementation has been selected.
 
-The remaining operational check needs an actual target and domain:
+- [ ] Collect examples that are awkward with current partials, such as reusable
+  cards or buttons with explicit inputs.
+- [ ] Compare extending partials with introducing a distinct component concept.
+- [ ] Discuss inputs, defaults, child content/slots, and variable scope.
+- [ ] Define escaping, validation, and error behavior consistently with Flea's
+  existing template safety rules.
+- [ ] Assess whether the benefit justifies extra template syntax and complexity;
+  preserve the plain-HTML workflow without requiring a frontend build system.
 
-1. Run `flea setup` against it.
-2. Allow inbound TCP 80/443 in the provider and host firewall, and point the
-   domain's A record at the server. Any AAAA record must also work.
-3. Deploy a test site with the commands above, then enable HTTPS.
-4. Confirm `http://SERVER_IP/_flea/health`, HTTP-to-HTTPS redirect, valid HTTPS,
-   pages/assets, and private-path rejection from another machine.
-5. Check `sudo systemctl status flea --no-pager` and service logs.
-6. Redeploy changed content, verify restart/cache reuse, and check recovery.
-7. Monitor real certificate renewal. Avoid repeatedly requesting certificates
-   while debugging DNS/firewalls because CA issuance limits apply.
+## Deferred work
 
-Older installed server binaries lack deployment protocol 7. They must be updated
-deliberately before deploy works; rerunning setup refuses an existing installation.
-README.md documents the executable/unit/certificate-directory requirements.
+These are candidates to scope and prioritize, not commitments.
 
-After the live verification, likely next improvements are a server upgrade
-command, explicit rollback, release retention/pruning, and remote status/logs.
+- Visual rich-text editing, images, and revision history.
+- Nondestructive server upgrades, rollback, release retention, and remote status/logs.
+- Remote content sync and deployment-setting consolidation.
+- Review existing legacy flea and deployment-format support for removal under
+  the project's no-backward-compatibility policy.
+- Parser fuzzing and additional resource-budget tests.
+- Independent site runtime versions: keep the shared Go server for now.
+  Revisit per-site processes and a routing host only when the need justifies
+  the operational complexity.
 
-## Working-tree note
+## Standing decisions
 
-Developer-facing output must always use simple, friendly English and readable
-line breaks. This standing guideline is recorded in AGENTS.md.
-
-The deploy/HTTPS implementation, dependency files, tests, documentation, and this
-handoff are uncommitted. Earlier setup/HTTP work was already clean in git when
-this implementation began. README.md, AGENTS.md, spec.md, and the generated-site
-README were updated. Both binaries were rebuilt, including the globally linked
-CLI. No commits, pushes, real server changes, or live CA registrations were made.
-# Root-level site layout
-
-Pages, layouts, partials, CSS, and images now live directly in the site root.
-The starter mirrors this layout. Private JSON stays in _/. Shared exclusions
-keep Git metadata and project docs out of serving, reloads, and deployment.
-Deployment protocol is now 3. Existing sites need html/ contents moved to the
-root after checking for collisions; existing servers need the updated binary.
-No existing example site or remote server was automatically migrated.
+- Prefer simple HTML, JSON, Go, and minimal dependencies.
+- No backward compatibility by default during early development. Ask before
+  adding any compatibility layer.
+- Keep the selected Skip logo and canonical starter files in `templates/`.
+- Update this roadmap when work is completed, deferred, or reprioritized.
+  Remove stale implementation notes rather than appending a running history.

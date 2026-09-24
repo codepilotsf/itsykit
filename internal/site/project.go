@@ -11,39 +11,41 @@ import (
 	"strings"
 
 	"flea/internal/contact"
+	"flea/internal/fleas"
 	"flea/internal/sitefiles"
-	"flea/internal/snips"
 )
 
 // Project is a validated serving snapshot. After publishing it to a Server,
 // callers must not mutate its maps or Content; reload builds a new Project.
 type Project struct {
-	Admin        AdminAccess
-	Contact      contact.Config
-	Content      *snips.Store
-	rich         map[string]template.HTML
-	Root         string
-	Site         map[string]any
-	Snips        map[string]map[string]any
-	Partials     map[string]string
-	Pages        map[string]*template.Template
-	Assets       map[string]string
-	AssetData    map[string][]byte
-	Errors       map[int]*template.Template
-	files        map[string]string
-	signature    string
-	icons        map[string]string
-	Warnings     []string
-	SnipsUpdated bool // A dev extraction changed templates or the active content index.
-	missingIcons map[string]string
+	layouts        map[string]bool
+	adminTemplates map[string]*template.Template
+	Admin          AdminAccess
+	Contact        contact.Config
+	Content        *fleas.Store
+	rich           map[string]template.HTML
+	Root           string
+	Site           map[string]any
+	Fleas          map[string]map[string]any
+	Partials       map[string]string
+	Pages          map[string]*template.Template
+	Assets         map[string]string
+	AssetData      map[string][]byte
+	Errors         map[int]*template.Template
+	files          map[string]string
+	signature      string
+	icons          map[string]string
+	Warnings       []string
+	FleasUpdated   bool // A dev extraction changed templates or the active content index.
+	missingIcons   map[string]string
 }
 
 func Load(root string) (*Project, error) {
-	return LoadWithSnips(root, nil)
+	return LoadWithFleas(root, nil)
 }
 
-// LoadWithSnips loads a code release with a separately managed content snapshot.
-func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
+// LoadWithFleas loads a code release with a separately managed content snapshot.
+func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 	root, err := filepath.Abs(root)
 	if err != nil {
 		return nil, err
@@ -53,7 +55,7 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 		return nil, err
 	}
 	defer boundary.Close()
-	p := &Project{Root: root, Snips: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
+	p := &Project{Root: root, Fleas: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
 	p.signature = fingerprint(root)
 	var config struct {
 		Site    map[string]any `json:"site"`
@@ -100,7 +102,7 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 		return nil, fmt.Errorf("_/flea.config: site.name must be a nonempty string")
 	}
 	if content == nil {
-		content, err = readSnipStore(boundary)
+		content, err = readFleaStore(boundary)
 		if err != nil {
 			return nil, err
 		}
@@ -112,19 +114,19 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 		return nil, err
 	}
 	for id, entry := range contentIndex {
-		clean, e := snips.Sanitize(entry.Content)
+		clean, e := fleas.Sanitize(entry.Content)
 		if e != nil {
-			return nil, fmt.Errorf("snip %s: %w", id, e)
+			return nil, fmt.Errorf("flea %s: %w", id, e)
 		}
 		p.rich[id] = template.HTML(clean)
 	}
 	p.AssetData = map[string][]byte{}
-	// Legacy snips and structured data intentionally share a namespace.
+	// Legacy fleas and structured data intentionally share a namespace.
 	for _, source := range []struct{ directory, kind string }{
-		{"_/snips", "snip"},
+		{"_/fleas", "flea"},
 		{"_/data", "data"},
 	} {
-		if err := loadDataDirectory(boundary, source.directory, source.kind, p.Snips); err != nil {
+		if err := loadDataDirectory(boundary, source.directory, source.kind, p.Fleas); err != nil {
 			return nil, err
 		}
 	}
@@ -161,7 +163,17 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 		return nil, err
 	}
 	// Compile all partials, even unused ones, so broken includes fail validation.
-	if _, err = p.SnipReferences(); err != nil {
+	if err := p.collectLayouts(); err != nil {
+		return nil, err
+	}
+	for name := range p.layouts {
+		if source, ok := p.files[name]; ok {
+			if _, err := p.compile(source, name, []string{name}, map[string]string{}); err != nil {
+				return nil, err
+			}
+		}
+	}
+	if _, err = p.FleaReferences(); err != nil {
 		return nil, err
 	}
 	for name, text := range p.Partials {
@@ -189,6 +201,9 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 				return filepath.SkipDir
 			}
 			return nil
+		}
+		if rel == "admin" && d.IsDir() {
+			return filepath.SkipDir
 		}
 		if d.IsDir() {
 			return nil
@@ -249,6 +264,9 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 			return nil, err
 		}
 	}
+	if err := p.buildAdminLayout(); err != nil {
+		return nil, err
+	}
 	names := make([]string, 0, len(p.missingIcons))
 	for name := range p.missingIcons {
 		names = append(names, name)
@@ -261,19 +279,26 @@ func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
 }
 
 func (p *Project) buildTemplate(file string, layout bool) (*template.Template, error) {
-	body, err := p.compile(p.files[file], file, nil, map[string]string{})
+	text, selected, err := pageSettings(p.files[file])
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", file, err)
+	}
+	if selected == "" {
+		selected = "_layout.html"
+	}
+	body, err := p.compile(text, file, nil, map[string]string{})
 	if err != nil {
 		return nil, err
 	}
 	source := body
-	if wrapper, ok := p.files["_layout.html"]; layout && ok {
-		compiled, e := p.compile(wrapper, "_layout.html", nil, map[string]string{})
+	if wrapper, ok := p.files[selected]; layout && ok {
+		compiled, e := p.compile(wrapper, selected, nil, map[string]string{})
 		if e != nil {
 			return nil, e
 		}
 		source = `[[NW define "body" NW]]` + body + `[[NW end NW]]` + compiled
 	}
-	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"lookup": lookup, "collection": collection, "richSnip": func(id string) template.HTML { return p.rich[id] }}).Parse(source)
+	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"lookup": lookup, "collection": collection, "richFlea": func(id string) template.HTML { return p.rich[id] }}).Parse(source)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
 	}
@@ -281,6 +306,10 @@ func (p *Project) buildTemplate(file string, layout bool) (*template.Template, e
 }
 
 func (p *Project) render(t *template.Template, route string) ([]byte, error) {
+	return p.renderWithBody(t, route, nil)
+}
+
+func (p *Project) renderWithBody(t *template.Template, route string, admin map[string]any) ([]byte, error) {
 	title := "Home"
 	if route != "/" {
 		parts := strings.Split(strings.Trim(route, "/"), "/")
@@ -289,9 +318,9 @@ func (p *Project) render(t *template.Template, route string) ([]byte, error) {
 			title = strings.ToUpper(title[:1]) + title[1:]
 		}
 	}
-	snips := map[string]any{}
-	for k, v := range p.Snips {
-		snips[k] = v
+	fleas := map[string]any{}
+	for k, v := range p.Fleas {
+		fleas[k] = v
 	}
 	description := ""
 	if page := p.Content.Pages[route]; page != nil {
@@ -300,7 +329,8 @@ func (p *Project) render(t *template.Template, route string) ([]byte, error) {
 		}
 		description = page.Description
 	}
-	data := map[string]any{"site": p.Site, "page": map[string]any{"title": title, "description": description, "path": route}, "snip": snips, "data": snips}
+	data := map[string]any{"site": p.Site, "page": map[string]any{"title": title, "description": description, "path": route}, "flea": fleas, "data": fleas}
+	data["admin"] = admin
 	var out bytes.Buffer
 	err := t.Execute(&out, data)
 	return out.Bytes(), err

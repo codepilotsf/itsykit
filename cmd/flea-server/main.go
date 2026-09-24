@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	version := flag.Bool("version", false, "print Flea CMS release version")
+	version := flag.Bool("version", false, "print FleaCMS release version")
 	config := flag.String("config", "/etc/flea/server.json", "server JSON configuration")
 	check := flag.Bool("check", false, "check configuration and running server readiness")
 	protocol := flag.Bool("protocol", false, "print deployment protocol version")
@@ -37,7 +37,7 @@ func main() {
 	canonical := flag.String("canonical", "", "primary domain for WWW redirect")
 	flag.Parse()
 	if *version {
-		fmt.Println("Flea CMS " + buildinfo.Version)
+		fmt.Println("FleaCMS " + buildinfo.Version)
 		return
 	}
 	logger := log.New(os.Stderr, "", 0)

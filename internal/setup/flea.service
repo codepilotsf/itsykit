@@ -1,5 +1,5 @@
 [Unit]
-Description=Flea CMS server
+Description=FleaCMS server
 After=network.target
 
 [Service]

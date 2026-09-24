@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"os"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -22,9 +23,13 @@ type Sender interface {
 type Settings struct {
 	APIKey string `json:"api_key"`
 	From   string `json:"from"`
+	Name   string `json:"name,omitempty"`
 }
 
 func (s Settings) Validate() error {
+	if len(s.Name) > 100 || strings.ContainsAny(s.Name, "\r\n\x00") {
+		return fmt.Errorf("Please enter a sender name on one line, up to 100 characters.")
+	}
 	if !regexp.MustCompile(`^re_[A-Za-z0-9_-]{8,256}$`).MatchString(s.APIKey) {
 		return fmt.Errorf("Please enter a valid Resend API key.")
 	}
@@ -35,10 +40,10 @@ func (s Settings) Validate() error {
 	return nil
 }
 
-// Env is deliberately not a general dotenv interpreter. systemd reads the
-// root-only EnvironmentFile; local development may export the same variables.
+// Env is for the production process: systemd loads the root-only EnvironmentFile.
+// Local development reads the site's .env through LocalSettings instead.
 func Env() Sender {
-	s := Settings{APIKey: os.Getenv("RESEND_API_KEY"), From: os.Getenv("FLEA_EMAIL_FROM")}
+	s := Settings{APIKey: os.Getenv("RESEND_API_KEY"), From: os.Getenv("FLEA_EMAIL_FROM"), Name: os.Getenv("FLEA_EMAIL_NAME")}
 	if s.Validate() != nil {
 		return nil
 	}
@@ -55,13 +60,17 @@ func NewResend(s Settings) *Resend {
 }
 
 func (s *Resend) Send(ctx context.Context, m Message) error {
+	from := s.settings.From
+	if s.settings.Name != "" {
+		from = (&mail.Address{Name: s.settings.Name, Address: from}).String()
+	}
 	data, err := json.Marshal(struct {
 		From    string   `json:"from"`
 		To      []string `json:"to"`
 		Subject string   `json:"subject"`
 		Text    string   `json:"text"`
 		ReplyTo string   `json:"reply_to,omitempty"`
-	}{s.settings.From, []string{m.To}, m.Subject, m.Text, m.ReplyTo})
+	}{from, []string{m.To}, m.Subject, m.Text, m.ReplyTo})
 	if err != nil {
 		return fmt.Errorf("Could not prepare the login email.")
 	}

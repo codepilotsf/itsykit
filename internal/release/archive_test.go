@@ -11,7 +11,7 @@ import (
 
 func TestArchiveRoundTripAndScope(t *testing.T) {
 	root := t.TempDir()
-	for name, body := range map[string]string{"index.html": "hello", "_/flea.config": `{"site":{"name":"test"}}`, "_/snips/home.json": "{}", "_/deploy.json": "private-target", ".git/config": "secret", "README.md": "local"} {
+	for name, body := range map[string]string{"index.html": "hello", "_/flea.config": `{"site":{"name":"test"}}`, "_/fleas/home.json": "{}", "_/deploy.json": "private-target", ".git/config": "secret", "README.md": "local"} {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)
