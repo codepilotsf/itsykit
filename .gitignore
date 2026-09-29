@@ -13,3 +13,6 @@
 !.env.example
 /flea/runtime/
 /flea/media/*.mp4
+
+# Private release source snapshots and verification records; never deploy.
+/release-work/
