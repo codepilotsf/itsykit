@@ -17,6 +17,9 @@ func TestNewInitializesGitWithoutCommit(t *testing.T) {
 	if code := Run(context.Background(), []string{"new", "demo"}, &out, io.Discard); code != 0 {
 		t.Fatal(code, out.String())
 	}
+	if !strings.HasSuffix(out.String(), "Start developing:\n  cd demo\n  flea dev\n\n") || strings.Contains(out.String(), "flea deploy") || strings.Contains(out.String(), "offer to commit") {
+		t.Fatal("new should finish with local development instructions", out.String())
+	}
 	branch, err := exec.Command("git", "-C", "demo", "symbolic-ref", "--short", "HEAD").Output()
 	if err != nil || strings.TrimSpace(string(branch)) != "main" {
 		t.Fatal(string(branch), err)

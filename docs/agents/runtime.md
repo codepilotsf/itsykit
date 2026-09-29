@@ -14,6 +14,8 @@ Bare `flea`, `flea help`, `flea -h`, and `flea --help` show the grouped command
 overview on stdout and exit successfully. Each command supports `--help` and
 `-h` without requiring a site or starting work. Keep the overview spacious;
 put flags and deployment requirements in command-specific help.
+Successful `flea new` output ends with `cd <site>` and `flea dev`; do not append
+publishing instructions or deployment commit guidance.
 Dev uses pinned github.com/fsnotify/fsnotify directory notifications with a
 100 ms debounce, not periodic file scans. Register included subdirectories,
 reconcile new/renamed/deleted directories, and keep atomic saves working.

@@ -6,6 +6,10 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.4.1 - 2026-09-29
+
+- Keep `flea new` completion output focused on starting local development.
+
 ## 0.4.0 - 2026-09-29
 
 - Record the current framework development snapshot as 0.4.0. Public downloads

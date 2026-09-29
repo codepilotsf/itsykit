@@ -393,7 +393,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				fmt.Fprintln(out, "\nGit is ready on the main branch. No commit has been made yet.")
 			}
 		}
-		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\nWhen you're ready to publish:\n  flea deploy\n\nFleaCMS will save your settings and offer to commit your changes before deploying.\n\n", name)
+		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\n", name)
 		return 0
 	case "reset":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
