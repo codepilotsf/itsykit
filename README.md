@@ -12,8 +12,9 @@ cd foobar
 flea dev
 ```
 
-The planned installer is `curl -fsSL https://fleacms.com/install.sh | bash`.
-Public downloads are not published yet; use your developer-provided CLI for now.
+Install the public test release with `curl -fsSL https://fleacms.com/install.sh | bash`.
+Downloads cover Apple Silicon macOS and x86-64 Linux. See
+https://fleacms.com/docs#installation for PATH setup and current testing limits.
 This generated folder already is a site, so you can skip directly to `flea dev`.
 `flea new` creates a clean layout and editable homepage. Use `flea new --starter
 foobar` (or `-s`) for example pages, a six-person fictional team and a contact form.

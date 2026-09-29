@@ -30,6 +30,11 @@
   .status-dot { display:inline-block; width:7px; height:7px; flex-shrink:0; border-radius:50%; background:var(--brand-1); }
   .hero h1 { font-size:clamp(3.5rem,7.4vw,6.7rem); line-height:1.015; letter-spacing:-.065em; font-weight:600; margin:0; max-width:100%; text-wrap:initial; }
   .hero-green { color:var(--brand-1); }
+  .install-command { margin-top:36px; max-width:640px; }
+  .install-command p { font-size:.8rem; font-weight:600; margin:0 0 10px; }
+  .install-command p span { display:inline-block; margin-left:12px; color:var(--dark); font-weight:400; }
+  .install-command pre { white-space:pre-wrap; overflow-wrap:anywhere; padding:18px 22px; border:1px solid var(--light); font-size:.88rem; margin:0 0 8px; }
+  .install-command > a { font-size:.8rem; }
   .hero-bottom { display:flex; justify-content:space-between; gap:40px; align-items:end; margin-top:36px; }
   .hero-description { max-width:520px; font-size:clamp(1.1rem,1.65vw,1.35rem); line-height:1.55; margin:0; color:var(--dark); }
   .hero-actions { display:flex; flex-direction:column; align-items:start; gap:14px; min-width:220px; padding-bottom:3px; }

@@ -4,6 +4,16 @@ Updated September 29, 2026.
 
 ## Current state after website deployment
 
+Installation update: Sean approved the temporary private-source transfer and
+public tester installation on September 29. Version 0.3.0 native Mac ARM64 and
+Linux AMD64 binaries are now published under `/releases/0.3.0/`, with checksums,
+`/releases/latest.txt` and `/install.sh`. Both actual public installer/update
+flows passed in isolated directories; Linux ran unprivileged. Homepage and docs
+now include the one-liner and label this an early test release. Clean-machine
+Mac testing remains pending; the Mac binary is ad-hoc signed, not notarized.
+See `RELEASES.md` for provenance and checks. This supersedes the older statements
+below that downloads were not yet published.
+
 The website now lives in `/Users/sean/fleacms-website`, the separate repository
 Sean supplied for this task. The earlier proposed directory and preview-only
 instructions below describe the previous plan. Sean subsequently requested
