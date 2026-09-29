@@ -14,7 +14,7 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
-## 0.4.1 release preparation
+## 0.4.1 published September 29, 2026
 
 Patch release from private framework commit `10dc360`, immutable tag `v0.4.1`.
 Shortens `flea new` output to the local development instructions. The preceding
@@ -25,7 +25,12 @@ Mac tests, race tests, vet, bundle extraction and new/status smoke checks passed
 Native Linux tests (with DAC bypass capabilities dropped), vet, bundle extraction
 and new/status smoke checks passed. Linux race tests were not run: this host has
 no C compiler. Mac code signature verification passed; notarization remains pending.
-Public publication and download checks are recorded below when complete.
+Both anonymous HTTPS downloads matched the staged SHA256SUMS before latest.txt
+was advanced. Website commit `146fdd5`, active release
+`20260929-223440-da9b0ae1b1a6a608fb7c5375`, publishes the 0.4.1 pointer and notes.
+Actual 0.3.0-to-0.4.1 updates and fresh installs passed on Apple Silicon macOS and
+unprivileged x86-64 Linux. Both verified the shortened new-command output and
+site validation. The existing 0.3.0 assets remain unchanged. Bookworm still responds.
 
 ## 0.3.0 build provenance
 
