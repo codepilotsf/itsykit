@@ -14,6 +14,19 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.4.1 release preparation
+
+Patch release from private framework commit `10dc360`, immutable tag `v0.4.1`.
+Shortens `flea new` output to the local development instructions. The preceding
+0.4.0 version was a framework development snapshot, not a public download.
+Source archive SHA-256:
+`9bd091f3babd20891032d162cb4e56c1d8fd7cef195a924ea05fbec38877a8fa`.
+Mac tests, race tests, vet, bundle extraction and new/status smoke checks passed.
+Native Linux tests (with DAC bypass capabilities dropped), vet, bundle extraction
+and new/status smoke checks passed. Linux race tests were not run: this host has
+no C compiler. Mac code signature verification passed; notarization remains pending.
+Public publication and download checks are recorded below when complete.
+
 ## 0.3.0 build provenance
 
 Built from an isolated snapshot of the current private framework working tree,
