@@ -20,10 +20,11 @@ if [[ "$kind" == server ]]; then
   CGO_ENABLED=0 go build -trimpath -ldflags "$flags" -o "$file" ./cmd/flea-server
   "$file" -protocol
 elif [[ "$kind" == client ]]; then
-  [[ "$(go env GOHOSTOS)" == darwin ]] || exit 1
+  system=$(go env GOHOSTOS)
+  [[ "$system" == darwin || "$system" == linux ]] || exit 1
   bash scripts/bundle.sh dist
   FLEA_REQUIRE_BUNDLE=1 go test ./internal/serverbundle -count=1
-  file="dist/flea-darwin-$arch"
+  file="dist/flea-$system-$arch"
   CGO_ENABLED=0 go build -trimpath -ldflags "$flags" -o "$file" ./cmd/flea
   "$file" version
   smoke=$(mktemp -d)

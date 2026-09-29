@@ -1,0 +1,48 @@
+# Repository map
+
+Implementation requirements linked from [AGENTS.md](../../AGENTS.md).
+Read this when the task touches this subsystem. Paths in prose and code are
+relative to the repository root unless stated otherwise.
+
+New sites include portable agent guidance in AGENTS.md and the import-brochure
+skill in flea/skills/import-brochure/SKILL.md. Keep these in Git but exclude them
+from runtime loading, public assets and deployment via sitefiles. This does not
+install or assume a particular agent plugin. Update skill conventions alongside
+template changes; test imports without publishing or using live credentials.
+
+Read `ARCHITECTURE.md` for dependency direction, trust boundaries, transaction
+ordering, and review follow-ups. Keep it current when those responsibilities change.
+
+- `cmd/flea/main.go`: executable entry point.
+- `cmd/flea-server/main.go`: standalone persistent server entry point.
+- `internal/host/`: strict server JSON config, hostname routing, readiness, and shutdown.
+- `internal/setup/`: interactive SSH bootstrap, installer, and systemd unit.
+- `internal/serverbundle/`: compressed embedded Linux servers and verified extraction.
+- `internal/setup/deploy.go`: native SSH/SCP deployment and local deployment settings.
+- `internal/release/`: bounded, confined runtime-only archive packing and extraction.
+- `internal/admin/`: privileged release activation, lock, recovery journal, and probes.
+- `internal/editor/`: inline editing, in-memory OTPs, persistent rolling sessions,
+  CSRF and external same-origin editor assets. Sign-in markup lives in templates/site/admin/.
+- `internal/editstore/`: conflict-checked content saves and validated snapshot publication.
+- `internal/mailer/`: provider-neutral Sender and Resend HTTP adapter; never expose provider errors or secrets.
+- `internal/state/`: the server-side file lock shared by browser saves and deployment.
+- `internal/cli/cli.go`: command handling and site creation.
+- `templates/`: canonical starter files, mirroring the generated site structure.
+- `templates/embed.go`: embeds HTML, CSS, SVG, JSON, and README files in the binary.
+- `internal/cli/cli_test.go`: CLI tests and executable/server smoke test.
+- `internal/site/project.go`: loading, validation, routes, snapshots, and rendering.
+- `internal/site/routes.go` and `data.go`: shared route conversion and JSON-directory loading.
+- `internal/site/regions.go`: source-preserving region scanner and lexical references.
+- `internal/site/extraction.go`: dev-only `LoadEditing` and snip extraction orchestration.
+- `internal/site/snip_transaction.go`: content-first extraction journal and replay.
+- `internal/site/files.go`: pinned project reads and durable atomic writes, also used by icons.
+- `internal/admin/content.go`: remote content merge/staging; activation retains the deployment lock.
+- `internal/setup/ssh.go`: shared SSH/SCP connection policy and target formatting.
+- `internal/release/protocol.go`: shared CLI/server archive compatibility marker.
+- `internal/site/template.go`: template parser, partial resolution, and data lookup.
+- `internal/site/icons.go`: on-demand pinned Lucide downloads, private cache,
+  geometry-only SVG validation, and icon directive compilation.
+- `internal/site/icons_test.go`: offline icon resolution, escaping, and security tests.
+- `internal/site/server.go`: HTTP serving, reload watching, and URL validation.
+- `internal/site/site_test.go`: rendering, routing, isolation, and reload tests.
+- `bin/flea`: local build output; rebuilding is necessary for CLI changes to take effect.

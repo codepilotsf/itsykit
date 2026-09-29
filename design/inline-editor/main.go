@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/fleas"
+	"flea/internal/snips"
 	"flea/templates"
 )
 
@@ -45,7 +45,7 @@ func handler() http.Handler {
 			http.Error(w, "Content too large", 413)
 			return
 		}
-		clean, err := fleas.Sanitize(string(data))
+		clean, err := snips.Sanitize(string(data))
 		if err != nil {
 			http.Error(w, "Invalid content", 400)
 			return

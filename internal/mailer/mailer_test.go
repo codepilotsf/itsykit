@@ -28,12 +28,12 @@ func TestResendRequestAndSafeErrors(t *testing.T) {
 			if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 				t.Fatal(err)
 			}
-			if data["from"] != s.From || data["text"] != "123456" || data["reply_to"] != "visitor@example.test" {
+			if data["from"] != s.From || data["text"] != "123456" || data["html"] != "<b>123456</b>" || data["reply_to"] != "visitor@example.test" {
 				t.Fatal(data)
 			}
 			return &http.Response{StatusCode: status, Header: http.Header{}, Body: io.NopCloser(strings.NewReader("secret " + s.APIKey))}, nil
 		})
-		err := sender.Send(context.Background(), Message{To: "owner@example.test", Subject: "Login", Text: "123456", ReplyTo: "visitor@example.test"})
+		err := sender.Send(context.Background(), Message{To: "owner@example.test", Subject: "Login", Text: "123456", HTML: "<b>123456</b>", ReplyTo: "visitor@example.test"})
 		if (err == nil) != (status == 200) {
 			t.Fatal(status, err)
 		}

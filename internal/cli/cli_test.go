@@ -21,7 +21,7 @@ import (
 
 func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "site")
-	if err := Create(root); err != nil {
+	if err := createSite(root, true); err != nil {
 		t.Fatal(err)
 	}
 	err := fs.WalkDir(templates.Files, ".", func(name string, entry fs.DirEntry, err error) error {
@@ -47,7 +47,7 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"_/flea.config", "_/fleas.json", "_layout.html", "_404.html", "_500.html"} {
+	for _, name := range []string{".flea.config.json", "flea/snips.json", "site/main.layout.html", "site/_404.html", "site/_500.html"} {
 		if _, err := os.Stat(filepath.Join(root, name)); err != nil {
 			t.Fatal(err)
 		}
@@ -58,6 +58,9 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 }
 
 func TestHelpWithoutSite(t *testing.T) {
+	if !strings.HasSuffix(usage, "\n\n") {
+		t.Fatal("overview needs trailing blank line")
+	}
 	t.Chdir(t.TempDir())
 	for _, args := range [][]string{nil, {"help"}, {"--help"}, {"-h"}} {
 		var out, errOut bytes.Buffer
@@ -65,10 +68,10 @@ func TestHelpWithoutSite(t *testing.T) {
 			t.Fatalf("%v: code=%d stdout=%q stderr=%q", args, code, out.String(), errOut.String())
 		}
 	}
-	for _, command := range []string{"new", "dev", "status", "admin", "email", "setup", "deploy", "https", "version"} {
+	for _, command := range []string{"new", "dev", "status", "admin", "email", "setup", "deploy", "https", "version", "pull", "update", "update-server"} {
 		for _, flag := range []string{"--help", "-h"} {
 			var out, errOut bytes.Buffer
-			if code := Run(context.Background(), []string{command, flag}, &out, &errOut); code != 0 || errOut.Len() != 0 || !strings.Contains(out.String(), "Usage: flea "+command) {
+			if code := Run(context.Background(), []string{command, flag}, &out, &errOut); code != 0 || errOut.Len() != 0 || !strings.Contains(out.String(), "Usage: flea "+command) || !strings.HasSuffix(out.String(), "\n\n") {
 				t.Fatalf("%s %s: code=%d stdout=%q stderr=%q", command, flag, code, out.String(), errOut.String())
 			}
 		}
@@ -77,7 +80,7 @@ func TestHelpWithoutSite(t *testing.T) {
 
 func TestCLI(t *testing.T) {
 	t.Chdir(t.TempDir())
-	for _, args := range [][]string{{"unknown"}, {"new"}, {"new", "../escape"}, {"dev", "-port", "-1"}, {"status", "extra"}, {"setup", "extra"}, {"deploy", "extra"}, {"https", "extra"}} {
+	for _, args := range [][]string{{"unknown"}, {"upgrade"}, {"update", "extra"}, {"new"}, {"new", "../escape"}, {"dev", "-port", "-1"}, {"status", "extra"}, {"setup", "extra"}, {"deploy", "extra"}, {"https", "extra"}} {
 		if code := Run(context.Background(), args, io.Discard, io.Discard); code != 2 {
 			t.Fatalf("%v returned %d", args, code)
 		}
@@ -88,14 +91,14 @@ func TestCLI(t *testing.T) {
 	if code := Run(context.Background(), []string{"new", "demo"}, io.Discard, io.Discard); code != 0 {
 		t.Fatal(code)
 	}
-	before, err := os.ReadFile("demo/index.html")
+	before, err := os.ReadFile("demo/site/index.html")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if code := Run(context.Background(), []string{"new", "demo"}, io.Discard, io.Discard); code != 1 {
 		t.Fatal("overwrote existing project")
 	}
-	after, err := os.ReadFile("demo/index.html")
+	after, err := os.ReadFile("demo/site/index.html")
 	if err != nil || !bytes.Equal(before, after) {
 		t.Fatal("existing content changed")
 	}
@@ -107,11 +110,14 @@ func TestCLI(t *testing.T) {
 	if code := Run(context.Background(), []string{"status"}, &out, io.Discard); code != 0 || !strings.Contains(out.String(), "Valid local project") {
 		t.Fatal(code, out.String())
 	}
-	if err := os.WriteFile("index.html", []byte("{broken syntax}"), 0644); err != nil {
+	if err := os.WriteFile("site/index.html", []byte("{broken syntax}"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	if code := Run(context.Background(), []string{"dev"}, io.Discard, io.Discard); code != 1 {
-		t.Fatal("dev did not validate first")
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	var devErr bytes.Buffer
+	if code := Run(ctx, []string{"dev", "-port", "0"}, io.Discard, &devErr); code != 1 || !strings.Contains(devErr.String(), "index.html") {
+		t.Fatal("dev did not validate the page first", code, devErr.String())
 	}
 }
 
@@ -120,7 +126,7 @@ func TestStatusWarnsForMissingIcon(t *testing.T) {
 	if err := Create(root); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, "index.html"), []byte(`Hello{icon unknown-icon}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "site", "index.html"), []byte(`Hello{icon unknown-icon}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	t.Chdir(root)
@@ -131,7 +137,7 @@ func TestStatusWarnsForMissingIcon(t *testing.T) {
 	if !strings.Contains(warnings.String(), "Warning: index.html:1:") || !strings.Contains(warnings.String(), "icon omitted") {
 		t.Fatal(warnings.String())
 	}
-	if _, err := os.Stat("_/icons"); !os.IsNotExist(err) {
+	if _, err := os.Stat("flea/icons/unknown-icon.svg"); !os.IsNotExist(err) {
 		t.Fatal("status wrote cache")
 	}
 }
@@ -155,9 +161,9 @@ func TestExecutableWorkflow(t *testing.T) {
 		}
 		return string(b)
 	}
-	run(temp, "new", "smoke")
+	run(temp, "new", "--starter", "smoke")
 	root := filepath.Join(temp, "smoke")
-	if got := run(root, "status"); !strings.Contains(got, "Valid local project: FleaCMS") {
+	if got := run(root, "status"); !strings.Contains(got, "Valid local project: Smoke") {
 		t.Fatal(got)
 	}
 	cmd := exec.Command(binary, "dev", "-port", "0")
@@ -196,8 +202,8 @@ func TestExecutableWorkflow(t *testing.T) {
 				stopped = true
 				t.Fatalf("dev exited: %v: %s", err, stderr.String())
 			}
-			if strings.HasPrefix(line, "FleaCMS running at ") {
-				address = strings.TrimPrefix(line, "FleaCMS running at ")
+			if strings.HasPrefix(line, "Website  ") {
+				address = strings.TrimPrefix(line, "Website  ")
 			}
 		case <-startupTimeout:
 			t.Fatal("dev did not start")
@@ -217,7 +223,7 @@ func TestExecutableWorkflow(t *testing.T) {
 		}
 		return response.StatusCode, string(b)
 	}
-	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/global.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/_/flea.config": 404, "/_header.html": 404, "/%2e%2e/_/flea.config": 404} {
+	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/global.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/.flea.config.json": 404, "/_header.html": 404, "/%2e%2e/.flea.config.json": 404} {
 		if code, _ := get(url); code != want {
 			t.Errorf("%s: %d", url, code)
 		}
@@ -229,6 +235,9 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	edit := func(name, body string) {
 		t.Helper()
+		if strings.HasSuffix(name, ".html") || strings.HasPrefix(name, "css/") {
+			name = "site/" + name
+		}
 		if err := os.WriteFile(filepath.Join(root, name), []byte(body), 0644); err != nil {
 			t.Fatal(err)
 		}
@@ -247,34 +256,38 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	// Ensure the watcher has begun before the first edit.
 	time.Sleep(100 * time.Millisecond)
-	edit("_/fleas.json", `{"pages":{"/":{"fleas":{"a7Km2pQ9xB":{"label":"title","content":"Smoke test changed"},"b8Ln3rR0yC":{"label":"introduction","content":"Hello"}}}},"shared":{"fleas":{}}}`)
+	seedContent, err := os.ReadFile(filepath.Join(root, "flea", "snips.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	edit("flea/snips.json", strings.Replace(string(seedContent), "Welcome to FleaCMS.", "Smoke test changed", 1))
 	wait("/", 200, "Smoke test changed")
-	edit("test.html", `<section flea="intro"><p>Extracted <em>live</em></p></section>`)
+	edit("test.html", `<section snip="intro"><p>Extracted <em>live</em></p></section>`)
 	wait("/test", 200, "Extracted <em>live</em>")
-	extracted, err := os.ReadFile(filepath.Join(root, "test.html"))
-	if err != nil || !strings.Contains(string(extracted), `{flea `) || strings.Contains(string(extracted), `{flea "`) {
+	extracted, err := os.ReadFile(filepath.Join(root, "site", "test.html"))
+	if err != nil || !strings.Contains(string(extracted), `{snip `) || strings.Contains(string(extracted), `{snip "`) {
 		t.Fatalf("region was not extracted: %s %v", extracted, err)
 	}
 	// Removal is reconciled on save, and undo restores the archived content.
 	edit("test.html", `<h1>Region removed</h1>`)
 	wait("/test", 200, "Region removed")
-	saved, err := os.ReadFile(filepath.Join(root, "_", "fleas.json"))
+	saved, err := os.ReadFile(filepath.Join(root, "flea", "snips.json"))
 	if err != nil || !strings.Contains(string(saved), `"archive"`) {
 		t.Fatal("missing archive after removal", err)
 	}
 	edit("test.html", string(extracted))
 	wait("/test", 200, "Extracted <em>live</em>")
-	if _, err := os.Stat(filepath.Join(root, "_", ".fleas.lock")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "flea", ".snips.lock")); !os.IsNotExist(err) {
 		t.Fatal("dev created lock file", err)
 	}
 	edit("css/global.css", "/* updated asset */")
 	wait("/css/global.css", 200, "updated asset")
-	edit("_/flea.config", `{"site":{"name":"Changed config"}}`)
+	edit(".flea.config.json", `{"app":{"site_name":"Changed config"}}`)
 	wait("/", 200, "Changed config")
 	edit("index.html", `{render missing-secret-name}`)
 	wait("/", 500, "")
-	if _, body := get("/"); strings.Contains(body, "missing-secret-name") {
-		t.Fatal("error detail leaked")
+	if _, body := get("/"); !strings.Contains(body, "How to fix it") || !strings.Contains(body, "missing-secret-name") {
+		t.Fatal("local dev error did not explain the missing partial")
 	}
 	invalid := exec.Command(binary, "status")
 	invalid.Dir = root
@@ -301,7 +314,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	if !strings.Contains(stderr.String(), "missing partial") || !strings.Contains(stderr.String(), "Site valid again") {
 		t.Fatalf("missing error/recovery diagnostics: %s", stderr.String())
 	}
-	for _, line := range []string{"GET /\n", "404 GET /about\n", "500 GET /\n", "Fleas updated in _/fleas.json.\n"} {
+	for _, line := range []string{"GET /\n", "404 GET /about\n", "500 GET /\n", "Snips updated in flea/snips.json.\n"} {
 		if !strings.Contains(stderr.String(), line) {
 			t.Errorf("missing request log %q", line)
 		}

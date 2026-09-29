@@ -17,7 +17,7 @@ func TestPrepareCommit(t *testing.T) {
 			if mode == "initial" {
 				testGit(t, root, "checkout", "--orphan", "fresh")
 			}
-			if err := os.WriteFile(filepath.Join(root, "index.html"), []byte("Updated"), 0644); err != nil {
+			if err := os.WriteFile(filepath.Join(root, "site", "index.html"), []byte("Updated"), 0644); err != nil {
 				t.Fatal(err)
 			}
 			if mode == "hook" {

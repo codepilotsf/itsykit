@@ -21,7 +21,7 @@ func (s *Server) AdminSettings() (AdminAccess, error) {
 // They are excluded from public routes and can only be selected by editor state.
 func (p *Project) buildAdminLayout() error {
 	p.adminTemplates = map[string]*template.Template{}
-	for _, name := range []string{"index", "code", "dashboard", "setup", "error"} {
+	for _, name := range []string{"index", "code", "setup", "error"} {
 		file := "admin/" + name + ".html"
 		if _, ok := p.files[file]; !ok {
 			continue
@@ -46,7 +46,7 @@ func (s *Server) RenderAdmin(mode string, data map[string]any) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	names := map[string]string{"login": "index", "verify": "code", "dashboard": "dashboard", "setup": "setup", "error": "error"}
+	names := map[string]string{"login": "index", "verify": "code", "setup": "setup", "error": "error"}
 	name, ok := names[mode]
 	if !ok {
 		return nil, fmt.Errorf("unknown admin page")
@@ -56,4 +56,16 @@ func (s *Server) RenderAdmin(mode string, data map[string]any) ([]byte, error) {
 		return nil, fmt.Errorf("missing admin/%s.html; copy the admin directory from a fresh Flea site", name)
 	}
 	return p.renderWithBody(t, "/admin", data)
+}
+
+// AdminReload supplies trusted development JavaScript to the editor's CSP-aware renderer.
+func (s *Server) AdminReload() string {
+	if s.production {
+		return ""
+	}
+	s.mu.RLock()
+	revision := s.revision
+	s.mu.RUnlock()
+	script := reloadScript(revision)
+	return string(script[len("<script>") : len(script)-len("</script>")])
 }

@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-type Message struct{ To, Subject, Text, ReplyTo string }
+type Message struct{ To, Subject, Text, ReplyTo, HTML string }
 type Sender interface {
 	Send(context.Context, Message) error
 }
@@ -70,7 +70,8 @@ func (s *Resend) Send(ctx context.Context, m Message) error {
 		Subject string   `json:"subject"`
 		Text    string   `json:"text"`
 		ReplyTo string   `json:"reply_to,omitempty"`
-	}{from, []string{m.To}, m.Subject, m.Text, m.ReplyTo})
+		HTML    string   `json:"html,omitempty"`
+	}{from, []string{m.To}, m.Subject, m.Text, m.ReplyTo, m.HTML})
 	if err != nil {
 		return fmt.Errorf("Could not prepare the login email.")
 	}

@@ -13,7 +13,7 @@ func TestPrototypeBoundaries(t *testing.T) {
 	}{
 		{"GET", "/", "127.0.0.1:3143", "", "", 200},
 		{"GET", "/main.go", "127.0.0.1:3143", "", "", 404},
-		{"GET", "/site/_/flea.config", "127.0.0.1:3143", "", "", 404},
+		{"GET", "/site/.flea.config.json", "127.0.0.1:3143", "", "", 404},
 		{"GET", "/", "example.com:3143", "", "", 403},
 		{"POST", "/sanitize-check", "127.0.0.1:3143", "http://other.test", "<p>Hello</p>", 403},
 		{"POST", "/sanitize-check", "127.0.0.1:3143", "http://127.0.0.1:3143", "<h1>Title</h1>", 200},

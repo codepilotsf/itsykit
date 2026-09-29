@@ -13,16 +13,16 @@ import (
 	"strings"
 
 	"flea/internal/admin"
+	"flea/internal/site"
 )
 
 type DeploymentConfig struct {
 	Branches map[string]DeploySettings `json:"branches"`
-	legacy   *DeploySettings
 }
 
 func readDeploymentConfig(root string) (DeploymentConfig, error) {
 	c := DeploymentConfig{Branches: map[string]DeploySettings{}}
-	data, err := os.ReadFile(filepath.Join(root, "_", "deploy.json"))
+	data, err := site.ReadManagedFile(root, ".flea.config.json")
 	if os.IsNotExist(err) {
 		return c, nil
 	}
@@ -33,16 +33,18 @@ func readDeploymentConfig(root string) (DeploymentConfig, error) {
 	if err = json.Unmarshal(data, &shape); err != nil {
 		return c, err
 	}
+	if shape == nil {
+		return c, fmt.Errorf(".flea.config.json must be an object")
+	}
+	data, exists := shape["deploy"]
+	if !exists {
+		return c, nil
+	}
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
-	if _, ok := shape["branches"]; ok {
-		err = dec.Decode(&c)
-	} else {
-		c.legacy = new(DeploySettings)
-		err = dec.Decode(c.legacy)
-	}
+	err = dec.Decode(&c)
 	if err != nil {
-		return c, fmt.Errorf("_/deploy.json: %w", err)
+		return c, fmt.Errorf(".flea.config.json: %w", err)
 	}
 	if c.Branches == nil {
 		c.Branches = map[string]DeploySettings{}
@@ -51,37 +53,23 @@ func readDeploymentConfig(root string) (DeploymentConfig, error) {
 }
 
 func saveDeploymentConfig(root string, c DeploymentConfig) error {
-	directory := filepath.Join(root, "_")
-	if info, err := os.Lstat(directory); err != nil || !info.IsDir() {
-		return fmt.Errorf("expected a site with a real _ directory")
-	}
-	name := filepath.Join(directory, "deploy.json")
-	if info, err := os.Lstat(name); err == nil && !info.Mode().IsRegular() {
-		return fmt.Errorf("deploy.json must be a regular file")
-	}
-	data, err := json.MarshalIndent(c, "", "  ")
+	data, err := site.ReadManagedFile(root, ".flea.config.json")
 	if err != nil {
 		return err
 	}
-	f, err := os.CreateTemp(directory, ".deploy-")
+	var fields map[string]json.RawMessage
+	if err = json.Unmarshal(data, &fields); err != nil || fields == nil {
+		return fmt.Errorf(".flea.config.json must be a valid object")
+	}
+	fields["deploy"], err = json.Marshal(c)
 	if err != nil {
 		return err
 	}
-	defer os.Remove(f.Name())
-	defer f.Close()
-	if err = f.Chmod(0644); err != nil {
+	data, err = json.MarshalIndent(fields, "", "  ")
+	if err != nil {
 		return err
 	}
-	if _, err = f.Write(append(data, '\n')); err != nil {
-		return err
-	}
-	if err = f.Sync(); err != nil {
-		return err
-	}
-	if err = f.Close(); err != nil {
-		return err
-	}
-	return os.Rename(f.Name(), name)
+	return site.WriteManagedFile(root, ".flea.config.json", append(data, '\n'))
 }
 
 func (s DeploySettings) domains() []string {
@@ -161,7 +149,7 @@ func SelectDeployment(ctx context.Context, root string, overrides DeploySettings
 			if err = saveDeploymentConfig(root, c); err != nil {
 				return s, err
 			}
-			fmt.Fprintln(out, "\nSaved your SSH username in _/deploy.json.\nFleaCMS will offer to commit this change before deploying.")
+			fmt.Fprintln(out, "\nSaved your SSH username in .flea.config.json.\nFleaCMS will offer to commit this change before deploying.")
 		}
 		s.Branch = state.Branch
 		return s, nil
@@ -180,14 +168,6 @@ func SelectDeployment(ctx context.Context, root string, overrides DeploySettings
 				s.Domain = strings.ToLower(regexp.MustCompile(`[^a-zA-Z0-9-]+`).ReplaceAllString(state.Branch, "-")) + "." + main.Domain
 				s.WWWRedirect = false
 			}
-		}
-		if c.legacy != nil {
-			generatedName := s.Name
-			s = *c.legacy
-			if s.Name == "" {
-				s.Name = generatedName
-			}
-			fmt.Fprintln(out, "Existing flat settings need to be assigned to this branch.")
 		}
 	}
 	for key := range provided {
@@ -278,7 +258,7 @@ func SelectDeployment(ctx context.Context, root string, overrides DeploySettings
 	if err = saveDeploymentConfig(root, c); err != nil {
 		return s, err
 	}
-	fmt.Fprintln(out, "Saved _/deploy.json.")
+	fmt.Fprintln(out, "Saved .flea.config.json.")
 	s.Branch = state.Branch
 	return s, nil
 }

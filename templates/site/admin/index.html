@@ -1,0 +1,17 @@
+<!-- flea
+layout: /admin.layout.html
+-->
+<div class="container py-xl">
+ <section class="admin-access">
+  <h1 class="text-xl mt-0">Sign in to {app.site_name}</h1>
+  <p class="text-dark">We’ll email you a sign-in code. No password needed.</p>
+  <form method="post" action="/admin/code">
+    <input type="hidden" name="csrf" value="{admin.csrf}" />
+    <label class="form-field">Email address
+      <input type="email" name="email" autocomplete="email" maxlength="254" required autofocus />
+    </label>
+    <button class="w-full ui-brand-1 text-white">Send sign-in code</button>
+  </form>
+  <p class="text-sm text-dark">First time here? Ask your developer to add your email address.</p>
+ </section>
+</div>

@@ -31,8 +31,8 @@ No Node build step is needed. Starter font imports may access Google Fonts.
 
 - H1–H4 and normal text; bold, italic, underline, and strikethrough.
 - Links, bullet/numbered lists, and left/center/right alignment.
-- Pasting rich text, undo/redo, and switching between separate flea regions.
-- Page title and description, including Privacy which has no page fleas.
+- Pasting rich text, undo/redo, and switching between separate snip regions.
+- Page title and description, including Privacy which has no page snips.
 - Shared footer edits, which apply across sample pages after saving.
 - Cancel and unsaved-navigation confirmation.
 - View/edit the current link destination, or remove it from the link dialog.
@@ -48,34 +48,34 @@ Safari, Firefox, mobile keyboards, real Word/Google Docs clipboard content,
 and assistive technology still need testing. Browser checks invoke Squire's paste
 API with fixtures; they are not a substitute for those real clipboard checks.
 
-## Before integration
+## Runtime integration
 
 The link dialog defaults bare domains to HTTPS, preserves explicit schemes and
 relative paths, and offers Open in a new tab (off by default). New-tab links keep
 `target="_blank" rel="noopener noreferrer"` through demo saves. Production still
-strips those attributes, so its allowlist needs updating before integration.
+preserves this restricted policy too.
 The switch is a native checkbox styled in `templates/css/ui.css`, with no
 JavaScript required for its appearance or keyboard toggling.
 
-- Extend Go's sanitizer for H1 and narrowly validated text alignment. The current
-  server strips both; the comparison endpoint deliberately demonstrates this gap.
+- Go's sanitizer now supports H1 and narrowly validated text alignment.
   Client-side DOMPurify is paste hygiene, never the server security boundary.
 - Keep `/admin` for login, then return to the homepage in browsing mode. Add the
   authenticated bar to public pages without leaking it through shared caches.
 - Expose editable-region IDs safely
   without changing template structure or introducing invalid block nesting.
 - Unlinked-page discovery is deferred; there is no editing page menu.
-- Connect one Save action to conflict-checked, atomic page metadata/fleas saves,
-  retaining session, Origin, CSRF, content limits, and deployment locking.
-- Decide how conditional or repeated rendered fleas should be represented.
+- One runtime Save action now publishes conflict-checked, atomic metadata/snips
+  changes, retaining session, Origin, CSRF, content limits and deployment locking.
+- Decide how conditional or repeated rendered snips should be represented.
 - Test selection across toolbar focus, mixed blocks, nested lists, keyboard
   navigation, CSP, narrow screens, and arbitrary site CSS.
 - Use real authenticated identity. Joe Appleseed is a demo label, not a new
   account-name feature.
 
-Media remains separate from rich text. Repeatable multi-fleas, Small/Large Text,
+Media remains separate from rich text. Repeatable multi-snips, Small/Large Text,
 tables, colors, and other advanced formatting are not part of this experiment.
-Do not replace the production editor until the prototype has been reviewed.
+The runtime editor now replaces the old dashboard; cross-browser and real clipboard
+checks remain follow-up work.
 
 ## Vendored files
 
@@ -93,7 +93,10 @@ Pinned distribution files from npm via unpkg, retained unmodified:
 Squire is 60,254 bytes raw / 18,560 gzip; DOMPurify is 28,885 / 11,414.
 Together the libraries are about 30 KB gzipped, before the demo glue, CSS,
 and browser checks. The preview does not currently enable HTTP compression.
-These dependencies are not embedded into the Flea CLI or generated starter.
+Copies of Squire and DOMPurify are now embedded into the Flea binaries for the
+authenticated real-page editor, with their licenses in `internal/editor/inline/`.
+They are not copied into generated sites. The demo remains isolated, while the
+runtime uses real sessions and atomic saves with the same core formatting controls.
 The nine toolbar SVGs in `vendor/lucide/` come from `lucide-static@1.47.0/icons/`
 via unpkg; its LICENSE is retained beside them. No Lucide JavaScript or npm
 installation is needed.

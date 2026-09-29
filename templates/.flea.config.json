@@ -1,0 +1,6 @@
+{
+  "app": {},
+  "dev": {"email_preview": true},
+  "admin": {"emails": [], "session_idle_days": 30},
+  "contact": {"to": "", "success_path": "/thank-you"}
+}

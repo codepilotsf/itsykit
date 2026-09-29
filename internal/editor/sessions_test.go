@@ -1,9 +1,7 @@
 package editor
 
 import (
-	"crypto/sha256"
 	"crypto/tls"
-	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -39,7 +37,7 @@ func TestPersistentRollingSessions(t *testing.T) {
 	restarted.now = func() time.Time { return now }
 	now = now.Add(36 * time.Hour)
 	w := request(restarted, "GET", "/admin", "example.test", nil, c)
-	if w.Code != 200 || !strings.Contains(w.Body.String(), "Page title") {
+	if w.Code != 303 || w.Header().Get("Location") != "/" {
 		t.Fatal(w.Code, w.Body.String())
 	}
 	renewed := cookie(t, w, h.cookieName("session"))
@@ -51,11 +49,11 @@ func TestPersistentRollingSessions(t *testing.T) {
 	restarted = New(h.options)
 	restarted.now = func() time.Time { return now }
 	w = request(restarted, "GET", "/admin", "example.test", nil, c)
-	if !strings.Contains(w.Body.String(), "Page title") {
+	if w.Code != 303 {
 		t.Fatal("rolling session expired early")
 	}
 	w = request(restarted, "GET", "/admin", "example.test", nil, otherDevice)
-	if strings.Contains(w.Body.String(), "Page title") {
+	if w.Code == 303 {
 		t.Fatal("idle device was renewed by another device")
 	}
 	csrf := restarted.sessions[key(c.Value)].csrf
@@ -65,7 +63,7 @@ func TestPersistentRollingSessions(t *testing.T) {
 	}
 	// Even the original handler must read revocation from disk.
 	w = request(h, "GET", "/admin", "example.test", nil, c)
-	if strings.Contains(w.Body.String(), "Page title") {
+	if w.Code == 303 {
 		t.Fatal("stale handler resurrected logout")
 	}
 }
@@ -89,7 +87,7 @@ func TestSessionOwnerRemovalAndShorterIdleWindow(t *testing.T) {
 			future := time.Now().Add(25 * time.Hour)
 			next.now = func() time.Time { return future }
 			w := request(next, "GET", "/admin", "example.test", nil, c)
-			if strings.Contains(w.Body.String(), "Page title") {
+			if w.Code == 303 {
 				t.Fatal("revoked/expired session survived")
 			}
 		})
@@ -134,7 +132,7 @@ func TestSessionStorageFailsClosed(t *testing.T) {
 				t.Cleanup(func() { os.Chmod(parent, 0700) })
 			}
 			w := request(h, "GET", "/admin", "example.test", nil, c)
-			if w.Code != 503 || strings.Contains(w.Body.String(), "Page title") || len(w.Result().Cookies()) != 0 {
+			if w.Code != 503 || w.Code == 303 || len(w.Result().Cookies()) != 0 {
 				t.Fatal(mode, w.Code, w.Body.String())
 			}
 		})
@@ -170,22 +168,17 @@ func TestActivityRequiresSessionOriginAndCSRF(t *testing.T) {
 }
 
 func TestActivityScriptIsPinnedAndHasNoIdleTimer(t *testing.T) {
-	h, mail := fixture(t)
-	c := login(t, h, mail)
-	w := request(h, "GET", "/admin", "example.test", nil, c)
-	digest := sha256.Sum256(activityScript)
-	if !strings.Contains(w.Header().Get("Content-Security-Policy"), "'sha256-"+base64.StdEncoding.EncodeToString(digest[:])+"'") {
-		t.Fatal("missing script hash")
-	}
-	if !strings.Contains(w.Body.String(), "<script>"+string(activityScript)+"</script>") {
-		t.Fatal("missing exact activity script")
+	// Exact inline script hashes are checked in TestAuthenticatedPublicPreview.
+	_, activity, _ := strings.Cut(string(inlineOwner), "let last=Date.now(),pending=false;")
+	if activity == "" {
+		t.Fatal("missing activity handler")
 	}
 	for _, forbidden := range []string{"setInterval", "setTimeout"} {
-		if strings.Contains(string(activityScript), forbidden) {
+		if strings.Contains(activity, forbidden) {
 			t.Fatal("idle timer present")
 		}
 	}
-	if !strings.Contains(string(activityScript), "event.isTrusted") {
+	if !strings.Contains(string(inlineOwner), "event.isTrusted") {
 		t.Fatal("untrusted events renew session")
 	}
 }
@@ -223,7 +216,7 @@ func TestConcurrentSessionRenewalAndLogout(t *testing.T) {
 	group.Wait()
 	next := New(h.options)
 	w := request(next, "GET", "/admin", "example.test", nil, c)
-	if strings.Contains(w.Body.String(), "Page title") {
+	if w.Code == 303 {
 		t.Fatal("concurrent renewal restored logged-out session")
 	}
 }

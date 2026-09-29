@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/signal"
@@ -14,9 +16,22 @@ import (
 	"flea/internal/buildinfo"
 	"flea/internal/host"
 	"flea/internal/release"
+	"flea/internal/syncstate"
 )
 
 func main() {
+	validate := flag.Bool("validate", false, "validate all installed sites without starting the server")
+	upgrade := flag.String("upgrade", "", "install verified server executable (root only)")
+	upgradeSHA := flag.String("sha256", "", "expected server checksum")
+	recoverUpgrade := flag.Bool("recover-upgrade", false, "recover interrupted executable upgrade (root only)")
+	backupSite := flag.Bool("backup", false, "export site backup (root only)")
+	restoreSite := flag.String("restore", "", "restore a site backup (root only)")
+	expectedState := flag.String("expected-state", "", "reviewed live-state digest")
+	history := flag.Bool("history", false, "list site release history (root only)")
+	rollback := flag.String("rollback", "", "restore retained code, preserving live content (root only)")
+	expectedRelease := flag.String("expected-release", "", "reviewed active release ID")
+	export := flag.Bool("export-state", false, "export owner-editable state (root only)")
+	planPath := flag.String("sync-plan", "", "reviewed sync plan accompanying deployment")
 	version := flag.Bool("version", false, "print FleaCMS release version")
 	config := flag.String("config", "/etc/flea/server.json", "server JSON configuration")
 	check := flag.Bool("check", false, "check configuration and running server readiness")
@@ -52,7 +67,64 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	var err error
-	if *mailStatus || *configureMail {
+	if *validate {
+		_, _, err = host.Load(*config, nil)
+	} else if *upgrade != "" || *recoverUpgrade {
+		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {
+			logger.Print("Upgrade requires root and the installed config.")
+			os.Exit(1)
+		}
+		if *recoverUpgrade {
+			err = admin.SystemUpgrader().Recover(ctx)
+		} else {
+			err = admin.SystemUpgrader().Upgrade(ctx, *upgrade, *upgradeSHA)
+		}
+		if err == nil {
+			fmt.Println("Server ready. Site data and configuration preserved.")
+		}
+	} else if *backupSite || *restoreSite != "" {
+		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {
+			logger.Print("Recovery requires root and the installed config.")
+			os.Exit(1)
+		}
+		if *backupSite {
+			err = admin.System().Backup(*name, *branch, os.Stdout)
+		} else {
+			var id string
+			id, err = admin.System().Restore(ctx, *name, *branch, *restoreSite, *expectedState)
+			if err == nil {
+				fmt.Println("Restored site backup. Release " + id)
+			}
+		}
+	} else if *history || *rollback != "" {
+		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {
+			logger.Print("Recovery requires root and the installed config.")
+			os.Exit(1)
+		}
+		if *history {
+			var records []admin.ReleaseRecord
+			records, err = admin.System().History(*name, *branch)
+			if err == nil {
+				err = json.NewEncoder(os.Stdout).Encode(records)
+			}
+		} else {
+			var id string
+			id, err = admin.System().Rollback(ctx, *name, *branch, *rollback, *expectedRelease)
+			if err == nil {
+				fmt.Println("Rolled back code. Live snips and theme preserved. Release " + id)
+			}
+		}
+	} else if *export {
+		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {
+			logger.Print("State export requires root and the installed config.")
+			os.Exit(1)
+		}
+		var snapshot syncstate.Snapshot
+		snapshot, err = admin.System().Snapshot(*name, *branch)
+		if err == nil {
+			err = json.NewEncoder(os.Stdout).Encode(snapshot)
+		}
+	} else if *mailStatus || *configureMail {
 		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {
 			logger.Print("Email configuration requires root and the installed server config.")
 			os.Exit(1)
@@ -86,7 +158,26 @@ func main() {
 				os.Exit(1)
 			}
 			var revision string
-			revision, err = m.Apply(ctx, admin.Options{Archive: *archive, Name: *name, Domains: admin.Domains(*domain), HTTPS: *https, Email: *email, AgreeTOS: *agree, Canonical: *canonical, Branch: *branch, Commit: *commit})
+			var plan *syncstate.Plan
+			if *planPath != "" {
+				f, e := os.Open(*planPath)
+				if e != nil {
+					logger.Print(e)
+					os.Exit(1)
+				}
+				d := json.NewDecoder(io.LimitReader(f, 8<<20))
+				d.DisallowUnknownFields()
+				e = d.Decode(&plan)
+				if e == nil && d.Decode(new(any)) != io.EOF {
+					e = fmt.Errorf("invalid sync plan")
+				}
+				f.Close()
+				if e != nil || plan == nil {
+					logger.Print("Invalid sync plan")
+					os.Exit(1)
+				}
+			}
+			revision, err = m.Apply(ctx, admin.Options{Sync: plan, Archive: *archive, Name: *name, Domains: admin.Domains(*domain), HTTPS: *https, Email: *email, AgreeTOS: *agree, Canonical: *canonical, Branch: *branch, Commit: *commit})
 			if err == nil {
 				fmt.Printf("Activated release %s\n", revision)
 			}

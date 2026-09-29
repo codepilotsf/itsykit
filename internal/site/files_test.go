@@ -10,6 +10,7 @@ import (
 func TestConfinedWritesAndReads(t *testing.T) {
 	dir := t.TempDir()
 	put(t, dir, "nested/page.html", "before")
+	dir = filepath.Join(dir, "site")
 	root, err := os.OpenRoot(dir)
 	if err != nil {
 		t.Fatal(err)
@@ -37,6 +38,7 @@ func TestConfinedWritesAndReads(t *testing.T) {
 	}
 	outside := t.TempDir()
 	put(t, outside, "secret", "untouched")
+	outside = filepath.Join(outside, "site")
 	for name, target := range map[string]string{"linked-dir": outside, "linked-file": filepath.Join(outside, "secret")} {
 		if err := os.Symlink(target, filepath.Join(dir, name)); err != nil {
 			t.Fatal(err)
@@ -66,7 +68,7 @@ func TestConfinedWritesAndReads(t *testing.T) {
 }
 
 func TestDataDirectoriesShareValidation(t *testing.T) {
-	for _, directory := range []string{"_/fleas", "_/data"} {
+	for _, directory := range []string{"flea/snips", "flea/data"} {
 		t.Run(directory, func(t *testing.T) {
 			root := fixture(t)
 			put(t, root, directory+"/extra.json", `{"title":"Hello"}`)
@@ -80,24 +82,24 @@ func TestDataDirectoriesShareValidation(t *testing.T) {
 		})
 	}
 	root := fixture(t)
-	put(t, root, "_/fleas/duplicate.json", `{}`)
-	put(t, root, "_/data/duplicate.json", `{}`)
-	if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "duplicate legacy flea/data") {
+	put(t, root, "flea/snips/duplicate.json", `{}`)
+	put(t, root, "flea/data/duplicate.json", `{}`)
+	if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "duplicate legacy snip/data") {
 		t.Fatal(err)
 	}
 }
 
-func TestPageRoutesMatchFleaScopes(t *testing.T) {
+func TestPageRoutesMatchSnipScopes(t *testing.T) {
 	for file, want := range map[string]string{"index.html": "/", "about.html": "/about", "about/index.html": "/about", "about/history.html": "/about/history"} {
 		if got := pageRoute(file); got != want {
 			t.Errorf("%s: %s", file, got)
 		}
-		if got := fleaScope(file); got != want {
+		if got := snipScope(file); got != want {
 			t.Errorf("scope %s: %s", file, got)
 		}
 	}
-	for _, file := range []string{"_layout.html", "about/_card.html", "_shared/card.html"} {
-		if got := fleaScope(file); got != "" {
+	for _, file := range []string{"main.layout.html", "about/_card.html", "_shared/card.html"} {
+		if got := snipScope(file); got != "" {
 			t.Errorf("shared scope %s: %s", file, got)
 		}
 	}

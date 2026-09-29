@@ -14,20 +14,25 @@ func Included(name string) bool {
 	if name == "." {
 		return true
 	}
+	if name == ".flea.config.json" {
+		return true
+	}
 	for _, part := range strings.Split(name, "/") {
 		if strings.HasPrefix(part, ".") {
 			return false
 		}
 		switch strings.ToLower(part) {
-		case "readme.md", "agents.md", "architecture.md", "spec.md", "next-steps.md", "license", "license.md", "go.mod", "go.sum", "node_modules":
+		case "readme.md", "agents.md", "architecture.md", "spec.md", "next-steps.md", "checklist.md", "license", "license.md", "go.mod", "go.sum", "node_modules":
 			return false
 		}
 	}
-	if name == "_" || strings.HasPrefix(name, "_/") {
-		if name == "_/data" || strings.HasPrefix(name, "_/data/") {
+	if name == "flea" || name == "flea/snips.json" {
+		return true
+	}
+	for _, directory := range []string{"site", "mailers", "flea/data", "flea/snips", "flea/icons", "flea/media"} {
+		if name == directory || strings.HasPrefix(name, directory+"/") {
 			return true
 		}
-		return name == "_" || name == "_/flea.config" || name == "_/fleas.json" || name == "_/fleas" || strings.HasPrefix(name, "_/fleas/") || name == "_/icons" || strings.HasPrefix(name, "_/icons/")
 	}
-	return true
+	return false
 }

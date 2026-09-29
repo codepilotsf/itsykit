@@ -1,5 +1,26 @@
 # Architecture and review guide
 
+`internal/selfupdate` updates only the local CLI, separate from SSH server updates.
+It trusts bounded HTTPS metadata from fleacms.com, checks checksum/platform/version,
+and replaces the executable under the shared installer lock. Checksums are not
+independent signatures. Public-host and clean-machine verification remain pending.
+
+Project files have explicit boundaries: `site/` supplies templates and public
+assets; `mailers/` supplies private `*.email.html`/`*.email.txt` templates and
+`main.layout.html`; `flea/` holds content, media, data, icons and agent skills.
+Runtime files are under `flea/runtime/`, outside serving, watching and archives.
+Template names and public URLs stay relative to site/, not the project root.
+Extraction journals use physical site/ paths. All *.layout.html files are private.
+Root `.flea.config.json` is the only admitted dotfile. Deployment destinations
+are nested in deploy.branches; archive packing removes deploy while retaining
+runtime settings. Configuration reads stay bounded and confined. Protocol 22
+requires this structure, with no alternate old-layout loader.
+
+Mail templates are private runtime files in `mailers/`. The shared inclusion
+policy retains them for watching, deployment and backups; the email renderer
+loads them separately from web pages and snip extraction. Protocol 22 requires
+this location, with no old-directory fallback.
+
 Email-only forms use internal/contact, configured by contact.to. Host routing
 binds handlers to fixed recipients and shares them across aliases. Validate Origin,
 TLS and bounded fields before synchronous, timed mailer.Send. Visitor input sets
@@ -18,21 +39,29 @@ development rules. spec.md also describes features that are not implemented.
 
 ## Where to start
 
+Local site creation composes the canonical starter with embedded minimal content
+overrides by default; `--starter` opts into the examples. `cli/reset.go` validates
+a fresh minimal tree before confirmation, takes the dev/pull lock, and moves old
+entries (except .git) to a mode-0700 sibling backup before publishing the new tree.
+Ordinary failures attempt rollback; interruptions leave the printed backup and
+remaining original entries for manual recovery. This is local-only, not server
+reset, deployment, or content synchronization. Backups may contain secrets.
+
 | Responsibility | Code |
 | --- | --- |
 | CLI dispatch, flags, local server lifecycle, new-site creation | `internal/cli/cli.go` |
 | Validated site snapshot and rendering | `internal/site/project.go` |
 | Template grammar and alias scope | `internal/site/template.go` |
 | Page filename to canonical route | `internal/site/routes.go` |
-| Legacy fleas and structured JSON loading | `internal/site/data.go` |
-| HTML region scanning and lexical flea references | `internal/site/regions.go` |
+| Legacy snips and structured JSON loading | `internal/site/data.go` |
+| HTML region scanning and lexical snip references | `internal/site/regions.go` |
 | Dev-only content extraction | `internal/site/extraction.go` |
-| Content-first write journal and replay | `internal/site/flea_transaction.go` |
+| Content-first write journal and replay | `internal/site/snip_transaction.go` |
 | Confined project reads and atomic writes | `internal/site/files.go` |
 | Lucide resolution, SVG validation, icon compilation | `internal/site/icons.go` |
 | Request handling and reload publication | `internal/site/server.go` |
 | Native directory notifications and debounced reloads | `internal/site/watch.go` |
-| Flea model, IDs, HTML sanitization, content merge | `internal/fleas/` |
+| Snip model, IDs, HTML sanitization, content merge | `internal/snips/` |
 | Shared runtime-file inclusion policy | `internal/sitefiles/` |
 | Hostname routing, configuration, listeners, ACME | `internal/host/` |
 | Local Git snapshot, prompts, SSH, installation and upload | `internal/setup/` |
@@ -40,7 +69,7 @@ development rules. spec.md also describes features that are not implemented.
 | Bounded release archives and compatibility marker | `internal/release/` |
 | Privileged activation, readiness, recovery | `internal/admin/deploy.go` |
 | Preserved-content staging during activation | `internal/admin/content.go` |
-| Owner authentication and server-rendered dashboard | `internal/editor/` |
+| Owner authentication and inline editing | `internal/editor/` |
 | Content-save authorization boundaries and publication | `internal/editstore/` |
 | Resend delivery behind a small Sender interface | `internal/mailer/` |
 | Cross-process content/deployment lock | `internal/state/` |
@@ -48,9 +77,9 @@ development rules. spec.md also describes features that are not implemented.
 
 Dependencies point toward site/content primitives, not toward command handlers.
 `cli` calls `setup` and `site`; `setup` uses `release`, `site`, and shared admin
-option validation. `admin` uses `host`, `release`, `site`, and `fleas`. `host`
-uses `site` and `fleas`. The site package never imports CLI, setup, or admin.
-`fleas` does not know about HTTP, SSH, templates, or deployment orchestration.
+option validation. `admin` uses `host`, `release`, `site`, and `snips`. `host`
+uses `site` and `snips`. The site package never imports CLI, setup, or admin.
+`snips` does not know about HTTP, SSH, templates, or deployment orchestration.
 
 Only CLI/setup imports serverbundle; the server never embeds copies of itself.
 Build both Linux servers before embedding their compressed bytes and hashes into
@@ -59,33 +88,83 @@ no runtime download/compiler fallback. scripts/build.sh refreshes generated asse
 
 ## Loading and serving
 
+Multisnips use page-local arrays in snips.Store and persistent field definitions
+derived from their developer-owned item template. Extraction consumes a single
+seed wrapper before ordinary snip scanning, with one shared recovery journal.
+Rendering validates field placement even for empty arrays. Owner-only prototypes
+and boundary comments enable preview additions without client-generated templates.
+Browser arrays are checked against visible groups, schema and version before
+publication. Preserve remote arrays during normal activation, including intentional
+empty lists. Explicit sync conflicts at whole-array granularity. Archived ordinary
+snips and retained removed fields are not a general content revision system.
+Collections arranges real page items in place. Shadow-root controls track item
+rectangles; only an empty temporary layout tile enters each group. Controls and
+tile content never enter saved fields. Dragging adds an inert, styled clone outside
+the editable regions, hides the original in its landing slot, and removes the
+clone on drop/cancel. Dashed region outlines are shadow-root overlays, not saved
+attributes. Editing preference is tab-local sessionStorage, separate from content.
+Pointer/keyboard movement changes the
+ordered draft array and its DOM nodes. Cancel restores original nodes, attributes
+and order. Empty groups keep an Add tile, with no group picker. Photo fields open
+a shared-styled dialog; empty photos render a fixed neutral portrait. Three pinned
+editor Lucide icons use the shared {icon ...} compiler and SVG validator.
+Collection photo uploads use the same bounded multipart page transaction as typed
+media. New IDs must be unused and referenced by visible photo fields in the draft.
+Processed immutable bytes precede atomic library metadata and item publication.
+Unused drafts are omitted from the request; Cancel revokes private object URLs.
+
+Site-owned email templates compile into immutable HTML/text renderers at load.
+They are not pages/partials and are never read based on a request path. Renderers
+receive only public app values and message-specific data and stop at output bounds.
+Auth/contact retain ownership of delivery, recipients and headers. Render failures
+never leak codes or message data in logs or expose account membership.
+
 `site.Load` validates the runtime tree, reads JSON, scans templates, resolves
 routes, compiles partials/pages, snapshots assets, and checks rendering. All
-partials are checked, including unused ones. Routes and flea page ownership use
-the same filename conversion. Legacy named fleas and `data.*` share a namespace
+partials are checked, including unused ones. Routes and snip page ownership use
+the same filename conversion. Legacy named snips and `data.*` share a namespace
 and one JSON-directory loader; collisions are errors.
 
-A `Project` is immutable after publication. Its exported maps exist for internal
+A `Project` is immutable after publication. Public config values come from `app`
+(app.site_name for the display name), never admin/mail settings. An omitted name
+gets a read-only folder default. Interactive dev saves it with confined,
+RawMessage-preserving writes; deployment requires a committed name. Protocol 22
+requires the app namespace without a site alias. Its exported maps exist for internal
 inspection, not concurrent editing. HTTP handlers select from validated maps;
 they never turn request paths into filesystem reads. Template output is buffered
 before sending headers, so a render failure can still produce a proper 500.
 
+Native cross-document transition CSS lives in the site's navigation.css, linked
+directly by both layout heads before global.css. Each head also declares the
+small native opt-in and reduced-motion opt-out before external styles resolve.
+Rendering never injects it. No JavaScript router is involved.
+
+Dev 405/500 diagnostics are embedded and independent of site templates/assets;
+404 responses use the site's ordinary error template with dev reload support.
+They require a loopback peer and Host as well as non-production mode. Compiler
+SourceError values hold bounded 11-line source excerpts and original locations
+at failure time, including region and page-setting validation failures;
+JSON syntax errors expose locations only. No request triggers source-file reads.
+Error pages escape details and allow only their hash-pinned reload script. Request
+failures and failed custom error rendering log quoted details in both modes;
+production HTTP stays generic/custom. Startup validation remains terminal-only.
+
 The template compiler translates FleaCMS directives into Go `html/template`.
-`{flea ID}` becomes a sanitized rich-content call. The HTML region scanner
+`{snip ID}` becomes a sanitized rich-content call. The HTML region scanner
 recognizes the same unquoted markers for extraction, editor access and deployment
 pruning. Quoted markers are rejected. HTML comments and script/style contents
 do not contribute references; comments never execute template instructions.
 Go retains responsibility for contextual escaping. JSON is passed as values,
-never compiled as template source. Rich fleas are the narrow exception to normal
+never compiled as template source. Rich snips are the narrow exception to normal
 text escaping: the HTML allowlist reconstructs them first, and only the result
 becomes `template.HTML`. SVG icons have a separate geometry-only validator.
 Keep these two sanitizers separate: their permitted markup and uses differ.
 
 There are three intentionally distinct loading entry points:
 
-- `Load` / `LoadWithFleas`: read-only; no downloads or source changes.
+- `Load` / `LoadWithSnips`: read-only; no downloads or source changes.
 - `LoadDev`: may fetch missing icons; also used on a temporary committed snapshot
-  during deployment. It does not extract fleas.
+  during deployment. It does not extract snips.
 - `LoadEditing`: extracts local editable regions, then calls `LoadDev`. Only the
   local dev command and watcher should use it.
 
@@ -98,8 +177,53 @@ must select the same content file.
 
 ## Filesystem boundaries
 
+Standalone images/videos are typed snip entries, with direct Image/Video metadata
+and optional direct Poster metadata. Extraction replaces source/alt/poster values
+with typed bindings while preserving developer markup. Owner-only media markers
+enable click-to-edit; template validation rejects nesting and competing sources.
+Multisnip photo fields retain their photo catalogue. ImageAssets/VideoAssets
+aggregate all referenced typed active/archive entries and catalogue files for
+loading, synchronization and recovery. Three-way sync compares a whole typed entry,
+excluding its developer-owned label, not merely the text content field.
+
+Hash-named MP4 files share flea/media/, but never enter AssetData. Loading validates
+bounded MP4 structure/codecs/checksum and pins a regular file handle. Requests
+select only catalogue entries and use independent SectionReaders for Range/HEAD;
+no request-derived path opens and no video playback buffers in the asset map.
+Normal uploads write immutable replacements, then validate/save metadata and
+publish. Failed writes may leave an unreferenced file, never a premature live link.
+Old snapshots retain their handles until garbage collection; do not mutate files
+in place. Symlinks/hardlinks are refused. A changed size/mtime stops serving.
+Local video bytes are excluded from Git, not backups. Deployment supplements the
+committed snapshot with exact hash-verified local bytes from committed metadata.
+Pull/backup include catalogue files; activation preserves live metadata and files.
+The pull-only LoadSyncSource skips video bytes and is explicitly nonservable,
+so fresh clones can obtain ignored files. Pull validates a complete normal snapshot
+after transfer and before publishing content or advancing its baseline.
+Video storage has an independent 64 MiB retained-file quota. Release/backup bounds
+are 256/270 MiB to accommodate both photos and videos alongside site code.
+
+Photo metadata belongs to snips.Store, while hash-named bytes live in local media/
+or the production content directory's media/ child. LoadWithMedia overlays only
+catalogued, checksum-checked bytes into the immutable asset map. Browser uploads
+decode/re-encode bounded JPEG/PNG under the content lock before saving metadata.
+An interrupted save can leave an unreferenced immutable photo; old bytes are never
+silently removed. Deployment seeds missing files and retains live metadata. Pull
+verifies a backup's state digest before installing immutable referenced files.
+
+Per-site release receipts form a chain from the current activation. Rollback
+requires a reachable receipt and reviewed active release, then reuses activation
+with live state and unchanged host policy. Backup/restore use bounded checksummed
+site archives, excluding credentials/runtime state. Restore requires a reviewed
+live digest and creates a new release. Upgrades use a separate executable journal;
+pending upgrades block content/deploy mutations. The new executable validates all
+sites before replacement; failed readiness restores the saved old executable.
+
 `sitefiles.Included` is a runtime inclusion policy, not a public-URL policy.
 Configuration and content belong in an archive but remain private over HTTP.
+Site configuration uses only `.flea.config.json`; protocol 22 rejects older
+server contracts before upload, including the inline-save/formatting contract.
+There is no extensionless-name fallback.
 Do not combine this predicate with the server's URL checks.
 
 Project files are untrusted. `site/files.go` pins directory handles, rejects
@@ -109,19 +233,47 @@ directory. The icon cache uses these same write primitives.
 
 Administrator-owned configuration has a different boundary. `admin.atomicWrite`
 works with trusted absolute paths; `realDirs` rejects linked managed directories.
-`fleas.ReadFile` pins an administrator-selected content directory and checks its
+`snips.ReadFile` pins an administrator-selected content directory and checks its
 file. These helpers are deliberately not forced into one general filesystem
 abstraction. Changing their trust assumptions requires tests, not just deduplication.
 
 ## Two separate transactions
 
+Explicit synchronization uses `internal/syncstate` for pure three-way comparisons,
+`setup/sync.go` for branch-scoped baselines and SSH orchestration, and
+`admin/sync.go` for a bounded privileged state export. Export and activation use
+the same deployment lock as browser saves. A reviewed plan carries an expected
+snapshot digest; activation refuses changes since review. Baselines are local Git
+metadata, never site runtime files. Pull locks out dev, validates candidates and
+checks local Git state again after network/prompts. It saves its baseline last;
+disk errors may leave reported partial local file writes, never a false baseline.
+
+Theme CSS is managed beside each content snapshot, selected by host.Themes.
+Aliases must share the same content/theme pair. `LoadWithState` overlays immutable
+CSS asset bytes without making code releases writable. Theme saves use the existing
+editstore lock/version/publication sequence and source-preserving `internal/theme`
+value validation. Code, content and theme switch together through the activation
+journal. Browser theme editing never writes host configuration or release files.
+Scale edits carry numeric endpoint settings, not client-generated CSS. Go validates
+and generates the declarations and settings comments under the same save lock.
+Browser calculations provide private previews only; parity tests cover the two
+implementations. No Node process or extra configuration file is involved.
+Font-family saves additionally regenerate a marked Google Fonts import block.
+Names are validated and URL-encoded into a fixed HTTPS endpoint; no arbitrary
+URL, server fetch or credentials are accepted. Existing developer imports remain
+unchanged. Private preview uses a removable stylesheet link and Cancel restores
+the original inline variables.
+
 ### Local extraction
 
 The HTML tokenizer records byte ranges, so extraction preserves source formatting
-outside the region. The extractor reserves IDs against active and archived content,
+outside the region and its consumed snip authoring attribute. Quote-aware attribute
+spans preserve all other tag bytes; generated directives need no persistent attribute.
+Existing directives with redundant markers use the same transaction without new IDs.
+The extractor reserves IDs against active and archived content,
 checks all regions, and builds edits before writing anything.
 
-While holding the in-process content mutex, it saves `_/.fleas-pending.json`, writes content,
+While holding the in-process content mutex, it saves `flea/runtime/.snips-pending.json`, writes content,
 then replaces templates. The journal contains before/after values. Replay accepts
 either state, but refuses a conflicting independent edit and retains the journal.
 Local extraction and editor saves share that mutex; always acquire it before the
@@ -142,10 +294,10 @@ multi-file editing, not an atomic filesystem transaction across all files.
    server validates it, persists the previous configuration in a recovery journal,
    atomically replaces the active config, restarts, and checks readiness.
 4. Failure restores the previous configuration. Success archives unreferenced
-   active fleas, saves the previous config, and removes the journal. Cleanup
+   active snips, saves the previous config, and removes the journal. Cleanup
    failure keeps the journal and reports that the release is already active.
 
-Flea references are lexical across all templates, not collected from one render.
+Snip references are lexical across all templates, not collected from one render.
 Otherwise empty loops or conditional sections could incorrectly lose content.
 Browser saves share the deployment lock, reject pending recovery journals, verify
 the active release/content pair, and compare a content digest from the submitted
@@ -161,7 +313,20 @@ but not code releases or host configuration. This is a change from the previous
 read-only service model and requires the updated installation permissions.
 
 Dev always mounts the editor so a fresh site's /admin can explain owner setup.
+Before serving, interactive CLI startup asks for the site name and optionally
+reuses AddAdmin; it never prompts for Resend setup. It reloads after writes so session setup and
+the first request see the new owner. Nonterminal startup never reads prompt input.
 The editor enforces loopback host checks before showing local instructions.
+
+The dev CLI alone reads dev.email_preview (enabled in the starter) to select
+internal/mailpreview instead of Resend for both login and contact delivery.
+It holds at most 20 bounded messages in memory behind random 256-bit URLs with
+10-minute expiry, exact listener Host/loopback-peer checks and no-store responses.
+The browser view escapes headers and sandboxes the HTML body; scripts, forms and
+external resource loads are blocked. Browser launch is bounded; failure logs only
+the local capability URL. No preview data is written to disk. Configuration and
+preview sender changes require dev restart. The production host never wires this
+sender or route, even when the committed config enables previews.
 The dev admin wrapper selects the current validated access list and reads local
 mail settings per request. A serialized handler replacement retains valid sessions
 and discards pending codes when settings change, with a matching edit-store allowlist. Invalid snapshots
@@ -170,26 +335,64 @@ until restart/deploy; local contact mail remains startup-bound.
 Production mounts it only for sites with approved owners. Setup and missing-mail
 pages grant no editing access; the normal email-code flow is still required.
 
-The editor passes a page state and plain data to a renderer supplied by the
-site's Server. Navigation derives from the validated public route list, not the
-flea store: a page needs no fleas to edit its metadata. Query parameters select
-one validated route at a time, never a filesystem path. Shared editing is separate.
+Authenticated public-page editing uses `editor.ServePublic` and an injected
+`site.Server.ServeOwner` callback. Authentication remains outside site. A private
+request-context value enables rich-snip comment markers during rendering; neither
+query parameters nor shared Project state can enable them. Only successful public
+page responses expose request-only app.current_admin to explicit layout conditionals.
+Config cannot define this reserved field. The template places a csrf-token meta
+and admin/_toolbar.html declarative shadow-root shell. The template supplies the
+visible rows before asynchronous metadata/dialog loading; initialization reuses
+the already-rendered formatting SVGs from {icon ...} tags and
+the shadow root and enables its inert controls. Rendering never injects UI or libraries. Static
+editor assets have revalidating ETags and no private data. Authenticated metadata
+fetches require the meta token and return private/no-store JSON. Bootstrap checks
+the content version against the rendered mount before allowing editing.
+Visitors, assets and errors retain ordinary rendering. Owner responses are private,
+no-store; their CSP permits the exact editor asset URL, not other site or inline scripts.
+Dev supplies the rendered revision to the external owner controller, which polls without cookies and reloads only
+when drafts, dialogs, saves and Theme previews are not at risk. Edit mode and
+scroll survive clean reloads in tab-local storage. Production omits this revision.
+The controller identifies complete wrappers by the server's directive-boundary
+comments, not source attributes. It changes only those wrappers in memory and restores them
+on Cancel. The same rendering snapshot supplies metadata and a version digest of
+content, templates, structured data, site settings and release root. A later disk
+read cannot attach a newer version to older rendered content.
+POST /admin/page applies changed IDs and metadata in one content transaction,
+with ordinary session/Origin/CSRF checks. Validate rendered complete-wrapper IDs,
+reject duplicates and hidden/cross-page changes, and constrain leaf content to
+inline marks/links. Inline formatting uses Squire in a temporary offscreen prose
+buffer, then sanitizes back to inline HTML; template wrappers never receive
+nested blocks. Native selection is restored by text offsets.
+Check shared wrapper constraints across routes. Sanitize rich content, validate
+the full candidate, write once, then publish. Stale/failed saves retain browser drafts.
+Typed media use the same transaction. Multipart saves authenticate and check header
+CSRF before parsing or acquiring the upload slot; form CSRF is checked afterward.
+Uploads are bounded at 40 MiB total, 25 MiB per video and 8 MiB per image/poster.
+Write immutable bytes before candidate validation and metadata publication. Failure
+can leave an unreferenced file, never a published broken link. Direct image/video
+dialogs stage private object-URL previews; no standalone library mode or upload API.
+
+The login handler passes plain data to a renderer supplied by the site's Server.
+Signed-in /admin redirects to /. Public-page metadata is editable even without snips.
 The renderer selects a precompiled developer-owned admin/*.html
 template and its selected layout from the current immutable snapshot. Values are
 contextually escaped, never compiled as source. The admin directory is excluded
 from public routes and assets; authentication remains in the editor handler.
 Missing templates fail without an embedded fallback. This shares site chrome and
 reflects template reloads without an editor dependency on site.
-Admin styling permits HTTPS CSS/fonts/images. Only the built-in activity script
-is permitted by a hash in CSP; other scripts remain blocked. Same-origin referrer policy preserves browser form origins;
+Login styling permits HTTPS CSS/fonts/images. Verification pages permit only the
+hash-pinned code-input enhancement; other login pages block scripts. Login mail
+has escaped HTML with a prominent code and a plain-text alternative. Inline pages allow
+the external editor script. Same-origin referrer policy preserves browser form origins;
 origin and CSRF validation remain exact.
 
 ### Session runtime state
 
-Both environments use a private `_/sessions.json`: below the project locally,
-below `/var/lib/flea/sites/<name>/` in production. Production's `_/` is service-owned
+Both environments use a private `flea/runtime/sessions.json`: below the project locally,
+below `/var/lib/flea/sites/<name>/` in production. Production's `flea/` is service-owned
 0700, beside content/releases, not inside either. Code and parent directories remain
-administrator-owned. Deployment protocol 10 requires these runtime permissions.
+administrator-owned. Deployment protocol 22 requires these runtime permissions.
 Host derives this stable location from the administrator-configured managed content
 path; aliases share storage, distinct sites must not. No request chooses a path.
 Candidate host validation is read-only; actual startup prunes expired/removed owners.
@@ -205,15 +408,15 @@ The local CLI installs ignore rules and refuses already tracked session state.
 The idle window is configurable in days, default 30. Current policy can shorten
 existing sessions. Valid admin navigation and CSRF-checked forms renew both disk
 expiry and the persistent cookie. Trusted visible user events send a throttled
-activity POST, not an idle heartbeat. The script is injected with exact bytes and
-hash-pinned in CSP; no dynamic JavaScript interpolation. OTPs/rate limits remain
+activity POST, not an idle heartbeat. The controller is an external same-origin
+asset; no dynamic JavaScript interpolation. OTPs/rate limits remain
 bounded in-memory state. Browser/device tokens are independent and host-bound.
 
 The loader resolves leading flea settings comments before compiling partials.
 Selected layouts are private HTML files removed from the partial namespace;
 they may render partials but cannot select another layout. Only the layout
 compiler accepts slots. Unknown/duplicate settings and invalid targets fail load.
-The admin starter selects _layout_admin.html; public _layout.html is independent.
+The admin starter selects admin.layout.html; public main.layout.html is independent.
 
 `flea email` uses the setup-only mailer.Checker interface for a non-sending
 connection check. Resend implements both Checker and Sender; auth/contact code
@@ -226,7 +429,7 @@ changing process environment. Production still reads systemd's mail.env.
 
 ## Review findings and decisions
 
-This refactor addressed mixed responsibilities in flea handling, icon-specific
+This refactor addressed mixed responsibilities in snip handling, icon-specific
 naming of shared file writes, duplicated route/data/SSH rules, repeated template
 alias restoration, and obsolete single-directory loops. Deployment content
 staging is now separate from the activation transaction. A dead prompt reader was
@@ -245,10 +448,8 @@ Remaining work and limits, not claims of completed sign-off:
 
 - Exercise real Ubuntu/systemd installation, interrupted activation, and live
   certificate issuance/renewal. Local tests and simulated SSH cannot establish these.
-- Provide a nondestructive server upgrade path. Setup currently offers a reset,
-  not an upgrade. Publishing release artifacts also remains operational work.
-- Decide and implement deployment-config consolidation separately. Settings still
-  live in `_/deploy.json`; this refactor does not migrate user files.
+- Exercise executable-only `flea update-server` and its recovery path on a real server.
+  Setup reset is not an upgrade. Publishing artifacts remains operational work.
 - Local dev uses pinned fsnotify directory notifications, registering included
   subdirectories and reconciling new/moved/deleted directories after a 100 ms
   debounce. Content fingerprints run only at startup or after events, suppressing
@@ -258,8 +459,8 @@ Remaining work and limits, not claims of completed sign-off:
   700 ms HTTP poll; the admin does not auto-refresh unsaved forms.
 - Keep the published `Project` immutable. Consider hiding exported maps if more
   in-process consumers appear; current callers do not need a broad accessor API.
-- Releases, content snapshots, and archived fleas are retained. A retention policy
-  and rollback CLI need explicit product behavior and separate tests.
+- Releases, content snapshots, archived snips and old photo files are retained.
+  Rollback is implemented; automatic retention/pruning still needs a policy.
 - A security review should add fuzzing and resource-budget tests for parsers and
   extraction recovery. Existing attack/regression cases are not exhaustive proof.
 

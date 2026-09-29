@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Subject}} · Email preview</title>
+  <style>
+    :root { color-scheme: light; font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #25312e; background: #eef1ee; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: clamp(16px, 4vw, 56px); }
+    main { max-width: 900px; margin: auto; }
+    .notice { display: flex; justify-content: space-between; gap: 12px; margin: 0 4px 18px; color: #5c6963; font-size: 13px; }
+    .notice strong { color: #354c42; font-weight: 600; }
+    article { background: white; border: 1px solid #d8dfda; border-radius: 14px; box-shadow: 0 12px 40px #213b2910; overflow: hidden; }
+    header { padding: clamp(20px, 4vw, 38px); border-bottom: 1px solid #e5e9e6; }
+    h1 { margin: 0 0 26px; font-size: clamp(23px, 3vw, 30px); line-height: 1.25; font-weight: 600; letter-spacing: -.025em; overflow-wrap: anywhere; }
+    .sender { display: flex; align-items: flex-start; gap: 14px; }
+    .avatar { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border-radius: 50%; background: #e9f0eb; color: #45644f; }
+    .avatar::before { content: ""; width: 20px; height: 14px; border: 1.5px solid currentColor; border-radius: 3px; background: linear-gradient(32deg, transparent 48%, currentColor 49%, currentColor 52%, transparent 53%) left top / 50% 9px no-repeat, linear-gradient(-32deg, transparent 48%, currentColor 49%, currentColor 52%, transparent 53%) right top / 50% 9px no-repeat; }
+    .identity { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+    .identity strong { font-weight: 650; }
+    .address { color: #66746c; font-size: 14px; margin-left: 5px; }
+    dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 8px 0 0; color: #5c6963; font-size: 13px; }
+    dt, dd { margin: 0; }
+    dt { color: #7a857f; }
+    iframe { display: block; width: 100%; height: 560px; height: max(420px, 62vh); border: 0; background: white; }
+    pre { margin: 0; padding: 28px; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.7 ui-monospace, monospace; }
+    details { border-top: 1px solid #e5e9e6; }
+    summary { cursor: pointer; padding: 16px 28px; color: #5c6963; font-size: 13px; }
+    summary:focus-visible { outline: 2px solid #45644f; outline-offset: -4px; }
+    footer { text-align: center; color: #6a776f; font-size: 12px; padding-top: 18px; }
+    @media (max-width: 540px) { .notice { flex-direction: column; gap: 2px; } .address { display: block; margin-left: 0; } .avatar { display: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="notice"><strong>FleaCMS email preview</strong><span>Local development · Not sent</span></div>
+    <article aria-labelledby="subject">
+      <header>
+        <h1 id="subject">{{.Subject}}</h1>
+        <div class="sender">
+          <span class="avatar" aria-hidden="true"></span>
+          <div class="identity">
+            <strong>{{.FromName}}</strong><span class="address">&lt;{{.FromAddress}}&gt;</span>
+            <dl>
+              <dt>To</dt><dd>{{.To}}</dd>
+              {{if .ReplyTo}}<dt>Reply-To</dt><dd>{{.ReplyTo}}</dd>{{end}}
+              <dt>Date</dt><dd><time datetime="{{.DateTime}}">{{.Date}}</time></dd>
+            </dl>
+          </div>
+        </div>
+      </header>
+      {{if .HTML}}<iframe title="Email message" sandbox srcdoc="{{.HTML}}" referrerpolicy="no-referrer"></iframe>
+      <details><summary>Plain-text version</summary><pre>{{.Text}}</pre></details>
+      {{else}}<pre>{{.Text}}</pre>{{end}}
+    </article>
+    <footer>Preview available for 10 minutes while flea dev is running.</footer>
+  </main>
+</body>
+</html>

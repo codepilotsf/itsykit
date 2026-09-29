@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"flea/internal/mailer"
+	"flea/templates"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -22,10 +23,22 @@ func TestContactSiteIsolation(t *testing.T) {
 	sites := map[string]string{}
 	for _, name := range []string{"one", "two"} {
 		root := filepath.Join(dir, name)
-		if err := os.MkdirAll(filepath.Join(root, "_"), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Join(root, "site"), 0755); err != nil {
 			t.Fatal(err)
 		}
-		for path, body := range map[string]string{"index.html": "Hello", "_/flea.config": `{"site":{"name":"test"},"contact":{"to":"` + name + `@example.test"}}`} {
+		if err := os.MkdirAll(filepath.Join(root, "mailers"), 0755); err != nil {
+			t.Fatal(err)
+		}
+		for _, file := range []string{"main.layout.html", "sign-in.email.html", "sign-in.email.txt", "contact.email.html", "contact.email.txt"} {
+			data, err := templates.Files.ReadFile("mailers/" + file)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(filepath.Join(root, "mailers", file), data, 0644); err != nil {
+				t.Fatal(err)
+			}
+		}
+		for path, body := range map[string]string{"site/index.html": "Hello", ".flea.config.json": `{"app":{"site_name":"test"},"contact":{"to":"` + name + `@example.test"}}`} {
 			if err := os.WriteFile(filepath.Join(root, path), []byte(body), 0644); err != nil {
 				t.Fatal(err)
 			}

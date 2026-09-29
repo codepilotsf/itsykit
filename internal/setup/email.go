@@ -18,7 +18,15 @@ func Email(ctx context.Context, directory string, in io.Reader, out io.Writer) e
 }
 
 func configureEmail(ctx context.Context, directory string, in io.Reader, out io.Writer, checker func(mailer.Settings) mailer.Checker) error {
-	if _, err := os.Stat(filepath.Join(directory, "_", "flea.config")); err != nil {
+	return configureEmailFlow(ctx, directory, in, out, checker, false)
+}
+
+func EmailOptional(ctx context.Context, directory string, in io.Reader, out io.Writer) error {
+	return configureEmailFlow(ctx, directory, in, out, func(s mailer.Settings) mailer.Checker { return mailer.NewResend(s) }, true)
+}
+
+func configureEmailFlow(ctx context.Context, directory string, in io.Reader, out io.Writer, checker func(mailer.Settings) mailer.Checker, optional bool) error {
+	if _, err := os.Stat(filepath.Join(directory, ".flea.config.json")); err != nil {
 		return fmt.Errorf("Run flea email from your site's folder.")
 	}
 	// If Git is present, fail closed on inspection errors and tracked secrets.
@@ -51,27 +59,45 @@ func configureEmail(ctx context.Context, directory string, in io.Reader, out io.
 	if _, err := localenv.Read(directory); err != nil {
 		return err
 	}
-	fmt.Fprint(out, "\nEmail setup · Resend\n\nUse an API key and an address on a domain verified in Resend.\nThese settings will be saved in this site's .env file.\n\n")
-	key, err := askSecret(ctx, in, out)
+	s := mailer.Settings{}
+	var err error
+	if optional {
+		s, err = mailer.LocalSettings(directory)
+		if err != nil {
+			return err
+		}
+	}
+	if s.APIKey == "" {
+		label := "Resend API key (masked)"
+		if optional {
+			label = "Resend API key (optional, masked)"
+		}
+		s.APIKey, err = askMasked(ctx, in, out, label)
+		if err != nil {
+			return err
+		}
+		if optional && s.APIKey == "" {
+			return nil
+		}
+	}
+	if s.Name == "" {
+		s.Name, err = ask(ctx, in, out, "Sender name", "")
+	}
 	if err != nil {
 		return err
 	}
-	name, err := ask(ctx, in, out, "Sender name (for example, MySite Support)", "")
-	if err != nil {
-		return err
-	}
-	if strings.TrimSpace(name) == "" {
+	if strings.TrimSpace(s.Name) == "" {
 		return fmt.Errorf("Please enter a sender name. Nothing was saved.")
 	}
-	from, err := ask(ctx, in, out, "From address (for example, hello@your-verified-domain.com)", "")
+	if s.From == "" {
+		s.From, err = ask(ctx, in, out, "Sender email (on a domain verified in Resend)", "")
+	}
 	if err != nil {
 		return err
 	}
-	s := mailer.Settings{APIKey: key, Name: name, From: from}
 	if err := s.Validate(); err != nil {
 		return err
 	}
-	fmt.Fprintln(out, "\nChecking the Resend connection...")
 	_, err = checker(s).Check(ctx)
 	if err != nil {
 		return err
@@ -79,9 +105,9 @@ func configureEmail(ctx context.Context, directory string, in io.Reader, out io.
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if err := localenv.Save(directory, map[string]string{"RESEND_API_KEY": key, "FLEA_EMAIL_NAME": name, "FLEA_EMAIL_FROM": from}, []string{"RESEND_API_KEY", "FLEA_EMAIL_NAME", "FLEA_EMAIL_FROM"}); err != nil {
+	if err := localenv.Save(directory, map[string]string{"RESEND_API_KEY": s.APIKey, "FLEA_EMAIL_NAME": s.Name, "FLEA_EMAIL_FROM": s.From}, []string{"RESEND_API_KEY", "FLEA_EMAIL_NAME", "FLEA_EMAIL_FROM"}); err != nil {
 		return err
 	}
-	fmt.Fprintln(out, "\nSaved email settings to .env.")
+	fmt.Fprintln(out, ".env updated.")
 	return nil
 }

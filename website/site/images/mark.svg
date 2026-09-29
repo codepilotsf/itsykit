@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-labelledby="title">
+  <title id="title">FleaCMS: Skip, a happy flea</title>
+  <g stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Wingless, compressed profile; the large angular hind leg is the signature. -->
+    <path d="M52 45C63 30 85 33 96 47C108 63 103 82 88 88C74 94 59 87 54 76"/>
+    <path d="M80 41C90 48 94 58 92 68M68 41C77 48 81 57 80 65"/>
+    <path d="M53 43C47 34 32 36 26 46C20 57 25 69 36 74C46 79 58 73 60 63"/>
+    <path d="M33 38L30 29M43 37L45 28M26 60Q31 65 36 60"/>
+    <path d="M89 78L72 66L65 87L94 103L109 103"/>
+    <path d="M62 81L53 99L42 99M39 76L32 85L20 83"/>
+  </g>
+  <circle cx="35" cy="51" r="3" fill="#1e293b"/>
+</svg>

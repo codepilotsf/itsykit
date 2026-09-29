@@ -27,8 +27,7 @@
   .prototype-notice { font-size: 12px; background: var(--lighter); color: var(--dark); }
   #page-label { margin-top: 0; }
   [data-region] { display: flow-root; }
-  body.editing [data-region] { outline: none; cursor: text; }
-  body.editing.keyboard-focus [data-region]:focus { outline: 2px solid #475569; outline-offset: 8px; }
+  body.editing [data-region] { outline: none !important; cursor: text; }
   body.editing main { cursor: not-allowed; }
   body.editing main a, body.editing main button { cursor: pointer; }
   body.editing [data-region] * { cursor: text; }

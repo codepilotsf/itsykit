@@ -18,14 +18,17 @@ import (
 
 	"flea/internal/buildinfo"
 	"flea/internal/contact"
-	"flea/internal/editor"
 	"flea/internal/mailer"
+	"flea/internal/mailpreview"
+	"flea/internal/selfupdate"
 	"flea/internal/setup"
 	"flea/internal/site"
 	"flea/templates"
 )
 
-const usage = `FleaCMS
+const usage = `_________
+ FleaCMS
+‾‾‾‾‾‾‾‾‾
 Small websites. Plain HTML. Editable content.
 
 Usage
@@ -33,17 +36,24 @@ Usage
 
 Build your site
   new <site-name>  Create a new site
+  reset            Reset this local site to a clean start
   dev              Start the local development server
   status           Check your site for errors
   admin [email]    Add an owner who can edit content
   email            Set up email delivery
 
 Publish your site
+  pull             Bring live snips and theme into your local site
   setup            Install Flea on your server
   deploy           Publish the current Git branch
+  rollback         Restore previous code, keeping live content
+  backup           Download a complete site backup
+  restore          Restore a site backup after confirmation
+  update-server    Update the server without resetting sites
   https            Configure HTTPS for your site
 
 Other commands
+  update           Update this CLI and its bundled servers
   version          Show the installed version
   help             Show this help
 
@@ -54,6 +64,7 @@ Get started
 
 Command details
   flea <command> --help
+
 `
 
 // Run returns 0 on success, 1 on project/runtime failure, 2 on usage errors.
@@ -64,9 +75,102 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	}
 	fail := func(err error) int { fmt.Fprintln(errOut, "flea:", err); return 1 }
 	switch args[0] {
-	case "email":
+	case "update":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea email\n\nSet up Resend email delivery from your site folder.\nPrompts for a hidden API key, sender name, and verified-domain address.\nChecks the connection and saves settings to .env. No email is sent.\nAdmin sign-in loads settings automatically; contact forms need a dev restart.")
+			fmt.Fprint(out, "Usage: flea update\n\nDownload and verify the latest CLI from fleacms.com.\nUpdates this executable and its bundled servers, without changing remote servers.\nNo site folder is required.\n\n")
+			return 0
+		}
+		if len(args) != 1 {
+			fmt.Fprintln(errOut, "Usage: flea update")
+			return 2
+		}
+		if err := selfupdate.Run(ctx, buildinfo.Version, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	case "update-server":
+		flags := flag.NewFlagSet("update-server", flag.ContinueOnError)
+		flags.SetOutput(errOut)
+		recover := flags.Bool("recover", false, "restore executable after an interrupted upgrade")
+		flags.Usage = func() {
+			fmt.Fprint(out, "Usage: flea update-server [--recover]\n\nUpdate this branch's server using the bundled executable. All its sites\nrestart briefly. Configuration, credentials and site data are preserved.\nNo automatic format migration or service-unit changes.\n\n")
+		}
+		if err := flags.Parse(args[1:]); err != nil {
+			if err == flag.ErrHelp {
+				return 0
+			}
+			return 2
+		}
+		if flags.NArg() != 0 {
+			return 2
+		}
+		if err := setup.Upgrade(ctx, ".", *recover, os.Stdin, out, errOut); err != nil {
+			return fail(err)
+		}
+		return 0
+	case "backup", "restore":
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprintf(out, "Usage: flea %s <backup-file>\n\nUse this branch's saved destination. Backups include code, snips and theme,\nnot credentials, certificates or sessions. Restore replaces live site data\nafter confirmation. Backup refuses to overwrite an existing file.\n\n", args[0])
+			return 0
+		}
+		if len(args) != 2 || strings.HasPrefix(args[1], "-") {
+			fmt.Fprintf(errOut, "Usage: flea %s <backup-file>\n", args[0])
+			return 2
+		}
+		var err error
+		if args[0] == "backup" {
+			err = setup.Backup(ctx, ".", args[1], os.Stdin, out, errOut)
+		} else {
+			err = setup.Restore(ctx, ".", args[1], os.Stdin, out, errOut)
+		}
+		if err != nil {
+			return fail(err)
+		}
+		return 0
+	case "rollback":
+		flags := flag.NewFlagSet("rollback", flag.ContinueOnError)
+		flags.SetOutput(errOut)
+		list := flags.Bool("list", false, "list retained releases")
+		flags.Usage = func() {
+			fmt.Fprint(out, "Usage: flea rollback [--list] [release-id]\n\nRestore previous code for this branch. Keep live snips and theme.\nWithout an ID, use the preceding release. Confirmation is required.\n\n")
+		}
+		if err := flags.Parse(args[1:]); err != nil {
+			if err == flag.ErrHelp {
+				return 0
+			}
+			return 2
+		}
+		if flags.NArg() > 1 {
+			return 2
+		}
+		target := ""
+		if flags.NArg() == 1 {
+			target = flags.Arg(0)
+		}
+		if err := setup.Rollback(ctx, ".", target, *list, os.Stdin, out, errOut); err != nil {
+			return fail(err)
+		}
+		return 0
+	case "email":
+		if len(args) >= 2 && args[1] == "preview" {
+			if len(args) != 3 || (args[2] != "sign-in" && args[2] != "contact") {
+				fmt.Fprintln(errOut, "Usage: flea email preview <sign-in|contact>")
+				return 2
+			}
+			p, err := site.Load(".")
+			if err != nil {
+				return fail(err)
+			}
+			message, err := p.RenderEmail(args[2], map[string]string{"code": "123456", "host": "localhost", "name": "Joe Appleseed", "address": "joe@example.com", "message": "Hello! I'd like to learn more about your services."})
+			if err != nil {
+				return fail(err)
+			}
+			fmt.Fprint(out, message.HTML)
+			return 0
+		}
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprintln(out, "Usage: flea email\n       flea email preview <sign-in|contact>\n\nSet up Resend delivery, or print a sample HTML email without sending it.\nTemplates live in mailers/. Setup saves credentials in .env.\nContact settings need a dev restart.")
+			fmt.Fprintln(out)
 			return 0
 		}
 		if len(args) != 1 {
@@ -79,7 +183,8 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "admin":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea admin [email]\n\nAdd an owner and set up email if needed. Local access updates automatically.\nView or remove owners in admin.emails in _/flea.config.\nCommit and deploy to apply live changes. No invitation is sent.")
+			fmt.Fprintln(out, "Usage: flea admin [email]\n\nAdd an owner and set up email if needed. Local access updates automatically.\nView or remove owners in admin.emails in .flea.config.json.\nCommit and deploy to apply live changes. No invitation is sent.")
+			fmt.Fprintln(out)
 			return 0
 		}
 		if len(args) > 2 || (len(args) == 2 && strings.HasPrefix(args[1], "-")) {
@@ -104,7 +209,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		if added {
-			fmt.Fprintf(out, "\nAdded %s to _/flea.config.\n", email)
+			fmt.Fprintf(out, "\nAdded %s to .flea.config.json.\n", email)
 		} else {
 			fmt.Fprintf(out, "\n%s already has owner access in this site's configuration. Nothing changed.\n", email)
 		}
@@ -112,7 +217,11 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if err != nil {
 			return fail(err)
 		}
-		if settings.Validate() != nil {
+		dev, err := site.ReadDevSettings(".")
+		if err != nil {
+			return fail(err)
+		}
+		if !dev.EmailPreview && settings.Validate() != nil {
 			fmt.Fprintln(out, "\nEmail needs setting up.")
 			if err := setup.Email(ctx, ".", os.Stdin, out); err != nil {
 				return fail(err)
@@ -123,17 +232,44 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	case "version", "--version":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			fmt.Fprintln(out, "Usage: flea version\n\nShow the installed version.")
+			fmt.Fprintln(out)
 			return 0
 		}
 		fmt.Fprintln(out, "FleaCMS "+buildinfo.Version)
+		return 0
+	case "pull":
+		flags := flag.NewFlagSet("pull", flag.ContinueOnError)
+		flags.SetOutput(errOut)
+		flags.Usage = func() {
+			fmt.Fprintln(flags.Output(), "Usage: flea pull [--snips-only | --theme-only]\n\nPull live snips and theme into your local site. Stop dev first.\nReview and commit changes afterwards. Configuration and sessions stay local.")
+			fmt.Fprintln(flags.Output())
+		}
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			flags.SetOutput(out)
+		}
+		snipsOnly := flags.Bool("snips-only", false, "pull only snips")
+		themeOnly := flags.Bool("theme-only", false, "pull only theme")
+		if e := flags.Parse(args[1:]); e != nil {
+			if e == flag.ErrHelp {
+				return 0
+			}
+			return 2
+		}
+		if flags.NArg() != 0 {
+			return fail(fmt.Errorf("unexpected pull arguments"))
+		}
+		if e := setup.Pull(ctx, ".", *snipsOnly, *themeOnly, os.Stdin, out, errOut); e != nil {
+			return fail(e)
+		}
 		return 0
 	case "deploy", "https":
 		var s setup.DeploySettings
 		flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintf(flags.Output(), "Usage: flea %s [options]\n\nConfigure the current Git branch's destination and publish it.\nUse -configure to edit saved settings in _/deploy.json.\nDeployment requires a clean, committed Git repository.\n\nOptions\n", args[0])
+			fmt.Fprintf(flags.Output(), "Usage: flea %s [options]\n\nConfigure the current Git branch's destination and publish it.\nUse -configure to edit saved settings in .flea.config.json.\nDeployment requires a clean, committed Git repository.\n\nOptions\n", args[0])
 			flags.PrintDefaults()
+			fmt.Fprintln(flags.Output())
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			flags.SetOutput(out)
@@ -146,6 +282,8 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags.BoolVar(&s.AgreeTOS, "agree-tos", s.AgreeTOS, "accept Let's Encrypt terms: https://letsencrypt.org/repository/")
 		flags.BoolVar(&s.WWWRedirect, "www-redirect", true, "redirect WWW to the primary domain")
 		configure := flags.Bool("configure", false, "confirm and save changes to this branch's deployment settings")
+		withSnips := flags.Bool("with-snips", false, "also publish reviewed snip changes (pull first)")
+		withTheme := flags.Bool("with-theme", false, "also publish reviewed theme changes (pull first)")
 		expectedIPs := flags.String("expected-ips", "", "expected DNS destination IPs for NAT or proxy setups")
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
@@ -159,7 +297,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		}
 		provided := map[string]bool{}
 		flags.Visit(func(f *flag.Flag) {
-			if f.Name != "configure" {
+			if f.Name != "configure" && f.Name != "with-snips" && f.Name != "with-theme" {
 				provided[f.Name] = true
 			}
 		})
@@ -172,6 +310,11 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if err != nil {
 			return fail(err)
 		}
+		s.WithSnips = *withSnips
+		s.WithTheme = *withTheme
+		if args[0] == "https" && (*withSnips || *withTheme) {
+			return fail(fmt.Errorf("use these options with flea deploy"))
+		}
 		if err := setup.Deploy(ctx, ".", s, args[0] == "https", os.Stdin, out, errOut); err != nil {
 			return fail(err)
 		}
@@ -181,6 +324,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
 			fmt.Fprintln(flags.Output(), "Usage: flea setup\n\nInstall Flea on your server over SSH.\nYou will be asked for the server address.")
+			fmt.Fprintln(flags.Output())
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			flags.SetOutput(out)
@@ -204,13 +348,17 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "new":
 		skipGit := false
+		starter := false
 		var names []string
 		for _, arg := range args[1:] {
 			switch arg {
+			case "--starter", "-s":
+				starter = true
 			case "--skip-git", "-skip-git":
 				skipGit = true
 			case "-h", "--help":
-				fmt.Fprintln(out, "Usage: flea new <site-name> [--skip-git]\n\nCreates a site and starts a Git repository on main.\nUse --skip-git to leave Git setup to you.")
+				fmt.Fprintln(out, "Usage: flea new [--starter|-s] <site-name> [--skip-git]\n\nCreates a clean site and starts a Git repository on main.\nUse --starter or -s for example pages and team content.\nUse --skip-git to leave Git setup to you.")
+				fmt.Fprintln(out)
 				return 0
 			default:
 				names = append(names, arg)
@@ -221,7 +369,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return 2
 		}
 		name := names[0]
-		if err := Create(name); err != nil {
+		if err := createSite(name, starter); err != nil {
 			return fail(err)
 		}
 		fmt.Fprintf(out, "\nCreated your site: %s\n", name)
@@ -247,9 +395,27 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		}
 		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\nWhen you're ready to publish:\n  flea deploy\n\nFleaCMS will save your settings and offer to commit your changes before deploying.\n\n", name)
 		return 0
+	case "reset":
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprintln(out, "Usage: flea reset\n\nReset this local site to a clean layout and homepage.\nReplaces content, uploads, customizations and settings after confirmation.\nKeeps Git history and a private sibling backup. Never changes the remote site.")
+			fmt.Fprintln(out)
+			return 0
+		}
+		if len(args) != 1 {
+			return 2
+		}
+		root, err := os.Getwd()
+		if err != nil {
+			return fail(err)
+		}
+		if err = resetSite(root, os.Stdin, out); err != nil {
+			return fail(err)
+		}
+		return 0
 	case "status":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			fmt.Fprintln(out, "Usage: flea status\n\nCheck the current site's configuration, templates, and content.\nRun this command from your site folder.")
+			fmt.Fprintln(out)
 			return 0
 		}
 		if len(args) != 1 {
@@ -261,9 +427,9 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		content, _ := p.Content.Index()
-		fmt.Fprintf(out, "Valid local project: %s\n%d pages, %d assets, %d fleas\n", p.Site["name"], len(p.Pages), len(p.Assets), len(p.Fleas)+len(content))
+		fmt.Fprintf(out, "Valid local project: %s\n%d pages, %d assets, %d snips\n", p.App["site_name"], len(p.Pages), len(p.Assets), len(p.Snips)+len(content))
 		if len(p.Admin.Emails) > 0 {
-			fmt.Fprintf(out, "Local sessions: %s (%d-day idle expiry)\n", filepath.Join(p.Root, "_", "sessions.json"), p.Admin.SessionIdleDays)
+			fmt.Fprintf(out, "Local sessions: %s (%d-day idle expiry)\n", filepath.Join(p.Root, "flea", "runtime", "sessions.json"), p.Admin.SessionIdleDays)
 		}
 		for _, warning := range p.Warnings {
 			fmt.Fprintf(errOut, "Warning: %s\n", warning)
@@ -276,8 +442,9 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet("dev", flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintln(flags.Output(), "Usage: flea dev [options]\n\nStart the local development server from your site folder.\nChanges reload automatically.\n\nOptions")
+			fmt.Fprintln(flags.Output(), "Usage: flea dev [options]\n\nStart the local development server from your site folder.\nAsks for a site name once, then offers optional owner setup.\nNew sites preview email in your browser without sending.\nChanges reload automatically.\n\nOptions")
 			flags.PrintDefaults()
+			fmt.Fprintln(flags.Output())
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			flags.SetOutput(out)
@@ -293,9 +460,26 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			fmt.Fprint(errOut, usage)
 			return 2
 		}
+		unlock, err := site.LockDevelopment(".")
+		if err != nil {
+			return fail(err)
+		}
+		defer unlock()
 		p, err := site.LoadEditing(ctx, ".")
 		if err != nil {
 			return fail(err)
+		}
+		changed, err := prepareDevOwner(ctx, p, os.Stdin, out, devTerminal(ctx, os.Stdin))
+		if err != nil {
+			return fail(err)
+		}
+		if changed {
+			updated := p.SnipsUpdated
+			p, err = site.LoadEditing(ctx, ".")
+			if err != nil {
+				return fail(err)
+			}
+			p.SnipsUpdated = p.SnipsUpdated || updated
 		}
 		if err := prepareLocalSessions(ctx, p); err != nil {
 			return fail(err)
@@ -313,8 +497,23 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		logger := log.New(errOut, "", 0)
-		if p.FleasUpdated {
-			logger.Print("Fleas updated in _/fleas.json.")
+		var preview *mailpreview.Preview
+		var previewSender mailer.Sender
+		if p.Dev.EmailPreview {
+			name := mailSettings.Name
+			if name == "" {
+				name = fmt.Sprint(p.App["site_name"])
+			}
+			preview, err = mailpreview.New("http://"+listener.Addr().String(), name, mailSettings.From, logger)
+			if err != nil {
+				listener.Close()
+				return fail(err)
+			}
+			previewSender, sender = preview, preview
+			logger.Print("Email preview is on. Messages open in your browser and are not sent.")
+		}
+		if p.SnipsUpdated {
+			logger.Print("Snips updated in flea/snips.json.")
 		}
 		for _, warning := range p.Warnings {
 			logger.Printf("Warning: %s", warning)
@@ -322,20 +521,17 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		handler := site.NewServer(p, logger)
 		var httpHandler http.Handler = handler
 		{
-			dashboard := devAdmin(p.Root, fmt.Sprint(p.Site["name"]), handler, logger)
-			httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if editor.IsPath(r.URL.Path) {
-					dashboard.ServeHTTP(w, r)
-				} else {
-					handler.ServeHTTP(w, r)
-				}
-			})
+			httpHandler = devAdmin(p.Root, fmt.Sprint(p.App["site_name"]), handler, logger, previewSender)
+			if len(p.Admin.Emails) == 0 {
+				logger.Print("Owner sign-in isn't set up. Run flea admin when you're ready.")
+			}
 			if len(p.Admin.Emails) > 0 && sender == nil {
 				logger.Print("Owner sign-in needs email setup. Run flea email.")
 			}
 		}
 		if p.Contact.To != "" {
 			form := contact.New(p.Contact, p.Root, sender, &contact.Budget{}, true, logger)
+			form.RenderEmail = handler.RenderEmail
 			next := httpHandler
 			httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == contact.Path {
@@ -348,6 +544,16 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				logger.Print("Contact forms need email setup. Run flea email, then restart dev.")
 			}
 		}
+		if preview != nil {
+			next := httpHandler
+			httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if strings.HasPrefix(r.URL.Path, mailpreview.Path) {
+					preview.ServeHTTP(w, r)
+				} else {
+					next.ServeHTTP(w, r)
+				}
+			})
+		}
 		server := &http.Server{Handler: httpHandler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 30 * time.Second}
 		watchCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -355,7 +561,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		go func() { watchDone <- handler.Watch(watchCtx, p.Root, logger) }()
 		done := make(chan error, 1)
 		go func() { done <- server.Serve(listener) }()
-		fmt.Fprintf(out, "\nFleaCMS running at http://%s\nWatching templates, assets, configuration and fleas.\n\nPress Ctrl-C to stop.\n", listener.Addr())
+		fmt.Fprintf(out, "\nWebsite  http://%s\nSign in  http://%s/admin\n\nPress Ctrl-C to stop.\n", listener.Addr(), listener.Addr())
 		select {
 		case err := <-watchDone:
 			server.Close()
@@ -391,6 +597,10 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 
 // Create reserves a new directory first and never overwrites an existing target.
 func Create(target string) error {
+	return createSite(target, false)
+}
+
+func createSite(target string, starter bool) error {
 	if err := os.Mkdir(target, 0755); err != nil {
 		return err
 	}
@@ -401,9 +611,27 @@ func Create(target string) error {
 		if entry.IsDir() {
 			return nil
 		}
+		if !starter && (name == "site/team.html" || name == "site/contact.html" || name == "site/thank-you.html" || name == "site/test.html") {
+			return nil
+		}
 		body, err := templates.Files.ReadFile(name)
 		if err != nil {
 			return err
+		}
+		if !starter {
+			switch name {
+			case "site/index.html":
+				body, err = templates.MinimalFiles.ReadFile("minimal/index.html")
+			case "flea/snips.json":
+				body, err = templates.MinimalFiles.ReadFile("minimal/snips.json")
+			case "site/_navigation.html":
+				body = []byte("<a href=\"/\">Home</a>\n")
+			case ".flea.config.json":
+				body = []byte("{\n  \"app\": {},\n  \"dev\": {\"email_preview\": true},\n  \"admin\": {\"emails\": [], \"session_idle_days\": 30}\n}\n")
+			}
+			if err != nil {
+				return err
+			}
 		}
 		dest := filepath.Join(target, filepath.FromSlash(name))
 		if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
@@ -427,5 +655,11 @@ func Create(target string) error {
 		return err
 	}
 	_, err = site.Load(target)
+	if err == nil {
+		err = site.IgnoreSessionFiles(target)
+	}
+	if err == nil {
+		err = os.Mkdir(filepath.Join(target, "flea", "media"), 0755)
+	}
 	return err
 }

@@ -71,7 +71,7 @@
     '/about': { label: 'About', title: 'About the studio', description: 'A small studio with a practical approach.', html: '<h1>Small by choice.</h1><p>We are a small team making thoughtful websites. We believe useful things can also be beautiful.</p><h2>How we work</h2><p>Start with a conversation. Decide what matters. Build only what you need.</p><h3>Keep it personal</h3><p>Your story deserves your own words.</p><h4>The little details</h4><p>Good spacing and clear language go a long way.</p>' },
     '/contact': { label: 'Contact', title: 'Say hello', description: 'Start a conversation with Little Field Studio.', html: '<h1>Let’s talk.</h1><p>Tell us a little about your project. We would love to hear from you.</p><p>Email <a href="mailto:hello@example.com">hello@example.com</a>.</p>' },
     '/thank-you': { label: 'Thank you', title: 'Thanks for getting in touch', description: 'Your message has arrived.', html: '<h1>Thanks for saying hello.</h1><p>Your message is with us. We will get back to you soon.</p>' },
-    '/privacy': { label: 'Privacy (no text fleas)', title: 'Privacy', description: 'Our privacy information.', html: null },
+    '/privacy': { label: 'Privacy (no text snips)', title: 'Privacy', description: 'Our privacy information.', html: null },
   };
   let shared = '<p>A little website. All yours.</p><p>Little Field Studio · Independent by design.</p>';
   let route = '/', editing = false, active = null, dirty = false, draft = null, signedIn = true;
@@ -145,7 +145,7 @@
     $('#details-button').disabled = !editing;
     $('#page-label').textContent = pages[route].label;
     if (pages[route].html === null) {
-      $('#content').innerHTML = '<h1>Privacy, in plain language.</h1><p>This developer-owned page has no editable text fleas. Its SEO title and description are still editable through Page details.</p>';
+      $('#content').innerHTML = '<h1>Privacy, in plain language.</h1><p>This developer-owned page has no editable text snips. Its SEO title and description are still editable through Page details.</p>';
     } else region($('#content'), 'page', pages[route].html, false);
     region($('#shared'), 'shared', shared, true);
     document.title = pages[route].title + ' · Flea prototype';
@@ -313,7 +313,7 @@
     } catch (error) { $('#compatibility').textContent = error.message; }
   });
   // Exposed only in this standalone experiment for the repeatable browser checks.
-  window.FleaPrototype = { createEditor, heading, cleanHTML, safeLink, normalizeLink, openDialog, closeDialog };
+  window.SnipPrototype = { createEditor, heading, cleanHTML, safeLink, normalizeLink, openDialog, closeDialog };
   const query = new URLSearchParams(location.search);
   show(query.get('page'), query.get('edit') === '1', false);
 })();

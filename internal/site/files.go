@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -16,6 +17,9 @@ import (
 // with the opened handle rejects symlink swaps during a reload as well as
 // symlinks already present at validation time.
 func readFile(root *os.Root, name string) ([]byte, error) {
+	return readFileBounded(root, name, 100<<20)
+}
+func readFileBounded(root *os.Root, name string, limit int64) ([]byte, error) {
 	if !fs.ValidPath(name) || strings.ContainsAny(name, "\\\x00") {
 		return nil, fmt.Errorf("invalid site path: %q", name)
 	}
@@ -44,15 +48,28 @@ func readFile(root *os.Root, name string) ([]byte, error) {
 	if !os.SameFile(info, actual) {
 		return nil, fmt.Errorf("file changed while loading: %s", name)
 	}
-	return io.ReadAll(f)
+	if actual.Size() > limit {
+		return nil, fmt.Errorf("file exceeds size limit: %s", name)
+	}
+	data, err := io.ReadAll(io.LimitReader(f, limit+1))
+	if int64(len(data)) > limit {
+		return nil, fmt.Errorf("file exceeds size limit: %s", name)
+	}
+	return data, err
 }
 
 func readJSON(root *os.Root, path string, target any) error {
 	data, err := readFile(root, path)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %w", path, err)
 	}
 	if err = json.Unmarshal(data, target); err != nil {
+		var syntax *json.SyntaxError
+		if errors.As(err, &syntax) {
+			// Point at the JSON line, but never put configuration values in HTML.
+			line := strings.Count(string(data[:min(int(syntax.Offset), len(data))]), "\n") + 1
+			return &SourceError{File: path, Line: line, Err: fmt.Errorf("invalid JSON: %w", err)}
+		}
 		return fmt.Errorf("%s: invalid JSON: %w", path, err)
 	}
 	return nil

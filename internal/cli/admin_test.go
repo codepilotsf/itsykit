@@ -72,6 +72,13 @@ func TestAdminStartsMissingEmailSetup(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Chdir("demo")
+	config, err := os.ReadFile(".flea.config.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(".flea.config.json", bytes.Replace(config, []byte(`"email_preview": true`), []byte(`"email_preview": false`), 1), 0644); err != nil {
+		t.Fatal(err)
+	}
 	input, err := os.Open(os.DevNull)
 	if err != nil {
 		t.Fatal(err)
@@ -84,9 +91,26 @@ func TestAdminStartsMissingEmailSetup(t *testing.T) {
 	if code := Run(context.Background(), []string{"admin", "owner@example.com"}, &out, &out); code != 1 {
 		t.Fatal("missing setup input must stop without sending", code)
 	}
-	for _, want := range []string{"Added owner@example.com", "Email setup", "API key"} {
+	for _, want := range []string{"Added owner@example.com", "Email needs setting up"} {
 		if !strings.Contains(out.String(), want) {
 			t.Fatal(out.String())
 		}
+	}
+}
+
+func TestAdminWithPreviewNeedsNoCredentials(t *testing.T) {
+	t.Setenv("RESEND_API_KEY", "")
+	t.Setenv("FLEA_EMAIL_FROM", "")
+	t.Chdir(t.TempDir())
+	if err := Create("demo"); err != nil {
+		t.Fatal(err)
+	}
+	t.Chdir("demo")
+	var out bytes.Buffer
+	if code := Run(context.Background(), []string{"admin", "owner@example.com"}, &out, &out); code != 0 {
+		t.Fatal(code, out.String())
+	}
+	if strings.Contains(out.String(), "Email needs") || strings.Contains(out.String(), "Resend") {
+		t.Fatal(out.String())
 	}
 }

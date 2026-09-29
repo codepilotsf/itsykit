@@ -26,12 +26,12 @@ func prepareLocalSessions(ctx context.Context, p *site.Project) error {
 			return cmd
 		}
 		if out, err := git("rev-parse", "--show-toplevel").CombinedOutput(); err == nil {
-			tracked, err := git("ls-files", "--", "_/sessions.json", "_/.sessions-*").Output()
+			tracked, err := git("ls-files", "--", "flea/runtime/", "flea/media/*.mp4").Output()
 			if err != nil {
 				return fmt.Errorf("Could not check Git tracking for session files.")
 			}
 			if len(tracked) > 0 {
-				return fmt.Errorf("Session files are tracked by Git. Remove _/sessions.json and _/.sessions-* from Git tracking before starting dev.")
+				return fmt.Errorf("Session files or video files are tracked by Git. Remove flea/runtime/ and flea/media/*.mp4 from Git tracking before starting dev.")
 			}
 		} else if !strings.Contains(string(out), "not a git repository") {
 			return fmt.Errorf("Could not check this site's Git repository before storing sessions.")
@@ -40,5 +40,5 @@ func prepareLocalSessions(ctx context.Context, p *site.Project) error {
 	if err := site.IgnoreSessionFiles(p.Root); err != nil {
 		return err
 	}
-	return editor.PruneSessions(editor.Options{SessionPath: filepath.Join(p.Root, "_", "sessions.json"), Emails: p.Admin.Emails, SessionIdleDays: p.Admin.SessionIdleDays})
+	return editor.PruneSessions(editor.Options{SessionPath: filepath.Join(p.Root, "flea", "runtime", "sessions.json"), Emails: p.Admin.Emails, SessionIdleDays: p.Admin.SessionIdleDays})
 }

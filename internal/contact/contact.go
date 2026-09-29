@@ -22,7 +22,8 @@ import (
 const Path = "/_flea/contact"
 
 type Config struct {
-	To string `json:"to"`
+	To          string `json:"to"`
+	SuccessPath string `json:"success_path,omitempty"`
 }
 
 func email(value string) bool {
@@ -31,6 +32,9 @@ func email(value string) bool {
 }
 
 func (c *Config) Validate() error {
+	if c.SuccessPath != "" && (!strings.HasPrefix(c.SuccessPath, "/") || strings.HasPrefix(c.SuccessPath, "//") || strings.ContainsAny(c.SuccessPath, "\\?#\r\n\x00") || strings.Contains(c.SuccessPath, "..")) {
+		return fmt.Errorf("contact.success_path must be a local absolute path")
+	}
 	c.To = strings.TrimSpace(c.To)
 	if c.To != "" && !email(c.To) {
 		return fmt.Errorf("contact.to must be one email address without a display name")
@@ -67,16 +71,17 @@ func (b *Budget) acquire(now time.Time) bool {
 func (b *Budget) release() { b.mu.Lock(); b.active--; b.mu.Unlock() }
 
 type Handler struct {
-	config Config
-	site   string
-	sender mailer.Sender
-	budget *Budget
-	local  bool
-	logger *log.Logger
-	mu     sync.Mutex
-	ips    map[string]bucket
-	window bucket
-	active bool
+	RenderEmail func(string, map[string]string) (mailer.Message, error)
+	config      Config
+	site        string
+	sender      mailer.Sender
+	budget      *Budget
+	local       bool
+	logger      *log.Logger
+	mu          sync.Mutex
+	ips         map[string]bucket
+	window      bucket
+	active      bool
 }
 
 func New(c Config, site string, sender mailer.Sender, budget *Budget, local bool, logger *log.Logger) *Handler {
@@ -169,6 +174,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.PostForm.Get("website") != "" {
+		if h.config.SuccessPath != "" {
+			http.Redirect(w, r, h.config.SuccessPath, http.StatusSeeOther)
+			return
+		}
 		fmt.Fprintln(w, "Thank you. Your form was received.")
 		return
 	}
@@ -199,7 +208,17 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer h.budget.release()
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
-	err = h.sender.Send(ctx, mailer.Message{To: h.config.To, ReplyTo: address, Subject: "New website contact message", Text: "Name: " + name + "\nEmail: " + address + "\n\n" + message})
+	mail := mailer.Message{To: h.config.To, ReplyTo: address, Subject: "New website contact message", Text: "Name: " + name + "\nEmail: " + address + "\n\n" + message}
+	if h.RenderEmail != nil {
+		rendered, renderErr := h.RenderEmail("contact", map[string]string{"name": name, "address": address, "message": message})
+		err = renderErr
+		if err == nil {
+			mail.HTML, mail.Text = rendered.HTML, rendered.Text
+		}
+	}
+	if err == nil {
+		err = h.sender.Send(ctx, mail)
+	}
 	if err != nil {
 		if h.logger != nil {
 			h.logger.Printf("Contact delivery failed for site %q", h.site)
@@ -209,6 +228,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if h.logger != nil {
 		h.logger.Printf("Contact message accepted for site %q", h.site)
+	}
+	if h.config.SuccessPath != "" {
+		http.Redirect(w, r, h.config.SuccessPath, http.StatusSeeOther)
+		return
 	}
 	fmt.Fprintln(w, "Thank you. Your message was accepted for delivery. You can return to the previous page.")
 }

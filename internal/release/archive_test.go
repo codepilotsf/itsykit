@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -11,7 +12,7 @@ import (
 
 func TestArchiveRoundTripAndScope(t *testing.T) {
 	root := t.TempDir()
-	for name, body := range map[string]string{"index.html": "hello", "_/flea.config": `{"site":{"name":"test"}}`, "_/fleas/home.json": "{}", "_/deploy.json": "private-target", ".git/config": "secret", "README.md": "local"} {
+	for name, body := range map[string]string{"site/index.html": "hello", ".flea.config.json": `{"app":{"site_name":"test"},"admin":{"emails":["owner@example.test"]},"deploy":{"branches":{"main":{"target":"private-target"}}}}`, "flea/data/home.json": "{}", "flea/runtime/sessions.json": "private-session", ".git/config": "secret", "README.md": "local"} {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)
@@ -21,6 +22,12 @@ func TestArchiveRoundTripAndScope(t *testing.T) {
 		}
 	}
 	var b bytes.Buffer
+	if err := os.MkdirAll(filepath.Join(root, "mailers"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "mailers", "sign-in.email.html"), []byte("{email.code}"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	if err := Pack(root, &b); err != nil {
 		t.Fatal(err)
 	}
@@ -28,10 +35,30 @@ func TestArchiveRoundTripAndScope(t *testing.T) {
 	if err := Extract(bytes.NewReader(b.Bytes()), dest); err != nil {
 		t.Fatal(err)
 	}
-	if data, err := os.ReadFile(filepath.Join(dest, "index.html")); err != nil || string(data) != "hello" {
+	if data, err := os.ReadFile(filepath.Join(dest, "site", "index.html")); err != nil || string(data) != "hello" {
 		t.Fatal(string(data), err)
 	}
-	for _, name := range []string{"_/deploy.json", ".git/config", "README.md"} {
+	if _, err := os.Stat(filepath.Join(dest, ".flea.config.json")); err != nil {
+		t.Fatal("configuration missing from release", err)
+	}
+	configBytes, err := os.ReadFile(filepath.Join(dest, ".flea.config.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var config map[string]json.RawMessage
+	if err = json.Unmarshal(configBytes, &config); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := config["deploy"]; ok || bytes.Contains(configBytes, []byte("private-target")) {
+		t.Fatal("deployment settings leaked into runtime archive")
+	}
+	if config["app"] == nil || config["admin"] == nil {
+		t.Fatal("runtime config fields lost")
+	}
+	if data, err := os.ReadFile(filepath.Join(dest, "mailers", "sign-in.email.html")); err != nil || string(data) != "{email.code}" {
+		t.Fatal("mailer missing from release", err)
+	}
+	for _, name := range []string{"flea/runtime", ".git/config", "README.md"} {
 		if _, err := os.Stat(filepath.Join(dest, name)); !os.IsNotExist(err) {
 			t.Fatal("included local file", name)
 		}
@@ -39,7 +66,7 @@ func TestArchiveRoundTripAndScope(t *testing.T) {
 	if err := Extract(bytes.NewReader(b.Bytes()), dest); err == nil {
 		t.Fatal("overwrote populated release")
 	}
-	if err := os.Symlink("index.html", filepath.Join(root, "link")); err != nil {
+	if err := os.Symlink("index.html", filepath.Join(root, "site", "link")); err != nil {
 		t.Fatal(err)
 	}
 	if err := Pack(root, &bytes.Buffer{}); err == nil {
@@ -53,7 +80,7 @@ func TestRejectUnsafeArchives(t *testing.T) {
 		typ  byte
 		size int64
 	}{
-		{"../escape", tar.TypeReg, 0}, {"../../escape", tar.TypeReg, 0}, {"/tmp/escape", tar.TypeReg, 0}, {"./index", tar.TypeReg, 0}, {"link", tar.TypeSymlink, 0}, {"hardlink", tar.TypeLink, 0}, {"fifo", tar.TypeFifo, 0}, {"_/deploy.json", tar.TypeReg, 0}, {"huge", tar.TypeReg, MaxBytes + 1}, {"html\\escape", tar.TypeReg, 0},
+		{"../escape", tar.TypeReg, 0}, {"../../escape", tar.TypeReg, 0}, {"/tmp/escape", tar.TypeReg, 0}, {"./index", tar.TypeReg, 0}, {"site/link", tar.TypeSymlink, 0}, {"site/hardlink", tar.TypeLink, 0}, {"site/fifo", tar.TypeFifo, 0}, {"flea/runtime/sessions.json", tar.TypeReg, 0}, {"site/huge", tar.TypeReg, MaxBytes + 1}, {"site\\escape", tar.TypeReg, 0},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			var b bytes.Buffer
@@ -74,7 +101,7 @@ func TestRejectUnsafeArchives(t *testing.T) {
 		gz := gzip.NewWriter(&b)
 		tw := tar.NewWriter(gz)
 		for i := 0; i < 2; i++ {
-			if err := tw.WriteHeader(&tar.Header{Name: "index.html", Mode: 0644, Typeflag: tar.TypeReg}); err != nil {
+			if err := tw.WriteHeader(&tar.Header{Name: "site/index.html", Mode: 0644, Typeflag: tar.TypeReg}); err != nil {
 				t.Fatal(err)
 			}
 		}
@@ -88,7 +115,7 @@ func TestRejectUnsafeArchives(t *testing.T) {
 		var b bytes.Buffer
 		gz := gzip.NewWriter(&b)
 		tw := tar.NewWriter(gz)
-		tw.WriteHeader(&tar.Header{Name: "css", Typeflag: tar.TypeDir, Mode: 0755})
+		tw.WriteHeader(&tar.Header{Name: "site/css", Typeflag: tar.TypeDir, Mode: 0755})
 		tw.Close()
 		gz.Close()
 		if err := Extract(bytes.NewReader(b.Bytes()[:b.Len()-5]), t.TempDir()); err == nil {

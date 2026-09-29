@@ -1,0 +1,15 @@
+# macOS metadata
+.DS_Store
+._*
+
+# Temporary editor files
+*.swp
+*.swo
+*~
+
+# Local environment secrets
+.env
+.env.*
+!.env.example
+/flea/runtime/
+/flea/media/*.mp4

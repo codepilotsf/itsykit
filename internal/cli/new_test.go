@@ -27,6 +27,18 @@ func TestNewInitializesGitWithoutCommit(t *testing.T) {
 	if _, err := os.Stat("demo/.gitignore"); err != nil {
 		t.Fatal(err)
 	}
+	if _, err := os.Stat("demo/flea/icons/.keep"); err != nil {
+		t.Fatal("missing icon directory placeholder", err)
+	}
+	icons, err := os.ReadDir("demo/flea/icons")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, icon := range icons {
+		if icon.IsDir() || icon.Name() == "LICENSE" {
+			t.Fatal("icon cache must be flat without a license file")
+		}
+	}
 }
 
 func TestNewSkipGitAndMissingGit(t *testing.T) {
@@ -45,7 +57,7 @@ func TestNewSkipGitAndMissingGit(t *testing.T) {
 	if code := Run(context.Background(), []string{"new", "three"}, &out, io.Discard); code != 0 || !strings.Contains(out.String(), "Git isn't installed") {
 		t.Fatal(code, out.String())
 	}
-	if _, err := os.Stat("three/index.html"); err != nil {
+	if _, err := os.Stat("three/site/index.html"); err != nil {
 		t.Fatal("site missing", err)
 	}
 }

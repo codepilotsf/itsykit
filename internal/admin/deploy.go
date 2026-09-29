@@ -17,23 +17,26 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/fleas"
 	"flea/internal/host"
 	"flea/internal/release"
 	"flea/internal/site"
+	"flea/internal/snips"
 	"flea/internal/state"
+	"flea/internal/syncstate"
 )
 
 type Options struct {
-	Archive   string
-	Name      string
-	Domains   []string
-	HTTPS     bool
-	Email     string
-	AgreeTOS  bool
-	Canonical string
-	Branch    string
-	Commit    string
+	keepRouting bool // Recovery actions retain current host/TLS policy.
+	Sync        *syncstate.Plan
+	Archive     string
+	Name        string
+	Domains     []string
+	HTTPS       bool
+	Email       string
+	AgreeTOS    bool
+	Canonical   string
+	Branch      string
+	Commit      string
 }
 
 func (o Options) Validate() error {
@@ -124,7 +127,15 @@ func verify(ctx context.Context, c host.Config, domains []string) error {
 }
 
 func (m Manager) lock() (func(), error) {
-	return state.Lock(filepath.Join(filepath.Dir(m.ConfigPath), "deploy.lock"))
+	unlock, err := state.Lock(filepath.Join(filepath.Dir(m.ConfigPath), "deploy.lock"))
+	if err != nil {
+		return nil, err
+	}
+	if _, err = os.Lstat(upgradePending(m.ConfigPath)); !os.IsNotExist(err) {
+		unlock()
+		return nil, fmt.Errorf("server upgrade recovery pending; run flea update-server --recover")
+	}
+	return unlock, nil
 }
 
 func (m Manager) pending() string {
@@ -170,6 +181,11 @@ func (m Manager) Apply(ctx context.Context, o Options) (string, error) {
 		return "", err
 	}
 	defer unlock()
+	return m.applyLocked(ctx, o)
+}
+
+// applyLocked requires the cross-process deployment lock.
+func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 	if _, err := os.Lstat(m.pending()); !os.IsNotExist(err) {
 		return "", fmt.Errorf("unfinished deployment; run sudo flea-server -recover before retrying")
 	}
@@ -210,8 +226,15 @@ func (m Manager) Apply(ctx context.Context, o Options) (string, error) {
 		return "", err
 	}
 	id := time.Now().UTC().Format("20060102-150405") + "-" + hex.EncodeToString(idBytes)
+	previous := ""
+	for _, root := range c.Sites {
+		if filepath.Dir(root) == filepath.Join(m.DataDir, "sites", o.Name, "releases") {
+			previous = filepath.Base(root)
+			break
+		}
+	}
 	var contentPath string
-	var activeContent *fleas.Store
+	var activeContent *snips.Store
 	if o.Archive != "" {
 		parent := filepath.Join(m.DataDir, "sites", o.Name, "releases")
 		for _, domain := range o.Domains {
@@ -241,74 +264,109 @@ func (m Manager) Apply(ctx context.Context, o Options) (string, error) {
 		if loadErr != nil {
 			return "", fmt.Errorf("invalid release %s: %w", dest, loadErr)
 		}
-		if err = project.CheckExtractedFleas(); err != nil {
+		if err = project.CheckExtractedSnips(); err != nil {
 			return "", err
+		}
+		remote, e := m.snapshot(c, o.Name, o.Branch)
+		if e != nil {
+			return "", e
+		}
+		if o.Sync != nil {
+			if o.Sync.Expected != remote.Version() {
+				return "", fmt.Errorf("live content changed during deployment; pull and retry")
+			}
+		}
+		css := project.ThemeCSS()
+		if remote.Exists && remote.Theme != nil {
+			css = remote.Theme
+		}
+		if o.Sync != nil && o.Sync.WithTheme {
+			css = o.Sync.Theme
 		}
 		if (len(project.Admin.Emails) > 0 || project.Contact.To != "") && !o.HTTPS {
 			return "", fmt.Errorf("sites with admin access or contact forms require HTTPS")
 		}
-		contentPath, activeContent, err = m.prepareContent(c, o.Name, id, dest, project)
+		contentPath, activeContent, err = m.prepareContentPlan(c, o.Name, id, dest, project, o.Sync)
 		if err != nil {
 			return "", err
 		}
 		if c.Content == nil {
 			c.Content = map[string]string{}
 		}
+		if c.Themes == nil {
+			c.Themes = map[string]string{}
+		}
+		themePath := ""
+		if css != nil {
+			themePath = contentPath + ".theme.css"
+			if err = atomicWrite(themePath, []byte(*css), 0644); err != nil {
+				return "", err
+			}
+		}
 		// All existing aliases for this site move together; unrelated sites survive.
 		for domain, root := range c.Sites {
 			if filepath.Dir(root) == parent {
 				c.Sites[domain] = dest
 				c.Content[domain] = contentPath
+				c.Themes[domain] = themePath
 			}
 		}
 		for _, domain := range o.Domains {
 			c.Sites[domain] = dest
 			c.Content[domain] = contentPath
+			c.Themes[domain] = themePath
 		}
 		if o.Branch != "" {
 			c.SiteBranches[o.Name] = o.Branch
 			c.Commits[o.Name] = o.Commit
 		}
 	}
-	if o.Canonical != "" {
-		c.Redirects["www."+o.Canonical] = o.Canonical
-	} else {
-		for _, domain := range o.Domains {
-			delete(c.Redirects, domain)
-			delete(c.Redirects, "www."+domain)
-		}
-	}
-	if o.HTTPS {
-		if c.TLS == nil {
-			c.TLS = &host.TLSConfig{Listen: ":443", CacheDir: filepath.Join(m.DataDir, "certs")}
-		}
-		c.TLS.Email = o.Email
-		c.TLS.AgreeTOS = o.AgreeTOS
-		for _, domain := range o.Domains {
-			if c.Sites[domain] == "" {
-				return "", fmt.Errorf("deploy %s before enabling HTTPS", domain)
+	if !o.keepRouting {
+		if o.Canonical != "" {
+			c.Redirects["www."+o.Canonical] = o.Canonical
+		} else {
+			for _, domain := range o.Domains {
+				delete(c.Redirects, domain)
+				delete(c.Redirects, "www."+domain)
 			}
-			found := false
-			for _, existing := range c.TLS.Domains {
-				if existing == domain {
-					found = true
+		}
+		if o.HTTPS {
+			if c.TLS == nil {
+				c.TLS = &host.TLSConfig{Listen: ":443", CacheDir: filepath.Join(m.DataDir, "certs")}
+			}
+			c.TLS.Email = o.Email
+			c.TLS.AgreeTOS = o.AgreeTOS
+			for _, domain := range o.Domains {
+				if c.Sites[domain] == "" {
+					return "", fmt.Errorf("deploy %s before enabling HTTPS", domain)
+				}
+				found := false
+				for _, existing := range c.TLS.Domains {
+					if existing == domain {
+						found = true
+					}
+				}
+				if !found {
+					c.TLS.Domains = append(c.TLS.Domains, domain)
 				}
 			}
-			if !found {
-				c.TLS.Domains = append(c.TLS.Domains, domain)
+		}
+		if !o.HTTPS && o.Archive != "" && c.TLS != nil {
+			remaining := c.TLS.Domains[:0]
+			for _, domain := range c.TLS.Domains {
+				if filepath.Dir(c.Sites[domain]) != filepath.Join(m.DataDir, "sites", o.Name, "releases") {
+					remaining = append(remaining, domain)
+				}
+			}
+			c.TLS.Domains = remaining
+			if len(remaining) == 0 {
+				c.TLS = nil
 			}
 		}
 	}
-	if !o.HTTPS && o.Archive != "" && c.TLS != nil {
-		remaining := c.TLS.Domains[:0]
-		for _, domain := range c.TLS.Domains {
-			if filepath.Dir(c.Sites[domain]) != filepath.Join(m.DataDir, "sites", o.Name, "releases") {
-				remaining = append(remaining, domain)
-			}
-		}
-		c.TLS.Domains = remaining
-		if len(remaining) == 0 {
-			c.TLS = nil
+	if o.Archive != "" {
+		if err = m.writeReceipt(o.Name, ReleaseRecord{ID: id, Previous: previous, Branch: o.Branch, Commit: o.Commit}); err != nil {
+			return "", err
 		}
 	}
 	c.Revision = id

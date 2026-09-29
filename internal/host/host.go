@@ -21,14 +21,15 @@ import (
 	"flea/internal/contact"
 	"flea/internal/editor"
 	"flea/internal/editstore"
-	"flea/internal/fleas"
 	"flea/internal/mailer"
 	"flea/internal/site"
+	"flea/internal/snips"
 )
 
 const HealthPath = "/_flea/health"
 
 type Config struct {
+	Themes       map[string]string `json:"themes,omitempty"`
 	Content      map[string]string `json:"content,omitempty"`
 	Listen       string            `json:"listen"`
 	Sites        map[string]string `json:"sites"`
@@ -75,6 +76,7 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 	// release would make deployment preservation depend on map iteration order.
 	byRoot := map[string]http.Handler{}
 	contentPaths := map[string]string{}
+	themePaths := map[string]string{}
 	sessionOwners := map[string]string{}
 	contactBudget := &contact.Budget{}
 	type owner struct {
@@ -91,6 +93,19 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 		}
 		key := filepath.Clean(root)
 		contentPath := config.Content[host]
+		themePath := config.Themes[host]
+		var themeCSS *string
+		if themePath != "" {
+			if !filepath.IsAbs(themePath) || contentPath == "" || themePath != contentPath+".theme.css" {
+				return config, nil, fmt.Errorf("theme must accompany its managed content snapshot")
+			}
+			b, e := site.ReadManagedFile(filepath.Dir(themePath), filepath.Base(themePath))
+			if e != nil {
+				return config, nil, e
+			}
+			v := string(b)
+			themeCSS = &v
+		}
 		if contentPath != "" {
 			if !filepath.IsAbs(contentPath) {
 				return config, nil, fmt.Errorf("content path must be absolute")
@@ -113,23 +128,28 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 			contentOwners = append(contentOwners, owner{key, info})
 		}
 		if handler, ok := byRoot[key]; ok {
-			if contentPaths[key] != contentPath {
+			if contentPaths[key] != contentPath || themePaths[key] != themePath {
 				return config, nil, fmt.Errorf("aliases for site %s must use the same content snapshot", root)
 			}
 			handlers[host] = handler
 			continue
 		}
-		var content *fleas.Store
+		var content *snips.Store
 		if name := config.Content[host]; name != "" {
 			if !filepath.IsAbs(name) {
 				return config, nil, fmt.Errorf("content path must be absolute")
 			}
-			content, err = fleas.ReadFile(name)
+			content, err = snips.ReadFile(name)
 			if err != nil {
 				return config, nil, err
 			}
 		}
-		project, err := site.LoadWithFleas(root, content)
+		themePaths[key] = themePath
+		mediaRoot := ""
+		if contentPath != "" {
+			mediaRoot = site.ManagedMediaRoot(contentPath)
+		}
+		project, err := site.LoadWithMedia(root, content, themeCSS, mediaRoot)
 		if err != nil {
 			return config, nil, fmt.Errorf("site %s: %w", host, err)
 		}
@@ -144,18 +164,19 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 			if contentPath == "" {
 				return config, nil, fmt.Errorf("site %s: admin requires a managed content snapshot; deploy this site first", host)
 			}
-			store := &editstore.Store{Root: root, ContentPath: contentPath, ConfigPath: configPath, Emails: project.Admin.Emails, Publish: public.Publish}
-			dashboard := editor.New(editor.Options{Emails: project.Admin.Emails, SessionPath: managedSessionPath(contentPath), SessionIdleDays: project.Admin.SessionIdleDays, Name: fmt.Sprint(project.Site["name"]), Sender: sender, Backend: store, Logger: logger, Render: public.RenderAdmin})
+			store := &editstore.Store{Root: root, ContentPath: contentPath, ThemePath: themePath, ConfigPath: configPath, Emails: project.Admin.Emails, Publish: public.Publish}
+			dashboard := editor.New(editor.Options{Emails: project.Admin.Emails, SessionPath: managedSessionPath(contentPath), SessionIdleDays: project.Admin.SessionIdleDays, Name: fmt.Sprint(project.App["site_name"]), Sender: sender, Backend: store, Logger: logger, Render: public.RenderAdmin, Public: public.ServeOwner, RenderEmail: public.RenderEmail})
 			handlers[host] = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if editor.IsPath(r.URL.Path) {
 					dashboard.ServeHTTP(w, r)
 				} else {
-					public.ServeHTTP(w, r)
+					dashboard.ServePublic(w, r, public)
 				}
 			})
 		}
 		if project.Contact.To != "" {
 			form := contact.New(project.Contact, key, sender, contactBudget, false, logger)
+			form.RenderEmail = public.RenderEmail
 			next := handlers[host]
 			handlers[host] = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == contact.Path {
@@ -280,7 +301,7 @@ func serve(ctx context.Context, config Config, handler http.Handler, logger *log
 // Managed content is <site>/content/<revision>.json; sessions belong beside
 // content, not within either the revision or its immutable release directory.
 func managedSessionPath(contentPath string) string {
-	return filepath.Join(filepath.Dir(filepath.Dir(contentPath)), "_", "sessions.json")
+	return filepath.Join(filepath.Dir(filepath.Dir(contentPath)), "flea", "runtime", "sessions.json")
 }
 
 func initializeSessions(config Config) error {

@@ -35,7 +35,7 @@ func TestManagedSessionsSurviveReleaseChange(t *testing.T) {
 	record, _ := json.Marshal(map[string]any{hex.EncodeToString(digest[:]): map[string]any{
 		"email": "owner@example.test", "host": "example.test", "csrf": strings.Repeat("b", 64), "last_active": now, "expires": now.Add(30 * 24 * time.Hour),
 	}})
-	sessions := filepath.Join(base, "_", "sessions.json")
+	sessions := filepath.Join(base, "flea", "runtime", "sessions.json")
 	write(sessions, record, 0600)
 	var config Config
 	var handler http.Handler
@@ -47,9 +47,9 @@ func TestManagedSessionsSurviveReleaseChange(t *testing.T) {
 		if err := os.CopyFS(root, templates.Files); err != nil {
 			t.Fatal(err)
 		}
-		write(filepath.Join(root, "_", "flea.config"), []byte(`{"site":{"name":"Example"},"admin":{"emails":["owner@example.test"],"session_idle_days":30}}`), 0644)
+		write(filepath.Join(root, ".flea.config.json"), []byte(`{"app":{"site_name":"Example"},"admin":{"emails":["owner@example.test"],"session_idle_days":30}}`), 0644)
 		content := filepath.Join(base, "content", revision+".json")
-		seed, err := os.ReadFile(filepath.Join(root, "_", "fleas.json"))
+		seed, err := os.ReadFile(filepath.Join(root, "flea", "snips.json"))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -77,19 +77,19 @@ func TestManagedSessionsSurviveReleaseChange(t *testing.T) {
 			w := httptest.NewRecorder()
 			handler.ServeHTTP(w, r)
 			if host == "example.test" {
-				if w.Code != 200 || !strings.Contains(w.Body.String(), "Page title") {
+				if w.Code != 303 || w.Header().Get("Location") != "/" {
 					t.Fatal(revision, w.Code, w.Body.String())
 				}
-			} else if strings.Contains(w.Body.String(), "Page title") {
+			} else if w.Code == 303 {
 				t.Fatal("session crossed aliases")
 			}
 		}
-		if _, err := os.Stat(filepath.Join(root, "_", "sessions.json")); !os.IsNotExist(err) {
+		if _, err := os.Stat(filepath.Join(root, "flea", "runtime", "sessions.json")); !os.IsNotExist(err) {
 			t.Fatal("session state entered release")
 		}
 	}
 	// Startup with all owners removed permanently prunes their sessions.
-	write(filepath.Join(config.Sites["example.test"], "_", "flea.config"), []byte(`{"site":{"name":"Example"},"admin":{"emails":[]}}`), 0644)
+	write(filepath.Join(config.Sites["example.test"], ".flea.config.json"), []byte(`{"app":{"site_name":"Example"},"admin":{"emails":[]}}`), 0644)
 	if err := initializeSessions(config); err != nil {
 		t.Fatal(err)
 	}

@@ -69,7 +69,7 @@ func TestMailSetupKeepsSecretsOutOfArgumentsAndOutput(t *testing.T) {
 }
 func TestAdminDeployRequiresHTTPSBeforeSSH(t *testing.T) {
 	root := repoSite(t)
-	if err := os.WriteFile(filepath.Join(root, "_", "flea.config"), []byte(`{"site":{"name":"Test"},"admin":{"emails":["owner@example.test"]}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, ".flea.config.json"), []byte(`{"app":{"site_name":"Test"},"admin":{"emails":["owner@example.test"]}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	testGit(t, root, "add", ".")
@@ -84,7 +84,7 @@ func TestAdminDeployConfiguresMailBeforeActivation(t *testing.T) {
 	t.Setenv("RESEND_API_KEY", "re_test123456")
 	t.Setenv("FLEA_EMAIL_FROM", "login@example.test")
 	root := repoSite(t)
-	if err := os.WriteFile(filepath.Join(root, "_", "flea.config"), []byte(`{"site":{"name":"Test"},"admin":{"emails":["owner@example.test"]}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, ".flea.config.json"), []byte(`{"app":{"site_name":"Test"},"admin":{"emails":["owner@example.test"]}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	testGit(t, root, "add", ".")
@@ -97,7 +97,7 @@ func TestAdminDeployConfiguresMailBeforeActivation(t *testing.T) {
 		}
 		switch {
 		case strings.Contains(args, "FLEA_SYSTEM"):
-			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=10")
+			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=22")
 		case strings.Contains(args, "-mail-status"):
 			fmt.Fprintln(c.out, "FLEA_MAIL=missing")
 		case strings.Contains(args, "mktemp -d /tmp/flea-mail"):

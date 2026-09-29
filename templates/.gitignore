@@ -11,5 +11,5 @@
 .env
 .env.*
 !.env.example
-/_/sessions.json
-/_/.sessions-*
+/flea/runtime/
+/flea/media/*.mp4

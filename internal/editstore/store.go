@@ -3,8 +3,6 @@
 package editstore
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -13,19 +11,21 @@ import (
 	"unicode/utf8"
 
 	"flea/internal/editor"
-	"flea/internal/fleas"
 	"flea/internal/site"
+	"flea/internal/snips"
 	"flea/internal/state"
+	"flea/internal/theme"
 )
 
 type Store struct {
+	ThemePath                     string
 	Root, ContentPath, ConfigPath string
 	Emails                        []string
 	Publish                       func(*site.Project)
 }
 
 func (s *Store) lock() (func(), error) {
-	lock, pending := "", filepath.Join(s.Root, "_", ".fleas-pending.json")
+	lock, pending := "", filepath.Join(s.Root, "flea", "runtime", ".snips-pending.json")
 	if s.ConfigPath != "" {
 		lock = filepath.Join(filepath.Dir(s.ConfigPath), "deploy.lock")
 		pending = filepath.Join(filepath.Dir(s.ConfigPath), "deploy.pending.json")
@@ -45,14 +45,18 @@ func (s *Store) lock() (func(), error) {
 		return nil, fmt.Errorf("content recovery is pending")
 	}
 	if s.ConfigPath != "" {
+		if _, e := os.Lstat(filepath.Join(filepath.Dir(s.ConfigPath), "upgrade.pending.json")); !os.IsNotExist(e) {
+			unlock()
+			return nil, fmt.Errorf("server upgrade recovery pending")
+		}
 		data, err := os.ReadFile(s.ConfigPath)
-		var c struct{ Sites, Content map[string]string }
+		var c struct{ Sites, Content, Themes map[string]string }
 		if err == nil {
 			err = json.Unmarshal(data, &c)
 		}
 		active := false
 		for domain, root := range c.Sites {
-			if filepath.Clean(root) == filepath.Clean(s.Root) && filepath.Clean(c.Content[domain]) == filepath.Clean(s.ContentPath) {
+			if filepath.Clean(root) == filepath.Clean(s.Root) && filepath.Clean(c.Content[domain]) == filepath.Clean(s.ContentPath) && c.Themes[domain] == s.ThemePath {
 				active = true
 			}
 		}
@@ -64,15 +68,24 @@ func (s *Store) lock() (func(), error) {
 	return unlock, nil
 }
 func (s *Store) load() (*site.Project, error) {
-	var content *fleas.Store
+	var content *snips.Store
 	var err error
 	if s.ConfigPath != "" {
-		content, err = fleas.ReadFile(s.ContentPath)
+		content, err = snips.ReadFile(s.ContentPath)
 		if err != nil {
 			return nil, err
 		}
 	}
-	p, err := site.LoadWithFleas(s.Root, content)
+	var css *string
+	if s.ThemePath != "" {
+		b, e := site.ReadManagedFile(filepath.Dir(s.ThemePath), filepath.Base(s.ThemePath))
+		if e != nil {
+			return nil, e
+		}
+		v := string(b)
+		css = &v
+	}
+	p, err := site.LoadWithMedia(s.Root, content, css, s.mediaRoot())
 	if err != nil {
 		return nil, err
 	}
@@ -80,11 +93,6 @@ func (s *Store) load() (*site.Project, error) {
 		return nil, fmt.Errorf("admin access changed; restart dev")
 	}
 	return p, nil
-}
-func version(s *fleas.Store) string {
-	b, _ := s.Bytes()
-	hash := sha256.Sum256(b)
-	return hex.EncodeToString(hash[:])
 }
 func (s *Store) Read() (editor.Document, error) {
 	unlock, err := s.lock()
@@ -96,7 +104,7 @@ func (s *Store) Read() (editor.Document, error) {
 	if err != nil {
 		return editor.Document{}, err
 	}
-	return editor.Document{Store: p.Content, Routes: p.Routes(), Version: version(p.Content)}, nil
+	return editor.Document{Store: p.Content, Theme: p.ThemeCSS(), Routes: p.Routes(), Version: p.EditingVersion()}, nil
 }
 func (s *Store) Save(u editor.Update) error {
 	unlock, err := s.lock()
@@ -108,16 +116,53 @@ func (s *Store) Save(u editor.Update) error {
 	if err != nil {
 		return err
 	}
-	if u.Version == "" || u.Version != version(p.Content) {
+	if u.Page != nil {
+		u.Version = u.Page.Version
+	}
+	if u.Version == "" || u.Version != p.EditingVersion() {
 		return fmt.Errorf("content changed since opening this form")
 	}
-	if u.ID != "" {
-		refs, err := p.FleaReferences()
+	if u.Theme != nil || len(u.Scales) > 0 {
+		css := p.ThemeCSS()
+		if css == nil {
+			return fmt.Errorf("no theme.css")
+		}
+		nextCSS, e := theme.ApplyScales(*css, u.Theme, u.Scales)
+		if e != nil {
+			return e
+		}
+		next, e := site.LoadWithMedia(s.Root, p.Content, &nextCSS, s.mediaRoot())
+		if e != nil {
+			return e
+		}
+		if s.ConfigPath == "" {
+			e = site.WriteManagedFile(s.Root, "site/css/theme.css", []byte(nextCSS))
+		} else {
+			if s.ThemePath == "" {
+				return fmt.Errorf("no managed theme; redeploy first")
+			}
+			e = site.WriteManagedFile(filepath.Dir(s.ThemePath), filepath.Base(s.ThemePath), []byte(nextCSS))
+		}
+		if e != nil {
+			return e
+		}
+		s.Publish(next)
+		return nil
+	}
+	if u.Page != nil {
+		if err := s.applyMedia(p, *u.Page); err != nil {
+			return err
+		}
+		if err := applyPage(p, *u.Page); err != nil {
+			return err
+		}
+	} else if u.ID != "" {
+		refs, err := p.SnipReferences()
 		if err != nil {
 			return err
 		}
 		if _, ok := refs[u.ID]; !ok {
-			return fmt.Errorf("flea is not referenced by this site")
+			return fmt.Errorf("snip is not referenced by this site")
 		}
 		index, err := p.Content.Index()
 		if err != nil {
@@ -125,18 +170,18 @@ func (s *Store) Save(u editor.Update) error {
 		}
 		entry, ok := index[u.ID]
 		if !ok {
-			return fmt.Errorf("unknown flea")
+			return fmt.Errorf("unknown snip")
 		}
-		entry.Content, err = fleas.Sanitize(u.Content)
+		entry.Content, err = snips.Sanitize(u.Content)
 		if err != nil {
 			return err
 		}
-		if _, ok := p.Content.Shared.Fleas[u.ID]; ok {
-			p.Content.Shared.Fleas[u.ID] = entry
+		if _, ok := p.Content.Shared.Snips[u.ID]; ok {
+			p.Content.Shared.Snips[u.ID] = entry
 		} else {
 			for _, page := range p.Content.Pages {
-				if _, ok := page.Fleas[u.ID]; ok {
-					page.Fleas[u.ID] = entry
+				if _, ok := page.Snips[u.ID]; ok {
+					page.Snips[u.ID] = entry
 				}
 			}
 		}
@@ -152,14 +197,14 @@ func (s *Store) Save(u editor.Update) error {
 		page.Description = u.Description
 	}
 	// Validate the full candidate before making it durable or visible to readers.
-	next, err := site.LoadWithFleas(s.Root, p.Content)
+	next, err := site.LoadWithMedia(s.Root, p.Content, p.ThemeCSS(), s.mediaRoot())
 	if err != nil {
 		return err
 	}
 	if s.ConfigPath == "" {
 		err = site.SaveContent(s.Root, p.Content)
 	} else {
-		err = fleas.WriteFile(s.ContentPath, p.Content)
+		err = snips.WriteFile(s.ContentPath, p.Content)
 	}
 	if err != nil {
 		return err

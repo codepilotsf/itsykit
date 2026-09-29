@@ -1,10 +1,39 @@
 package site
 
 import (
+	"bytes"
 	"net/http/httptest"
 	"strings"
 	"testing"
 )
+
+func TestAdminReloadScriptDevelopmentOnly(t *testing.T) {
+	root := fixture(t)
+	for _, name := range []string{"index", "code", "setup", "error"} {
+		put(t, root, "admin/"+name+".html", `<p>Before</p>`)
+	}
+	p := mustLoad(t, root)
+	s := NewServer(p)
+	for _, mode := range []string{"login", "verify", "setup", "error"} {
+		body, err := s.RenderAdmin(mode, nil)
+		if err != nil || !strings.Contains(s.AdminReload(), reloadPath) {
+			t.Fatalf("%s lacks current reload script: %s, %v", mode, body, err)
+		}
+		body, err = NewProductionServer(p, nil).RenderAdmin(mode, nil)
+		if err != nil || bytes.Contains(body, []byte(reloadPath)) || NewProductionServer(p, nil).AdminReload() != "" {
+			t.Fatalf("production %s has reload script: %s, %v", mode, body, err)
+		}
+	}
+	before := s.revision
+	put(t, root, "admin/index.html", `<p>After</p>`)
+	if err := s.Reload(root); err != nil {
+		t.Fatal(err)
+	}
+	body, err := s.RenderAdmin("login", nil)
+	if err != nil || s.revision == before || !bytes.Contains(reloadScript(s.revision), []byte(s.AdminReload())) || !bytes.Contains(body, []byte("After")) {
+		t.Fatalf("admin reload did not publish updated content and revision: %s, %v", body, err)
+	}
+}
 
 func TestAdminTemplatesArePrivateAndEditable(t *testing.T) {
 	root := fixture(t)
@@ -34,16 +63,16 @@ func TestAdminTemplatesArePrivateAndEditable(t *testing.T) {
 
 func TestAdminUsesCurrentLayoutWithoutCompilingContent(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "_layout.html", `<html><head><title>{page.title} | {site.name}</title></head><body>{render header}{slot}<footer>Site footer</footer></body></html>`)
+	put(t, root, "main.layout.html", `<html><head><title>{page.title} | {app.site_name}</title></head><body>{render header}{slot}<footer>Site footer</footer></body></html>`)
 	put(t, root, "_header.html", `<header>Site header</header>`)
 	put(t, root, "admin/index.html", `<form>{admin.message}</form>`)
 	s := NewServer(mustLoad(t, root))
-	content := map[string]any{"message": "<script>{site.name}</script>"}
+	content := map[string]any{"message": "<script>{app.site_name}</script>"}
 	got, err := s.RenderAdmin("login", content)
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"Admin | Test", "<header>Site header</header>", "&lt;script&gt;{site.name}&lt;/script&gt;", "<footer>Site footer</footer>"} {
+	for _, want := range []string{"Admin | Test", "<header>Site header</header>", "&lt;script&gt;{app.site_name}&lt;/script&gt;", "<footer>Site footer</footer>"} {
 		if !strings.Contains(string(got), want) {
 			t.Fatalf("missing %q in %s", want, got)
 		}
@@ -56,7 +85,7 @@ func TestAdminUsesCurrentLayoutWithoutCompilingContent(t *testing.T) {
 	if err != nil || !strings.Contains(string(got), "Updated header") {
 		t.Fatal(string(got), err)
 	}
-	put(t, root, "_layout.html", `{render missing}`)
+	put(t, root, "main.layout.html", `{render missing}`)
 	if s.Reload(root) == nil {
 		t.Fatal("accepted invalid layout")
 	}

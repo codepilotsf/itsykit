@@ -1,0 +1,13 @@
+<!-- flea
+layout: /admin.layout.html
+-->
+<div class="container py-lg">
+  <h1 class="text-xl">Your changes weren’t saved.</h1>
+  <p role="alert">{admin.message}</p>
+  {#if admin.draft}
+  <label class="form-field">Copy your text before leaving
+    <textarea readonly>{admin.draft}</textarea>
+  </label>
+  {/if}
+  <a href="/admin">Return to your dashboard</a>
+</div>

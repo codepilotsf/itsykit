@@ -3,6 +3,7 @@ package site
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -18,9 +19,12 @@ import (
 
 // Only explicitly referenced SVGs are downloaded. No icon library is embedded.
 const LucideVersion = "1.47.0"
-const iconCacheDir = "_/icons/lucide-" + LucideVersion
+const iconCacheDir = "flea/icons"
 const iconSource = "https://unpkg.com/lucide-static@" + LucideVersion + "/"
 const maxIconBytes = 64 << 10
+
+//go:embed lucide-license.txt
+var lucideLicense string
 
 var iconNamePattern = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
 var iconAttributePattern = regexp.MustCompile(`^[a-z][a-z0-9-]*$`)
@@ -271,7 +275,8 @@ func downloadIcon(ctx context.Context, rootPath, name string, client *http.Clien
 	if err != nil {
 		return err
 	}
-	if _, err := sanitizeIcon(data); err != nil {
+	body, err := sanitizeIcon(data)
+	if err != nil {
 		return &invalidIconError{err}
 	}
 	cache, err := openIconCache(rootPath)
@@ -279,16 +284,12 @@ func downloadIcon(ctx context.Context, rootPath, name string, client *http.Clien
 		return err
 	}
 	defer cache.Close()
-	if _, err := readFile(cache, "LICENSE"); os.IsNotExist(err) {
-		license, err := fetch("LICENSE", 128<<10)
-		if err != nil {
-			return err
-		}
-		if err := writeSiteFile(cache, "LICENSE", license); err != nil {
-			return err
-		}
-	} else if err != nil {
-		return err
+	// Reconstruct the SVG so an XML declaration cannot follow our notice. The
+	// notice stays in the source file, not in the rendered page's geometry.
+	notice := strings.ReplaceAll(lucideLicense, "--", "- - ")
+	data = []byte("<!-- Lucide " + LucideVersion + "\n" + notice + "\n-->\n" + `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` + body + "</svg>\n")
+	if _, err := sanitizeIcon(data); err != nil {
+		return &invalidIconError{err}
 	}
 	return writeSiteFile(cache, name+".svg", data)
 }
@@ -403,4 +404,26 @@ func iconLiteral(value string) string {
 	// Entity-encoded internal delimiters must remain literal HTML, not become
 	// executable Go template source after HTML entity decoding.
 	return strings.ReplaceAll(html.EscapeString(html.UnescapeString(value)), "[", "&#91;")
+}
+
+// CompileIconMarkup compiles a literal {icon ...} with supplied, pinned SVG
+// bytes. Bundled editor controls use the same validation and syntax as sites,
+// without reading project files or accessing the network during a request.
+func CompileIconMarkup(directive string, svg []byte) (string, error) {
+	if !strings.HasPrefix(directive, "{icon ") || !strings.HasSuffix(directive, "}") {
+		return "", fmt.Errorf("expected an icon directive")
+	}
+	token := strings.TrimSuffix(strings.TrimPrefix(directive, "{"), "}")
+	fields := strings.Fields(token)
+	if len(fields) < 2 {
+		return "", fmt.Errorf("missing icon name")
+	}
+	body, err := sanitizeIcon(svg)
+	if err != nil {
+		return "", err
+	}
+	p := &Project{icons: map[string]string{fields[1]: body}}
+	return p.compileIcon(token, func(string) (string, error) {
+		return "", fmt.Errorf("bundled icon attributes must be literal")
+	})
 }

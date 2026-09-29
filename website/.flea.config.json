@@ -1,0 +1,5 @@
+{
+  "app": {"site_name":"FleaCMS"},
+  "admin": {"emails": [], "session_idle_days": 30},
+  "contact": {"to": "", "success_path": "/thank-you"}
+}

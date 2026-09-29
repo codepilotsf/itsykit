@@ -22,7 +22,7 @@ func TestEmailWizard(t *testing.T) {
 	for _, fail := range []bool{false, true} {
 		dir := t.TempDir()
 		os.Mkdir(filepath.Join(dir, "_"), 0755)
-		os.WriteFile(filepath.Join(dir, "_", "flea.config"), []byte(`{"site":{"name":"Test"}}`), 0644)
+		os.WriteFile(filepath.Join(dir, ".flea.config.json"), []byte(`{"app":{"site_name":"Test"}}`), 0644)
 		var out bytes.Buffer
 		err := configureEmail(context.Background(), dir, strings.NewReader("re_test123456\nMySite Support\nhello@example.test\n"), &out, func(s mailer.Settings) mailer.Checker {
 			if s.Name != "MySite Support" || s.From != "hello@example.test" {
@@ -51,7 +51,7 @@ func TestEmailWizard(t *testing.T) {
 		if fail && len(values) != 0 {
 			t.Fatal("saved despite failed check")
 		}
-		if !fail && (values["FLEA_EMAIL_NAME"] != "MySite Support" || !strings.Contains(out.String(), "Saved email settings to .env")) {
+		if !fail && (values["FLEA_EMAIL_NAME"] != "MySite Support" || !strings.Contains(out.String(), ".env updated.")) {
 			t.Fatal(out.String())
 		}
 	}

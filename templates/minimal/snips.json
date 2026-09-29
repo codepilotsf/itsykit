@@ -1,0 +1,13 @@
+{
+  "pages": {
+    "/": {
+      "title": "Home",
+      "description": "",
+      "snips": {
+        "a7Km2pQ9xB": {"content": "Your new website"},
+        "b8Ln3rR0yC": {"content": "Make it your own."}
+      }
+    }
+  },
+  "shared": {"snips": {}}
+}

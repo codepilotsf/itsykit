@@ -24,7 +24,7 @@ func TestIconsResolveOnlyNeededAndWorkOffline(t *testing.T) {
 	if p, err := Load(root); err != nil || len(p.Warnings) != 2 {
 		t.Fatalf("read-only load must warn for two missing icons: %v, %+v", err, p)
 	}
-	if _, err := os.Stat(filepath.Join(root, "_/icons")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "flea/icons")); !os.IsNotExist(err) {
 		t.Fatal("Load wrote cache")
 	}
 	requested := map[string]int{}
@@ -43,8 +43,21 @@ func TestIconsResolveOnlyNeededAndWorkOffline(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(requested) != 3 {
-		t.Fatalf("expected two SVGs and license, got %v", requested)
+	if len(requested) != 2 {
+		t.Fatalf("expected only two SVGs, got %v", requested)
+	}
+	files, err := os.ReadDir(filepath.Join(root, "flea/icons"))
+	if err != nil || len(files) != 2 {
+		t.Fatalf("unexpected icon cache: %v %v", files, err)
+	}
+	for _, file := range files {
+		if file.IsDir() || !strings.HasSuffix(file.Name(), ".svg") {
+			t.Fatal("cache must contain flat SVG files")
+		}
+		data, err := os.ReadFile(filepath.Join(root, "flea/icons", file.Name()))
+		if err != nil || !strings.Contains(string(data), "ISC License") || !strings.Contains(string(data), "Cole Bemis") {
+			t.Fatal("missing icon license notice", err)
+		}
 	}
 	for name, count := range requested {
 		if count != 1 {
@@ -67,8 +80,8 @@ func TestIconsResolveOnlyNeededAndWorkOffline(t *testing.T) {
 func TestIconAttributesScopeAndEscaping(t *testing.T) {
 	root := fixture(t)
 	put(t, root, iconCacheDir+"/search.svg", testIconSVG)
-	put(t, root, "_card.html", `{icon search class="inline {site.name}" aria-label="{member.name}" size="1em" stroke-width='3' data-note="a}b &amp; c"}`)
-	put(t, root, "index.html", `{#each flea.team.members as member}{render card}{/each}{icon search aria-label="{site.unsafe}"}{icon search}`)
+	put(t, root, "_card.html", `{icon search class="inline {app.site_name}" aria-label="{member.name}" size="1em" stroke-width='3' data-note="a}b &amp; c"}`)
+	put(t, root, "index.html", `{#each snip.team.members as member}{render card}{/each}{icon search aria-label="{app.unsafe}"}{icon search}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
 	if err != nil {
@@ -89,7 +102,7 @@ func TestBadIconDirectives(t *testing.T) {
 	for _, source := range []string{
 		`{icon}`, `{icon ../secret}`, `{icon Search}`, `{icon "search"}`, `{icon search.svg}`,
 		`{icon search class=x}`, `{icon search onclick="alert(1)"}`, `{icon search href="https://example.com"}`, `{icon search style="color:red"}`,
-		`{icon search class="a" class="b"}`, `{icon search size="12"width="8"}`, `{icon search aria-label="{site.name + 1}"}`, `{icon search class="unfinished}`,
+		`{icon search class="a" class="b"}`, `{icon search size="12"width="8"}`, `{icon search aria-label="{app.site_name + 1}"}`, `{icon search class="unfinished}`,
 	} {
 		t.Run(source, func(t *testing.T) {
 			root := fixture(t)
@@ -104,8 +117,8 @@ func TestBadIconDirectives(t *testing.T) {
 
 func TestIconsDoNotParseContentOrRawElements(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "_/fleas/content.json", `{"text":"{icon search}<svg onload=alert(1)>"}`)
-	put(t, root, "index.html", `<script>const icon="{icon search}";</script><style>/* {icon search} */</style>{flea.content.text}`)
+	put(t, root, "flea/snips/content.json", `{"text":"{icon search}<svg onload=alert(1)>"}`)
+	put(t, root, "index.html", `<script>const icon="{icon search}";</script><style>/* {icon search} */</style>{snip.content.text}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
 	if err != nil {
@@ -114,7 +127,7 @@ func TestIconsDoNotParseContentOrRawElements(t *testing.T) {
 	if !strings.Contains(string(b), `{icon search}&lt;svg`) {
 		t.Fatal(string(b))
 	}
-	if _, err := os.Stat(filepath.Join(root, "_/icons")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "flea/icons")); !os.IsNotExist(err) {
 		t.Fatal("data or raw element triggered download")
 	}
 }
@@ -126,7 +139,7 @@ func TestUnsafeIconSVGs(t *testing.T) {
 		`<svg viewBox="0 0 24 24"><path d="M0 0" onload="alert(1)"/></svg>`,
 		`<svg viewBox="0 0 24 24"><path d="M0 0" fill="url(https://example.com)"/></svg>`,
 		`<svg viewBox="0 0 24 24"><path d="[[NW . NW]]"/></svg>`,
-		`<svg viewBox="0 0 24 24"><path d="{site.name}"/></svg>`,
+		`<svg viewBox="0 0 24 24"><path d="{app.site_name}"/></svg>`,
 		`<svg viewBox="0 0 24 24"><foreignObject><div>bad</div></foreignObject></svg>`,
 		`<!DOCTYPE svg><svg viewBox="0 0 24 24"><path d="M0 0"/></svg>`,
 		testIconSVG + testIconSVG, `<svg/>`, strings.Repeat(" ", maxIconBytes+1),
@@ -230,7 +243,7 @@ func TestUnsafeDownloadedIconRemainsError(t *testing.T) {
 func TestIconCacheRejectsSymlinks(t *testing.T) {
 	root := fixture(t)
 	outside := t.TempDir()
-	if err := os.Symlink(outside, filepath.Join(root, "_/icons")); err != nil {
+	if err := os.Symlink(outside, filepath.Join(root, "flea/icons")); err != nil {
 		t.Fatal(err)
 	}
 	if cache, err := openIconCache(root); err == nil {

@@ -11,41 +11,56 @@ import (
 	"strings"
 
 	"flea/internal/contact"
-	"flea/internal/fleas"
 	"flea/internal/sitefiles"
+	"flea/internal/snips"
 )
 
 // Project is a validated serving snapshot. After publishing it to a Server,
 // callers must not mutate its maps or Content; reload builds a new Project.
 type Project struct {
-	layouts        map[string]bool
-	adminTemplates map[string]*template.Template
-	Admin          AdminAccess
-	Contact        contact.Config
-	Content        *fleas.Store
-	rich           map[string]template.HTML
-	Root           string
-	Site           map[string]any
-	Fleas          map[string]map[string]any
-	Partials       map[string]string
-	Pages          map[string]*template.Template
-	Assets         map[string]string
-	AssetData      map[string][]byte
-	Errors         map[int]*template.Template
-	files          map[string]string
-	signature      string
-	icons          map[string]string
-	Warnings       []string
-	FleasUpdated   bool // A dev extraction changed templates or the active content index.
-	missingIcons   map[string]string
+	syncOnly           bool
+	videos             map[string]videoAsset
+	MediaRoot          string
+	emails             map[string]emailTemplates
+	layouts            map[string]bool
+	adminTemplates     map[string]*template.Template
+	Admin              AdminAccess
+	Dev                DevSettings
+	Contact            contact.Config
+	Content            *snips.Store
+	rich               map[string]template.HTML
+	contentIndex       map[string]snips.Entry
+	Root               string
+	App                map[string]any
+	SiteNameConfigured bool
+	Snips              map[string]map[string]any
+	Partials           map[string]string
+	Pages              map[string]*template.Template
+	Assets             map[string]string
+	AssetData          map[string][]byte
+	Errors             map[int]*template.Template
+	files              map[string]string
+	signature          string
+	icons              map[string]string
+	Warnings           []string
+	SnipsUpdated       bool // A dev extraction changed templates or the active content index.
+	missingIcons       map[string]string
 }
 
 func Load(root string) (*Project, error) {
-	return LoadWithFleas(root, nil)
+	return LoadWithSnips(root, nil)
 }
 
-// LoadWithFleas loads a code release with a separately managed content snapshot.
-func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
+// LoadWithSnips loads a code release with a separately managed content snapshot.
+func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
+	return loadProject(root, content, "", false)
+}
+
+// LoadSyncSource validates metadata/templates for pull before ignored video files
+// are available. Its result is deliberately not an HTTP serving snapshot.
+func LoadSyncSource(root string) (*Project, error) { return loadProject(root, nil, "", true) }
+
+func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly bool) (*Project, error) {
 	root, err := filepath.Abs(root)
 	if err != nil {
 		return nil, err
@@ -55,10 +70,16 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 		return nil, err
 	}
 	defer boundary.Close()
-	p := &Project{Root: root, Fleas: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
+	p := &Project{Root: root, Snips: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
+	p.MediaRoot = mediaRoot
+	p.syncOnly = syncOnly
+	if p.MediaRoot == "" {
+		p.MediaRoot = filepath.Join(root, "flea", "media")
+	}
 	p.signature = fingerprint(root)
 	var config struct {
-		Site    map[string]any `json:"site"`
+		Dev     DevSettings    `json:"dev"`
+		App     map[string]any `json:"app"`
 		Admin   AdminAccess    `json:"admin"`
 		Contact contact.Config `json:"contact"`
 	}
@@ -86,23 +107,39 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 		return nil, err
 	}
 	// Validate the tree before reading configuration or any content.
-	if err = readJSON(boundary, "_/flea.config", &config); err != nil {
+	if err = readJSON(boundary, ".flea.config.json", &config); err != nil {
 		return nil, err
 	}
-	p.Site = config.Site
+	p.App = config.App
+	if _, exists := p.App["current_admin"]; exists {
+		return nil, fmt.Errorf("app.current_admin is reserved for the authenticated request; remove it from config")
+	}
 	if err := config.Admin.validate(); err != nil {
 		return nil, err
 	}
 	p.Admin = config.Admin
+	p.Dev = config.Dev
 	if err := config.Contact.Validate(); err != nil {
 		return nil, err
 	}
 	p.Contact = config.Contact
-	if name, ok := p.Site["name"].(string); !ok || strings.TrimSpace(name) == "" {
-		return nil, fmt.Errorf("_/flea.config: site.name must be a nonempty string")
+	if p.App == nil {
+		return nil, fmt.Errorf(".flea.config.json: app must be a JSON object")
+	}
+	if value, exists := p.App["site_name"]; exists {
+		name, ok := value.(string)
+		if !ok || strings.TrimSpace(name) == "" {
+			return nil, fmt.Errorf(".flea.config.json: app.site_name must be a nonempty string")
+		}
+		p.SiteNameConfigured = true
+	} else {
+		p.App["site_name"] = DefaultSiteName(root)
+	}
+	if err := p.loadEmails(boundary); err != nil {
+		return nil, err
 	}
 	if content == nil {
-		content, err = readFleaStore(boundary)
+		content, err = readSnipStore(boundary)
 		if err != nil {
 			return nil, err
 		}
@@ -113,28 +150,37 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 	if err != nil {
 		return nil, err
 	}
+	p.contentIndex = contentIndex
 	for id, entry := range contentIndex {
-		clean, e := fleas.Sanitize(entry.Content)
+		if entry.Type != "" {
+			continue
+		}
+		clean, e := snips.Sanitize(entry.Content)
 		if e != nil {
-			return nil, fmt.Errorf("flea %s: %w", id, e)
+			return nil, fmt.Errorf("snip %s: %w", id, e)
 		}
 		p.rich[id] = template.HTML(clean)
 	}
 	p.AssetData = map[string][]byte{}
-	// Legacy fleas and structured data intentionally share a namespace.
+	views, err := boundary.OpenRoot("site")
+	if err != nil {
+		return nil, fmt.Errorf("open site directory: %w", err)
+	}
+	defer views.Close()
+	// Legacy snips and structured data intentionally share a namespace.
 	for _, source := range []struct{ directory, kind string }{
-		{"_/fleas", "flea"},
-		{"_/data", "data"},
+		{"flea/snips", "snip"},
+		{"flea/data", "data"},
 	} {
-		if err := loadDataDirectory(boundary, source.directory, source.kind, p.Fleas); err != nil {
+		if err := loadDataDirectory(boundary, source.directory, source.kind, p.Snips); err != nil {
 			return nil, err
 		}
 	}
-	err = fs.WalkDir(boundary.FS(), ".", func(path string, d fs.DirEntry, e error) error {
+	err = fs.WalkDir(views.FS(), ".", func(path string, d fs.DirEntry, e error) error {
 		if e != nil {
 			return e
 		}
-		if !sitefiles.Included(path) || path == "_" {
+		if path != "." && !sitefiles.Included("site/"+path) {
 			if d.IsDir() {
 				return fs.SkipDir
 			}
@@ -145,7 +191,7 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 		}
 		rel := path
 		if strings.HasSuffix(rel, ".html") {
-			data, e := readFile(boundary, path)
+			data, e := readFile(views, path)
 			if e != nil {
 				return e
 			}
@@ -154,7 +200,7 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 			}
 			p.files[rel] = string(data)
 		}
-		if strings.HasPrefix(d.Name(), "_") && strings.HasSuffix(rel, ".html") && rel != "_layout.html" && rel != "_404.html" && rel != "_500.html" {
+		if strings.HasPrefix(d.Name(), "_") && strings.HasSuffix(rel, ".html") && rel != "main.layout.html" && rel != "_404.html" && rel != "_500.html" {
 			p.Partials[rel] = p.files[rel]
 		}
 		return nil
@@ -173,7 +219,10 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 			}
 		}
 	}
-	if _, err = p.FleaReferences(); err != nil {
+	if _, err = p.SnipReferences(); err != nil {
+		return nil, err
+	}
+	if err = p.checkContentStructure(); err != nil {
 		return nil, err
 	}
 	for name, text := range p.Partials {
@@ -182,20 +231,23 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 		}
 	}
 	routes := map[string]string{}
-	err = fs.WalkDir(boundary.FS(), ".", func(path string, d fs.DirEntry, e error) error {
+	err = fs.WalkDir(views.FS(), ".", func(path string, d fs.DirEntry, e error) error {
 		if e != nil {
 			return e
 		}
 		if path == "." {
 			return nil
 		}
-		if !sitefiles.Included(path) {
+		if !sitefiles.Included("site/" + path) {
 			if d.IsDir() {
 				return fs.SkipDir
 			}
 			return nil
 		}
 		rel := path
+		if strings.HasSuffix(rel, ".layout.html") {
+			return nil
+		}
 		if strings.HasPrefix(d.Name(), "_") || strings.HasPrefix(d.Name(), ".") {
 			if d.IsDir() {
 				return filepath.SkipDir
@@ -230,7 +282,7 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 			}
 			p.Pages[route] = t
 		} else {
-			p.Assets[route] = path
+			p.Assets[route] = "site/" + path
 		}
 		return nil
 	})
@@ -253,6 +305,14 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 			return nil, e
 		}
 		p.AssetData[route] = data
+	}
+	if err = p.loadMedia(); err != nil {
+		return nil, err
+	}
+	if !syncOnly {
+		if err = p.loadVideos(); err != nil {
+			return nil, err
+		}
 	}
 	for route, t := range p.Pages {
 		if _, err = p.render(t, route); err != nil {
@@ -279,12 +339,12 @@ func LoadWithFleas(root string, content *fleas.Store) (*Project, error) {
 }
 
 func (p *Project) buildTemplate(file string, layout bool) (*template.Template, error) {
-	text, selected, err := pageSettings(p.files[file])
+	text, selected, err := pageSettings(file, p.files[file])
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
 	}
 	if selected == "" {
-		selected = "_layout.html"
+		selected = "main.layout.html"
 	}
 	body, err := p.compile(text, file, nil, map[string]string{})
 	if err != nil {
@@ -298,7 +358,12 @@ func (p *Project) buildTemplate(file string, layout bool) (*template.Template, e
 		}
 		source = `[[NW define "body" NW]]` + body + `[[NW end NW]]` + compiled
 	}
-	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"lookup": lookup, "collection": collection, "richFlea": func(id string) template.HTML { return p.rich[id] }}).Parse(source)
+	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"snipField": p.snipField, "multiPhoto": multiPhoto, "multiRows": p.multiRows, "multiValue": multiValue, "multiBoundary": multiBoundary, "multiItemBoundary": multiItemBoundary, "lookup": lookup, "collection": collection, "richFlea": func(id string, owner bool) template.HTML {
+		if owner {
+			return template.HTML("<!--snip-start:"+id+"-->") + p.rich[id] + template.HTML("<!--snip-end:"+id+"-->")
+		}
+		return p.rich[id]
+	}}).Parse(source)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
 	}
@@ -310,6 +375,10 @@ func (p *Project) render(t *template.Template, route string) ([]byte, error) {
 }
 
 func (p *Project) renderWithBody(t *template.Template, route string, admin map[string]any) ([]byte, error) {
+	return p.renderPage(t, route, admin, false)
+}
+
+func (p *Project) renderPage(t *template.Template, route string, admin map[string]any, owner bool) ([]byte, error) {
 	title := "Home"
 	if route != "/" {
 		parts := strings.Split(strings.Trim(route, "/"), "/")
@@ -318,9 +387,9 @@ func (p *Project) renderWithBody(t *template.Template, route string, admin map[s
 			title = strings.ToUpper(title[:1]) + title[1:]
 		}
 	}
-	fleas := map[string]any{}
-	for k, v := range p.Fleas {
-		fleas[k] = v
+	snips := map[string]any{}
+	for k, v := range p.Snips {
+		snips[k] = v
 	}
 	description := ""
 	if page := p.Content.Pages[route]; page != nil {
@@ -329,8 +398,31 @@ func (p *Project) renderWithBody(t *template.Template, route string, admin map[s
 		}
 		description = page.Description
 	}
-	data := map[string]any{"site": p.Site, "page": map[string]any{"title": title, "description": description, "path": route}, "flea": fleas, "data": fleas}
+	app := make(map[string]any, len(p.App)+1)
+	for key, value := range p.App {
+		app[key] = value
+	}
+	app["current_admin"] = nil
+	if owner && admin != nil {
+		app["current_admin"] = admin
+	}
+	data := map[string]any{"app": app, "page": map[string]any{"title": title, "description": description, "path": route}, "snip": snips, "data": snips}
+	photos := map[string]any{}
+	for id, photo := range p.Content.Media {
+		photos[id] = map[string]any{"src": "/media/" + photo.File, "alt": photo.Alt, "width": photo.Width, "height": photo.Height, "name": photo.Name}
+	}
+	data["media"] = photos
+	videos := map[string]any{}
+	for id, v := range p.Content.Videos {
+		poster := ""
+		if photo, ok := p.Content.Media[v.Poster]; ok {
+			poster = "/media/" + photo.File
+		}
+		videos[id] = map[string]any{"src": "/media/" + v.File, "poster": poster, "width": v.Width, "height": v.Height, "name": v.Name}
+	}
+	data["videos"] = videos
 	data["admin"] = admin
+	data["__ownerPreview"] = owner
 	var out bytes.Buffer
 	err := t.Execute(&out, data)
 	return out.Bytes(), err

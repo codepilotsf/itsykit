@@ -6,5 +6,10 @@ import "embed"
 // Files mirrors a generated site. The all: prefix includes private underscore
 // files, which Go's default directory embedding would otherwise exclude.
 //
-//go:embed *.html all:admin all:css all:images all:_ README.md .gitignore
+//go:embed all:site all:mailers all:flea .flea.config.json README.md AGENTS.md .gitignore
 var Files embed.FS
+
+// MinimalFiles supplies the two content files used by the clean default.
+//
+//go:embed minimal/*
+var MinimalFiles embed.FS

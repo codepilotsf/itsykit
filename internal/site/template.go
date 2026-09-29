@@ -44,10 +44,47 @@ var rawClose = map[string]*regexp.Regexp{
 // compile translates the deliberately small FleaCMS language to html/template.
 // Go's contextual escaping also protects URL and attribute contexts.
 func (p *Project) compile(source, file string, stack []string, aliases map[string]string) (string, error) {
+	mediaBindings, mediaErr := scanMediaBindings(file, source)
+	if mediaErr != nil {
+		return "", mediaErr
+	}
+	mediaInsert := map[int]string{}
+	mediaExpressions := map[string]bool{}
+	index := p.contentIndex
+	for _, b := range mediaBindings {
+		if b.id == "" {
+			continue
+		}
+		entry, ok := index[b.id]
+		expected := "image"
+		if b.tag == "video" {
+			expected = "video"
+		}
+		if !ok || entry.Type != expected {
+			return "", sourceError(file, source, b.start, fmt.Errorf("missing or incorrect %s snip %s", expected, b.id))
+		}
+		at := b.start + strings.IndexAny(source[b.start:b.end], " \t\r\n/>")
+		mediaInsert[at] = b.id
+		for _, value := range b.attrs {
+			if m := mediaRef.FindStringSubmatch(value); m != nil {
+				mediaExpressions[value] = true
+			}
+		}
+	}
+	ms, err := multisnipBlocks(file, source)
+	if err != nil {
+		return "", err
+	}
+	for _, b := range ms {
+		if _, err := definition(source[b.bodyStart:b.bodyEnd]); err != nil {
+			return "", fmt.Errorf("%s: %w", file, err)
+		}
+	}
 	var out strings.Builder
 	type block struct {
 		kind, alias, previous string
 		elseSeen              bool
+		start                 int
 	}
 	var blocks []block
 	restoreAlias := func(alias, previous string) {
@@ -74,9 +111,15 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 		return "(lookup $ " + strconv.Quote(path) + ")", nil
 	}
 	fail := func(pos int, err error) (string, error) {
-		return "", fmt.Errorf("%s:%d: %w", file, strings.Count(source[:pos], "\n")+1, err)
+		if original, ok := p.files[file]; ok && strings.HasSuffix(original, source) {
+			return "", sourceError(file, original, len(original)-len(source)+pos, err)
+		}
+		return "", sourceError(file, source, pos, err)
 	}
 	for i := 0; i < len(source); {
+		if id, ok := mediaInsert[i]; ok {
+			out.WriteString(`[[NW if (lookup $ "__ownerPreview") NW]] data-snip-media="` + id + `"[[NW end NW]]`)
+		}
 		if strings.HasPrefix(source[i:], "<!--") {
 			end := strings.Index(source[i+4:], "-->")
 			if end < 0 {
@@ -120,6 +163,9 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			if source[end] == '}' {
 				break
 			}
+			if source[end] == '{' {
+				return fail(i, fmt.Errorf("unclosed template directive; expected } before the next directive"))
+			}
 		}
 		if end == len(source) {
 			return fail(i, fmt.Errorf("unclosed template directive"))
@@ -146,7 +192,7 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 				return fail(i, err)
 			}
 		case token == "slot":
-			if file != "_layout.html" && !p.layouts[file] {
+			if file != "main.layout.html" && !p.layouts[file] {
 				return fail(i, fmt.Errorf("{slot} is only allowed in a layout"))
 			}
 			rendered = `[[NW template "body" $ NW]]`
@@ -168,36 +214,69 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			if err != nil {
 				return "", err
 			}
-		case token == "flea" || strings.HasPrefix(token, "flea ") || strings.HasPrefix(token, "flea\t") || strings.HasPrefix(token, "flea\n"):
+		case token == "snip" || strings.HasPrefix(token, "snip ") || strings.HasPrefix(token, "snip\t") || strings.HasPrefix(token, "snip\n"):
 			name := strings.TrimSpace(token[4:])
-			if !namePattern.MatchString(name) {
-				return fail(i, fmt.Errorf("use an unquoted flea ID, for example {flea a7Km2pQ9xB}"))
-			}
-			if _, ok := p.rich[name]; ok {
-				rendered = "[[NW richFlea " + strconv.Quote(name) + " NW]]"
+			if m := mediaRef.FindStringSubmatch("{" + token + "}"); m != nil {
+				if !mediaExpressions["{"+token+"}"] {
+					return fail(i, fmt.Errorf("media snip references require img/video attribute bindings"))
+				}
+				rendered = "[[NW snipField " + strconv.Quote(m[1]) + " " + strconv.Quote(m[2]) + " NW]]"
 				break
 			}
-			data, ok := p.Fleas[name]
+			if !namePattern.MatchString(name) {
+				return fail(i, fmt.Errorf("use an unquoted snip ID, for example {snip a7Km2pQ9xB}"))
+			}
+			if _, ok := p.rich[name]; ok {
+				rendered = "[[NW richFlea " + strconv.Quote(name) + " (lookup $ \"__ownerPreview\") NW]]"
+				break
+			}
+			data, ok := p.Snips[name]
 			if !ok {
-				return fail(i, fmt.Errorf("missing flea %q", name))
+				return fail(i, fmt.Errorf("missing snip %q", name))
 			}
 			if _, ok := data["text"].(string); !ok {
-				return fail(i, fmt.Errorf("flea %q requires a string 'text' field for {flea}; use dotted paths for structured data", name))
+				return fail(i, fmt.Errorf("snip %q requires a string 'text' field for {snip}; use dotted paths for structured data", name))
 			}
-			rendered = "[[NW lookup $ " + strconv.Quote("flea."+name+".text") + " NW]]"
-		case strings.HasPrefix(token, "#if "):
-			expr, err := lookup(strings.TrimSpace(token[4:]))
+			rendered = "[[NW lookup $ " + strconv.Quote("snip."+name+".text") + " NW]]"
+		case strings.HasPrefix(token, "#if ") || strings.HasPrefix(token, "#unless "):
+			kind, path, _ := strings.Cut(token[1:], " ")
+			expr, err := lookup(strings.TrimSpace(path))
 			if err != nil {
 				return fail(i, err)
 			}
-			blocks = append(blocks, block{kind: "if"})
+			blocks = append(blocks, block{kind: kind, start: i})
+			if kind == "unless" {
+				expr = "not " + expr
+			}
 			rendered = "[[NW if " + expr + " NW]]"
+		case strings.HasPrefix(token, "#multisnip "):
+			for _, b := range blocks {
+				if b.kind == "each" {
+					return fail(i, fmt.Errorf("multisnips cannot be nested in a loop"))
+				}
+			}
+			name := strings.TrimSpace(strings.TrimPrefix(token, "#multisnip "))
+			if !namePattern.MatchString(name) || aliases["snip"] != "" {
+				return fail(i, fmt.Errorf("invalid or nested multisnip"))
+			}
+			variable := fmt.Sprintf("$multi%d", len(blocks))
+			blocks = append(blocks, block{kind: "multisnip", alias: "snip", previous: name, start: i})
+			aliases["snip"] = variable
+			rendered = "[[NW multiBoundary " + strconv.Quote(name) + " false (lookup $ \"__ownerPreview\") NW]][[NW range " + variable + " := multiRows $ " + strconv.Quote(name) + " NW]][[NW multiItemBoundary " + variable + " false NW]]"
+		case token == "/multisnip":
+			if len(blocks) == 0 || blocks[len(blocks)-1].kind != "multisnip" {
+				return fail(i, fmt.Errorf("unmatched /multisnip"))
+			}
+			b := blocks[len(blocks)-1]
+			blocks = blocks[:len(blocks)-1]
+			rendered = "[[NW multiItemBoundary " + aliases["snip"] + " true NW]][[NW end NW]][[NW multiBoundary " + strconv.Quote(b.previous) + " true (lookup $ \"__ownerPreview\") NW]]"
+			delete(aliases, "snip")
 		case strings.HasPrefix(token, "#each "):
 			parts := strings.Split(token[6:], " as ")
 			if len(parts) != 2 || !aliasPattern.MatchString(parts[1]) {
 				return fail(i, fmt.Errorf("expected {#each dotted.path as alias}"))
 			}
-			if parts[1] == "site" || parts[1] == "page" || parts[1] == "flea" || parts[1] == "data" {
+			if parts[1] == "app" || parts[1] == "page" || parts[1] == "snip" || parts[1] == "data" {
 				return fail(i, fmt.Errorf("loop alias %q is reserved", parts[1]))
 			}
 			expr, err := lookup(strings.TrimSpace(parts[0]))
@@ -206,20 +285,20 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			}
 			// Include the partial depth so an included loop cannot shadow a caller's variable.
 			variable := fmt.Sprintf("$item%d_%d", len(stack), len(blocks))
-			blocks = append(blocks, block{kind: "each", alias: parts[1], previous: aliases[parts[1]]})
+			blocks = append(blocks, block{kind: "each", alias: parts[1], previous: aliases[parts[1]], start: i})
 			aliases[parts[1]] = variable
 			rendered = "[[NW range " + variable + " := collection " + expr + " NW]]"
 		case token == ":else" || strings.HasPrefix(token, ":else if "):
 			if len(blocks) == 0 {
-				return fail(i, fmt.Errorf("{%s} requires an open if or each block", token))
+				return fail(i, fmt.Errorf("{%s} requires an open if, unless or each block", token))
 			}
 			b := &blocks[len(blocks)-1]
 			if b.elseSeen {
 				return fail(i, fmt.Errorf("{%s} cannot follow {:else}", token))
 			}
 			if token != ":else" {
-				if b.kind != "if" {
-					return fail(i, fmt.Errorf("{:else if} is only allowed in an if block"))
+				if b.kind != "if" && b.kind != "unless" {
+					return fail(i, fmt.Errorf("{:else if} is only allowed in an if or unless block"))
 				}
 				expr, err := lookup(strings.TrimSpace(strings.TrimPrefix(token, ":else if ")))
 				if err != nil {
@@ -232,7 +311,7 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 				restoreAlias(b.alias, b.previous)
 				rendered = "[[NW else NW]]"
 			}
-		case token == "/if" || token == "/each":
+		case token == "/if" || token == "/unless" || token == "/each":
 			if len(blocks) == 0 || blocks[len(blocks)-1].kind != token[1:] {
 				return fail(i, fmt.Errorf("unmatched {%s}", token))
 			}
@@ -241,6 +320,14 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			restoreAlias(b.alias, b.previous)
 			rendered = "[[NW end NW]]"
 		default:
+			if strings.HasPrefix(token, "snip.") && aliases["snip"] != "" {
+				if parts := strings.Split(strings.TrimPrefix(token, "snip."), "."); len(parts) == 2 {
+					rendered = "[[NW multiPhoto " + aliases["snip"] + " " + strconv.Quote(parts[0]) + " " + strconv.Quote(parts[1]) + " NW]]"
+					break
+				}
+				rendered = "[[NW multiValue " + aliases["snip"] + " " + strconv.Quote(strings.TrimPrefix(token, "snip.")) + " (lookup $ \"__ownerPreview\") NW]]"
+				break
+			}
 			expr, err := lookup(token)
 			if err != nil {
 				return fail(i, err)
@@ -251,7 +338,8 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 		i = end + 1
 	}
 	if len(blocks) > 0 {
-		return fail(len(source), fmt.Errorf("unclosed %s block", blocks[len(blocks)-1].kind))
+		b := blocks[len(blocks)-1]
+		return fail(b.start, fmt.Errorf("unclosed %s block; expected {/%s}", b.kind, b.kind))
 	}
 	return out.String(), nil
 }

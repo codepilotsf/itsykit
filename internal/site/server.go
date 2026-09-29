@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"flea/internal/sitefiles"
+	"flea/internal/viewer"
 )
 
 // Server publishes complete validated snapshots. Failed edits produce a 500
@@ -177,14 +178,18 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 	w.Header().Set("Cache-Control", "no-store")
-	if r.Method != "GET" && r.Method != "HEAD" {
-		w.Header().Set("Allow", "GET, HEAD")
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 	s.mu.RLock()
 	p, loadErr, revision := s.project, s.err, s.revision
 	s.mu.RUnlock()
+	if p != nil && p.syncOnly {
+		http.Error(w, "Site synchronization is incomplete.", http.StatusServiceUnavailable)
+		return
+	}
+	if r.Method != "GET" && r.Method != "HEAD" {
+		w.Header().Set("Allow", "GET, HEAD")
+		s.serveError(w, r, p, http.StatusMethodNotAllowed, revision, nil)
+		return
+	}
 	if !s.production && r.URL.Path == reloadPath && r.URL.RawPath == "" {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		if r.Method != "HEAD" {
@@ -193,30 +198,50 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !safeURL(r.URL.Path) {
-		serveReloadError(w, r, p, 404, revision, !s.production)
+		s.serveError(w, r, p, 404, revision, nil)
 		return
 	}
 	if loadErr != nil {
-		serveReloadError(w, r, p, 500, revision, !s.production)
+		s.serveError(w, r, p, 500, revision, loadErr)
 		return
 	}
 	if t, ok := p.Pages[r.URL.Path]; ok {
-		body, err := p.render(t, r.URL.Path)
+		decorate, owner := r.Context().Value(ownerRenderKey{}).(ownerTransform)
+		var admin map[string]any
+		if identity, authenticated := viewer.From(r.Context()); owner && authenticated {
+			admin = map[string]any{"email": identity.Email, "csrf_token": identity.CSRF, "version": p.EditingVersion(), "revision": ""}
+			if !s.production {
+				admin["revision"] = fmt.Sprint(revision)
+			}
+		}
+		body, err := p.renderPage(t, r.URL.Path, admin, owner)
 		if err != nil {
-			serveReloadError(w, r, p, 500, revision, !s.production)
+			s.serveError(w, r, p, 500, revision, err)
 			return
 		}
-		if !s.production {
+		if owner {
+			if !s.production {
+				w.Header().Set("X-Flea-Dev-Revision", fmt.Sprint(revision))
+			}
+			var ok bool
+			body, ok = decorate(body, p.Content, p.EditingVersion())
+			if !ok {
+				return
+			}
+		} else if !s.production {
 			body = withReload(body, revision)
 		}
 		writeHTML(w, r, 200, body)
+		return
+	}
+	if p.serveVideo(w, r) {
 		return
 	}
 	if data, ok := p.AssetData[r.URL.Path]; ok {
 		http.ServeContent(w, r, path.Base(r.URL.Path), time.Time{}, bytes.NewReader(data))
 		return
 	}
-	serveReloadError(w, r, p, 404, revision, !s.production)
+	s.serveError(w, r, p, 404, revision, nil)
 }
 
 type statusWriter struct {
@@ -245,16 +270,25 @@ func (w *statusWriter) Write(body []byte) (int, error) {
 
 func (w *statusWriter) Unwrap() http.ResponseWriter { return w.ResponseWriter }
 
-func serveReloadError(w http.ResponseWriter, r *http.Request, p *Project, code int, revision uint64, reload bool) {
+func (s *Server) serveError(w http.ResponseWriter, r *http.Request, p *Project, code int, revision uint64, cause error) {
+	if cause != nil && s.logger != nil {
+		s.logger.Printf("Page error: %s %s: %q", r.Method, r.URL.EscapedPath(), cause.Error())
+	}
+	if !s.production && code != http.StatusNotFound && localDiagnosticRequest(r) {
+		serveDevError(w, r, p, code, revision, cause)
+		return
+	}
 	body := []byte("<!doctype html><title>" + http.StatusText(code) + "</title><h1>" + http.StatusText(code) + "</h1>")
 	if p != nil {
 		if t, ok := p.Errors[code]; ok {
 			if b, e := p.render(t, fmt.Sprintf("/%d", code)); e == nil {
 				body = b
+			} else if s.logger != nil {
+				s.logger.Printf("Error page %d failed: %q", code, e.Error())
 			}
 		}
 	}
-	if reload {
+	if !s.production {
 		body = withReload(body, revision)
 	}
 	writeHTML(w, r, code, body)

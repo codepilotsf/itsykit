@@ -1,5 +1,66 @@
 # Publishing FleaCMS
 
+## V1 distribution plan
+
+The agreed plan is in [next-steps.md](next-steps.md). Source remains private;
+public binaries will be free to use without an account or license key. The
+primary path is the implemented `website/site/install.sh`, intended for
+https://fleacms.com/install.sh, followed by `flea update` for local CLI updates.
+Remote updates use `flea update-server` (including `--recover`), without an alias.
+The 0.3.0 public test release is hosted by the separate website repository at
+`/Users/sean/fleacms-website`. Its `RELEASES.md` records build provenance and
+actual public installer/update checks. Versioned binaries, SHA256SUMS,
+latest.txt and install.sh are live on fleacms.com. Clean-machine Mac testing
+and notarization remain unverified; do not describe this as a completed V1 release.
+See [installation and trust](docs/installation.md).
+
+Required CLI targets are macOS ARM64 and Linux AMD64. Add macOS AMD64 and Linux
+ARM64 only if building and verifying them takes little extra work. The current
+pipeline below provides this build matrix but has not been run remotely. Public
+artifacts are hosted in the website's versioned release directories without
+opening the source repository. The registry instructions below are historical.
+
+`scripts/release.sh client <arch>` now supports native Linux as well as Mac
+runners. Each needs both previously built Linux server artifacts in dist/.
+After required native CLI checks, `scripts/stage-release.sh` prepares only
+`dist/public/install.sh`, `releases/latest.txt`, and immutable
+`releases/<version>/` binaries plus SHA256SUMS. It requires a matching stable tag
+and refuses an existing version staging directory. It does not upload anything.
+Publish the version directory first, verify anonymous HTTPS downloads, then
+advance latest.txt. Never overwrite an already published version. The old GitLab
+publish job is not the new public channel and must not be used for V1 as-is.
+
+Homebrew and native packages are deferred for V1. Their existing tooling is
+described below for reference, not as a required V1 distribution path. Test the
+actual downloaded Mac binary and its platform trust requirements regardless of
+packaging. Follow the sprint's release criteria before publication.
+
+## Mac distribution tooling
+
+After `bash scripts/build.sh`, `bash scripts/package-macos.sh` creates a native
+installer under dist/ without installing it. Optional APPLICATION_IDENTITY and
+INSTALLER_IDENTITY sign the executable and package. Public distribution still
+requires notarization and independent installation testing. An unsigned package
+is a development artifact, not a public release.
+
+Local packaging verification generated a readable package with the CLI payload,
+but pkgbuild emitted permission warnings and included AppleDouble metadata,
+including after copying without extended attributes and running outside the sandbox.
+Resolve this on the signing runner and verify a clean payload before release;
+installation, signing and notarization have not been verified.
+
+After building release binaries, set RELEASE_BASE_URL to the HTTPS release
+directory and run `bash scripts/homebrew.sh` to generate dist/flea.rb with real
+checksums. Review and publish it to a Homebrew tap separately. These scripts do
+not publish artifacts, create a tap, or modify a user's installation.
+
+Local verification built both Mac architectures, generated the formula using a
+non-publishing placeholder URL, and passed Ruby syntax validation. A real tap
+installation and downloaded-artifact verification remain pending.
+
+The website/ directory is unpublished local website source. Confirm downloads,
+installation instructions and live deployment before publishing it.
+
 End users install only FleaCMS. Setup uses native SSH/SCP and extracts the
 matching bundled static Linux server; neither machine needs Go or source code.
 Both Linux architectures are gzip-compressed inside each CLI, with SHA-256 hashes.
@@ -12,14 +73,17 @@ as required by the existing committed-source workflow.
 The repository's .gitlab-ci.yml builds tagged releases on native runners:
 
 - linux-amd64 and linux-arm64 for server builds and tests.
-- macos-amd64 and macos-arm64 for CLI builds and tests.
+- macos-arm64 and linux-amd64 for CLI builds and tests.
 
 Register trusted shell runners with those exact tags. Each needs Go, Git, Bash,
 gzip and shasum; the publishing Linux runner also needs curl. Race tests need a C
 compiler on runners only. Go does not run on either end user's machine or VPS.
 Jobs verify host architecture and refuse cross-architecture release builds.
 
-Enable the generic package registry and anonymous downloads for this project.
+The older `scripts/publish.sh` targets a GitLab generic package registry and is
+not invoked by the V1 pipeline. Do not enable anonymous source access to make
+downloads work. Select public binary storage separately.
+For the older registry workflow only, enable anonymous package downloads.
 The registry distributes releases but is not used by setup. No user tokens are
 embedded. Protect release tags and the runners. Disable duplicate
 generic package versions so a published version cannot silently be overwritten.
@@ -32,16 +96,16 @@ GitLab package API: https://docs.gitlab.com/user/packages/generic_packages/
    Commit the changes and run the tests.
 2. Create and push a new immutable tag, for example v0.2.0.
 3. Both native Linux jobs test and build static server binaries.
-4. Both native Mac jobs embed both Linux artifacts and their hashes using
+4. The native Mac ARM64 and Linux AMD64 jobs embed both Linux artifacts using
    scripts/bundle.sh, test extraction and build CLIs with the same version.
-5. Review the four artifacts, then run the manual publish job. It uploads to
-   the generic package registry and verifies unauthenticated downloads against
-   local checksums. If a partial publication fails, investigate before retrying;
-   do not replace a version already distributed to users.
+5. Review the artifacts, then run the manual publish-stage job. Despite its
+   stage name, it only prepares downloadable `dist/public/` CI artifacts.
+   It does not upload to fleacms.com or advance the public update channel.
+   Upload to the selected public host only after approval and verification.
 6. Test the downloaded Mac CLI on a clean Mac and setup on a disposable Ubuntu
    machine for each architecture before announcing the release or updating a tap.
 
-Artifacts are raw executables named flea-darwin-amd64, flea-darwin-arm64,
+Artifacts are raw executables named flea-linux-amd64, flea-darwin-arm64,
 flea-server-linux-amd64, and flea-server-linux-arm64. A Homebrew formula
 can install the appropriate Mac binary directly, with its release SHA-256 and
 no Go dependency. Creating/publishing that tap remains a separate step.

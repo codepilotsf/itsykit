@@ -21,7 +21,7 @@ func loadDataDirectory(root *os.Root, directory, kind string, values map[string]
 			return fmt.Errorf("invalid %s name %q", kind, name)
 		}
 		if _, exists := values[name]; exists {
-			return fmt.Errorf("duplicate legacy flea/data name %q", name)
+			return fmt.Errorf("duplicate legacy snip/data name %q", name)
 		}
 		var data map[string]any
 		if err := readJSON(root, directory+"/"+entry.Name(), &data); err != nil {

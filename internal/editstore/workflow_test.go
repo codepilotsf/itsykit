@@ -2,6 +2,8 @@ package editstore
 
 import (
 	"context"
+	"encoding/json"
+	"html"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -24,18 +26,19 @@ func (s testSender) Send(_ context.Context, m mailer.Message) error { s <- m; re
 func TestHTTPSLoginEditAndPublicSnapshot(t *testing.T) {
 	store, public := fixture(t, true)
 	inbox := make(testSender, 1)
-	dashboard := editor.New(editor.Options{Emails: store.Emails, SessionPath: filepath.Join(store.Root, "_", "sessions.json"), Name: "Test", Sender: inbox, Backend: store, Render: public.RenderAdmin})
+	dashboard := editor.New(editor.Options{Emails: store.Emails, SessionPath: filepath.Join(store.Root, "flea", "runtime", "sessions.json"), Name: "Test", Sender: inbox, Backend: store, Render: public.RenderAdmin, Public: public.ServeOwner})
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if editor.IsPath(r.URL.Path) {
 			dashboard.ServeHTTP(w, r)
 		} else {
-			public.ServeHTTP(w, r)
+			dashboard.ServePublic(w, r, public)
 		}
 	}))
 	defer server.Close()
 	client := server.Client()
 	client.Jar, _ = cookiejar.New(nil)
 	client.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
+	var csrf string
 	call := func(method, path string, values url.Values) (int, string) {
 		t.Helper()
 		req, err := http.NewRequest(method, server.URL+path, strings.NewReader(values.Encode()))
@@ -46,6 +49,7 @@ func TestHTTPSLoginEditAndPublicSnapshot(t *testing.T) {
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 			req.Header.Set("Origin", server.URL)
 		}
+		req.Header.Set("X-CSRF-Token", csrf)
 		resp, err := client.Do(req)
 		if err != nil {
 			t.Fatal(err)
@@ -69,7 +73,7 @@ func TestHTTPSLoginEditAndPublicSnapshot(t *testing.T) {
 	if status != 200 {
 		t.Fatal(status)
 	}
-	csrf := field(body, "csrf")
+	csrf = field(body, "csrf")
 	status, _ = call("POST", "/admin/code", url.Values{"csrf": {csrf}, "email": {"owner@example.test"}})
 	if status != 200 {
 		t.Fatal(status)
@@ -85,24 +89,52 @@ func TestHTTPSLoginEditAndPublicSnapshot(t *testing.T) {
 	if status != 303 {
 		t.Fatal(status)
 	}
-	status, body = call("GET", "/admin", nil)
+	status, body = call("GET", "/", nil)
 	if status != 200 {
 		t.Fatal(status)
 	}
-	csrf, version := field(body, "csrf"), field(body, "version")
-	status, _ = call("POST", "/admin/save", url.Values{"csrf": {csrf}, "version": {version}, "id": {"abcdefghij"}, "content": {"Live <strong>owner edit</strong><script>bad()</script>"}})
-	if status != 303 {
+	attribute := func(name string) string {
+		t.Helper()
+		match := regexp.MustCompile(`data-` + name + `="([^"]*)"`).FindStringSubmatch(body)
+		if len(match) != 2 {
+			t.Fatal("missing", name)
+		}
+		return html.UnescapeString(match[1])
+	}
+	meta := regexp.MustCompile(`name="csrf-token" content="([^"]+)"`).FindStringSubmatch(body)
+	if len(meta) != 2 {
+		t.Fatal("missing CSRF meta")
+	}
+	csrf = html.UnescapeString(meta[1])
+	version := attribute("version")
+	status, body = call("GET", "/admin/editor-context?route=/", nil)
+	var edit editor.PageEdit
+	var contextData struct {
+		Page editor.PageEdit `json:"page"`
+	}
+	if err := json.Unmarshal([]byte(body), &contextData); err != nil {
+		t.Fatal(err)
+	}
+	edit = contextData.Page
+	if status != 200 || edit.Version != version {
+		t.Fatal("wrong context snapshot", status)
+	}
+	edit.Changes = []editor.ContentEdit{{ID: "abcdefghij", Content: "Live owner edit<script>bad()</script>"}}
+	data, _ := json.Marshal(edit)
+	values := url.Values{"csrf": {csrf}, "edit": {string(data)}}
+	status, _ = call("POST", "/admin/page", values)
+	if status != 204 {
 		t.Fatal(status)
 	}
 	status, body = call("GET", "/", nil)
-	if status != 200 || !strings.Contains(body, "Live <strong>owner edit</strong>") || strings.Contains(body, "<script>") {
+	if status != 200 || !strings.Contains(body, "Live owner edit") || strings.Contains(body, "bad()") {
 		t.Fatal(status, body)
 	}
 	doc, err := store.Read()
-	if err != nil || doc.Store.Pages["/"].Fleas["abcdefghij"].Content != "Live <strong>owner edit</strong>" {
+	if err != nil || doc.Store.Pages["/"].Snips["abcdefghij"].Content != "Live owner edit" {
 		t.Fatal(doc, err)
 	}
-	status, _ = call("POST", "/admin/save", url.Values{"csrf": {csrf}, "version": {version}, "id": {"abcdefghij"}, "content": {"Stale overwrite"}})
+	status, _ = call("POST", "/admin/page", values)
 	if status != 409 {
 		t.Fatal("stale form accepted", status)
 	}

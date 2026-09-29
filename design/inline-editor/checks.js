@@ -4,7 +4,7 @@ document.querySelector('#run-checks').addEventListener('click', async () => {
   const button = document.querySelector('#run-checks');
   button.disabled = true;
   const results = [];
-  const { createEditor, heading, cleanHTML, safeLink } = window.FleaPrototype;
+  const { createEditor, heading, cleanHTML, safeLink } = window.SnipPrototype;
   const tick = () => new Promise((resolve) => requestAnimationFrame(resolve));
   const assert = (value, message) => { if (!value) throw new Error(message); };
   async function check(name, test) {
@@ -109,19 +109,19 @@ document.querySelector('#run-checks').addEventListener('click', async () => {
     const dialog = document.createElement('dialog');
     dialog.textContent = 'Animation check'; document.body.append(dialog);
     try {
-      window.FleaPrototype.openDialog(dialog);
+      window.SnipPrototype.openDialog(dialog);
       assert(dialog.open, 'dialog did not open');
-      const closing = window.FleaPrototype.closeDialog(dialog);
+      const closing = window.SnipPrototype.closeDialog(dialog);
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) assert(dialog.open && dialog.classList.contains('closing'), 'closed before exit animation');
       await closing;
       assert(!dialog.open && !dialog.classList.contains('closing'), 'close did not finish');
-      window.FleaPrototype.openDialog(dialog);
+      window.SnipPrototype.openDialog(dialog);
       assert(dialog.open, 'reopen failed');
-      await window.FleaPrototype.closeDialog(dialog);
+      await window.SnipPrototype.closeDialog(dialog);
     } finally { dialog.remove(); }
   });
   await check('Link protocol normalization and new-tab round trip', async (editor, root, select) => {
-    const normalize = window.FleaPrototype.normalizeLink;
+    const normalize = window.SnipPrototype.normalizeLink;
     assert(normalize('example.com/about') === 'https://example.com/about', 'bare domain not HTTPS');
     for (const url of ['http://example.com', 'https://example.com', '/about', './page.html', '../about', '#contact', 'mailto:hello@example.com', 'tel:+15551234567']) assert(normalize(url) === url, 'explicit URL changed');
     select(); editor.makeLink('https://example.com', { target: '_blank', rel: 'noopener noreferrer' }); await tick();

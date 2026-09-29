@@ -16,6 +16,11 @@ import (
 )
 
 func askSecret(ctx context.Context, in io.Reader, out io.Writer) (string, error) {
+	return askMasked(ctx, in, out, "Resend API key (masked)")
+}
+
+func askMasked(ctx context.Context, in io.Reader, out io.Writer, label string) (string, error) {
+	timedTerminal := false
 	if terminal, ok := in.(*os.File); ok {
 		state := exec.Command("stty", "-g")
 		state.Stdin = terminal
@@ -23,19 +28,64 @@ func askSecret(ctx context.Context, in io.Reader, out io.Writer) (string, error)
 		if err != nil {
 			return "", fmt.Errorf("Enter the API key in an interactive terminal, or set RESEND_API_KEY in your environment.")
 		}
-		hide := exec.Command("stty", "-echo")
+		hide := exec.Command("stty", "-echo", "-icanon", "min", "0", "time", "1")
 		hide.Stdin = terminal
 		if err = hide.Run(); err != nil {
 			return "", fmt.Errorf("Could not hide your API key. Set RESEND_API_KEY in your environment instead.")
 		}
+		timedTerminal = true
 		defer func() {
 			restore := exec.Command("stty", strings.TrimSpace(string(mode)))
 			restore.Stdin = terminal
 			_ = restore.Run()
-			fmt.Fprintln(out)
 		}()
 	}
-	return ask(ctx, in, out, "Resend API key (hidden)", "")
+	fmt.Fprint(out, label+": ")
+	defer fmt.Fprintln(out)
+	var key []byte
+	var one [1]byte
+	for {
+		if err := ctx.Err(); err != nil {
+			return "", err
+		}
+		n, err := in.Read(one[:])
+		if err != nil {
+			if err == io.EOF && timedTerminal {
+				continue
+			}
+			if err == io.EOF && len(key) > 0 {
+				return strings.TrimSpace(string(key)), nil
+			}
+			return "", fmt.Errorf("API key input ended before confirmation")
+		}
+		if n == 0 {
+			continue
+		}
+		switch one[0] {
+		case '\n', '\r':
+			return strings.TrimSpace(string(key)), nil
+		case 3:
+			return "", context.Canceled
+		case 8, 127:
+			if len(key) > 0 {
+				key = key[:len(key)-1]
+				fmt.Fprint(out, "\b \b")
+			}
+		case 21:
+			for len(key) > 0 {
+				key = key[:len(key)-1]
+				fmt.Fprint(out, "\b \b")
+			}
+		default:
+			if one[0] >= 32 && one[0] < 127 {
+				if len(key) >= 4096 {
+					return "", fmt.Errorf("API key is too long")
+				}
+				key = append(key, one[0])
+				fmt.Fprint(out, "*")
+			}
+		}
+	}
 }
 
 func ensureMail(ctx context.Context, directory, target string, options []string, isRoot bool, in io.Reader, out, errOut io.Writer, run runner) error {

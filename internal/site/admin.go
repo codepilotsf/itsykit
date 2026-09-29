@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"slices"
-	"strings"
 )
 
 // AddAdmin changes only developer-owned configuration, never content or secrets.
@@ -22,20 +21,17 @@ func AddAdmin(directory, email string) (string, bool, error) {
 		return "", false, err
 	}
 	defer root.Close()
-	const name = "_/flea.config"
+	const name = ".flea.config.json"
 	original, err := readFile(root, name)
 	if err != nil {
-		return "", false, fmt.Errorf("Could not read _/flea.config. Run this command from your site's folder.")
+		return "", false, fmt.Errorf("Could not read .flea.config.json. Run this command from your site's folder.")
 	}
 	var config map[string]json.RawMessage
 	if err := json.Unmarshal(original, &config); err != nil || config == nil {
-		return "", false, fmt.Errorf("Please fix the JSON in _/flea.config before adding an admin.")
+		return "", false, fmt.Errorf("Please fix the JSON in .flea.config.json before adding an admin.")
 	}
-	var settings struct {
-		Name string `json:"name"`
-	}
-	if err := json.Unmarshal(config["site"], &settings); err != nil || strings.TrimSpace(settings.Name) == "" {
-		return "", false, fmt.Errorf("Please set site.name in _/flea.config before adding an admin.")
+	if _, err := appSettings(config); err != nil {
+		return "", false, err
 	}
 	admin := map[string]json.RawMessage{}
 	if raw, ok := config["admin"]; ok {

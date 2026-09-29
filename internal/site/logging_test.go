@@ -28,7 +28,7 @@ func TestRequestLogging(t *testing.T) {
 		t.Fatal("expected validation error")
 	}
 	request(s, "GET", "/")
-	want := "GET /\nGET /about\nHEAD /about\n404 GET /missing\n405 POST /about\nGET /css/main.css\n404 GET /bad%0Aline\n206 GET /css/main.css\n500 GET /\n"
+	want := "GET /\nGET /about\nHEAD /about\n404 GET /missing\n405 POST /about\nGET /css/main.css\n404 GET /bad%0Aline\n206 GET /css/main.css\n" + `Page error: GET /: "index.html:1: unsupported expression \"bad syntax\""` + "\n500 GET /\n"
 	if output.String() != want {
 		t.Fatalf("got:\n%swant:\n%s", output.String(), want)
 	}

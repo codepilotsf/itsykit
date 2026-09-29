@@ -22,8 +22,11 @@ clients:
   needs: [servers]
   parallel:
     matrix:
-      - ARCH: [amd64, arm64]
-  tags: ["macos-$ARCH"]
+      - ARCH: arm64
+        RUNNER: macos-arm64
+      - ARCH: amd64
+        RUNNER: linux-amd64
+  tags: ["$RUNNER"]
   script:
     - bash scripts/release.sh client "$ARCH"
   artifacts:
@@ -36,4 +39,7 @@ publish:
   needs: [servers, clients]
   when: manual
   script:
-    - bash scripts/publish.sh
+    - bash scripts/stage-release.sh
+  artifacts:
+    paths: [dist/public/]
+    expire_in: 30 days

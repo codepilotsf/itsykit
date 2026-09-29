@@ -1,0 +1,29 @@
+class Flea < Formula
+  desc "Plain HTML websites with inline owner editing"
+  homepage "https://fleacms.com"
+  version "@VERSION@"
+
+  on_macos do
+    on_arm do
+      url "@BASE@/flea-darwin-arm64"
+      sha256 "@ARM_SHA@"
+    end
+    on_intel do
+      url "@BASE@/flea-darwin-amd64"
+      sha256 "@INTEL_SHA@"
+    end
+  end
+
+  def install
+    binary = Hardware::CPU.arm? ? "flea-darwin-arm64" : "flea-darwin-amd64"
+    bin.install binary => "flea"
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/flea version")
+    system bin/"flea", "new", "example", "--skip-git"
+    cd "example" do
+      assert_match "Valid local project: Example", shell_output("#{bin}/flea status")
+    end
+  end
+end

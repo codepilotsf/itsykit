@@ -2,33 +2,64 @@ package editor
 
 import (
 	"fmt"
+	"html"
 	"log"
 	"net"
 	"net/http"
-	"net/url"
-	"sort"
 	"strings"
 	"sync"
 	"time"
 
-	"flea/internal/fleas"
 	"flea/internal/mailer"
+	"flea/internal/snips"
+	"flea/internal/theme"
 )
 
 type Document struct {
-	Store   *fleas.Store
+	Theme   *string
+	Store   *snips.Store
 	Routes  []string
 	Version string
 }
-type Update struct{ Version, Route, ID, Content, Title, Description string }
+type Update struct {
+	Scales                                          map[string]theme.ScaleEdit
+	Theme                                           map[string]string
+	Version, Route, ID, Content, Title, Description string
+	Page                                            *PageEdit
+}
+type ContentEdit struct {
+	ID      string `json:"id"`
+	Content string `json:"content"`
+}
+type PageEdit struct {
+	Version     string                       `json:"version"`
+	Route       string                       `json:"route"`
+	Title       string                       `json:"title"`
+	Description string                       `json:"description"`
+	Changes     []ContentEdit                `json:"changes"`
+	Multisnips  map[string][]snips.MultiItem `json:"multisnips,omitempty"`
+	Media       []MediaEdit                  `json:"media,omitempty"`
+}
+type MediaEdit struct {
+	Library     bool   `json:"library,omitempty"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Alt         string `json:"alt"`
+	ClearPoster bool   `json:"clear_poster,omitempty"`
+	Data        []byte `json:"-"`
+	PosterData  []byte `json:"-"`
+}
 type Backend interface {
 	Read() (Document, error)
 	Save(Update) error
 }
 type Options struct {
+	RenderEmail     func(string, map[string]string) (mailer.Message, error)
 	SessionPath     string
 	SessionIdleDays int
 	Render          func(string, map[string]any) ([]byte, error)
+	ReloadScript    func() string
+	Public          func(http.ResponseWriter, *http.Request, func([]byte, *snips.Store, string) ([]byte, bool))
 	Emails          []string
 	Name            string
 	Sender          mailer.Sender
@@ -57,7 +88,7 @@ func New(o Options) *Handler {
 	return h
 }
 func emailMessage(email, code, host string) mailer.Message {
-	return mailer.Message{To: email, Subject: "Your FleaCMS sign-in code", Text: fmt.Sprintf("Your sign-in code for %s is:\n\n%s\n\nIt expires in 10 minutes and can only be used once.\nIf you did not request it, ignore this email.", host, code)}
+	return mailer.Message{To: email, Subject: "Your FleaCMS sign-in code", Text: fmt.Sprintf("Your sign-in code for %s is:\n\n%s\n\nIt expires in 10 minutes and can only be used once.\nIf you did not request it, ignore this email.", host, code), HTML: fmt.Sprintf(`<div style="font-family:Arial,sans-serif;font-size:16px;line-height:1.5"><p>Your sign-in code for %s is:</p><p style="font-family:monospace;font-size:36px;font-weight:700;letter-spacing:6px">%s</p><p>It expires in 10 minutes and can only be used once.</p><p>If you did not request it, ignore this email.</p></div>`, html.EscapeString(host), html.EscapeString(code))}
 }
 func IsPath(path string) bool { return path == "/admin" || strings.HasPrefix(path, "/admin/") }
 
@@ -66,8 +97,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Referrer-Policy", "same-origin")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
+	if serveEditorAsset(w, r) {
+		return
+	}
 	w.Header().Set("X-Frame-Options", "DENY")
-	w.Header().Set("Content-Security-Policy", "default-src 'none'; style-src 'self' https: 'unsafe-inline'; font-src 'self' https: data:; img-src 'self' https: data:; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"+activityPolicy())
+	w.Header().Set("Content-Security-Policy", "default-src 'none'; style-src 'self' https: 'unsafe-inline'; font-src 'self' https: data:; img-src 'self' https: data:; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")
 	if len(h.allowed) == 0 && !h.options.Local {
 		http.NotFound(w, r)
 		return
@@ -97,6 +131,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "POST" {
+		pageUpload := r.URL.Path == "/admin/page" && strings.HasPrefix(strings.ToLower(r.Header.Get("Content-Type")), "multipart/form-data")
 		scheme := "https"
 		if h.options.Local {
 			scheme = "http"
@@ -107,7 +142,41 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Please submit this form from the admin page.", 403)
 			return
 		}
-		r.Body = http.MaxBytesReader(w, r.Body, 2<<20)
+		limit := int64(2 << 20)
+		if pageUpload {
+			photoSession, authenticated, e := h.current(r)
+			if e != nil {
+				h.sessionError(w, e)
+				return
+			}
+			if !authenticated || !equal(photoSession.csrf, r.Header.Get("X-CSRF-Token")) {
+				http.Error(w, "Your session expired. Please sign in again.", 403)
+				return
+			}
+			select {
+			case mediaSlot <- struct{}{}:
+				defer func() { <-mediaSlot }()
+			default:
+				http.Error(w, "Media processing is busy. Try again shortly.", 429)
+				return
+			}
+			limit = 40 << 20
+			// Only authenticated, CSRF-checked uploads get a longer bounded window.
+			controller := http.NewResponseController(w)
+			_ = controller.SetReadDeadline(time.Now().Add(3 * time.Minute))
+			_ = controller.SetWriteDeadline(time.Now().Add(4 * time.Minute))
+		}
+		r.Body = http.MaxBytesReader(w, r.Body, limit)
+		if pageUpload {
+			err := r.ParseMultipartForm(1 << 20)
+			if r.MultipartForm != nil {
+				defer r.MultipartForm.RemoveAll()
+			}
+			if err != nil {
+				http.Error(w, "This upload is invalid or exceeds 40 MiB total. Choose images up to 8 MiB and videos up to 25 MiB.", 400)
+				return
+			}
+		}
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "This form is too large or invalid.", 400)
 			return
@@ -140,7 +209,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case "/admin/verify":
 			h.verifyCode(w, r)
 			return
-		case "/admin/logout", "/admin/save", "/admin/activity":
+		case "/admin/logout", "/admin/activity", "/admin/page", "/admin/theme":
 			if !logged || !equal(s.csrf, r.FormValue("csrf")) {
 				http.Error(w, "Your session expired. Please sign in again.", 403)
 				return
@@ -167,29 +236,26 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusNoContent)
 				return
 			}
-			u := Update{Version: r.FormValue("version"), Route: r.FormValue("route"), ID: r.FormValue("id"), Content: r.FormValue("content"), Title: r.FormValue("title"), Description: r.FormValue("description")}
-			if err := h.options.Backend.Save(u); err != nil {
-				if h.options.Logger != nil {
-					h.options.Logger.Printf("Admin content save failed: %v", err)
-				}
-				draft := u.Content
-				if u.ID == "" {
-					draft = "Page title: " + u.Title + "\nDescription: " + u.Description
-				}
-				w.WriteHeader(409)
-				h.page(w, view{Mode: "error", Message: "The page changed or could not be saved. Copy your text, reload the dashboard, and try again.", Draft: draft})
+			if r.URL.Path == "/admin/page" {
+				h.savePage(w, r)
 				return
 			}
-			target := "/admin?saved=1&page=" + url.QueryEscape(r.FormValue("page"))
-			if r.FormValue("shared") == "1" {
-				target = "/admin?saved=1&shared=1"
+			if r.URL.Path == "/admin/theme" {
+				h.saveTheme(w, r)
+				return
 			}
-			http.Redirect(w, r, target, 303)
-			return
 		default:
 			http.NotFound(w, r)
 			return
 		}
+	}
+	if r.URL.Path == "/admin/editor-context" && logged {
+		h.readEditorContext(w, r, s)
+		return
+	}
+	if r.URL.Path == "/admin/theme" && logged {
+		h.readTheme(w, r)
+		return
 	}
 	if r.URL.Path != "/admin" && r.URL.Path != "/admin/" {
 		http.NotFound(w, r)
@@ -205,53 +271,15 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.page(w, view{Mode: "login", CSRF: csrf})
 		return
 	}
-	doc, err := h.options.Backend.Read()
-	if err != nil {
-		http.Error(w, "Content is temporarily unavailable. Please try again shortly.", 503)
-		return
-	}
-	v := view{Mode: "dashboard", Email: s.email, CSRF: s.csrf, Version: doc.Version}
-	v.Selected = r.URL.Query().Get("page")
-	v.SharedSelected = r.URL.Query().Get("shared") == "1"
-	if v.Selected == "" && len(doc.Routes) > 0 {
-		v.Selected = doc.Routes[0]
-	}
-	found := false
-	if r.URL.Query().Get("saved") == "1" {
-		v.Message = "Your changes are live."
-	}
-	for _, route := range doc.Routes {
-		if route == v.Selected {
-			found = true
-		}
-		p := doc.Store.Pages[route]
-		if p == nil {
-			p = &fleas.Page{}
-		}
-		v.Pages = append(v.Pages, pageView{Route: route, Title: p.Title, Description: p.Description, Fleas: p.Fleas})
-	}
-	if !v.SharedSelected && !found && v.Selected != "" {
-		http.NotFound(w, r)
-		return
-	}
 	if !h.renew(w, r) {
 		return
 	}
-	v.Shared = doc.Store.Shared.Fleas
-	h.page(w, v)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-type pageView struct {
-	Route, Title, Description string
-	Fleas                     map[string]fleas.Entry
-}
 type view struct {
-	Selected                                         string
-	SharedSelected                                   bool
 	Instructions                                     string
 	Mode, Name, Email, CSRF, Version, Message, Draft string
-	Pages                                            []pageView
-	Shared                                           map[string]fleas.Entry
 }
 
 func (h *Handler) page(w http.ResponseWriter, v view) {
@@ -259,32 +287,7 @@ func (h *Handler) page(w http.ResponseWriter, v view) {
 		http.Error(w, "Admin pages are not configured.", 500)
 		return
 	}
-	entries := func(fleas map[string]fleas.Entry) []any {
-		keys := make([]string, 0, len(fleas))
-		for id := range fleas {
-			keys = append(keys, id)
-		}
-		sort.Strings(keys)
-		var result []any
-		for _, id := range keys {
-			entry := fleas[id]
-			label := entry.Label
-			if label == "" {
-				label = "Content"
-			}
-			result = append(result, map[string]any{"id": id, "label": label, "content": entry.Content})
-		}
-		return result
-	}
-	var pages []any
-	for _, page := range v.Pages {
-		label := page.Route
-		if label == "/" {
-			label = "Homepage"
-		}
-		pages = append(pages, map[string]any{"route": page.Route, "label": label, "selected": !v.SharedSelected && page.Route == v.Selected, "title": page.Title, "description": page.Description, "fleas": entries(page.Fleas)})
-	}
-	data, err := h.options.Render(v.Mode, map[string]any{"name": h.options.Name, "email": v.Email, "csrf": v.CSRF, "version": v.Version, "message": v.Message, "instructions": v.Instructions, "draft": v.Draft, "pages": pages, "shared": entries(v.Shared), "sharedSelected": v.SharedSelected})
+	data, err := h.options.Render(v.Mode, map[string]any{"name": h.options.Name, "email": v.Email, "csrf": v.CSRF, "version": v.Version, "message": v.Message, "instructions": v.Instructions, "draft": v.Draft})
 	if err != nil {
 		if h.options.Logger != nil {
 			h.options.Logger.Printf("Admin page could not be rendered: %v", err)
@@ -293,8 +296,14 @@ func (h *Handler) page(w http.ResponseWriter, v view) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if v.Mode == "dashboard" {
-		data = withActivity(data)
+	if v.Mode == "verify" {
+		data = appendCodeInput(w, data)
+	}
+	if h.options.Local && h.options.ReloadScript != nil {
+		if script := h.options.ReloadScript(); script != "" {
+			data = appendTrustedScript(w, data, script)
+			w.Header().Set("Content-Security-Policy", w.Header().Get("Content-Security-Policy")+"; connect-src 'self'")
+		}
 	}
 	_, _ = w.Write(data)
 }

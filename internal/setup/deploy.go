@@ -3,6 +3,7 @@ package setup
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -19,6 +20,8 @@ import (
 
 // DeploySettings contains no secrets. Native SSH configuration owns credentials.
 type DeploySettings struct {
+	WithSnips   bool     `json:"-"`
+	WithTheme   bool     `json:"-"`
 	Target      string   `json:"target"`
 	Domain      string   `json:"domain"`
 	Name        string   `json:"name"`
@@ -50,6 +53,9 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		return fmt.Errorf("branch changed since selecting the deployment destination")
 	}
 	fmt.Fprintf(out, "\nDeploying %s branch to %s.\nPress Ctrl-C to abort.\n\n", state.Branch, s.Domain)
+	if !httpsOnly && !s.WithSnips && !s.WithTheme {
+		fmt.Fprintln(out, "Existing live snips and theme will be kept. New snips use their committed content.")
+	}
 	target, err := targetName(s.Target)
 	if err != nil {
 		return fmt.Errorf("deploy target: %w", err)
@@ -78,6 +84,8 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 	defer os.RemoveAll(temp)
 	archive := filepath.Join(temp, "site.tar.gz")
 	needsMail := false
+	var localProject *site.Project
+	planFile := ""
 	if !httpsOnly {
 		fmt.Fprintln(out, "Validating and packaging site...")
 		committed := filepath.Join(temp, "commit")
@@ -87,13 +95,20 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		if err = committedSnapshot(ctx, root, committed, state); err != nil {
 			return err
 		}
+		if err = site.StageVideos(root, committed); err != nil {
+			return fmt.Errorf("stage video files: %w", err)
+		}
 		p, err := site.LoadDev(ctx, committed)
 		if err != nil {
 			return err
 		}
-		if err = p.CheckExtractedFleas(); err != nil {
+		if err = p.CheckExtractedSnips(); err != nil {
 			return err
 		}
+		if !p.SiteNameConfigured {
+			return fmt.Errorf("Set app.site_name in .flea.config.json, or run flea dev to choose a site name, then commit it before deploying.")
+		}
+		localProject = p
 		needsMail = len(p.Admin.Emails) > 0 || p.Contact.To != ""
 		if needsMail && !opts.HTTPS {
 			return fmt.Errorf("Admin login requires HTTPS, and so do contact forms. Enable it with flea deploy -configure before deploying this site.")
@@ -206,6 +221,32 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 	if !strings.Contains(output.String(), release.Protocol+"\n") {
 		return fmt.Errorf("This server has an older or incomplete FleaCMS installation.\nPlease update the server before deploying.")
 	}
+	if s.WithSnips || s.WithTheme {
+		if httpsOnly {
+			return fmt.Errorf("content options require flea deploy")
+		}
+		s.Branch = state.Branch
+		base, e := readBaseline(ctx, root, s)
+		if e != nil {
+			return e
+		}
+		remote, e := fetchState(ctx, s, ssh, isRoot)
+		if e != nil {
+			return e
+		}
+		plan, e := makePlan(base, localProject, remote, s.WithSnips, s.WithTheme, resolveSync(ctx, in, out))
+		if e != nil {
+			return e
+		}
+		b, e := json.Marshal(plan)
+		if e != nil {
+			return e
+		}
+		planFile = filepath.Join(temp, "sync.json")
+		if e = os.WriteFile(planFile, b, 0600); e != nil {
+			return e
+		}
+	}
 	fmt.Fprintln(out, "Checking DNS from the target server...")
 	dnsCommand := "/usr/local/bin/flea-server -check-dns -domain " + shellQuote(strings.Join(opts.Domains, ","))
 	if len(s.ExpectedIPs) > 0 {
@@ -239,7 +280,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		defer func() {
 			c, stop := context.WithTimeout(context.Background(), 5*time.Second)
 			defer stop()
-			_ = ssh(c, "rm -f -- "+shellQuote(stage+"/site.tar.gz")+"; rmdir -- "+shellQuote(stage), false, io.Discard)
+			_ = ssh(c, "rm -f -- "+shellQuote(stage+"/site.tar.gz")+" "+shellQuote(stage+"/sync.json")+"; rmdir -- "+shellQuote(stage), false, io.Discard)
 		}()
 		scpTarget := target
 		if at := strings.LastIndex(target, "@"); strings.Contains(target[at+1:], ":") {
@@ -251,6 +292,13 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			return fmt.Errorf("upload failed: %w", err)
 		}
 		text += " -deploy " + shellQuote(stage+"/site.tar.gz") + " -name " + shellQuote(s.Name)
+		if planFile != "" {
+			args := append(append([]string{}, sshOptions...), "--", planFile, scpTarget+":"+stage+"/sync.json")
+			if e := runCommand(ctx, command{name: "scp", args: args, in: in, out: out, errOut: errOut}); e != nil {
+				return e
+			}
+			text += " -sync-plan " + shellQuote(stage+"/sync.json")
+		}
 	}
 	text += " -domain " + shellQuote(strings.Join(opts.Domains, ","))
 	text += " -branch " + shellQuote(state.Branch) + " -commit " + shellQuote(state.Commit)

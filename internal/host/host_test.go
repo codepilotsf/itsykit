@@ -19,7 +19,7 @@ func testConfig(t *testing.T, listen string) string {
 	t.Helper()
 	dir := t.TempDir()
 	root := filepath.Join(dir, "site")
-	for path, body := range map[string]string{"_/flea.config": `{"site":{"name":"Host test"}}`, "index.html": "<h1>{site.name}</h1>", "_404.html": "Custom missing"} {
+	for path, body := range map[string]string{".flea.config.json": `{"app":{"site_name":"Host test"},"dev":{"email_preview":true}}`, "site/index.html": "<h1>{app.site_name}</h1>", "site/_404.html": "Custom missing"} {
 		file := filepath.Join(root, path)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)
@@ -52,6 +52,7 @@ func TestHostRoutesWithoutDevelopmentFeatures(t *testing.T) {
 	}{
 		{"example.test", "/", 200, "Host test"}, {"EXAMPLE.TEST:8080", "/", 200, "Host test"},
 		{"example.test", "/missing", 404, "Custom missing"}, {"example.test", "/_flea/reload", 404, "Custom missing"},
+		{"example.test", "/_flea/email-preview/123456", 404, "Custom missing"},
 		{"other.test", "/", 404, "404 page not found"}, {"localhost", HealthPath, 200, `"status":"ready"`},
 	} {
 		r := httptest.NewRequest("GET", test.path, nil)

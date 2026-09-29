@@ -13,7 +13,7 @@ import (
 	"path"
 )
 
-const MaxBytes int64 = 100 << 20
+const MaxBytes int64 = 256 << 20
 const MaxFiles = 10000
 
 func allowed(name string) bool {
@@ -68,15 +68,47 @@ func Pack(directory string, output io.Writer) error {
 			hdr.Mode = 0755
 			hdr.Size = 0
 		}
+		var config []byte
+		if name == ".flea.config.json" && !info.IsDir() {
+			if info.Size() > 1<<20 {
+				return fmt.Errorf("site config exceeds 1 MiB")
+			}
+			file, openErr := root.Open(name)
+			if openErr != nil {
+				return openErr
+			}
+			actual, statErr := file.Stat()
+			if statErr != nil || !os.SameFile(info, actual) || !actual.Mode().IsRegular() {
+				file.Close()
+				return fmt.Errorf("file changed while packaging: %s", name)
+			}
+			config, err = io.ReadAll(io.LimitReader(file, (1<<20)+1))
+			file.Close()
+			if err != nil {
+				return err
+			}
+			if len(config) > 1<<20 {
+				return fmt.Errorf("site config exceeds 1 MiB")
+			}
+			config, err = sitefiles.RuntimeConfig(config)
+			if err != nil {
+				return err
+			}
+			hdr.Size = int64(len(config))
+		}
 		total += hdr.Size
 		if total > MaxBytes {
-			return fmt.Errorf("release exceeds 100 MiB")
+			return fmt.Errorf("release exceeds 256 MiB")
 		}
 		if err := tw.WriteHeader(hdr); err != nil {
 			return err
 		}
 		if info.IsDir() {
 			return nil
+		}
+		if config != nil {
+			_, err = tw.Write(config)
+			return err
 		}
 		file, err := root.Open(name)
 		if err != nil {

@@ -13,11 +13,19 @@ func IgnoreSessionFiles(directory string) error {
 		return err
 	}
 	defer root.Close()
+	if err := root.MkdirAll("flea/runtime", 0700); err != nil {
+		return err
+	}
+	private, err := pinnedDir(root, "flea/runtime")
+	if err != nil {
+		return err
+	}
+	private.Close()
 	data, err := readFile(root, ".gitignore")
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
-	const rules = "/_/sessions.json\n/_/.sessions-*"
+	const rules = "/flea/runtime/\n/flea/media/*.mp4"
 	text := strings.TrimRight(string(data), "\n")
 	if text == rules || strings.HasSuffix(text, "\n"+rules) {
 		return nil

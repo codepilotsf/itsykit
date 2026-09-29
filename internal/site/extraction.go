@@ -9,8 +9,8 @@ import (
 	"os"
 	"strings"
 
-	"flea/internal/fleas"
 	"flea/internal/sitefiles"
+	"flea/internal/snips"
 )
 
 // LoadEditing extracts new regions only for the local dev server.
@@ -26,44 +26,49 @@ func loadEditing(ctx context.Context, root string) (*Project, error) {
 		return nil, err
 	}
 	updated := false
-	if err := extractFleas(root, &updated); err != nil {
+	if err := extractSnips(root, &updated); err != nil {
 		return nil, err
 	}
 	p, err := LoadDev(ctx, root)
 	if err == nil {
-		p.FleasUpdated = updated
+		p.SnipsUpdated = updated
 	}
 	return p, err
 }
 
-// ExtractFleas is invoked by dev only, never by status or deployment packaging.
-func ExtractFleas(directory string) error {
+// ExtractSnips is invoked by dev only, never by status or deployment packaging.
+func ExtractSnips(directory string) error {
 	unlock := LockContent()
 	defer unlock()
-	return extractFleas(directory, nil)
+	return extractSnips(directory, nil)
 }
 
-func extractFleas(directory string, updated *bool) error {
+func extractSnips(directory string, updated *bool) error {
 	root, err := os.OpenRoot(directory)
 	if err != nil {
 		return err
 	}
 	defer root.Close()
+	views, err := root.OpenRoot("site")
+	if err != nil {
+		return err
+	}
+	defer views.Close()
 	if err := rejectOldContentPaths(root); err != nil {
 		return err
 	}
 	if data, e := readFile(root, transactionFile); e == nil {
-		var tx fleaTransaction
+		var tx snipTransaction
 		if e = json.Unmarshal(data, &tx); e != nil {
 			return e
 		}
-		if e = finishFleaTransaction(root, tx); e != nil {
+		if e = finishSnipTransaction(root, tx); e != nil {
 			return e
 		}
 	} else if !os.IsNotExist(e) {
 		return e
 	}
-	store, err := readFleaStore(root)
+	store, err := readSnipStore(root)
 	if err != nil {
 		return err
 	}
@@ -87,8 +92,15 @@ func extractFleas(directory string, updated *bool) error {
 	for id := range store.Archive {
 		used[id] = struct{}{}
 	}
+	for _, page := range store.Pages {
+		for _, items := range page.Multisnips {
+			for _, item := range items {
+				used[item.ID] = struct{}{}
+			}
+		}
+	}
 	legacy := map[string]bool{}
-	for _, directory := range []string{"_/fleas", "_/data"} {
+	for _, directory := range []string{"flea/snips", "flea/data"} {
 		entries, e := fs.ReadDir(root.FS(), directory)
 		if e != nil && !os.IsNotExist(e) {
 			return e
@@ -103,28 +115,29 @@ func extractFleas(directory string, updated *bool) error {
 			}
 		}
 	}
-	tx := fleaTransaction{Edits: map[string]fleaEdit{}}
-	previous, previousErr := readFile(root, "_/fleas.json")
+	tx := snipTransaction{Edits: map[string]snipEdit{}}
+	mediaSources := map[string]string{}
+	previous, previousErr := readFile(root, "flea/snips.json")
 	if previousErr != nil && !os.IsNotExist(previousErr) {
 		return previousErr
 	}
-	previousStore := fleas.NewStore()
+	previousStore := snips.NewStore()
 	if previousErr == nil {
-		previousStore, err = fleas.Decode(previous)
+		previousStore, err = snips.Decode(previous)
 		if err != nil {
 			return err
 		}
 	}
 	previousSnapshot, _ := previousStore.Bytes()
 	if !bytes.Equal(originalStore, previousSnapshot) {
-		return fmt.Errorf("fleas.json changed while preparing extraction; please save and retry")
+		return fmt.Errorf("snips.json changed while preparing extraction; please save and retry")
 	}
 	tx.BeforeContent = previous
-	err = fs.WalkDir(root.FS(), ".", func(name string, d fs.DirEntry, e error) error {
+	err = fs.WalkDir(views.FS(), ".", func(name string, d fs.DirEntry, e error) error {
 		if e != nil {
 			return e
 		}
-		if !sitefiles.Included(name) || name == "_" {
+		if name != "." && !sitefiles.Included("site/"+name) {
 			if d.IsDir() {
 				return fs.SkipDir
 			}
@@ -136,44 +149,73 @@ func extractFleas(directory string, updated *bool) error {
 		if !strings.HasSuffix(name, ".html") {
 			return nil
 		}
-		data, e := readFile(root, name)
+		data, e := readFile(views, name)
 		if e != nil {
 			return e
 		}
-		regions, ids, e := scanRegions(string(data), legacy)
+		original := string(data)
+		if _, e := scanMediaBindings(name, original); e != nil {
+			return e
+		}
+		multiSource, e := extractMultisnips(directory, name, original, store, used)
+		if e != nil {
+			return fmt.Errorf("%s: %w", name, e)
+		}
+		multiSource, e = extractMediaSnips(directory, name, multiSource, store, used)
+		if e != nil {
+			return e
+		}
+		data = []byte(multiSource)
+		mediaSources[name] = multiSource
+		regions, ids, e := scanRegions(name, string(data), legacy)
 		if e != nil {
 			return fmt.Errorf("%s: %w", name, e)
 		}
 		for _, id := range ids {
-			addReference(id, fleaScope(name))
+			addReference(id, snipScope(name))
 		}
 		var out bytes.Buffer
 		last := 0
-		changed := false
+		changed := original != multiSource
 		for _, r := range regions {
+			out.Write(data[last:r.attributeStart])
+			out.Write(data[r.attributeEnd:r.start])
 			if r.id != "" {
-				labels[r.id] = r.label
+				if r.label != "" {
+					labels[r.id] = r.label
+				}
+				out.Write(data[r.start:r.end])
+				last = r.end
+				changed = true
 				continue
 			}
-			id, e := fleas.ReserveID(used)
+			id, e := snips.ReserveID(used)
 			if e != nil {
 				return e
 			}
-			content, e := fleas.Sanitize(r.content)
+			content, e := snips.Sanitize(r.content)
 			if e != nil {
 				return e
 			}
-			store.Page(fleaScope(name)).Fleas[id] = fleas.Entry{Label: r.label, Content: content}
-			addReference(id, fleaScope(name))
+			store.Page(snipScope(name)).Snips[id] = snips.Entry{Label: r.label, Content: content}
+			addReference(id, snipScope(name))
 			labels[id] = r.label
-			out.Write(data[last:r.start])
-			out.WriteString(`{flea ` + id + `}`)
+			out.WriteString(`{snip ` + id + `}`)
 			last = r.end
 			changed = true
 		}
 		if changed {
 			out.Write(data[last:])
-			tx.Edits[name] = fleaEdit{Before: string(data), After: out.String()}
+			blocks, err := multisnipBlocks(name, out.String())
+			if err != nil {
+				return err
+			}
+			for _, b := range blocks {
+				if _, err := definition(out.String()[b.bodyStart:b.bodyEnd]); err != nil {
+					return err
+				}
+			}
+			tx.Edits["site/"+name] = snipEdit{Before: original, After: out.String()}
 		}
 		return nil
 	})
@@ -190,21 +232,44 @@ func extractFleas(directory string, updated *bool) error {
 			entry, ok = store.Archive[id]
 		}
 		if !ok {
-			return fmt.Errorf("missing flea %s in _/fleas.json", id)
+			return fmt.Errorf("missing snip %s in flea/snips.json", id)
 		}
-		delete(store.Shared.Fleas, id)
+		delete(store.Shared.Snips, id)
 		for _, page := range store.Pages {
-			delete(page.Fleas, id)
+			delete(page.Snips, id)
 		}
 		delete(store.Archive, id)
 		if label, ok := labels[id]; ok {
 			entry.Label = label
 		}
-		store.Page(scope).Fleas[id] = entry
+		store.Page(scope).Snips[id] = entry
+	}
+	index, err = store.Index()
+	if err != nil {
+		return err
+	}
+	for file, source := range mediaSources {
+		bindings, e := scanMediaBindings(file, source)
+		if e != nil {
+			return e
+		}
+		for _, binding := range bindings {
+			if binding.id == "" {
+				continue
+			}
+			kind := "image"
+			if binding.tag == "video" {
+				kind = "video"
+			}
+			entry, ok := index[binding.id]
+			if !ok || entry.Type != kind {
+				return sourceError(file, source, binding.start, fmt.Errorf("missing or incorrect %s snip %s", kind, binding.id))
+			}
+		}
 	}
 	// Keep removed content recoverable, but remove it from the active page index.
 	// References include all templates, not just the page currently being rendered.
-	store, err = fleas.Merge(store, store, references)
+	store, err = snips.Merge(store, store, references)
 	if err != nil {
 		return err
 	}
@@ -215,17 +280,20 @@ func extractFleas(directory string, updated *bool) error {
 	if len(tx.Edits) == 0 && bytes.Equal(originalStore, tx.Content) {
 		return nil
 	}
-	if _, err = fleas.Decode(tx.Content); err != nil {
+	if _, err = snips.Decode(tx.Content); err != nil {
 		return err
 	}
 	data, err := json.Marshal(tx)
 	if err != nil {
 		return err
 	}
+	if err = root.MkdirAll("flea/runtime", 0700); err != nil {
+		return err
+	}
 	if err = writeSiteFile(root, transactionFile, data); err != nil {
 		return err
 	}
-	if err := finishFleaTransaction(root, tx); err != nil {
+	if err := finishSnipTransaction(root, tx); err != nil {
 		return err
 	}
 	if updated != nil {

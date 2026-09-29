@@ -155,13 +155,25 @@ func (h *Handler) requestCode(w http.ResponseWriter, r *http.Request) {
 	h.challenges[key(login)] = challenge{email: email, host: authority(r), digest: key(login + code), expires: now.Add(codeLife)}
 	h.mu.Unlock()
 	if h.allowed[email] {
+		host := authority(r)
 		message := emailMessage(email, code, authority(r))
 		// Respond independently of provider timing so the allowlist cannot be
 		// inferred from a network round trip. The rate limiter bounds workers.
 		go func() {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
-			if err := h.options.Sender.Send(ctx, message); err != nil {
+			var err error
+			if h.options.RenderEmail != nil {
+				rendered, renderErr := h.options.RenderEmail("sign-in", map[string]string{"code": code, "host": host})
+				err = renderErr
+				if err == nil {
+					message.HTML, message.Text = rendered.HTML, rendered.Text
+				}
+			}
+			if err == nil {
+				err = h.options.Sender.Send(ctx, message)
+			}
+			if err != nil {
 				h.mu.Lock()
 				if c, ok := h.challenges[key(login)]; ok && c.digest == key(login+code) {
 					delete(h.challenges, key(login))
@@ -174,7 +186,7 @@ func (h *Handler) requestCode(w http.ResponseWriter, r *http.Request) {
 		}()
 	}
 	// The same response is used for unlisted addresses and provider failures.
-	h.page(w, view{Mode: "verify", CSRF: login, Message: "If this address has access, a code will arrive shortly. It expires in 10 minutes."})
+	h.page(w, view{Mode: "verify", CSRF: login})
 }
 
 func (h *Handler) verifyCode(w http.ResponseWriter, r *http.Request) {
@@ -229,5 +241,5 @@ func (h *Handler) verifyCode(w http.ResponseWriter, r *http.Request) {
 	}
 	h.cookie(w, "session", t, int(h.sessionDuration().Seconds()))
 	h.cookie(w, "login", "", -1)
-	http.Redirect(w, r, "/admin", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

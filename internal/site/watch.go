@@ -97,8 +97,8 @@ func (s *Server) Watch(ctx context.Context, root string, logger *log.Logger) err
 				last = project.signature
 				s.mu.RUnlock()
 				if logger != nil {
-					if project.FleasUpdated {
-						logger.Print("Fleas updated in _/fleas.json.")
+					if project.SnipsUpdated {
+						logger.Print("Snips updated in flea/snips.json.")
 					}
 					for _, warning := range project.Warnings {
 						logger.Printf("Warning: %s", warning)
@@ -113,7 +113,7 @@ func (s *Server) Watch(ctx context.Context, root string, logger *log.Logger) err
 				if message == "" {
 					logger.Print("Site valid again; changes loaded")
 				} else {
-					logger.Printf("Site invalid: %s", message)
+					logger.Printf("Site invalid: %q", message)
 				}
 			}
 			previous = message

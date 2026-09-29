@@ -15,6 +15,9 @@ import (
 
 func put(t *testing.T, root, name, body string) {
 	t.Helper()
+	if !strings.HasPrefix(name, "flea/") && !strings.HasPrefix(name, "mailers/") && !strings.HasPrefix(name, "site/") && !strings.HasPrefix(name, ".") && name != "AGENTS.md" && name != "README.md" {
+		name = "site/" + name
+	}
 	dest := filepath.Join(root, filepath.FromSlash(name))
 	if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 		t.Fatal(err)
@@ -26,9 +29,9 @@ func put(t *testing.T, root, name, body string) {
 func fixture(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
-	put(t, root, "_/flea.config", `{"site":{"name":"Test","url":"javascript:alert(1)","unsafe":"\"/><script>alert(1)</script>"}}`)
-	put(t, root, "_/fleas/team.json", `{"text":"<b>{site.name}</b>","members":[{"name":"Ada","children":[{"name":"Bea"}]},{"name":"Cy","children":[]}],"empty":[],"false":false,"zero":0,"blank":""}`)
-	put(t, root, "index.html", "<h1>{site.name}</h1>")
+	put(t, root, ".flea.config.json", `{"app":{"site_name":"Test","url":"javascript:alert(1)","unsafe":"\"/><script>alert(1)</script>"}}`)
+	put(t, root, "flea/snips/team.json", `{"text":"<b>{app.site_name}</b>","members":[{"name":"Ada","children":[{"name":"Bea"}]},{"name":"Cy","children":[]}],"empty":[],"false":false,"zero":0,"blank":""}`)
+	put(t, root, "index.html", "<h1>{app.site_name}</h1>")
 	put(t, root, "about/index.html", "About")
 	put(t, root, "css/main.css", "body{color:red}")
 	put(t, root, "_404.html", "Not here")
@@ -42,6 +45,27 @@ func mustLoad(t *testing.T, root string) *Project {
 		t.Fatal(err)
 	}
 	return p
+}
+
+func TestConfigurationRequiresJSONFilename(t *testing.T) {
+	root := fixture(t)
+	current := filepath.Join(root, ".flea.config.json")
+	old := filepath.Join(root, "flea/flea.config")
+	if err := os.Rename(current, old); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "flea.config.json") {
+		t.Fatal("old filename unexpectedly accepted", err)
+	}
+	if err := os.Rename(old, current); err != nil {
+		t.Fatal(err)
+	}
+	p := mustLoad(t, root)
+	for _, route := range []string{"/.flea.config.json", "/flea/flea.config"} {
+		if got := request(NewProductionServer(p, nil), "GET", route).Code; got != 404 {
+			t.Fatalf("private configuration route %s returned %d", route, got)
+		}
+	}
 }
 func request(s *Server, method, url string) *httptest.ResponseRecorder {
 	w := httptest.NewRecorder()
@@ -62,7 +86,7 @@ func TestRoutingAndSecurity(t *testing.T) {
 			t.Errorf("%s: %d", url, w.Code)
 		}
 	}
-	for _, url := range []string{"/index.html", "/about.html", "/about/index.html", "/about/", "/missing", "/_secret.txt", "/.env", "/.hidden/file", "/_private/file", "/_/flea.config", "/../_/flea.config", "/%2e%2e/_/flea.config", "/%5fsecret.txt", "/%252e%252e/secret", "//about", "/css/../_secret.txt", "/css%5c..%5c_secret.txt", "/%00"} {
+	for _, url := range []string{"/index.html", "/about.html", "/about/index.html", "/about/", "/missing", "/_secret.txt", "/.env", "/.hidden/file", "/_private/file", "/.flea.config.json", "/../.flea.config.json", "/%2e%2e/.flea.config.json", "/%5fsecret.txt", "/%252e%252e/secret", "//about", "/css/../_secret.txt", "/css%5c..%5c_secret.txt", "/%00"} {
 		w := request(s, "GET", url)
 		if w.Code != 404 || strings.Contains(w.Body.String(), "SECRET") {
 			t.Errorf("unsafe route %s: %d %s", url, w.Code, w.Body.String())
@@ -97,15 +121,18 @@ func TestCollisionsAndSymlinks(t *testing.T) {
 			}
 		})
 	}
-	for _, name := range []string{"link.txt", "nested", "_/fleas/link.json", "_/flea.config"} {
+	for _, name := range []string{"link.txt", "nested", "flea/snips/link.json", ".flea.config.json"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
 			target := filepath.Join(t.TempDir(), "secret")
 			if err := os.WriteFile(target, []byte("SECRET"), 0600); err != nil {
 				t.Fatal(err)
 			}
-			dest := filepath.Join(root, name)
-			if name == "_/flea.config" {
+			dest := filepath.Join(root, "site", name)
+			if strings.HasPrefix(name, "flea/") || name == ".flea.config.json" {
+				dest = filepath.Join(root, name)
+			}
+			if name == ".flea.config.json" {
 				if err := os.Remove(dest); err != nil {
 					t.Fatal(err)
 				}
@@ -122,16 +149,16 @@ func TestCollisionsAndSymlinks(t *testing.T) {
 
 func TestRenderingScopeAndEscaping(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "_layout.html", `<html><title>{site.name}</title><body>{slot}</body></html>`)
-	put(t, root, "_member.html", `[{member.name}:{site.name}:{#each member.children as member}{member.name}/{site.name}{/each}:{member.name}]`)
-	put(t, root, "index.html", `{#each flea.team.members as member}{render member}{/each}<p>{site.unsafe}</p><div title="{site.unsafe}"></div><a href="{site.url}">link</a>{flea team}{#if flea.team.false}BAD{/if}{#if flea.team.zero}BAD{/if}{#if flea.team.blank}BAD{/if}{#if flea.team.empty}BAD{/if}{#each flea.team.empty as x}BAD{/each}{#each flea.missing as x}BAD{/each}`)
+	put(t, root, "main.layout.html", `<html><title>{app.site_name}</title><body>{slot}</body></html>`)
+	put(t, root, "_member.html", `[{member.name}:{app.site_name}:{#each member.children as member}{member.name}/{app.site_name}{/each}:{member.name}]`)
+	put(t, root, "index.html", `{#each snip.team.members as member}{render member}{/each}<p>{app.unsafe}</p><div title="{app.unsafe}"></div><a href="{app.url}">link</a>{snip team}{#if snip.team.false}BAD{/if}{#if snip.team.zero}BAD{/if}{#if snip.team.blank}BAD{/if}{#if snip.team.empty}BAD{/if}{#each snip.team.empty as x}BAD{/each}{#each snip.missing as x}BAD{/each}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
 	if err != nil {
 		t.Fatal(err)
 	}
 	got := string(b)
-	for _, want := range []string{"[Ada:Test:Bea/Test:Ada][Cy:Test::Cy]", "#ZgotmplZ", "&lt;script&gt;", "&lt;b&gt;{site.name}&lt;/b&gt;", "<body>"} {
+	for _, want := range []string{"[Ada:Test:Bea/Test:Ada][Cy:Test::Cy]", "#ZgotmplZ", "&lt;script&gt;", "&lt;b&gt;{app.site_name}&lt;/b&gt;", "<body>"} {
 		if !strings.Contains(got, want) {
 			t.Errorf("missing %q in %s", want, got)
 		}
@@ -147,7 +174,7 @@ func TestRenderPaths(t *testing.T) {
 	put(t, root, "about/_footer.html", "LOCAL")
 	put(t, root, "foo/bar/_footer.html", "NESTED:{render note}:{render ../../footer}")
 	put(t, root, "foo/bar/_note.html", "NOTE")
-	put(t, root, "_layout.html", "{slot}|{render footer}")
+	put(t, root, "main.layout.html", "{slot}|{render footer}")
 	put(t, root, "about/index.html", "{render footer}|{render ./footer}|{render /foo/bar/footer}")
 	s := NewServer(mustLoad(t, root))
 	w := request(s, "GET", "/about")
@@ -184,14 +211,14 @@ func TestInvalidRenderPaths(t *testing.T) {
 
 func TestRawElements(t *testing.T) {
 	root := fixture(t)
-	source := `<script data-value=">">const x={a: "{site.name}"}; const t="{{.Site}}"; const close="</scripture>"; const untouched="{site.name}";</script><STYLE>.x { color:red; }</STYLE><p>{site.name}</p>`
+	source := `<script data-value=">">const x={a: "{app.site_name}"}; const t="{{.App}}"; const close="</scripture>"; const untouched="{app.site_name}";</script><STYLE>.x { color:red; }</STYLE><p>{app.site_name}</p>`
 	put(t, root, "index.html", source)
 	p := mustLoad(t, root)
 	compiled, err := p.compile(source, "index.html", nil, map[string]string{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(compiled, `const close="</scripture>"; const untouched="{site.name}";`) {
+	if !strings.Contains(compiled, `const close="</scripture>"; const untouched="{app.site_name}";`) {
 		t.Fatalf("parser changed script body: %s", compiled)
 	}
 	b, err := p.render(p.Pages["/"], "/")
@@ -201,18 +228,18 @@ func TestRawElements(t *testing.T) {
 	// html/template normalizes this literal to an equivalent JS escape; the
 	// FleaCMS parser must leave both it and subsequent braces untouched.
 	want := strings.Replace(source, "</scripture>", `\x3C/scripture>`, 1)
-	if string(b) != strings.Replace(want, "<p>{site.name}</p>", "<p>Test</p>", 1) {
+	if string(b) != strings.Replace(want, "<p>{app.site_name}</p>", "<p>Test</p>", 1) {
 		t.Fatalf("raw content changed: %s", b)
 	}
 }
 
 func TestInvalidTemplatesAndData(t *testing.T) {
 	cases := map[string]string{
-		"missing partial": `{render missing}`, "unclosed each": `{#each flea.team.members as m}`,
-		"unmatched": `{/if}`, "bad expression": `{site.name + 1}`, "empty if": `{#if }x{/if}`, "empty each": `{#each }`,
-		"non-array": `{#each site.name as item}x{/each}`, "reserved alias": `{#each flea.team.members as site}{/each}`,
-		"bad alias": `{#each flea.team.members as x-y}{/each}`, "slot": `{slot}`, "unclosed directive": `{site.name`,
-		"missing flea": `{flea missing}`, "unclosed script": `<script>{anything}`,
+		"missing partial": `{render missing}`, "unclosed each": `{#each snip.team.members as m}`,
+		"unmatched": `{/if}`, "bad expression": `{app.site_name + 1}`, "empty if": `{#if }x{/if}`, "empty each": `{#each }`,
+		"non-array": `{#each app.site_name as item}x{/each}`, "reserved alias": `{#each snip.team.members as app}{/each}`,
+		"bad alias": `{#each snip.team.members as x-y}{/each}`, "slot": `{slot}`, "unclosed directive": `{app.site_name`,
+		"missing snip": `{snip missing}`, "unclosed script": `<script>{anything}`,
 	}
 	for name, source := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -233,7 +260,7 @@ func TestInvalidTemplatesAndData(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
-	for _, name := range []string{"_/flea.config", "_/fleas/team.json"} {
+	for _, name := range []string{".flea.config.json", "flea/snips/team.json"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
 			put(t, root, name, "{bad}")
@@ -287,7 +314,7 @@ func TestReloadAndConcurrentRequests(t *testing.T) {
 
 func TestErrorPageLayouts(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "_layout.html", `<!doctype html><html><body><header>{site.name}</header>{slot}<footer>Shared footer</footer></body></html>`)
+	put(t, root, "main.layout.html", `<!doctype html><html><body><header>{app.site_name}</header>{slot}<footer>Shared footer</footer></body></html>`)
 	s := NewServer(mustLoad(t, root))
 	for _, url := range []string{"/missing", "/_private"} {
 		w := request(s, "GET", url)
@@ -306,7 +333,7 @@ func TestErrorPageLayouts(t *testing.T) {
 	if w.Code != 500 || !strings.HasPrefix(w.Body.String(), "Try later") || strings.Contains(w.Body.String(), "Shared footer") {
 		t.Fatal("500 must stay standalone")
 	}
-	if err := os.Remove(filepath.Join(root, "_layout.html")); err != nil {
+	if err := os.Remove(filepath.Join(root, "site", "main.layout.html")); err != nil {
 		t.Fatal(err)
 	}
 	put(t, root, "index.html", "fixed")
@@ -321,9 +348,9 @@ func TestErrorPageLayouts(t *testing.T) {
 
 func TestRenderingFailureFallback(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "index.html", `{#each flea.team.members as m}{m.name}{/each}`)
+	put(t, root, "index.html", `{#each snip.team.members as m}{m.name}{/each}`)
 	p := mustLoad(t, root)
-	p.Fleas["team"]["members"] = "wrong type"
+	p.Snips["team"]["members"] = "wrong type"
 	w := request(NewServer(p), "GET", "/")
 	if w.Code != 500 || !strings.HasPrefix(w.Body.String(), "Try later") {
 		t.Fatal(w)
@@ -355,9 +382,9 @@ func TestWatchChangesAndRecovery(t *testing.T) {
 		t.Fatal("watch did not publish change")
 	}
 	for _, edit := range []struct{ name, body, url, want string }{
-		{"_/flea.config", `{"site":{"name":"Renamed"}}`, "/", "Renamed"},
-		{"index.html", `{flea.team.text}`, "/", "&lt;b&gt;"},
-		{"_/fleas/team.json", `{"text":"new content"}`, "/", "new content"},
+		{".flea.config.json", `{"app":{"site_name":"Renamed"}}`, "/", "Renamed"},
+		{"index.html", `{snip.team.text}`, "/", "&lt;b&gt;"},
+		{"flea/snips/team.json", `{"text":"new content"}`, "/", "new content"},
 		{"css/main.css", "new css", "/css/main.css", "new css"},
 	} {
 		put(t, root, edit.name, edit.body)
@@ -372,7 +399,7 @@ func TestWatchChangesAndRecovery(t *testing.T) {
 	wait(func() bool { return strings.Contains(request(s, "GET", "/new").Body.String(), "partial one") })
 	put(t, root, "_live.html", "partial two")
 	wait(func() bool { return strings.Contains(request(s, "GET", "/new").Body.String(), "partial two") })
-	if err := os.Remove(filepath.Join(root, "new.html")); err != nil {
+	if err := os.Remove(filepath.Join(root, "site", "new.html")); err != nil {
 		t.Fatal(err)
 	}
 	wait(func() bool { return request(s, "GET", "/new").Code == 404 })
@@ -397,10 +424,10 @@ func TestConfinedReads(t *testing.T) {
 	if err := os.Symlink(filepath.Join(root, "_"), filepath.Join(root, "link")); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := readFile(boundary, "link/flea.config"); err == nil {
+	if _, err := readFile(boundary, "link/flea.config.json"); err == nil {
 		t.Fatal("followed a private directory symlink")
 	}
-	if err := os.Symlink(filepath.Join(root, "_", "flea.config"), filepath.Join(root, "secret")); err != nil {
+	if err := os.Symlink(filepath.Join(root, ".flea.config.json"), filepath.Join(root, "secret")); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := readFile(boundary, "secret"); err == nil {

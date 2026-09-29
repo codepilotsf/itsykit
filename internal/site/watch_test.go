@@ -47,25 +47,25 @@ func TestDirectoryWatchLifecycle(t *testing.T) {
 	wait("/nested/deep", "nested edit", 200)
 	// Editors commonly save to an ignored temporary file and rename over the page.
 	put(t, root, "nested/deep/.save", "atomic replacement")
-	if err := os.Rename(filepath.Join(root, "nested/deep/.save"), filepath.Join(root, "nested/deep/index.html")); err != nil {
+	if err := os.Rename(filepath.Join(root, "site", "nested/deep/.save"), filepath.Join(root, "site", "nested/deep/index.html")); err != nil {
 		t.Fatal(err)
 	}
 	wait("/nested/deep", "atomic replacement", 200)
-	if err := os.Rename(filepath.Join(root, "nested"), filepath.Join(root, "renamed")); err != nil {
+	if err := os.Rename(filepath.Join(root, "site", "nested"), filepath.Join(root, "site", "renamed")); err != nil {
 		t.Fatal(err)
 	}
 	wait("/renamed/deep", "atomic replacement", 200)
 	wait("/nested/deep", "", 404)
 	put(t, root, "renamed/deep/index.html", "after rename")
 	wait("/renamed/deep", "after rename", 200)
-	if err := os.RemoveAll(filepath.Join(root, "renamed")); err != nil {
+	if err := os.RemoveAll(filepath.Join(root, "site", "renamed")); err != nil {
 		t.Fatal(err)
 	}
 	wait("/renamed/deep", "", 404)
 	put(t, root, "renamed/deep/index.html", "recreated")
 	wait("/renamed/deep", "recreated", 200)
 	// Extraction-generated writes must settle instead of creating a reload loop.
-	put(t, root, "rich.html", `<h1 flea="Heading">Extract me</h1>`)
+	put(t, root, "rich.html", `<h1 snip="Heading">Extract me</h1>`)
 	wait("/rich", "Extract me", 200)
 	time.Sleep(400 * time.Millisecond)
 	s.mu.RLock()

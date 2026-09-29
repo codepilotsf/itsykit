@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{.Code}} · FleaCMS development</title>
+  <style>
+    :root { color-scheme: light; --ink:#192636; --muted:#596779; --line:#dde3ea; --paper:#fff; --accent:#b43834; font:16px/1.6 system-ui,sans-serif; background:#f4f6f9; color:var(--ink); }
+    * { box-sizing:border-box; }
+    body { margin:0; }
+    header { background:var(--paper); border-bottom:1px solid var(--line); }
+    .container { width:100%; max-width:1080px; margin-inline:auto; padding-inline:clamp(20px,5vw,56px); }
+    header .container { min-height:76px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { font-weight:750; letter-spacing:-.04em; font-size:21px; }
+    .environment { color:var(--muted); font:600 12px/1.4 ui-monospace,monospace; letter-spacing:.04em; text-transform:uppercase; }
+    .environment::before { content:""; display:inline-block; width:7px; height:7px; background:#cc7162; border-radius:50%; margin-right:9px; }
+    main { padding-block:clamp(36px,7vw,76px); }
+    h1 { font-size:clamp(28px,4.3vw,46px); font-weight:680; line-height:1.14; letter-spacing:-.045em; margin:0 0 18px; max-width:780px; }
+    .summary { color:var(--muted); font-size:18px; max-width:680px; margin:0 0 28px; }
+    .request { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:28px; font:13px/1.5 ui-monospace,monospace; }
+    .request span { border:1px solid var(--line); background:var(--paper); padding:3px 9px; border-radius:6px; font-weight:700; }
+    .request code { overflow-wrap:anywhere; }
+    .panel { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--paper); box-shadow:0 8px 28px #18263708; margin-bottom:24px; }
+    .panel-title { padding:14px 22px; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center; font-size:13px; }
+    .panel-title strong { font-weight:650; }
+    .panel-title code { color:var(--muted); overflow-wrap:anywhere; }
+    pre { margin:0; font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:2; }
+    .message { padding:22px; color:#933831; background:#fffaf8; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .source { padding:16px 0; overflow:auto; background:#1b2637; color:#dae3ed; }
+    .line { display:block; padding-inline:20px; min-width:max-content; }
+    .line.marked { background:#ffffff10; box-shadow:inset 3px 0 #f4a18e; }
+    .number { display:inline-block; min-width:3.5em; padding-right:20px; text-align:right; color:#9eafc4; user-select:none; }
+    .marked .number { color:#f4b7a9; }
+    .next { display:grid; grid-template-columns:140px 1fr; gap:20px; padding:24px; }
+    h2 { font-size:14px; line-height:1.6; margin:0; font-weight:700; }
+    .next p { margin:0; color:var(--muted); font-size:15px; }
+    @media (max-width:600px) { .next { grid-template-columns:1fr; gap:8px; } .environment { max-width:120px; text-align:right; } }
+  </style>
+</head>
+<body>
+  <header><div class="container"><span class="brand">FleaCMS</span><span class="environment">Local development</span></div></header>
+  <main class="container">
+    <h1>{{.Title}}</h1>
+    <p class="summary">{{.Summary}}</p>
+    <div class="request" aria-label="Request"><span>{{.Method}}</span><code>{{.Path}}</code></div>
+    <section class="panel" aria-label="Error details">
+      <div class="panel-title"><strong>What happened</strong>{{if .File}}<code>{{.File}}{{if .Line}}:{{.Line}}{{end}}</code>{{end}}</div>
+      <pre class="message">{{.Detail}}</pre>
+      {{if .Lines}}<pre class="source" aria-label="Template context">{{range .Lines}}<span class="line{{if .Highlight}} marked{{end}}"><span class="number">{{.Number}}</span>{{.Text}}</span>{{end}}</pre>{{end}}
+    </section>
+    <section class="panel next"><h2>How to fix it</h2><p>{{.Hint}}</p></section>
+  </main>
+</body>
+</html>
