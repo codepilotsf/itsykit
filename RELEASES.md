@@ -25,7 +25,8 @@ Private source archive SHA-256:
 
 The archive is retained locally under ignored `release-work/0.3.0/`, outside
 `site/`. Never move it into a public directory. The temporary Linux build copy
-must be removed after verification.
+was removed after verification, together with the temporary toolchain and Linux
+test installation. The local private source archive remains available.
 
 The Mac release pipeline passed tests, race tests, vet, bundle verification,
 site creation and validation. Native Linux tests, vet, bundle verification,
@@ -53,3 +54,9 @@ published.
 - These were isolated directories on existing machines, not clean OS installs.
   The public pages explicitly invite testing and disclose the Mac notarization
   and platform limits.
+
+The installation pages were deployed from website commit `2205161`, active
+release `20260929-202718-8ebaae1f4db520dfa3f53919`. The homepage and docs show the
+command; live install.sh matches the reviewed file; latest.txt is 0.3.0. Public
+links and anchors resolve. The private source URL returns 404. Bookworm retains
+its original release/content/theme and returns HTTP 200.

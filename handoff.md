@@ -14,6 +14,12 @@ Mac testing remains pending; the Mac binary is ad-hoc signed, not notarized.
 See `RELEASES.md` for provenance and checks. This supersedes the older statements
 below that downloads were not yet published.
 
+Installation-page deployment: commit `2205161`, release
+`20260929-202718-8ebaae1f4db520dfa3f53919`. Live homepage/docs command, installer
+bytes, release pointer and links verified. Temporary Linux source/toolchain/test
+directories were removed; the source snapshot remains privately under ignored
+`release-work/0.3.0/`. Bookworm remains unchanged.
+
 The website now lives in `/Users/sean/fleacms-website`, the separate repository
 Sean supplied for this task. The earlier proposed directory and preview-only
 instructions below describe the previous plan. Sean subsequently requested
