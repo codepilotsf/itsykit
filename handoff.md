@@ -2,6 +2,34 @@
 
 Updated September 29, 2026.
 
+## Current state after website deployment
+
+The website now lives in `/Users/sean/fleacms-website`, the separate repository
+Sean supplied for this task. The earlier proposed directory and preview-only
+instructions below describe the previous plan. Sean subsequently requested
+building and deploying the site and confirmed `fleacms.com` as server and domain.
+
+- Built `/` and `/docs` with bright white surfaces, green accents, the preserved
+  Skip logo, and an actual local-editor screenshot at `site/images/editor-demo.png`.
+- Site commit: `1ca1012` (initial website implementation and deployment settings).
+- Live: `https://fleacms.com`, with HTTPS and a WWW-to-apex redirect.
+- SSH: `root@fleacms.com`; remote site name: `fleacms-website-main`.
+- Active release: `20260929-195606-b19e2095c1c32bb2802f4125`.
+- Verified both public pages over HTTPS, the image checksum, HTTP/WWW redirects,
+  local template validation, links and anchors. Bookworm's existing release,
+  content and theme paths remain unchanged and its homepage returns HTTP 200.
+- Desktop rendering was inspected. Browser automation failed during the later
+  checks, so final desktop spacing and mobile rendering still need visual review.
+- Public installer downloads are not published by this work. Docs say so.
+- The production owner allowlist remains empty. No sign-in delivery or access
+  settings were added. The screenshot used an isolated local demo with preview
+  mail and a fictional address; no mail was sent.
+
+Continue in this checkout. Website-only changes do not require a framework build.
+Normal `flea deploy` preserves live snips and theme; pull before any explicit sync.
+
+## Original design brief
+
 ## Start here
 
 Build the public FleaCMS website as a separate Flea site and Git repository at
