@@ -1,0 +1,18 @@
+{
+  "app": {"site_name": "FleaCMS"},
+  "dev": {"email_preview": true},
+  "admin": {"emails": [], "session_idle_days": 30},
+  "deploy": {
+    "branches": {
+      "main": {
+        "target": "root@fleacms.com",
+        "domain": "fleacms.com",
+        "name": "fleacms-website-main",
+        "https": true,
+        "email": "sean@codepilot.com",
+        "agree_tos": true,
+        "www_redirect": true
+      }
+    }
+  }
+}

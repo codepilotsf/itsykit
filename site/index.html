@@ -1,0 +1,33 @@
+<section class="hero container">
+  <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> A small CMS for plain HTML</p>
+  <h1>{snip a7Km2pQ9xB}</h1>
+  <div class="hero-bottom">
+    <p class="hero-description">{snip b8Ln3rR0yC}</p>
+    <div class="hero-actions"><a class="ui-button ui-brand-1" href="/docs#installation">Get started <span aria-hidden="true">↗</span></a><a class="quiet-link" href="#editing">See how editing works <span aria-hidden="true">↓</span></a></div>
+  </div>
+</section>
+<section class="demo-section container" id="editing" aria-labelledby="editing-title">
+  <div class="section-caption"><span>THE OWNER'S SIDE</span><span>Click. Edit. Save.</span></div>
+  <figure class="editor-demo">
+    <a href="/images/editor-demo.png" aria-label="View the full-size FleaCMS editor screenshot"><img src="/images/editor-demo.png" width="928" height="900" alt="The real FleaCMS editor on a local example site, with on-page editable text and the Save toolbar." fetchpriority="high" /></a>
+    <figcaption><span class="status-dot" aria-hidden="true"></span> The actual FleaCMS editor, shown on a local example site.</figcaption>
+  </figure>
+  <div class="demo-explanation"><h2 id="editing-title">Their website.<br />Their words.</h2><p>Owners sign in, click the text they want to change, and save. Photos, videos and repeatable content live right on the page, too. You decide what they can edit.</p></div>
+</section>
+<section class="example-section container" aria-labelledby="html-title">
+  <div class="example-copy"><p class="eyebrow">THE DEVELOPER'S SIDE</p><h2 id="html-title">One attribute.<br />Editable content.</h2><p>Add <code>snip</code> to your HTML. Flea moves the content into JSON and connects it to the page editor.</p><p>Your markup, classes and layout stay in your hands.</p><a class="quiet-link" href="/docs#editable-content">Meet snips <span aria-hidden="true">↗</span></a></div>
+  <div class="code-example"><div class="code-label"><span>site/index.html</span><span>HTML</span></div><pre><code><span class="code-muted">&lt;section&gt;</span>
+  &lt;h1 <span class="code-accent">snip</span>&gt;A little hello.&lt;/h1&gt;
+  &lt;p <span class="code-accent">snip</span>&gt;
+    Good things start small.
+  &lt;/p&gt;
+<span class="code-muted">&lt;/section&gt;</span></code></pre><div class="code-note">Plain HTML in. Content your client can edit.</div></div>
+</section>
+<section class="workflow-section">
+  <div class="container"><p class="eyebrow">FROM FOLDER TO WEBSITE</p><h2>A short trip to live.</h2><p class="section-intro">Build locally. Keep your work in Git. Publish to your own server.</p>
+    <ol class="workflow"><li><span class="step-number">01</span><h3>Make a site</h3><p>A clean folder with HTML, CSS and JSON. Start with your own design.</p><pre><code>flea new my-site
+cd my-site</code></pre></li><li><span class="step-number">02</span><h3>Make it yours</h3><p>Edit your files and see changes in the browser. No frontend build step.</p><pre><code>flea dev</code></pre></li><li><span class="step-number">03</span><h3>Put it online</h3><p>Publish committed files over SSH. One Flea server can host multiple sites.</p><pre><code>flea deploy</code></pre></li></ol>
+    <a class="quiet-link" href="/docs#quickstart">Read the quickstart <span aria-hidden="true">↗</span></a>
+  </div>
+</section>
+<section class="closing container"><h2>Keep the site small.<br />Keep the possibilities open.</h2><div><p>For brochure sites, studios, local businesses and the people who keep them current. Bring your HTML and CSS. Flea handles the editing and serving.</p><a class="ui-button ui-brand-1" href="/docs">Explore the docs <span aria-hidden="true">↗</span></a><p class="release-note">Early release. Public downloads are not available yet.</p></div></section>

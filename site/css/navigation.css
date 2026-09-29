@@ -1,0 +1,22 @@
+/* Native same-origin page navigation. No link interception or client router. */
+@view-transition { navigation: auto; }
+@keyframes flea-page-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes flea-page-in { from { opacity: 0; } to { opacity: 1; } }
+::view-transition-old(root), ::view-transition-old(flea-page) {
+  animation: flea-page-out 240ms ease both;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root), ::view-transition-new(flea-page) {
+  animation: flea-page-in 240ms ease both;
+  mix-blend-mode: normal;
+}
+/* The standard layout fades content, leaving the header and owner bar steady.
+   Other layouts receive a whole-page fade without adding wrappers. */
+body > main:only-of-type { view-transition-name: flea-page; }
+::view-transition-group(flea-page) { animation: none; }
+html:has(> body > main:only-of-type)::view-transition-old(root) { display: none; }
+html:has(> body > main:only-of-type)::view-transition-new(root) { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
+}
