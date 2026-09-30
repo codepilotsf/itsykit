@@ -14,6 +14,25 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.5.0 release preparation, September 29, 2026
+
+Private framework commit `0994c1f`, immutable tag `v0.5.0`. Adds full opt-in LAN
+development (`--lan`/`-l`), localhost startup links and in-place page saves.
+Source archive SHA-256:
+`6711e8ffc05500eecb555f4c83f05000a48a7b6dc356e0f5d40352c18c33dff8`.
+
+Mac tests, race tests, vet, bundle extraction, native build, ad-hoc signature
+verification and starter smoke checks passed. The tagged source passed a real
+Chrome sign-in/edit/save test on a private-network HTTP origin.
+Native Linux tests, vet, bundled build and new/status smoke checks passed as
+UID 65534. The 1 GB host killed a parallel compiler for memory pressure; a rerun
+with `GOMAXPROCS=1 GOFLAGS=-p=1` passed. Linux race tests remain unavailable because
+the temporary build host has no C compiler. No system toolchain was installed.
+
+Versioned downloads are staged before advancing latest.txt. Public installation
+and update results will be recorded after verification. Mac notarization and
+independent clean-machine/device testing remain pending.
+
 ## 0.4.1 published September 29, 2026
 
 Patch release from private framework commit `10dc360`, immutable tag `v0.4.1`.
