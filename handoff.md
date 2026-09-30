@@ -4,11 +4,15 @@ Updated September 29, 2026.
 
 ## Current state after website deployment
 
-Version 0.5.0 is the current release task. Framework commit `0994c1f` and tag
+Version 0.5.0 is published. Framework commit `0994c1f` and tag
 `v0.5.0` are pushed. Both native downloads matched their public HTTPS checksums
 before advancing the update pointer. Website docs now cover `--lan`/`-l`,
 localhost links, device sign-in and in-place saves. See `RELEASES.md` for the
-final deployment and installation checks. The entries below are historical.
+final deployment and installation checks. Active website release:
+`20260930-010405-485949623ee87304b3304819` (commit `f2d3c60`). Public fresh installs
+and updates from 0.4.1 passed on Mac ARM64 and unprivileged Linux AMD64, including
+local and LAN dev startup. Temporary Linux build files were removed. The server
+executable and Bookworm data were not changed. The entries below are historical.
 
 Installation update: Sean approved the temporary private-source transfer and
 public tester installation on September 29. Version 0.3.0 native Mac ARM64 and

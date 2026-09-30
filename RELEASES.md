@@ -14,7 +14,7 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
-## 0.5.0 release preparation, September 29, 2026
+## 0.5.0 published September 29, 2026
 
 Private framework commit `0994c1f`, immutable tag `v0.5.0`. Adds full opt-in LAN
 development (`--lan`/`-l`), localhost startup links and in-place page saves.
@@ -35,7 +35,16 @@ The initial activation hit host memory pressure and automatically rolled back.
 A stale, inactive 188 MB Go build directory was moved from RAM-backed `/tmp`
 to `/var/tmp/flea-go-build-archive-1567161428`, preserving it for recovery; the
 retry succeeded. No server executable, access settings or Bookworm data changed.
-Public installation and update results will be recorded after verification.
+Website commit `f2d3c60`, active release
+`20260930-010405-485949623ee87304b3304819`, publishes the update pointer and docs.
+Actual public fresh installs, reinstalls, PATH selection, new/status, local and
+LAN dev, already-current updates and 0.4.1-to-0.5.0 updates passed on Apple
+Silicon macOS and native x86-64 Linux. Linux checks ran as UID 65534. Both
+installations used paths containing spaces and matched the published checksums.
+Live homepage, LAN docs, installer bytes and private-source 404 were verified.
+FleaCMS and Bookworm returned HTTP 200. The temporary Linux source, toolchain,
+cache and test installation were removed; the local private archive remains.
+Framework main and the annotated tag both resolve remotely to `0994c1f`.
 Mac notarization and independent clean-machine/device testing remain pending.
 
 ## 0.4.1 published September 29, 2026
