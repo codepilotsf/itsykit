@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fern &amp; Field</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/nursery.css">
+  {#if app.current_admin}<meta name="csrf-token" content="{app.current_admin.csrf_token}">{/if}
+</head>
+<body>
+  {#if app.current_admin}{render /admin/toolbar}{/if}
+  <header class="nursery-nav flex items-center justify-between">
+    <a class="nursery-brand" href="/">fern <i>&amp;</i> field<span>YOUR NEIGHBORHOOD NURSERY</span></a>
+    <nav class="flex items-center gap-md"><a href="#plants">Our plants</a><a href="#visit">Come say hello <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main>{slot}</main>
+</body>
+</html>

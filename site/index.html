@@ -1,34 +1,97 @@
-<section class="hero container">
-  <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> A small CMS for plain HTML</p>
-  <h1>{snip a7Km2pQ9xB}</h1>
-  <div class="hero-bottom">
-    <p class="hero-description">{snip b8Ln3rR0yC}</p>
-    <div class="hero-actions"><a class="ui-button ui-brand-1" href="/docs#installation">Get started <span aria-hidden="true">↗</span></a><a class="quiet-link" href="#editing">See how editing works <span aria-hidden="true">↓</span></a></div>
+<section class="hero container" aria-labelledby="hero-title">
+  <div class="hero-grid items-center">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> A small CMS for plain HTML</p>
+      <h1 id="hero-title">{snip a7Km2pQ9xB}</h1>
+      <p class="hero-description">{snip b8Ln3rR0yC}</p>
+      <div class="hero-actions flex flex-wrap items-center gap-md">
+        <a class="ui-button ui-brand-1" href="/docs#installation">Get started <span aria-hidden="true">↗</span></a>
+        <a class="quiet-link" href="#editing">See how it works <span aria-hidden="true">↓</span></a>
+      </div>
+      <p class="hero-note">Your files. Your design. Your server.</p>
+    </div>
+    <figure class="hero-demo m-0">
+      <div class="demo-heading flex items-center justify-between gap-sm">
+        <span class="inline-flex items-center gap-xs"><span class="status-dot" aria-hidden="true"></span> MADE WITH FLEA</span>
+        <span>Fern &amp; Field · Example site</span>
+      </div>
+      <a class="poster-link" href="/images/nursery-editor.jpg" aria-label="View the full-size Flea editor on the Fern and Field example site">
+        <img src="/images/nursery-editor.jpg" width="1100" height="740" alt="Flea's editor on Fern and Field, a fictional plant nursery website. A heading is being edited directly on the page, with formatting controls and Save above." fetchpriority="high" decoding="async">
+      </a>
+      <figcaption class="flex items-center justify-between gap-sm"><span>Editing a heading in FleaCMS.</span><a href="/images/nursery-editor.jpg">View full size <span aria-hidden="true">↗</span></a></figcaption>
+    </figure>
   </div>
-  <div class="install-command"><p>Try 0.5.0 <span>Apple Silicon Mac &amp; x86-64 Linux</span></p><pre><code>curl -fsSL https://fleacms.com/install.sh | bash</code></pre><a href="/docs#installation">Installation notes</a></div>
+  <ul class="hero-facts flex flex-wrap items-center">
+    <li>Plain HTML &amp; CSS</li>
+    <li>No frontend build step</li>
+    <li>On-page editing for your clients</li>
+  </ul>
 </section>
-<section class="demo-section container" id="editing" aria-labelledby="editing-title">
-  <div class="section-caption"><span>THE OWNER'S SIDE</span><span>Click. Edit. Save.</span></div>
-  <figure class="editor-demo">
-    <a href="/images/editor-demo.png" aria-label="View the full-size FleaCMS editor screenshot"><img src="/images/editor-demo.png" width="928" height="900" alt="The real FleaCMS editor on a local example site, with on-page editable text and the Save toolbar." fetchpriority="high" /></a>
-    <figcaption><span class="status-dot" aria-hidden="true"></span> The actual FleaCMS editor, shown on a local example site.</figcaption>
-  </figure>
-  <div class="demo-explanation"><h2 id="editing-title">Their website.<br />Their words.</h2><p>Owners sign in, click the text they want to change, and save. Photos, videos and repeatable content live right on the page, too. You decide what they can edit.</p></div>
+
+<section class="feature-section container" id="editing" aria-labelledby="editing-title">
+  <div class="feature-grid items-center">
+    <div class="feature-copy">
+      <p class="eyebrow">THE OWNER’S SIDE</p>
+      <h2 id="editing-title">Their website.<br>Their words.</h2>
+      <p>Owners sign in, click the text they want to change, and save. Photos, videos and repeatable content live right on the page, too. You decide what they can edit.</p>
+      <ol class="edit-steps flex flex-wrap gap-md" aria-label="How editing works">
+        <li><span>1</span> Click</li>
+        <li><span>2</span> Edit</li>
+        <li><span>3</span> Save</li>
+      </ol>
+    </div>
+    <figure class="edit-detail m-0">
+      <div class="detail-label flex items-center justify-between gap-sm"><span>EDITABLE TEXT</span><span>On the page</span></div>
+      <img src="/images/nursery-edit-detail.jpg" width="512" height="266" alt="Close-up of the nursery heading being edited inside its green editable outline." loading="lazy" decoding="async">
+      <figcaption>The green outline marks what you can edit.</figcaption>
+    </figure>
+  </div>
 </section>
-<section class="example-section container" aria-labelledby="html-title">
-  <div class="example-copy"><p class="eyebrow">THE DEVELOPER'S SIDE</p><h2 id="html-title">One attribute.<br />Editable content.</h2><p>Add <code>snip</code> to your HTML. Flea moves the content into JSON and connects it to the page editor.</p><p>Your markup, classes and layout stay in your hands.</p><a class="quiet-link" href="/docs#editable-content">Meet snips <span aria-hidden="true">↗</span></a></div>
-  <div class="code-example"><div class="code-label"><span>site/index.html</span><span>HTML</span></div><pre><code><span class="code-muted">&lt;section&gt;</span>
-  &lt;h1 <span class="code-accent">snip</span>&gt;A little hello.&lt;/h1&gt;
+
+<section class="feature-section developer-section container" aria-labelledby="html-title">
+  <div class="feature-grid items-center">
+    <div class="feature-copy">
+      <p class="eyebrow">THE DEVELOPER’S SIDE</p>
+      <h2 id="html-title">One attribute.<br>Editable content.</h2>
+      <p>Add <code>snip</code> to your HTML. Flea moves the content into JSON and connects it to the page editor.</p>
+      <p>Your markup, classes and layout stay in your hands.</p>
+      <a class="quiet-link" href="/docs#editable-content">Meet snips <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="code-example">
+      <div class="code-label flex items-center justify-between"><span>site/index.html</span><span>HTML</span></div>
+      <pre><code><span class="code-muted">&lt;section&gt;</span>
+  &lt;h1 <span class="code-accent">snip</span>&gt;A little greener.&lt;/h1&gt;
   &lt;p <span class="code-accent">snip</span>&gt;
-    Good things start small.
+    Find your next little growing thing.
   &lt;/p&gt;
-<span class="code-muted">&lt;/section&gt;</span></code></pre><div class="code-note">Plain HTML in. Content your client can edit.</div></div>
-</section>
-<section class="workflow-section">
-  <div class="container"><p class="eyebrow">FROM FOLDER TO WEBSITE</p><h2>A short trip to live.</h2><p class="section-intro">Build locally. Keep your work in Git. Publish to your own server.</p>
-    <ol class="workflow"><li><span class="step-number">01</span><h3>Make a site</h3><p>A clean folder with HTML, CSS and JSON. Start with your own design.</p><pre><code>flea new my-site
-cd my-site</code></pre></li><li><span class="step-number">02</span><h3>Make it yours</h3><p>Edit your files and see changes in the browser. No frontend build step.</p><pre><code>flea dev</code></pre></li><li><span class="step-number">03</span><h3>Put it online</h3><p>Publish committed files over SSH. One Flea server can host multiple sites.</p><pre><code>flea deploy</code></pre></li></ol>
-    <a class="quiet-link" href="/docs#quickstart">Read the quickstart <span aria-hidden="true">↗</span></a>
+<span class="code-muted">&lt;/section&gt;</span></code></pre>
+      <div class="code-note"><span class="code-accent">snip</span> is all it takes to make it editable.</div>
+    </div>
   </div>
 </section>
-<section class="closing container"><h2>Keep the site small.<br />Keep the possibilities open.</h2><div><p>For brochure sites, studios, local businesses and the people who keep them current. Bring your HTML and CSS. Flea handles the editing and serving.</p><a class="ui-button ui-brand-1" href="/docs">Explore the docs <span aria-hidden="true">↗</span></a><p class="release-note">0.5.0 is available to try. We'd like your feedback.</p></div></section>
+
+<section class="workflow-section" aria-labelledby="workflow-title">
+  <div class="container">
+    <div class="workflow-heading flex flex-wrap items-end justify-between gap-md">
+      <div><p class="eyebrow">FROM FOLDER TO WEBSITE</p><h2 id="workflow-title">A short trip to live.</h2><p class="section-intro">Build locally. Keep your work in Git. Publish to your own server.</p></div>
+      <a class="quiet-link" href="/docs#quickstart">Read the quickstart <span aria-hidden="true">↗</span></a>
+    </div>
+    <ol class="workflow">
+      <li><span class="step-number">01</span><h3>Make a site</h3><p>A clean folder with HTML, CSS and JSON. Start with your own design.</p><pre><code>flea new my-site
+cd my-site</code></pre></li>
+      <li><span class="step-number">02</span><h3>Make it yours</h3><p>Edit your files and see changes in the browser. No frontend build step.</p><pre><code>flea dev</code></pre></li>
+      <li><span class="step-number">03</span><h3>Put it online</h3><p>Publish committed files over SSH. One Flea server can host multiple sites.</p><pre><code>flea deploy</code></pre></li>
+    </ol>
+    <div class="install-command items-center">
+      <div><h3>Try Flea 0.5.0</h3><p>Apple Silicon Mac &amp; x86-64 Linux</p></div>
+      <div><pre><code>curl -fsSL https://fleacms.com/install.sh | bash</code></pre><a href="/docs#installation">Installation notes <span aria-hidden="true">↗</span></a></div>
+    </div>
+  </div>
+</section>
+
+<section class="closing container" aria-labelledby="closing-title">
+  <div class="closing-grid items-center">
+    <h2 id="closing-title">Keep the site small.<br><span class="hero-green">Keep the possibilities open.</span></h2>
+    <div><p>For brochure sites, local businesses and the people who keep them current. Bring your HTML and CSS. Flea handles the editing and serving.</p><a class="ui-button ui-brand-1" href="/docs">Explore the docs <span aria-hidden="true">↗</span></a><p class="release-note">0.5.0 is available to try. We’d like your feedback.</p></div>
+  </div>
+</section>

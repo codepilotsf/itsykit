@@ -4,8 +4,8 @@
       "title": "Plain HTML. Editable content.",
       "description": "A small CMS for developers who build with plain files, and people who want to update their own website.",
       "snips": {
-        "a7Km2pQ9xB": {"content": "Write the HTML.<br><span class=\"hero-green\">Let them handle<br>the edits.</span>"},
-        "b8Ln3rR0yC": {"content": "A small CMS for developers who build with plain files, and people who just want to update their website."}
+        "a7Km2pQ9xB": {"content": "Write the HTML.<br><span class=\"hero-green\">Let your clients edit.</span>"},
+        "b8Ln3rR0yC": {"content": "A small CMS for plain HTML websites. You control the design. Your clients update the words, photos, and videos."}
       }
     },
     "/docs": {
