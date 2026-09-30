@@ -74,7 +74,7 @@ Set `"dev": {"email_preview": false}` and restart dev to test real delivery;
 configure it explicitly with `flea email`. Production always uses real delivery
 and ignores this toggle. See [email previews](docs/email-templates.md) for details.
 
-Open http://127.0.0.1:3000, edit `site/index.html`, and save. Your browser reloads
+Open http://localhost:3000, edit `site/index.html`, and save. Your browser reloads
 automatically. Change the welcome text in `flea/snips.json`, or give the site
 your own colors and fonts in `site/css/theme.css`. Press Ctrl-C to stop the server.
 Admin sign-in pages also refresh when their templates or layout change in dev.
@@ -82,13 +82,27 @@ Signed-in pages reload too, including newly extracted snips, and retain edit
 mode when there are no unsaved changes. Drafts, open dialogs and Theme previews
 pause reloads so they are not lost. Cancel a draft to accept pending source changes.
 
+To test from a phone or another computer on the same trusted network, run
+`flea dev --lan` (or `flea dev -l`). Open one of the printed Network URLs on that
+device. Sign-in, editing, uploads, Theme, forms, reloads and dev diagnostics work
+there too. Each device signs in separately. Email previews still open on the
+computer running Flea; enter that code on your other device. To share a private
+preview, replace its `127.0.0.1` host with a printed network IP, keeping the port
+and random path. Never share preview links with anyone you do not trust.
+
+LAN mode uses unencrypted HTTP and detected private IPv4 addresses. Use it only
+on a trusted network, never forward its port, and restart after changing networks.
+VPN addresses may also appear. Allow the chosen port through your computer's
+firewall if needed; guest Wi-Fi may block device-to-device connections.
+Without the flag, dev remains accessible only from this computer.
+
 ## Everyday commands
 
 Run these from your site's folder:
 
 | Command | What it does |
 | --- | --- |
-| `flea dev` | Preview your site at http://127.0.0.1:3000 with browser reloads. |
+| `flea dev` | Preview your site at http://localhost:3000 with browser reloads. |
 | `flea dev -port 8080` | Preview on a different port. |
 | `flea status` | Check configuration, routes, templates, and content without starting a server. |
 | `flea reset` | Reset the local site to the clean default after confirmation, keeping a private backup. |
@@ -530,7 +544,8 @@ H1–H4, bold, italic, underline, strikethrough, links, lists, and left/center/r
 alignment; individual headings and paragraphs support inline marks and links,
 without nested headings or lists. Cancel restores the page.
 
-Save publishes all changed regions and page details together. It stays
+Save publishes all changed regions and page details together without reloading
+the page. Editing stays on, and Cancel restores your most recent save. Save stays
 disabled until something changes. Shared content is marked in the toolbar and
 updates everywhere its ID appears. Repeated instances on the page stay in sync.
 The link dialog edits the current URL, offers Remove link and a new-tab switch,

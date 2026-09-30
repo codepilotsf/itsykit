@@ -56,6 +56,5 @@ flea_install() (
     *":$destination:"*) printf '\nGet started: flea new my-site\n' ;;
     *) printf '\nAdd this directory to PATH in your shell profile, then open a new terminal:\n  export PATH=%q:"$PATH"\n' "$destination" ;;
   esac
-  printf '\nUpdate the CLI later with flea update. Remote servers update separately with flea update-server.\n'
 )
 flea_install

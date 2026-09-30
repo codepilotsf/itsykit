@@ -125,8 +125,12 @@ func TestAuthenticatedPagePublication(t *testing.T) {
 	data, _ := json.Marshal(edit)
 	values := url.Values{"csrf": {attrs["csrf"]}, "edit": {string(data)}}
 	w = request("POST", "/admin/page", values, session)
-	if w.Code != 204 {
+	if w.Code != 200 {
 		t.Fatal(w.Code, w.Body.String())
+	}
+	var receipt editor.PageResult
+	if err := json.Unmarshal(w.Body.Bytes(), &receipt); err != nil || receipt.Page.Version == "" || receipt.Page.Version == edit.Version || len(receipt.Page.Changes) != 1 || receipt.Page.Changes[0].Content != "Saved heading" {
+		t.Fatal("missing canonical save receipt", err, w.Body.String())
 	}
 	w = request("GET", "/", nil, nil)
 	if !strings.Contains(w.Body.String(), "Saved heading") || !strings.Contains(w.Body.String(), edit.Title) || strings.Contains(w.Body.String(), "flea-owner-root") {
@@ -135,5 +139,12 @@ func TestAuthenticatedPagePublication(t *testing.T) {
 	w = request("POST", "/admin/page", values, session)
 	if w.Code != 409 {
 		t.Fatal("stale browser draft accepted", w.Code)
+	}
+	edit.Version = receipt.Page.Version
+	edit.Changes[0].Content = "Second saved heading"
+	data, _ = json.Marshal(edit)
+	values.Set("edit", string(data))
+	if w = request("POST", "/admin/page", values, session); w.Code != 200 {
+		t.Fatal("receipt version cannot save again", w.Code, w.Body.String())
 	}
 }

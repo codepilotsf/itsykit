@@ -1,6 +1,6 @@
 # Installation and updates
 
-Version 0.4.1 is available as a public test release for Apple Silicon macOS and
+Version 0.5.0 is a public test release for Apple Silicon macOS and
 x86-64 Linux. Install it with:
 
 ```sh
@@ -18,7 +18,7 @@ The actual public installer passed installation, reinstall, PATH, new-site,
 status, dev HTTP and update checks in isolated directories on an existing Mac
 and an existing Ubuntu host. Linux installation ran unprivileged. These are not
 clean-OS tests. The Mac executable is ad-hoc signed, not notarized; independent
-clean-machine testing remains pending. The website labels 0.4.1 as an early test
+clean-machine testing remains pending. The website labels 0.5.0 as an early test
 release so invited testers can provide this feedback.
 
 `flea update` updates only the local CLI and embedded Linux servers. Downloads

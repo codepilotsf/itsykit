@@ -10,7 +10,9 @@ import (
 	"sync"
 	"time"
 
+	"flea/internal/devaccess"
 	"flea/internal/mailer"
+	"flea/internal/media"
 	"flea/internal/snips"
 	"flea/internal/theme"
 )
@@ -26,6 +28,13 @@ type Update struct {
 	Theme                                           map[string]string
 	Version, Route, ID, Content, Title, Description string
 	Page                                            *PageEdit
+	// Result is filled from the committed snapshot while the save lock is held.
+	Result *PageResult
+}
+type PageResult struct {
+	Page   PageEdit               `json:"page"`
+	Media  map[string]snips.Entry `json:"media"`
+	Photos map[string]media.Photo `json:"photos"`
 }
 type ContentEdit struct {
 	ID      string `json:"id"`
@@ -116,7 +125,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			host = name
 		}
 		ip := net.ParseIP(host)
-		if host != "localhost" && (ip == nil || !ip.IsLoopback()) {
+		if !devaccess.LAN(r) && host != "localhost" && (ip == nil || !ip.IsLoopback()) {
 			http.Error(w, "Use the localhost address shown in your terminal.", 403)
 			return
 		}

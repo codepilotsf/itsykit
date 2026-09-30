@@ -32,7 +32,7 @@ or permit arbitrary inline scripts; the full editor remains external and deferre
 Initialize Page Details from that same preference before paint. The toolbar stays
 inert until hydration even when Page Details looks enabled.
 navigation retains native beforeunload protection. Cancel restores the page and
-keeps editing on; Save reloads into the remembered mode. Cancel/Save sit at the
+keeps editing on; Save applies the canonical server receipt in place. Cancel/Save sit at the
 right of the second row, disabled until changes exist. Theme stays in the first
 row, suspends content editing and restores the preferred mode on close.
 Keep the first row compact: no product wordmark or account separator, dark-off/
@@ -52,6 +52,12 @@ content/templates, not a later Backend.Read. Reject stale versions, duplicate ID
 hidden/cross-page IDs and block markup in leaf wrappers. Shared IDs update all uses;
 repeated on-page instances stay in sync. Validate the whole candidate, persist once,
 then publish once. Failed requests preserve the draft and a visible error message.
+Return the committed version and canonical changed values from inside that same
+save lock, never from a later Read. Rebase text, collection membership/order,
+photos and media baselines after success; subsequent Cancel restores the last save.
+Retain existing wrappers and editor instances. Dev revision changes matching the
+saved content version are acknowledged through authenticated editor context,
+without a reload; differing source versions retain the usual reload protection.
 Authenticated responses are private/no-store with the exact external editor script URL
 and exact-origin activity/logout. Templates explicitly include admin/_toolbar.html
 inside {#if app.current_admin}; the head explicitly includes its csrf-token meta.
@@ -169,7 +175,9 @@ and status reports the local path. Runtime inclusion excludes sessions/lock/temp
 files from watchers, snapshots and archives; underscore URL privacy still applies.
 Require exact Origin and CSRF checks on every POST, host-bound HttpOnly/SameSite
 cookies, HTTPS and __Host- cookies in production. Local dev permits loopback HTTP
-only, with no login bypass. Do not trust forwarded headers. Rate-limit requests by
+and explicit `--lan`/`-l` requests authorized by devaccess middleware. Keep the
+same checks for authenticated public rendering and admin routes. LAN is HTTP on
+a trusted private IPv4 network, never a login bypass. Do not trust forwarded headers. Rate-limit requests by
 address, actual client IP and site. Do not reveal allowlist membership or log codes.
 
 Resend uses mailer.Sender, not an SDK-specific dependency in auth code. Delivery is

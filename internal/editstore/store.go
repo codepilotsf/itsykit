@@ -210,5 +210,23 @@ func (s *Store) Save(u editor.Update) error {
 		return err
 	}
 	s.Publish(next)
+	if u.Page != nil && u.Result != nil {
+		page := next.Content.Page(u.Page.Route)
+		result := editor.PageResult{Page: editor.PageEdit{Version: next.EditingVersion(), Route: u.Page.Route, Title: page.Title, Description: page.Description, Changes: []editor.ContentEdit{}, Multisnips: map[string][]snips.MultiItem{}}, Media: map[string]snips.Entry{}}
+		index, _ := next.Content.Index() // The candidate has already been validated.
+		result.Photos = next.Content.Media
+		for _, change := range u.Page.Changes {
+			result.Page.Changes = append(result.Page.Changes, editor.ContentEdit{ID: change.ID, Content: index[change.ID].Content})
+		}
+		for name := range u.Page.Multisnips {
+			result.Page.Multisnips[name] = page.Multisnips[name]
+		}
+		for _, change := range u.Page.Media {
+			if !change.Library {
+				result.Media[change.ID] = index[change.ID]
+			}
+		}
+		*u.Result = result
+	}
 	return nil
 }

@@ -11,6 +11,9 @@ New sites enable dev.email_preview in .flea.config.json. Local sign-in/contact
 mail opens in the browser without Resend credentials. Preview mode and sender
 details require a dev restart after changes; production ignores the toggle.
 Do not write preview messages or sign-in codes into site files.
+`flea dev --lan`/`-l` enables full HTTP development on a trusted private IPv4
+network. Default dev remains loopback-only. Email previews open on the host
+computer; enter the code on the other device. Never forward the development port.
 
 Public pages, partials, layouts and assets belong in site/. Use main.layout.html
 as the default wrapper and *.layout.html for custom layouts. Root .flea.config.json

@@ -16,6 +16,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"flea/internal/devaccess"
 	"flea/internal/mailer"
 )
 
@@ -134,7 +135,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if v, _, err := net.SplitHostPort(host); err == nil {
 			host = v
 		}
-		if ip := net.ParseIP(host); host != "localhost" && (ip == nil || !ip.IsLoopback()) {
+		if ip := net.ParseIP(host); !devaccess.LAN(r) && host != "localhost" && (ip == nil || !ip.IsLoopback()) {
 			http.Error(w, "Use the local address shown by flea dev.", 403)
 			return
 		}

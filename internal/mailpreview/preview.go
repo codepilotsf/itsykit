@@ -1,4 +1,4 @@
-// Package mailpreview provides a bounded, local-only development mail sender.
+// Package mailpreview provides a bounded development-only mail sender.
 // Only the dev CLI wires it; the production host always uses real delivery.
 package mailpreview
 
@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	"flea/internal/devaccess"
 	"flea/internal/mailer"
 )
 
@@ -120,7 +121,13 @@ func (p *Preview) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; img-src data:; frame-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil || !net.ParseIP(ip).IsLoopback() || r.Host != p.host || (r.Header.Get("Origin") != "" && r.Header.Get("Origin") != p.origin) || r.Header.Get("Sec-Fetch-Site") == "cross-site" {
+	allowed := err == nil && net.ParseIP(ip).IsLoopback() && r.Host == p.host
+	origin := p.origin
+	if devaccess.LAN(r) {
+		allowed = true
+		origin = "http://" + r.Host
+	}
+	if !allowed || (r.Header.Get("Origin") != "" && r.Header.Get("Origin") != origin) || r.Header.Get("Sec-Fetch-Site") == "cross-site" {
 		http.NotFound(w, r)
 		return
 	}

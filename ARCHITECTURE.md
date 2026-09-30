@@ -141,7 +141,8 @@ Rendering never injects it. No JavaScript router is involved.
 
 Dev 405/500 diagnostics are embedded and independent of site templates/assets;
 404 responses use the site's ordinary error template with dev reload support.
-They require a loopback peer and Host as well as non-production mode. Compiler
+They require a loopback peer and Host, or CLI-authorized LAN context, as well as
+non-production mode. Compiler
 SourceError values hold bounded 11-line source excerpts and original locations
 at failure time, including region and page-setting validation failures;
 JSON syntax errors expose locations only. No request triggers source-file reads.
@@ -316,12 +317,23 @@ Dev always mounts the editor so a fresh site's /admin can explain owner setup.
 Before serving, interactive CLI startup asks for the site name and optionally
 reuses AddAdmin; it never prompts for Resend setup. It reloads after writes so session setup and
 the first request see the new owner. Nonterminal startup never reads prompt input.
-The editor enforces loopback host checks before showing local instructions.
+The editor enforces loopback host checks before showing local instructions,
+unless devaccess has authorized an explicit LAN request. `flea dev --lan`/`-l`
+binds IPv4 interfaces and snapshots detected private IPv4 addresses at startup.
+The outer middleware admits only exact approved Hosts with the listener port and
+actual private/loopback peers, then adds an unexported context marker. Editor,
+authenticated public rendering, contact, diagnostics and previews share this
+decision; no HTTP header can enable it. Production never installs this middleware
+and still requires HTTPS. LAN mode changes reachability, not authentication,
+session host binding, CSRF, exact-Origin checks or content validation.
 
 The dev CLI alone reads dev.email_preview (enabled in the starter) to select
 internal/mailpreview instead of Resend for both login and contact delivery.
 It holds at most 20 bounded messages in memory behind random 256-bit URLs with
 10-minute expiry, exact listener Host/loopback-peer checks and no-store responses.
+Explicit LAN mode allows existing capability URLs on middleware-approved network
+addresses too, retaining exact Origin and cross-site checks. Browser launch stays
+on the developer's computer; no inbox or automatic disclosure to login requesters.
 The browser view escapes headers and sandboxes the HTML body; scripts, forms and
 external resource loads are blocked. Browser launch is bounded; failure logs only
 the local capability URL. No preview data is written to disk. Configuration and
@@ -366,6 +378,9 @@ buffer, then sanitizes back to inline HTML; template wrappers never receive
 nested blocks. Native selection is restored by text offsets.
 Check shared wrapper constraints across routes. Sanitize rich content, validate
 the full candidate, write once, then publish. Stale/failed saves retain browser drafts.
+Page saves return a canonical receipt captured under the same lock as publication.
+The browser applies it in place and advances its version and Cancel baselines;
+no post-save Read may pair a newer version with older displayed content.
 Typed media use the same transaction. Multipart saves authenticate and check header
 CSRF before parsing or acquiring the upload slot; form CSRF is checked afterward.
 Uploads are bounded at 40 MiB total, 25 MiB per video and 8 MiB per image/poster.

@@ -64,8 +64,8 @@ func TestPageMediaUploadAuthorization(t *testing.T) {
 		cookie                      bool
 		want                        int
 	}{
-		{"valid", csrf, "https://example.test", "media-Abcdef1234", true, 204},
-		{"collection upload", csrf, "https://example.test", "media-Abcdef1234", true, 204},
+		{"valid", csrf, "https://example.test", "media-Abcdef1234", true, 200},
+		{"collection upload", csrf, "https://example.test", "media-Abcdef1234", true, 200},
 		{"no header", "", "https://example.test", "media-Abcdef1234", true, 403},
 		{"no session", csrf, "https://example.test", "media-Abcdef1234", false, 403},
 		{"origin", csrf, "https://else.test", "media-Abcdef1234", true, 403},
@@ -112,7 +112,7 @@ func TestPageSaveRequiresSessionOriginAndCSRF(t *testing.T) {
 		cookie             bool
 		status             int
 	}{
-		{"valid", "https://example.test", session.csrf, true, 204},
+		{"valid", "https://example.test", session.csrf, true, 200},
 		{"missing origin", "", session.csrf, true, 403},
 		{"other origin", "https://evil.test", session.csrf, true, 403},
 		{"bad csrf", "https://example.test", "bad", true, 403},

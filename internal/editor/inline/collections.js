@@ -242,6 +242,12 @@
     setPhoto(selectedPhoto,id);preparePhotos();owner.changed();schedule();owner.close($('#collection-photo-dialog'));
   };
   host.collectionUI={
+    commit(saved){
+      for(const [id,photo] of uploads){URL.revokeObjectURL(photo.preview);delete photos[id];}uploads.clear();
+      Object.assign(photos,saved);
+      for(const group of groups.values())for(const item of group.items)for(const image of item.node.querySelectorAll('img[data-snip-photo]'))setPhoto(image,image.dataset.photoId||'');
+      clearArrangement();
+    },
     hasUploads:()=>usedUploads().length>0,
     appendUploads(edit,body){for(const [id,photo] of usedUploads()){edit.media.push({id,name:photo.name,alt:photo.alt,library:true});body.set('media-'+id,photo.file);}},
     updateState,

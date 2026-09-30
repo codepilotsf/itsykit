@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"flea/internal/devaccess"
 	"flea/internal/mailer"
 )
 
@@ -91,6 +92,42 @@ func TestPreviewMessageAndIsolation(t *testing.T) {
 	}
 	if get(p, p.origin+Path).Code != 404 || get(p, p.origin+Path+strings.Repeat("0", 64)).Code != 404 {
 		t.Fatal("preview enumeration")
+	}
+}
+
+func TestLANPreviewRequiresCapabilityAndApprovedRequest(t *testing.T) {
+	p, address := fixture(t)
+	if err := p.Send(context.Background(), mailer.Message{To: "owner@example.test", Text: "Private LAN preview"}); err != nil {
+		t.Fatal(err)
+	}
+	h := devaccess.WrapLAN(p, []string{"192.168.1.5"}, 3000)
+	lanURL := strings.Replace(*address, "127.0.0.1", "192.168.1.5", 1)
+	for _, tc := range []struct {
+		name, url, origin, peer string
+		handler                 http.Handler
+		want                    int
+	}{
+		{"LAN", lanURL, "", "192.168.1.9:4321", h, 200},
+		{"same origin", lanURL, "http://192.168.1.5:3000", "192.168.1.9:4321", h, 200},
+		{"default", lanURL, "", "192.168.1.9:4321", p, 404},
+		{"foreign origin", lanURL, "http://evil.test", "192.168.1.9:4321", h, 404},
+		{"public peer", lanURL, "", "203.0.113.8:4321", h, 403},
+		{"no token", "http://192.168.1.5:3000" + Path, "", "192.168.1.9:4321", h, 404},
+		{"unknown token", "http://192.168.1.5:3000" + Path + strings.Repeat("0", 64), "", "192.168.1.9:4321", h, 404},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			r := httptest.NewRequest("GET", tc.url, nil)
+			r.RemoteAddr = tc.peer
+			r.Header.Set("Origin", tc.origin)
+			w := httptest.NewRecorder()
+			tc.handler.ServeHTTP(w, r)
+			if w.Code != tc.want {
+				t.Fatal(w.Code, w.Body.String())
+			}
+			if tc.want != 200 && strings.Contains(w.Body.String(), "Private LAN preview") {
+				t.Fatal("preview leaked")
+			}
+		})
 	}
 }
 

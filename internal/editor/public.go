@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	_ "embed"
 	"encoding/base64"
+	"flea/internal/devaccess"
 	"flea/internal/snips"
 	"flea/internal/viewer"
 	"flea/templates"
@@ -65,7 +66,7 @@ func (h *Handler) ServePublic(w http.ResponseWriter, r *http.Request, public htt
 			host = name
 		}
 		ip := net.ParseIP(host)
-		if host != "localhost" && (ip == nil || !ip.IsLoopback()) {
+		if !devaccess.LAN(r) && host != "localhost" && (ip == nil || !ip.IsLoopback()) {
 			public.ServeHTTP(w, r)
 			return
 		}

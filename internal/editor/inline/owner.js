@@ -230,7 +230,10 @@
     group.end.before(node);const item={node,id};group.items.push(item);
     const before=regions.length;findRegions(node);
     for(const r of regions.slice(before)){startRegion(r);const text=document.createElement('span');text.textContent=label(r.id.split('/')[2]);r.editor.setHTML(text.innerHTML);}
-    for(const img of node.querySelectorAll('img[data-snip-photo]'))setPhoto(img,'');
+    for(const img of node.querySelectorAll('img[data-snip-photo]')){
+      setPhoto(img,'');
+      photoAttributes.set(img,['src','alt','data-photo-id','tabindex','role','aria-label','style'].map(name=>[name,img.getAttribute(name)]));
+    }
     changed();return item;
   }
   for(const b of all('[data-mark]'))b.onclick=()=>command(e=>{const mark={tag:b.dataset.mark};e.changeFormat(e.hasFormat(mark.tag)?null:mark,e.hasFormat(mark.tag)?mark:null);});
@@ -291,12 +294,41 @@
     for(const r of regions)r.node.setAttribute('contenteditable','false');controls();$('#status').textContent='Saving…';
     try {
       const response=await fetch('/admin/page',{method:'POST',credentials:'same-origin',redirect:'error',headers:{'X-CSRF-Token':host.dataset.csrf},signal:AbortSignal.timeout(body instanceof FormData?180000:15000),body});
-      if(response.status!==204) {
+      if(response.status!==200) {
         if(response.status===403)expired=true;
         const validation=response.status===400?(await response.text()).trim().slice(0,500):'';
         throw new Error(expired?'Your session expired. Copy your draft before signing in again.':validation||'Could not save. Your draft is still here. Copy it before reloading; the page may have changed.');
       }
-      dirty=false;location.reload();
+      const saved=await response.json();
+      if(!saved.page?.version || saved.page.route!==page.route || !Array.isArray(saved.page.changes))throw new Error('Save could not be confirmed. Your draft is still here. Reload before trying again.');
+      const canonical=new Map(saved.page.changes.map(change=>[change.id,change.content]));
+      for(const [name,items] of Object.entries(saved.page.multisnips||{}))for(const item of items||[])for(const [field,value] of Object.entries(item.fields))canonical.set(name+'/'+item.id+'/'+field,value);
+      for(const r of regions){
+        if(!r.node.isConnected){r.editor?.destroy();continue;}
+        const html=canonical.get(r.id);
+        if(html!==undefined && content(r)!==html)r.editor.setHTML(html);
+        r.html=content(r);r.baseline=r.html;
+      }
+      regions.splice(0,regions.length,...regions.filter(r=>r.node.isConnected));
+      if(active&&!active.node.isConnected)active=null;
+      originalRegions.splice(0,originalRegions.length,...regions);
+      host.collectionUI?.commit(saved.photos||{});
+      for(const group of groups.values()){
+        group.nodes=[];for(let node=group.start.nextSibling;node&&node!==group.end;node=node.nextSibling)group.nodes.push(node);
+        group.original=group.items.slice();
+      }
+      for(const group of groups.values())for(const item of group.items)for(const img of item.node.querySelectorAll('img[data-snip-photo]')){
+        const prior=photoAttributes.get(img)||['src','alt','data-photo-id','tabindex','role','aria-label','style'].map(name=>[name,null]);
+        for(const pair of prior)if(['src','alt','data-photo-id'].includes(pair[0]))pair[1]=img.getAttribute(pair[0]);
+        photoAttributes.set(img,prior);
+      }
+      host.mediaSnips?.commit(saved.media||{});
+      Object.assign(page,saved.page);host.dataset.version=page.version;host.dataset.page=JSON.stringify(page);
+      draft={title:page.title,description:page.description};
+      saving=false;dirty=false;saveError='';
+      $('#edit').disabled=$('#theme').disabled=$('#logout').disabled=false;
+      for(const r of regions)r.node.setAttribute('contenteditable','true');
+      beginMultisnips();changed();
     } catch(error) {
       saveError=error instanceof TypeError || error.name==='TimeoutError'?'Save could not be confirmed. Your draft is still here. Check the connection and copy it before reloading.':error.message;
       $('#status').textContent=saveError;
@@ -325,6 +357,9 @@
         const response=await fetch('/_flea/reload',{cache:'no-store',credentials:'omit',redirect:'error',signal:AbortSignal.timeout(5000)});
         if(!response.ok)return;const revision=await response.text();
         if(!/^\d+$/.test(revision) || revision===host.dataset.revision)return;
+        if(saving)return;
+        const contextResponse=await fetch('/admin/editor-context?route='+encodeURIComponent(page.route),{credentials:'same-origin',cache:'no-store',headers:{'X-CSRF-Token':host.dataset.csrf},signal:AbortSignal.timeout(5000)});
+        if(contextResponse.ok){const context=await contextResponse.json();if(saving)return;if(context.page?.version===page.version){host.dataset.revision=revision;return;}}
         if(dirty){$('#status').textContent='Source changed. Your draft is preserved; cancel edits to reload.';return;}
         if(saving || expired || [...all('dialog')].some(dialog=>dialog.open))return;
         if(!host.dispatchEvent(new Event('dev-reload-check',{cancelable:true})))return;

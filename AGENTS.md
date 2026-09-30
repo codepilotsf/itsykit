@@ -74,6 +74,8 @@ starter syntax, committed, and excluded from serving/deployment.
 New sites enable `dev.email_preview`. Only `flea dev` opens actual outgoing mail
 in private browser previews; production ignores this setting. Keep the first-run
 prompts limited to site name and optional owner email. See the runtime guide.
+Dev defaults to loopback. `--lan`/`-l` explicitly enables full trusted-network
+development over HTTP; preserve the shared Host/peer gate and ordinary auth/CSRF.
 `flea new` defaults to a clean layout/index. `--starter`/`-s` adds demo pages and a
 six-person fictional team. `flea reset` confirms before resetting all local files
 except `.git`, with a private sibling recovery copy; it never deploys.
@@ -91,7 +93,8 @@ spacing. Preserve vendored CSS/JS. Use `{icon name}` and the flat
 
 Owner edits happen on the page with explicit Save/Cancel. The Edit switch defaults on
 and persists per tab across pages. Save/Cancel remain on the second toolbar row
-and keep editing on. Theme has its own fixed-footer Save and header X; Escape closes
+and keep editing on. Page Save updates in place from the committed server receipt,
+rebasing Cancel without reloading or replacing editable wrappers. Theme has its own fixed-footer Save and header X; Escape closes
 with dirty-preview confirmation. Use green 2px dashed shadow-root overlays with 6px
 corners, never layout-changing borders on content. Keep keyboard focus visible on controls.
 Collection photos use a thumbnail picker with private upload previews; keep

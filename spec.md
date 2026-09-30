@@ -32,6 +32,8 @@ these runtime features. Adaptive streaming and automatic retention remain planne
 Dev reloads authenticated public pages when safe, restoring edit mode and scroll.
 Unsaved drafts, open dialogs, saves and Theme panels block automatic reload.
 Production owner pages do not poll for development reloads.
+Page Save applies server-confirmed content in place without a full reload and
+updates the version and Cancel baseline for subsequent edits.
 
 Interactive dev startup asks for a missing site name and optional owner email,
 never Resend setup. Noninteractive startup never prompts. New sites enable
@@ -40,6 +42,12 @@ window without sending. Previews are bounded, expire in 10 minutes and live only
 in memory. Production ignores the toggle. Preview-mode changes require restart;
 real local delivery uses the explicit email wizard. Secrets stay in ignored .env,
 while approved owners remain developer-owned configuration.
+
+`flea dev --lan`/`-l` explicitly enables full development over trusted-network
+HTTP, using detected private IPv4 URLs. Loopback remains the default. Exact
+Host/port and actual-peer checks gate LAN requests; sessions, Origin, CSRF and
+production HTTPS requirements remain intact. Previews open on the dev computer
+and existing private capability URLs also work on approved network addresses.
 
 Editable state: `flea pull` retrieves live snips and theme CSS into local files,
 with `--snips-only` / `--theme-only` selectors. Plain deployment preserves live
@@ -254,8 +262,9 @@ Rules:
 7. An unmatched route returns `_404.html` with HTTP status 404, wrapped in `main.layout.html` when present. The 404 template contains page content for `{slot}`, not a separate HTML document.
 8. An unexpected request-time/internal rendering failure returns `_500.html` with HTTP status 500. This fallback must remain deliberately simple.
 
-In local dev, 404/405/500 responses instead show self-contained diagnostic pages
-to loopback peers using a localhost/loopback Host. Include escaped error text,
+In dev, 404 responses use the site's ordinary error template; 405/500 responses
+show self-contained diagnostic pages to loopback peers using a localhost/loopback
+Host, or explicitly authorized LAN requests. Include escaped error text,
 up to 11 template lines with original line numbers and the error highlighted
 (five lines on either side) when available, safe JSON locations,
 route guidance, and automatic recovery after save. Never expose source details

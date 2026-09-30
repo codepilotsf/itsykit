@@ -13,7 +13,9 @@ flea dev
 ```
 
 The planned installer is `curl -fsSL https://fleacms.com/install.sh | bash`.
-Public downloads are not published yet; use your developer-provided CLI for now.
+Install the public test release with `curl -fsSL https://fleacms.com/install.sh | bash`.
+Downloads cover Apple Silicon macOS and x86-64 Linux; see
+https://fleacms.com/docs#installation for PATH setup and testing limits.
 This generated folder already is a site, so you can skip directly to `flea dev`.
 `flea new` creates a clean layout and editable homepage. Use `flea new --starter
 foobar` (or `-s`) for example pages, a six-person fictional team and a contact form.
@@ -45,8 +47,15 @@ For real local delivery, set `"dev": {"email_preview": false}`, run `flea email`
 and restart dev. Production ignores preview mode and always needs real email
 configuration. Restart dev after changing preview mode or its sender details.
 
-Open [http://127.0.0.1:3000](http://127.0.0.1:3000). Leave the server running while
+Open [http://localhost:3000](http://localhost:3000). Leave the server running while
 you work; saved changes reload the browser. Run one dev process per site.
+
+For another device on the same trusted network, use `flea dev --lan` (or `-l`)
+and open a printed Network URL. Sign-in, editing, media, Theme, forms and reloads
+work there too. Email previews open on the computer running Flea; enter that code
+on the other device. LAN mode uses unencrypted HTTP on private IPv4 networks.
+Do not forward the port. Allow it through your firewall if needed and restart dev
+after changing networks. Without the flag, access stays on this computer.
 
 ### 2. Make your first change
 

@@ -52,6 +52,11 @@ must match the finished product. Keep one agent unless Sean authorizes delegatio
   (Go regressions and Chrome Theme check; broader manual acceptance remains below).
 - [ ] Address any additional blocking defects discovered during the sprint.
   Scope new features separately rather than extending V1 during QA.
+- [ ] Verify in-place page Save in Safari and on a real mobile device, then include
+  it in the next patch release. Zjax adoption remains a separate decision.
+- [ ] Investigate Chrome's native-navigation browser check reporting
+  "Missing page transition name". The in-place Save, media, collection and dev
+  reload browser checks pass; this separate transition check still needs review.
 - [ ] Review the Inter/forest-green boilerplate on real devices. Chrome desktop
   and mobile access-page checks passed; the theme is explicitly synced to Bookworm.
 - [ ] Review clean default, `new --starter` / `-s`, fictional team and native

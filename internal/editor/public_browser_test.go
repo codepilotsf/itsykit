@@ -111,6 +111,25 @@ func TestPublicPreviewBrowser(t *testing.T) {
   assert(!article.hasAttribute('contenteditable') && !leaf.hasAttribute('contenteditable'),'editing attributes leaked');
   assert(!ui.querySelector('#format').hidden && ui.querySelector('#details').disabled && ui.querySelector('[data-mark]').disabled && !ui.querySelector('#logout').hidden,'cancel state');
   assert(root.getBoundingClientRect().height===browseHeight,'toolbar height changed after cancel');
+  ui.querySelector('#edit').click();
+  const fontSize=getComputedStyle(leaf).fontSize,originalLeaf=leaf;
+  let saves=0,previousVersion=JSON.parse(root.dataset.page).version;
+  window.fetch=async(url,options)=>{
+    const edit=JSON.parse(options.body.get('edit'));assert(edit.version===previousVersion,'save used stale version');
+    previousVersion='saved-'+(++saves);
+    return {status:200,json:async()=>({page:{...edit,version:previousVersion,changes:edit.changes.map(c=>({...c,content:c.content.replace('draft','canonical')}))},media:{},photos:{}})};
+  };
+  leaf.textContent='First draft';leaf.dispatchEvent(new Event('input'));
+  ui.querySelector('#save').click();await new Promise(resolve=>setTimeout(resolve,30));
+  assert(leaf===originalLeaf&&leaf.textContent==='First canonical'&&getComputedStyle(leaf).fontSize===fontSize,'save replaced wrapper or changed typography');
+  assert(ui.querySelector('#save').disabled&&ui.querySelector('#cancel').disabled&&leaf.isContentEditable,'saved state not clean and editable');
+  leaf.textContent='Second draft';leaf.dispatchEvent(new Event('input'));
+  ui.querySelector('#save').click();await new Promise(resolve=>setTimeout(resolve,30));
+  assert(saves===2&&leaf.textContent==='Second canonical','second save failed');
+  leaf.textContent='Discard me';leaf.dispatchEvent(new Event('input'));ui.querySelector('#cancel').click();
+  assert(leaf.textContent==='Second canonical','Cancel restored pre-save content');
+  ui.querySelector('#edit').click();
+  assert(leaf.textContent==='Second canonical','leaving edit restored pre-save content');
   const oldBrand=document.documentElement.style.getPropertyValue('--brand-1');
   window.fetch=async(url,options)=>options?.method==='POST'?{status:409}:{ok:true,json:async()=>({version:'theme-version',fields:THEME_FIELDS,scales:THEME_SCALES})};
   ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));
@@ -126,7 +145,7 @@ func TestPublicPreviewBrowser(t *testing.T) {
   typography.querySelector('summary').click();assert(typography.open,'accordion opening');
   const pageColors=[...ui.querySelectorAll('#theme-fields details')].find(d=>d.querySelector('summary').textContent==='Page colors');
   const fontColor=pageColors.querySelector('[aria-label="Font Color"]');
-  const background=pageColors.querySelector('[aria-label="Background Color"]');assert(background.value==='var(--white)','background default');
+  const background=pageColors.querySelector('[aria-label="Background Color"]');assert(background.value==='var(--lighter)','background default');
   background.value='var(--brand-1-light)';background.dispatchEvent(new Event('input'));assert(document.documentElement.style.getPropertyValue('--bg-color')==='var(--brand-1-light)','background preview');
   assert(fontColor.tagName==='SELECT' && fontColor.value==='var(--black)','font color default');
   assert([...fontColor.querySelectorAll('optgroup')].map(g=>g.label).join(',')==='Neutral colors,Brand colors','font color ordering');

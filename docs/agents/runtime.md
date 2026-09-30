@@ -23,7 +23,15 @@ Fingerprint only at startup or after events to suppress self-generated writes.
 On overflow rescan; on watcher failure stop dev with an error. No polling fallback.
 Browser reload polling is separate and unchanged. Preserve invalid-edit recovery.
 Dev admin pages also receive the revision reload script; production admin pages never do.
-The dev server listens on loopback; the persistent host defaults to public HTTP
+The dev server defaults to loopback and prints localhost URLs with the actual bound
+port. `--lan`/`-l` binds IPv4 interfaces and prints detected RFC1918 addresses.
+The outer devaccess middleware validates exact listener Host/port and actual
+private/loopback peers, then marks the request context. Forwarded headers never
+authorize access. Only marked dev requests may use LAN admin, contact, diagnostics
+and private capability previews. Keep exact Origin, CSRF, host-bound sessions and
+production HTTPS checks. Warn that LAN HTTP requires a trusted network; restart
+after network changes. Fail clearly when no private IPv4 address is available.
+The persistent host defaults to public HTTP
 port 80, with opt-in automatic HTTPS on port 443 per domain.
 
 ## Email templates
@@ -40,7 +48,10 @@ Contact success_path is developer-configured, local-only, never visitor-selected
 New sites enable dev.email_preview. Only the dev CLI wires internal/mailpreview
 as a Sender and mounts its random-token loopback route. Keep at most 20 messages
 in memory, with 10-minute expiry, no-store responses, exact host/loopback checks
-and sandboxed HTML. Do not write previews to disk or let production choose this
+and sandboxed HTML. Explicit LAN mode also admits middleware-validated requests
+to existing unguessable preview URLs, with exact request Origin checks. Previews
+still open on the developer's computer; no inbox or login bypass is exposed.
+Do not write previews to disk or let production choose this
 sender. Browser launch failure prints a local capability link, never message data.
 Preview mode/sender changes require restart; real local delivery remains explicit.
 
@@ -69,8 +80,9 @@ absolute-path writes; their trust assumptions differ.
 Do not replace validated route maps with request-derived filesystem reads.
 Production keeps detailed errors in server logs and generic/custom HTTP error
 pages. Local dev uses the ordinary 404 template and embedded diagnostics for 405/500 when
-both Host and client are loopback. Never expose these through production, forwarded
-headers or an external Host. SourceError captures bounded compiler-owned excerpts
+both Host and client are loopback, or the CLI's LAN middleware authorized the
+request. Never expose these through production, forwarded headers or an unapproved
+Host. SourceError captures bounded compiler-owned excerpts
 at failure time; never read source files based on request paths or error strings.
 Include five lines before and after the highlighted source line, with original
 line numbers. Preserve source locations through region and page-setting validation.

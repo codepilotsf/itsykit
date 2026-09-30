@@ -37,7 +37,13 @@ Set the toggle to false (or omit it), configure `flea email`, then restart dev
 to send real mail. Restart after changing preview mode or preview sender details.
 
 Previews are held in memory, with at most 20 messages and 10-minute expiry.
-Their random URLs work only on the exact loopback dev address. Stopping dev
+Their random URLs work only on the exact loopback dev address by default.
+With `flea dev --lan` (or `-l`), they also work on the printed network addresses.
+Previews still open on the computer running Flea. Enter its code on the other
+device, or replace the preview URL's loopback IP with a printed network IP while
+keeping its port and random path. A preview link is private access to that message;
+share it only with someone you trust. No preview listing or login bypass is added.
+Stopping dev
 discards them; no preview files enter Git, backups or deployment. The HTML body
 is sandboxed with scripts, forms and external resource loads disabled. No inbox
 listing is exposed. If browser launch fails, a local preview link is printed in

@@ -18,6 +18,7 @@ import (
 
 	"flea/internal/buildinfo"
 	"flea/internal/contact"
+	"flea/internal/devaccess"
 	"flea/internal/mailer"
 	"flea/internal/mailpreview"
 	"flea/internal/selfupdate"
@@ -450,6 +451,9 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			flags.SetOutput(out)
 		}
 		port := flags.Int("port", 3000, "local HTTP port (0 selects an available port)")
+		var lan bool
+		flags.BoolVar(&lan, "lan", false, "enable full development access on a trusted private IPv4 network (HTTP)")
+		flags.BoolVar(&lan, "l", false, "same as --lan")
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
 				return 0
@@ -492,7 +496,16 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if mailSettings.Validate() == nil {
 			sender = mailer.NewResend(mailSettings)
 		}
-		listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", *port))
+		bindHost := "127.0.0.1"
+		var lanAddresses []string
+		if lan {
+			lanAddresses, err = devLANAddresses()
+			if err != nil {
+				return fail(err)
+			}
+			bindHost = "0.0.0.0"
+		}
+		listener, err := net.Listen("tcp4", net.JoinHostPort(bindHost, fmt.Sprint(*port)))
 		if err != nil {
 			return fail(err)
 		}
@@ -504,7 +517,8 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			if name == "" {
 				name = fmt.Sprint(p.App["site_name"])
 			}
-			preview, err = mailpreview.New("http://"+listener.Addr().String(), name, mailSettings.From, logger)
+			previewOrigin := fmt.Sprintf("http://127.0.0.1:%d", listener.Addr().(*net.TCPAddr).Port)
+			preview, err = mailpreview.New(previewOrigin, name, mailSettings.From, logger)
 			if err != nil {
 				listener.Close()
 				return fail(err)
@@ -554,6 +568,9 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				}
 			})
 		}
+		if lan {
+			httpHandler = devaccess.WrapLAN(httpHandler, lanAddresses, listener.Addr().(*net.TCPAddr).Port)
+		}
 		server := &http.Server{Handler: httpHandler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 30 * time.Second}
 		watchCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -561,7 +578,19 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		go func() { watchDone <- handler.Watch(watchCtx, p.Root, logger) }()
 		done := make(chan error, 1)
 		go func() { done <- server.Serve(listener) }()
-		fmt.Fprintf(out, "\nWebsite  http://%s\nSign in  http://%s/admin\n\nPress Ctrl-C to stop.\n", listener.Addr(), listener.Addr())
+		localAddress := fmt.Sprintf("localhost:%d", listener.Addr().(*net.TCPAddr).Port)
+		fmt.Fprintf(out, "\nWebsite  http://%s\nSign in  http://%s/admin\n", localAddress, localAddress)
+		if lan {
+			for _, address := range lanAddresses {
+				base := fmt.Sprintf("http://%s:%d", address, listener.Addr().(*net.TCPAddr).Port)
+				fmt.Fprintf(out, "\nNetwork  %s\nSign in  %s/admin\n", base, base)
+			}
+			fmt.Fprintln(out, "\nLAN mode uses unencrypted HTTP. Use only on a trusted network; do not forward this port.")
+			if preview != nil {
+				fmt.Fprintln(out, "Email previews open on this computer. Use the code on your other device.")
+			}
+		}
+		fmt.Fprintln(out, "\nPress Ctrl-C to stop.")
 		select {
 		case err := <-watchDone:
 			server.Close()

@@ -31,6 +31,11 @@ func TestPhotosBrowser(t *testing.T) {
  $('#save').click();await wait();assert(sent.media[0].id==='Abcdef1234'&&sent.media[0].alt==='New description'&&sent.version==='v1'&&body.get('csrf')===host.dataset.csrf,'save payload');assert(!$('#save').disabled&&image.alt==='New description','failed save discarded draft');
  $('#cancel').click();$('#edit').click();assert(image.alt==='Joe'&&image.getAttribute('role')===null&&image.getAttribute('tabindex')===null,'cancel did not restore image');
  $('#edit').click();image.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));assert($('#media-dialog').open,'keyboard inaccessible');$('#media-alt').value='Discard me';$('#media-cancel').click();await wait();assert(image.alt==='Joe'&&$('#save').disabled,'dialog cancel saved draft');
+ window.fetch=async(url,options)=>{const edit=JSON.parse(options.body.get('edit'));return {status:200,json:async()=>({page:{...edit,version:'v2',changes:[]},media:{Abcdef1234:{type:'image',image:{file:'saved.png',name:'Saved',alt:'Saved description'}}},photos:{}})};};
+ image.click();assert($('#media-dialog').open&&!$('#media-dialog').classList.contains('closing'),'media dialog did not reopen');$('#media-alt').value='Saved description';$('#media-form').requestSubmit();await wait();$('#save').click();await wait();
+ assert(image.alt==='Saved description'&&image.src.endsWith('/media/saved.png')&&$('#save').disabled,'media save did not commit: '+image.alt+' '+image.src+' '+$('#status').textContent);
+ image.click();$('#media-alt').value='Discard';$('#media-form').requestSubmit();await wait();$('#cancel').click();
+ assert(image.alt==='Saved description'&&image.src.endsWith('/media/saved.png'),'media Cancel lost saved baseline');
  result.textContent='PASS';}catch(e){result.textContent='FAIL '+e.stack}document.body.append(result)},50);`
 	h.options.Public = func(w http.ResponseWriter, r *http.Request, decorate func([]byte, *snips.Store, string) ([]byte, bool)) {
 		store := snips.NewStore()
@@ -56,7 +61,7 @@ func TestPhotosBrowser(t *testing.T) {
 	defer server.Close()
 	ctx, stop := context.WithTimeout(context.Background(), 20*time.Second)
 	defer stop()
-	cmd := exec.CommandContext(ctx, browser, "--headless", "--disable-gpu", "--no-first-run", "--no-default-browser-check", "--user-data-dir="+t.TempDir(), "--dump-dom", "--virtual-time-budget=2500", server.URL)
+	cmd := exec.CommandContext(ctx, browser, "--headless", "--disable-gpu", "--force-prefers-reduced-motion", "--no-first-run", "--no-default-browser-check", "--user-data-dir="+t.TempDir(), "--dump-dom", "--virtual-time-budget=4000", server.URL)
 	cmd.WaitDelay = 2 * time.Second
 	output, err := cmd.CombinedOutput()
 	text := string(output)

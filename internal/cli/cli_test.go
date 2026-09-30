@@ -209,6 +209,9 @@ func TestExecutableWorkflow(t *testing.T) {
 			t.Fatal("dev did not start")
 		}
 	}
+	if !strings.HasPrefix(address, "http://localhost:") || address == "http://localhost:0" {
+		t.Fatalf("expected localhost with the assigned port, got %q", address)
+	}
 	client := &http.Client{Timeout: 2 * time.Second}
 	get := func(url string) (int, string) {
 		t.Helper()

@@ -123,7 +123,7 @@ func TestHTTPSLoginEditAndPublicSnapshot(t *testing.T) {
 	data, _ := json.Marshal(edit)
 	values := url.Values{"csrf": {csrf}, "edit": {string(data)}}
 	status, _ = call("POST", "/admin/page", values)
-	if status != 204 {
+	if status != 200 {
 		t.Fatal(status)
 	}
 	status, body = call("GET", "/", nil)

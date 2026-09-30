@@ -6,6 +6,17 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.5.0 - 2026-09-29
+
+- Add `flea dev --lan`/`-l` with detected private IPv4 URLs and full authenticated
+  development, forms, reloads, diagnostics and private email-preview links on a
+  trusted network. Keep ordinary dev loopback-only and production HTTPS-only.
+
+- Display dev website and sign-in links using localhost, retaining loopback-only access.
+
+- Save page edits in place without reloading fonts or the page. Keep editing on
+  and make Cancel restore the latest successful save, including collections/media.
+
 ## 0.4.1 - 2026-09-29
 
 - Keep `flea new` completion output focused on starting local development.

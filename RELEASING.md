@@ -7,7 +7,7 @@ public binaries will be free to use without an account or license key. The
 primary path is the implemented `website/site/install.sh`, intended for
 https://fleacms.com/install.sh, followed by `flea update` for local CLI updates.
 Remote updates use `flea update-server` (including `--recover`), without an alias.
-The 0.4.1 public test release is hosted by the separate website repository at
+The public test release is hosted by the separate website repository at
 `/Users/sean/fleacms-website`. Its `RELEASES.md` records build provenance and
 actual public installer/update checks. Versioned binaries, SHA256SUMS,
 latest.txt and install.sh are live on fleacms.com. Clean-machine Mac testing

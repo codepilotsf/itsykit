@@ -60,7 +60,8 @@ func TestAtomicPageSave(t *testing.T) {
 			if err := s.Save(editor.Update{Page: &bad}); err == nil {
 				t.Fatal("duplicate accepted")
 			}
-			if err := s.Save(editor.Update{Page: &edit}); err != nil {
+			var receipt editor.PageResult
+			if err := s.Save(editor.Update{Page: &edit, Result: &receipt}); err != nil {
 				t.Fatal(err)
 			}
 			if err := s.Save(editor.Update{Page: &edit}); err == nil {
@@ -81,6 +82,9 @@ func TestAtomicPageSave(t *testing.T) {
 				}
 			}
 			content := got.Store.Pages["/"].Snips["abcdefghij"].Content
+			if receipt.Page.Version != got.Version || receipt.Page.Version == edit.Version || receipt.Page.Changes[0].Content != content {
+				t.Fatal("receipt does not describe the committed canonical snapshot", receipt)
+			}
 			if !strings.Contains(content, `<h1 style="text-align: center;">`) || !strings.Contains(content, `target="_blank" rel="noopener noreferrer"`) {
 				t.Fatal(content)
 			}

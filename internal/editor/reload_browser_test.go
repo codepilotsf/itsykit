@@ -34,7 +34,14 @@ func TestOwnerReloadBrowser(t *testing.T) {
     assert(document.getElementById('new-region').isContentEditable,'new snip not editable');
     ui.querySelector('#edit').click();location.href='/off-check';return;
   }
-  window.fetch=async url=>url==='/_flea/reload'?{ok:true,text:async()=>'2'}:{ok:true,json:async()=>({version:'v',fields:[],scales:{}})};
+  window.fetch=async(url,options)=>{
+    if(url==='/admin/page'){const edit=JSON.parse(options.body.get('edit'));return {status:200,json:async()=>({page:{...edit,version:'saved'},media:{},photos:{}})};}
+    if(url==='/_flea/reload')return {ok:true,text:async()=>'2'};
+    return {ok:true,json:async()=>({page:{version:'saved'}})};
+  };
+  const savedRegion=document.getElementById('region');savedRegion.textContent='Saved';savedRegion.dispatchEvent(new Event('input'));ui.querySelector('#save').click();
+  await wait(1000);assert(savedRegion.isConnected&&ui.querySelector('#save').disabled&&host.dataset.revision==='2','own save triggered reload or failed to acknowledge revision');
+  window.fetch=async url=>url==='/_flea/reload'?{ok:true,text:async()=>'3'}:{ok:true,json:async()=>({version:'v',fields:[],scales:{}})};
   window.confirm=()=>true;
   assert(ui.querySelector('#edit').checked,'editing defaults on');
   const region=document.getElementById('region');region.textContent='Draft';region.dispatchEvent(new Event('input'));

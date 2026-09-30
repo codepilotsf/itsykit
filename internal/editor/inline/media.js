@@ -95,6 +95,17 @@
     owner.changed();await owner.close(dialog);sourceNode?.focus();
   };
   host.mediaSnips={
+    commit(saved){
+      Object.assign(entries,saved);
+      for(const node of nodes){
+        const entry=saved[node.dataset.snipMedia];if(!entry)continue;
+        const values={src:'/media/'+(entry.image||entry.video).file};
+        if(node.tagName==='IMG')values.alt=entry.image.alt||'';else values.poster=entry.poster?'/media/'+entry.poster.file:null;
+        for(const pair of original.get(node).attrs)if(pair[0] in values){pair[1]=values[pair[0]];pair[1]===null?node.removeAttribute(pair[0]):node.setAttribute(pair[0],pair[1]);}
+        if(node.tagName==='VIDEO')node.load();
+      }
+      drafts.clear();for(const url of urls)URL.revokeObjectURL(url);urls.clear();
+    },
     dirty:()=>drafts.size>0,
     start(){for(const node of nodes){node.tabIndex=0;node.setAttribute('role','button');node.setAttribute('aria-label',node.tagName==='IMG'?'Edit image':'Edit video');node.style.cursor='pointer';node.style.setProperty('outline','none','important');if(node.tagName==='VIDEO')node.pause();}},
     reset(){

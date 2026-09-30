@@ -84,7 +84,8 @@ func (h *Handler) savePage(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	if err := h.options.Backend.Save(Update{Page: &edit}); err != nil {
+	var result PageResult
+	if err := h.options.Backend.Save(Update{Page: &edit, Result: &result}); err != nil {
 		if h.options.Logger != nil {
 			h.options.Logger.Printf("Page save failed: %q", err.Error())
 		}
@@ -96,5 +97,6 @@ func (h *Handler) savePage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not save. The page may have changed. Your draft is still here; copy it before reloading.", 409)
 		return
 	}
-	w.WriteHeader(http.StatusNoContent)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(result)
 }

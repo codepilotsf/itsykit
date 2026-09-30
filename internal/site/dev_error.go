@@ -10,6 +10,8 @@ import (
 	"net"
 	"net/http"
 	"strings"
+
+	"flea/internal/devaccess"
 )
 
 //go:embed dev_error.html
@@ -17,6 +19,9 @@ var devErrorHTML string
 var devErrorTemplate = template.Must(template.New("dev-error").Parse(devErrorHTML))
 
 func localDiagnosticRequest(r *http.Request) bool {
+	if devaccess.LAN(r) {
+		return true
+	}
 	host := r.Host
 	if name, _, err := net.SplitHostPort(host); err == nil {
 		host = name
