@@ -29,9 +29,14 @@ UID 65534. The 1 GB host killed a parallel compiler for memory pressure; a rerun
 with `GOMAXPROCS=1 GOFLAGS=-p=1` passed. Linux race tests remain unavailable because
 the temporary build host has no C compiler. No system toolchain was installed.
 
-Versioned downloads are staged before advancing latest.txt. Public installation
-and update results will be recorded after verification. Mac notarization and
-independent clean-machine/device testing remain pending.
+Both anonymous HTTPS downloads matched the staged checksum manifest before
+advancing latest.txt. Asset-only release: `20260930-005958-5fbeba55cfd5fbaf51a0efe0`.
+The initial activation hit host memory pressure and automatically rolled back.
+A stale, inactive 188 MB Go build directory was moved from RAM-backed `/tmp`
+to `/var/tmp/flea-go-build-archive-1567161428`, preserving it for recovery; the
+retry succeeded. No server executable, access settings or Bookworm data changed.
+Public installation and update results will be recorded after verification.
+Mac notarization and independent clean-machine/device testing remain pending.
 
 ## 0.4.1 published September 29, 2026
 

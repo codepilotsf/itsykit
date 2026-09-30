@@ -46,8 +46,13 @@ For real local delivery, set `"dev": {"email_preview": false}`, run `flea email`
 and restart dev. Production ignores preview mode and always needs real email
 configuration. Restart dev after changing preview mode or its sender details.
 
-Open [http://127.0.0.1:3000](http://127.0.0.1:3000). Leave the server running while
+Open [http://localhost:3000](http://localhost:3000). Leave the server running while
 you work; saved changes reload the browser. Run one dev process per site.
+
+Use `flea dev --lan` (or `-l`) to test the full site from another device on a
+trusted private IPv4 network. Open a printed Network URL. Email previews open
+on the computer running Flea; use its code on the other device. LAN mode uses
+unencrypted HTTP. Never forward the development port; restart after changing networks.
 
 ### 2. Make your first change
 
