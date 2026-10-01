@@ -4,7 +4,17 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
-## Unreleased
+## 0.6.0 - 2026-10-01
+
+- Clarify the message shown when `flea dev`, `pull` or `reset` finds the site
+  already in use, without repeating the generic lock text.
+
+- On the first `flea dev`, explain that the optional email adds an admin who can
+  sign in and edit, point to `flea admin` when skipped, and ask only once. Space
+  out the prompts and startup links for readability.
+
+- Use "admin" for the people who sign in throughout user-facing copy, help and
+  documentation; internal code and DOM identifiers keep "owner".
 
 ## 0.5.0 - 2026-09-29
 

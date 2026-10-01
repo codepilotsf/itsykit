@@ -30,7 +30,7 @@ func main() {
 	history := flag.Bool("history", false, "list site release history (root only)")
 	rollback := flag.String("rollback", "", "restore retained code, preserving live content (root only)")
 	expectedRelease := flag.String("expected-release", "", "reviewed active release ID")
-	export := flag.Bool("export-state", false, "export owner-editable state (root only)")
+	export := flag.Bool("export-state", false, "export admin-editable state (root only)")
 	planPath := flag.String("sync-plan", "", "reviewed sync plan accompanying deployment")
 	version := flag.Bool("version", false, "print FleaCMS release version")
 	config := flag.String("config", "/etc/flea/server.json", "server JSON configuration")

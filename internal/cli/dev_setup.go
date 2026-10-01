@@ -17,50 +17,61 @@ func devTerminal(ctx context.Context, in *os.File) bool {
 	return cmd.Run() == nil
 }
 
-// Only interactive dev startup offers onboarding. Explicit commands remain
-// available for later setup; missing credentials never create a login bypass.
-func prepareDevOwner(ctx context.Context, p *site.Project, in io.Reader, out io.Writer, interactive bool) (bool, error) {
+// Only interactive dev startup offers onboarding, and only on the first run
+// (before the site name is saved). Explicit commands remain available for later
+// setup; missing credentials never create a login bypass. The second return
+// value reports whether the admin prompt was shown this run, so the caller can
+// avoid repeating its reminder immediately afterwards.
+func prepareDevOwner(ctx context.Context, p *site.Project, in io.Reader, out io.Writer, interactive bool) (bool, bool, error) {
 	if !interactive {
-		return false, nil
+		return false, false, nil
 	}
+	firstRun := !p.SiteNameConfigured
 	changed := false
-	if !p.SiteNameConfigured {
+	if firstRun {
+		fmt.Fprintln(out)
 		name, err := setup.Prompt(ctx, in, out, "Site name ["+fmt.Sprint(p.App["site_name"])+"]")
 		if err != nil {
-			return false, err
+			return false, false, err
 		}
 		if name == "" {
 			name = fmt.Sprint(p.App["site_name"])
 		}
 		if err := ctx.Err(); err != nil {
-			return false, err
+			return false, false, err
 		}
 		if err := site.SetSiteName(p.Root, name); err != nil {
-			return false, err
+			return false, false, err
 		}
 		changed = true
 		fmt.Fprintln(out, "Config file updated.")
 	}
-	if len(p.Admin.Emails) == 0 {
-		for {
-			address, err := setup.Prompt(ctx, in, out, "Admin email (optional)")
-			if err != nil {
-				return false, err
-			}
-			if address == "" {
-				break
-			}
-			if err := ctx.Err(); err != nil {
-				return false, err
-			}
-			_, _, err = site.AddAdmin(p.Root, address)
-			if err != nil {
-				return false, err
-			}
+	offered := false
+	if firstRun && len(p.Admin.Emails) == 0 {
+		offered = true
+		fmt.Fprintln(out)
+		fmt.Fprintln(out, "Add an admin who can sign in and edit your site. You can skip this and add one later.")
+		address, err := setup.Prompt(ctx, in, out, "Admin email (optional)")
+		if err != nil {
+			return false, offered, err
+		}
+		if address == "" {
+			fmt.Fprintln(out, "No problem. Add an admin whenever you're ready with: flea admin")
+			return changed, offered, nil
+		}
+		if err := ctx.Err(); err != nil {
+			return false, offered, err
+		}
+		email, added, err := site.AddAdmin(p.Root, address)
+		if err != nil {
+			return false, offered, err
+		}
+		if added {
 			changed = true
-			fmt.Fprintln(out, "Config file updated.")
-			break
+			fmt.Fprintf(out, "Added %s to .flea.config.json.\n", email)
+		} else {
+			fmt.Fprintf(out, "%s already has admin access in this site's configuration. Nothing changed.\n", email)
 		}
 	}
-	return changed, nil
+	return changed, offered, nil
 }

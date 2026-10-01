@@ -47,7 +47,7 @@ repeat adjacent same-name authoring blocks with identical markup outside their
 editable fields. Dev extracts them in source order and keeps one loop template.
 Different classes, fixed text or structure are rejected rather than discarded.
 An existing stored array is preserved, including an intentionally empty array;
-use the owner editor to add items after extraction.
+use the admin editor to add items after extraction.
 Names use lowercase letters, digits and underscores,
 starting with a letter. Keep one root element and one complete element per field.
 

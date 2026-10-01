@@ -40,7 +40,7 @@ Build your site
   reset            Reset this local site to a clean start
   dev              Start the local development server
   status           Check your site for errors
-  admin [email]    Add an owner who can edit content
+  admin [email]    Add an admin who can edit content
   email            Set up email delivery
 
 Publish your site
@@ -184,7 +184,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "admin":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea admin [email]\n\nAdd an owner and set up email if needed. Local access updates automatically.\nView or remove owners in admin.emails in .flea.config.json.\nCommit and deploy to apply live changes. No invitation is sent.")
+			fmt.Fprintln(out, "Usage: flea admin [email]\n\nAdd an admin and set up email if needed. Local access updates automatically.\nView or remove admins in admin.emails in .flea.config.json.\nCommit and deploy to apply live changes. No invitation is sent.")
 			fmt.Fprintln(out)
 			return 0
 		}
@@ -197,7 +197,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			email = args[1]
 		} else {
 			var err error
-			email, err = setup.Prompt(ctx, os.Stdin, out, "Site owner email address")
+			email, err = setup.Prompt(ctx, os.Stdin, out, "Admin email address")
 			if err != nil {
 				return fail(err)
 			}
@@ -212,7 +212,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if added {
 			fmt.Fprintf(out, "\nAdded %s to .flea.config.json.\n", email)
 		} else {
-			fmt.Fprintf(out, "\n%s already has owner access in this site's configuration. Nothing changed.\n", email)
+			fmt.Fprintf(out, "\n%s already has admin access in this site's configuration. Nothing changed.\n", email)
 		}
 		settings, err := mailer.LocalSettings(".")
 		if err != nil {
@@ -443,7 +443,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet("dev", flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintln(flags.Output(), "Usage: flea dev [options]\n\nStart the local development server from your site folder.\nAsks for a site name once, then offers optional owner setup.\nNew sites preview email in your browser without sending.\nChanges reload automatically.\n\nOptions")
+			fmt.Fprintln(flags.Output(), "Usage: flea dev [options]\n\nStart the local development server from your site folder.\nAsks for a site name once, then offers optional admin setup.\nNew sites preview email in your browser without sending.\nChanges reload automatically.\n\nOptions")
 			flags.PrintDefaults()
 			fmt.Fprintln(flags.Output())
 		}
@@ -473,7 +473,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if err != nil {
 			return fail(err)
 		}
-		changed, err := prepareDevOwner(ctx, p, os.Stdin, out, devTerminal(ctx, os.Stdin))
+		changed, offered, err := prepareDevOwner(ctx, p, os.Stdin, out, devTerminal(ctx, os.Stdin))
 		if err != nil {
 			return fail(err)
 		}
@@ -536,11 +536,11 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		var httpHandler http.Handler = handler
 		{
 			httpHandler = devAdmin(p.Root, fmt.Sprint(p.App["site_name"]), handler, logger, previewSender)
-			if len(p.Admin.Emails) == 0 {
-				logger.Print("Owner sign-in isn't set up. Run flea admin when you're ready.")
+			if len(p.Admin.Emails) == 0 && !offered {
+				logger.Print("Admin sign-in isn't set up. Run flea admin when you're ready.")
 			}
 			if len(p.Admin.Emails) > 0 && sender == nil {
-				logger.Print("Owner sign-in needs email setup. Run flea email.")
+				logger.Print("Admin sign-in needs email setup. Run flea email.")
 			}
 		}
 		if p.Contact.To != "" {

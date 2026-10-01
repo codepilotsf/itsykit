@@ -2,7 +2,7 @@
   "pages": {
     "/": {
       "title": "Plain HTML. Inline editing.",
-      "description": "FleaCMS is a small Go-powered CMS for plain HTML websites and inline owner editing.",
+      "description": "FleaCMS is a small Go-powered CMS for plain HTML websites and inline admin editing.",
       "snips": {
         "a7Km2pQ9xB": {"content": "Welcome to FleaCMS."},
         "b8Ln3rR0yC": {"content": "Your new site is ready. Make yourself at home."}

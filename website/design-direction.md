@@ -12,7 +12,7 @@ Zjax's dark background. White surfaces, generous whitespace, crisp charcoal
 type and vivid green accents; avoid making this another muted starter site.
 
 The only public content pages are `/` and `/docs`. Put installation, quickstart,
-template syntax, owner editing, deployment, email, recovery, updates, limitations,
+template syntax, admin editing, deployment, email, recovery, updates, limitations,
 release notes and support in anchored sections of `/docs`. Use a sticky contents
 list on desktop and a compact native disclosure on mobile. No separate Features,
 FAQ, Contact or Getting started page. Private authentication and error templates
@@ -43,7 +43,7 @@ Actions: Get started and See how editing works.
 
 Follow immediately with an actual editor screenshot or recording, showing a
 small example site. No simulated customer testimonials or invented usage counts.
-Below it, explain the developer/owner boundary with one short HTML example and
+Below it, explain the developer/admin boundary with one short HTML example and
 the resulting editable content. End with the new/dev/deploy workflow and an
 honest summary of hosting, email and platform requirements.
 

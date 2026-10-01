@@ -3,6 +3,7 @@ package site
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"flea/internal/state"
 	"fmt"
 	"os"
@@ -22,8 +23,11 @@ func LockDevelopment(root string) (func(), error) {
 	}
 	h := sha256.Sum256([]byte(absolute))
 	unlock, e := state.Lock(filepath.Join(os.TempDir(), "flea-dev-"+hex.EncodeToString(h[:])+".lock"))
+	if errors.Is(e, state.ErrBusy) {
+		return nil, fmt.Errorf("another running flea dev, pull or reset is using this site; stop that command, then try again")
+	}
 	if e != nil {
-		return nil, fmt.Errorf("stop flea dev or the other pull for this site, then retry: %w", e)
+		return nil, e
 	}
 	return unlock, nil
 }

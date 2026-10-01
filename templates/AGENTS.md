@@ -39,7 +39,7 @@ alt="{snip ID.alt}", a video to src and poster bindings. The generated JSON
 entry is the only source of editable values. Keep classes, dimensions, links
 and playback attributes in the template. Do not nest snips or use competing
 srcset/picture/source elements for a media snip. Local JPEG/PNG and optimized
-H.264 MP4 seeds are imported by dev. Do not invent IDs. Owners click media in
+H.264 MP4 seeds are imported by dev. Do not invent IDs. Admins click media in
 Edit mode and use the same page Save/Cancel. No Photos/Videos library buttons.
 
 ## Available skill

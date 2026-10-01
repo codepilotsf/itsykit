@@ -30,7 +30,7 @@ func TestAdminCommand(t *testing.T) {
 		t.Fatal("configured site must have concise output", out.String())
 	}
 	out.Reset()
-	if code := Run(context.Background(), []string{"admin", "OWNER@example.com"}, &out, &out); code != 0 || !strings.Contains(out.String(), "already has owner access") {
+	if code := Run(context.Background(), []string{"admin", "OWNER@example.com"}, &out, &out); code != 0 || !strings.Contains(out.String(), "already has admin access") {
 		t.Fatal(code, out.String())
 	}
 	for _, args := range [][]string{{"admin", "--bad"}, {"admin", "a", "b"}} {
@@ -59,7 +59,7 @@ func TestAdminCommand(t *testing.T) {
 	os.Stdin = input
 	defer func() { os.Stdin = previous }()
 	out.Reset()
-	if code := Run(context.Background(), []string{"admin"}, &out, &out); code != 0 || !strings.Contains(out.String(), "Site owner email address:") || !strings.Contains(out.String(), "Added second@example.com") {
+	if code := Run(context.Background(), []string{"admin"}, &out, &out); code != 0 || !strings.Contains(out.String(), "Admin email address:") || !strings.Contains(out.String(), "Added second@example.com") {
 		t.Fatal(code, out.String())
 	}
 }

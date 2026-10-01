@@ -183,7 +183,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if h.sender == nil {
-		message := "Email delivery is unavailable. Please contact the site owner directly."
+		message := "Email delivery is unavailable. Please contact the site admin directly."
 		if h.local {
 			message = "Email delivery is not configured. Set RESEND_API_KEY and FLEA_EMAIL_FROM to a verified sender address, then restart flea dev."
 		}

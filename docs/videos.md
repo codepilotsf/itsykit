@@ -1,11 +1,11 @@
 # Videos
 
-Developers designate a video with a bare `snip` attribute. Signed-in owners choose
+Developers designate a video with a bare `snip` attribute. Signed-in admins choose
 **Edit**, then click that video to replace its optimized MP4, change its name or
 replace/remove its JPEG/PNG poster. **Done** previews the draft; the topbar
 **Save changes** publishes it with the page after validation. **Cancel** restores
 the original. Invalid or stale saves retain the draft. There is no Videos topbar
-mode and no owner-created media region without a developer designation.
+mode and no admin-created media region without a developer designation.
 
 ## Preparing a file
 
@@ -59,7 +59,7 @@ Its `video` value holds validated MP4 metadata; optional `poster` holds image
 metadata directly. There is only one stored source/poster value per snip.
 Commit metadata and templates. Local video files live in **flea/media/** and
 are Git-ignored. Dev, uploads and pulls ensure that ignore rule; dev refuses
-already tracked video files. Files use SHA-256 names and are not renamed by owners.
+already tracked video files. Files use SHA-256 names and are not renamed by admins.
 
 Deployment stages the exact local video bytes identified by the committed
 metadata, without putting those files in Git. Missing or changed bytes stop

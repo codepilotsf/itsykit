@@ -193,7 +193,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(h.allowed) == 0 {
 		w.WriteHeader(http.StatusServiceUnavailable)
-		h.page(w, view{Mode: "setup", Instructions: "Add the first site owner from your site's folder:\n\nflea admin owner@example.com\n\nThe command sets up email if needed. Then return here to sign in."})
+		h.page(w, view{Mode: "setup", Instructions: "Add the first admin from your site's folder:\n\nflea admin admin@example.com\n\nThe command sets up email if needed. Then return here to sign in."})
 		return
 	}
 	s, logged, err := h.current(r)

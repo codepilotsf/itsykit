@@ -73,7 +73,9 @@ starter syntax, committed, and excluded from serving/deployment.
 
 New sites enable `dev.email_preview`. Only `flea dev` opens actual outgoing mail
 in private browser previews; production ignores this setting. Keep the first-run
-prompts limited to site name and optional owner email. See the runtime guide.
+prompts limited to site name and optional admin email, asked once on first run.
+User-facing copy says "admin"; code and DOM identifiers keep "owner". See the
+runtime guide.
 Dev defaults to loopback. `--lan`/`-l` explicitly enables full trusted-network
 development over HTTP; preserve the shared Host/peer gate and ordinary auth/CSRF.
 `flea new` defaults to a clean layout/index. `--starter`/`-s` adds demo pages and a

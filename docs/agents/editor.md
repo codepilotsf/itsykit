@@ -102,17 +102,21 @@ Referrer-Policy must be same-origin,
 not no-referrer: native browser POSTs otherwise send Origin: null. Keep exact
 Origin matching and CSRF validation; never accept null or missing origins.
 
-Interactive `flea dev` first asks for a missing app.site_name, accepting its folder
-default on Enter, then asks for a missing optional Admin email. Never prompt for
-Resend credentials or sender details during dev startup. New sites enable
+Interactive `flea dev` offers onboarding only on the first run, before app.site_name
+is saved: it asks for the missing name, accepting its folder default on Enter, then
+offers an optional admin who can sign in and edit. Ask once; a skipped admin prints
+the `flea admin` next step and is not offered again. Never prompt for Resend
+credentials or sender details during dev startup. New sites enable
 dev.email_preview; the CLI-only preview sender handles both auth and contact
 mail without provider credentials. Read docs/email-templates.md for its boundaries.
-Confirm successful config writes with "Config file updated." Noninteractive stdin
-never prompts. Only the explicit email wizard checks Resend. Reload after adding
-an owner, before initializing sessions and serving. Keep secrets in ignored .env,
+Confirm the site name with "Config file updated." and an added admin with
+"Added <email> to .flea.config.json." Noninteractive stdin never prompts. Only
+the explicit email wizard checks Resend. Reload after adding an owner, before
+initializing sessions and serving. Keep secrets in ignored .env,
 never site config. Malformed settings or wizard failures stop with an error.
 Owner onboarding uses a developer-shared /admin link, not invitation emails or
-separate account registration. Use "site owner" in developer and owner guidance.
+separate account registration. User-facing copy calls these people "admins"
+(matching flea admin and admin.emails); code, DOM ids and internal docs keep "owner".
 The CLI explains applying access changes, sharing the live link, local mail setup,
 and viewing/removing addresses via admin.emails. Local /admin shows a setup page
 even with no owners; production remains disabled with an empty allowlist.

@@ -35,7 +35,7 @@ Production owner pages do not poll for development reloads.
 Page Save applies server-confirmed content in place without a full reload and
 updates the version and Cancel baseline for subsequent edits.
 
-Interactive dev startup asks for a missing site name and optional owner email,
+Interactive dev startup asks for a missing site name and optional admin email,
 never Resend setup. Noninteractive startup never prompts. New sites enable
 dev.email_preview: actual local login/contact mail opens in an email-style browser
 window without sending. Previews are bounded, expire in 10 minutes and live only

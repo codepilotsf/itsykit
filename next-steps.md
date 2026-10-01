@@ -219,6 +219,20 @@ they appear in this roadmap.
 
 ## Details to resolve when their stage starts
 
+### Planned Markdown support
+
+- [ ] Support `.md` pages out of the box, using the same layouts, routing,
+  Svelte-like template syntax and editable snips as HTML pages.
+- Allow natural HTML mixed with Markdown, including HTML elements with snip
+  attributes, without requiring special wrappers or an extra build step.
+- Define Markdown/template/HTML parsing order, code-fence escaping, `.md`/`.html`
+  route collision handling and snip extraction/save behavior before implementation.
+  Preserve contextual escaping, rich-content sanitization and source formatting.
+- Verify conditions, loops, partials, inline HTML and snips together, including
+  dev reloads and repeated owner saves. Choose a parser only after reviewing these
+  requirements. This is planned work, not part of the current save-fix patch;
+  release placement remains to be decided.
+
 ### Planned no-mail contact fallback
 
 - Keep local `dev.email_preview` working without Resend. It is not a production fallback.

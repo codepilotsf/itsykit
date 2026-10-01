@@ -15,7 +15,7 @@ flea update-server --recover
 
 ## Rollback
 
-Rollback republishes earlier code as a new release while preserving current owner
+Rollback republishes earlier code as a new release while preserving current admin
 snips, multisnips, photos and theme. It moves all of this site's aliases together;
 other sites, HTTPS policy and redirects stay unchanged. It asks for confirmation
 and refuses if the active release changed after review. Incompatible old templates
@@ -33,7 +33,7 @@ Backup downloads a verified, bounded snapshot of the active site's code, public
 configuration, live snips, multisnips, photos and theme under the deployment lock.
 It refuses existing output files and creates new files with private permissions.
 Keep backups outside the website directory and copy them to separate storage.
-Backups can contain owner addresses and content; handle them as private data.
+Backups can contain admin addresses and content; handle them as private data.
 
 Credentials, certificates, deployment settings and sessions are excluded. A backup
 is not a whole-server disaster-recovery image. Record server/email setup separately.

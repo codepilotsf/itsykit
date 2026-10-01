@@ -52,7 +52,7 @@ page keeps its own minimal styles so it works without site assets.
 
 Run `flea reset` from a site folder to return to the clean default. It asks before
 replacing **all local files and settings except `.git`**, including uploads,
-custom pages, `.env`, owner access, theme changes and deployment destinations.
+custom pages, `.env`, admin access, theme changes and deployment destinations.
 Stop `flea dev` first. Git history is retained, but reset does not create a commit.
 
 Old files are moved to a private `.flea-reset-backup-*` folder beside the site;
@@ -63,12 +63,12 @@ printed backup before trying again; some original files may still be in the site
 
 ## Develop locally
 
-On first startup in a terminal, Flea asks for the site name and an optional owner
-email. Press Enter to skip the owner. New sites enable `dev.email_preview` in
+On first startup in a terminal, Flea asks for the site name and an optional admin
+email. Press Enter to skip the admin. New sites enable `dev.email_preview` in
 `.flea.config.json`: sign-in and contact emails open in your browser instead of
 being sent. No Resend setup is needed. The preview shows the sender, recipient,
 subject, date/time and actual message, including a usable sign-in code.
-Automated runs never prompt. Use `flea admin` to add an owner later.
+Automated runs never prompt. Use `flea admin` to add an admin later.
 
 Set `"dev": {"email_preview": false}` and restart dev to test real delivery;
 configure it explicitly with `flea email`. Production always uses real delivery
@@ -231,7 +231,7 @@ to server logs. Local dev instead shows the diagnostic page described below.
 
 Page navigation uses native CSS view transitions: a 240 ms crossfade between
 same-origin pages. A single direct-child `<main>` fades independently of the
-header and owner bar; other layouts get a whole-page fade. Reduced-motion settings
+header and admin bar; other layouts get a whole-page fade. Reduced-motion settings
 disable the effect. Browsers without cross-document transitions navigate normally.
 The starter links `css/navigation.css` directly in the layout head, before the
 general stylesheet. A small native-CSS opt-in in each layout head makes it
@@ -350,7 +350,7 @@ Images and videos use the same authoring attribute, outside text snips:
 Dev imports these local files and replaces their source/alt/poster values with
 bindings such as `src="{snip ID.src}"`. The generated typed JSON entry is the
 source of truth. Classes, dimensions and playback attributes stay in the template.
-With Editing on, owners click the media, then Save or Cancel with the page.
+With Editing on, admins click the media, then Save or Cancel with the page.
 JPEG/PNG images and optimized H.264 MP4 videos are supported. Nested snips,
 srcset/picture combinations and competing video source elements are rejected.
 See [images](docs/photos.md) and [videos](docs/videos.md) for details.
@@ -406,7 +406,7 @@ the recovery record without preserving its content.
 
 Developer-managed structured JSON belongs in `flea/data/*.json`, available as
 `{data.team.members}` and in `{#each data.team.members as member}` loops. It is
-deployed with code, not treated as owner-editable rich content. Legacy
+deployed with code, not treated as admin-editable rich content. Legacy
 `flea/snips/*.json` remains supported; new sites no longer generate that directory.
 
 ### Site settings
@@ -425,7 +425,7 @@ structure described above; no old filename or directory fallback is supported.
 }
 ```
 
-Other fields within `app` are available to templates. `admin.emails` controls owner
+Other fields within `app` are available to templates. `admin.emails` controls admin
 access as described below. Other unknown top-level settings are ignored; redirects
 and deploy settings have no effect here. JSON comments and trailing commas are errors.
 Rich snips live in `flea/snips.json`; structured data lives in `flea/data/*.json`.
@@ -441,7 +441,7 @@ without writing or prompting. Set and commit a nonempty name before deployment.
 There is no `site.*` alias or old-configuration fallback.
 Legacy named snips in `flea/snips/*.json` remain supported but are not browser-editable.
 
-## Owner editing
+## Admin editing
 
 Repeatable, page-local content is documented in [Multisnips](docs/multisnips.md).
 For developer-editable sign-in/contact messages and offline previews, see
@@ -449,7 +449,7 @@ For developer-editable sign-in/contact messages and offline previews, see
 
 ### Theme editing
 
-Every approved owner can choose **Theme**, beside Editing in the topbar. A right-hand
+Every approved admin can choose **Theme**, beside Editing in the topbar. A right-hand
 panel groups the existing variables in `css/theme.css`: colors, typography,
 sizes, spacing, layout, forms, corners, borders, and shadows. Controls share the
 topbar's sizing and interaction styles, independently of the website theme.
@@ -482,7 +482,7 @@ or Node installation is needed. Info buttons explain settings, and only one Them
 section opens at a time.
 Unsupported CSS values remain developer-managed rather than being rewritten.
 
-Sign in at `/admin`, then browse your site normally. Choose Edit in the owner
+Sign in at `/admin`, then browse your site normally. Choose Edit in the admin
 bar to change the current page. Page details edits its title and description,
 including pages with no editable text. There is no sidebar or page dropdown.
 
@@ -507,7 +507,7 @@ browsers to omit their origin and fail the exact-origin security check.
 From your site's folder, run `flea admin` and enter an email, or provide it directly:
 
 ```sh
-flea admin owner@example.com
+flea admin admin@example.com
 ```
 
 This creates or appends to `admin.emails` in `.flea.config.json`, preserves other
@@ -521,24 +521,24 @@ the dev watcher; commit and deploy to update the live site. You can also edit JS
 {
   "app": {"site_name": "My site"},
   "admin": {
-    "emails": ["owner@example.com", "editor@example.com"],
+    "emails": ["admin@example.com", "editor@example.com"],
     "session_idle_days": 30
   }
 }
 ```
 
 The starter has an empty list. Local `/admin` shows instructions for adding the
-first owner; production admin access stays disabled until you configure it.
+first admin; production admin access stays disabled until you configure it.
 There is no registration, password, or user-management screen. All listed addresses
 have the same editing access. Up to 20 unique addresses are supported; matching is
 case-insensitive. Only the developer can change the list.
 
-To view or remove owners, edit `admin.emails` in `.flea.config.json`. Dev reloads the
-list automatically. Removed owners lose access; other owners stay signed in.
+To view or remove admins, edit `admin.emails` in `.flea.config.json`. Dev reloads the
+list automatically. Removed admins lose access; other admins stay signed in.
 Access or email-setting changes clear pending codes, not valid sessions.
 Commit and deploy for the live site.
 
-After login, Flea returns you to the homepage with an owner bar. Choose **Edit**
+After login, Flea returns you to the homepage with an admin bar. Choose **Edit**
 to change the page's existing `snip` regions. Prose containers support
 H1–H4, bold, italic, underline, strikethrough, links, lists, and left/center/right
 alignment; individual headings and paragraphs support inline marks and links,
@@ -552,7 +552,7 @@ The link dialog edits the current URL, offers Remove link and a new-tab switch,
 and defaults bare domains to HTTPS. There are no undo/redo toolbar buttons.
 The old dashboard and its save route have been removed; `/admin` is for sign-in.
 
-Visitors receive no editing bar or owner markers. Signed-in pages disable site
+Visitors receive no editing bar or editing markers. Signed-in pages disable site
 JavaScript and automatic dev reload to protect the session and avoid losing
 unsaved edits. Reload manually after developer changes. Site layouts are not
 rewritten; fixed-position headers and unusual layouts still need browser checks.
@@ -562,7 +562,7 @@ Reusable toggle styling is in `css/ui.css`: use a native checkbox with
 need no JavaScript.
 
 After deploying, share your site's URL with `/admin` added, along with the email
-address you approved. Flea does not send invitations. Owners do not create a
+address you approved. Flea does not send invitations. Admins do not create a
 separate account: they enter that email and request a sign-in code. If no email
 arrives, they should check spam and ask you to check access and delivery settings.
 
@@ -578,7 +578,7 @@ response but no email. Forwarded IP/TLS headers are not trusted.
 
 ### Staying signed in
 
-`admin.session_idle_days` controls how long an owner stays signed in without
+`admin.session_idle_days` controls how long an admin stays signed in without
 activity. The default is **30 days** (omitted or zero); set 1–365 days. Opening an
 admin page or submitting an authenticated form renews that browser's session.
 Typing, clicking, and scrolling also renew it, at most once a minute. An idle or
@@ -592,7 +592,7 @@ Flea manages one private JSON file per site:
 - Production: `/var/lib/flea/sites/<site>/flea/runtime/sessions.json`, outside releases
 
 These are independent local and live sessions, not files to copy between environments.
-The file contains hashed session tokens, owner addresses, host binding, CSRF values,
+The file contains hashed session tokens, admin addresses, host binding, CSRF values,
 and activity/expiration timestamps. Raw login tokens stay in browser cookies.
 Flea creates it on first sign-in with owner-only permissions, locks updates, and
 saves atomically. Expired or revoked entries are removed during use/startup.
@@ -604,8 +604,8 @@ The starter ignores `/flea/runtime/sessions.json` and `/flea/runtime/.sessions-*
 rules exist and refuses already tracked session files. Do not commit, edit, or
 copy session state. To sign everyone out, stop the server and delete only that
 site's `flea/runtime/sessions.json`, then start it again. Logout removes just the current
-browser's session. Removing an owner revokes their sessions. `flea status` shows
-the local session path when owners are configured.
+browser's session. Removing an admin revokes their sessions. `flea status` shows
+the local session path when admins are configured.
 
 The production service can write the site's private `flea/` directory, not its
 release directory or configuration. Deployment protocol 22 requires the updated
@@ -710,7 +710,7 @@ lines, single/double quotes, and full-line comments, with no variable expansion
 or shell execution. Double-quoted escapes use JSON/Go string syntax. Only the
 mail settings are consumed; this does not export arbitrary variables to commands.
 Never place keys in `.flea.config.json` or commit them. No restart is needed for
-owner access or sign-in email changes. Contact forms still need a dev restart.
+admin access or sign-in email changes. Contact forms still need a dev restart.
 Authentication still requires an emailed code.
 
 To rotate server credentials, edit `/etc/flea/mail.env` as root, keeping the
@@ -738,7 +738,7 @@ Editable email templates live in `mailers/`, including `main.layout.html` and
 HTML/plain-text versions of sign-in and contact messages. They are private,
 watched during dev, and included in deployment. See [email templates](docs/email-templates.md).
 
-Add `"contact": { "to": "owner@example.com" }` alongside `app` in
+Add `"contact": { "to": "admin@example.com" }` alongside `app` in
 `.flea.config.json`, then put this in a page template:
 
 ```html
@@ -951,8 +951,8 @@ If both copies changed differently, the CLI shows the conflict and asks whether
 to keep live, use local, or cancel. The first pull also asks when differing copies
 have no shared baseline. There is no default winner; noninteractive conflicts fail.
 All choices are collected before publishing. Live state is rechecked under the
-deployment lock before activation; concurrent owner edits stop a stale plan.
-Pull again after publishing to refresh your baseline and local owner content.
+deployment lock before activation; concurrent admin edits stop a stale plan.
+Pull again after publishing to refresh your baseline and local admin content.
 
 Pull validates before writing and advances its baseline last. If a disk write
 fails, it reports any partial local update; review the files before retrying.
@@ -1242,7 +1242,7 @@ Setup verifies systemd activity and HTTP readiness before reporting success.
 Before changing the server, the installer checks TCP and UDP ports 80 and 443
 on IPv4 and IPv6. It refuses occupied ports unless every listener is verified as
 the existing FleaCMS systemd main process during a confirmed reinstall. Unknown
-owners or failed port checks also stop installation; other services are never stopped.
+admins or failed port checks also stop installation; other services are never stopped.
 
 Setup connects as root; enter just the hostname or IP. When the server binary
 and configuration already exist, it warns that all sites will go offline and
@@ -1371,7 +1371,7 @@ The executable smoke test builds the binary, creates a fresh starter, runs statu
 
 Developers designate editable images/videos with a bare `snip` attribute. Dev
 imports local seeds and writes typed JSON entries, generating src/alt/poster
-bindings while preserving layout attributes. Owners click the media in Edit mode
+bindings while preserving layout attributes. Admins click the media in Edit mode
 and use the page's Save/Cancel. There are no Photos/Videos topbar modes.
 Nested media/text snips and competing srcset/picture/source markup are errors.
 Video requires H.264 plus optional AAC-LC, fast start,
@@ -1397,7 +1397,7 @@ image/video snips. Rollback, site backups/restoration and executable-only server
 are supported; see [recovery](docs/recovery.md). Release pruning, remote logs/status
 commands, general-purpose forms, general field schemas, per-edit revision history
 and adaptive video streaming remain deferred. Deployment briefly restarts the service
-and preserves remote owner content. Developer-managed images may remain in `images/`.
+and preserves remote admin content. Developer-managed images may remain in `images/`.
 Unrestricted raw HTML is unsupported. Real Ubuntu installation, live Resend
 delivery and live CA verification remain pending; automated tests use fake email
 delivery and local HTTP/TLS. This is not a production security certification.

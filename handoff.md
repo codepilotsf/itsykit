@@ -113,7 +113,7 @@ than silently building the finished website inside the framework again.
   `flea reset` confirms before resetting local files, preserving Git and a private
   sibling recovery copy. It never resets a live site.
 - Local email preview is enabled for new sites. Dev prompts for site name and
-  optional owner email, not Resend. Production delivery requires configuration.
+  optional admin email, not Resend. Production delivery requires configuration.
 - Owners sign in by email code, then edit on-page. Edit defaults on and persists
   per tab. Page Save/Cancel are in the formatting bar; Theme has its own Save/X.
 - Text, photos, supported MP4 video, collection editing/reordering and theme

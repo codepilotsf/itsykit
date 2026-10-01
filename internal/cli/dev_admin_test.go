@@ -48,7 +48,7 @@ func TestDevAdminReloadsAccessAndMail(t *testing.T) {
 			t.Fatalf("want %q: %s", want, w.Body.String())
 		}
 	}
-	get("Add the first site owner")
+	get("Add the first admin")
 	if _, _, err := site.AddAdmin(root, "owner@example.com"); err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func TestDevAdminReloadsAccessAndMail(t *testing.T) {
 	if err := public.Reload(root); err != nil {
 		t.Fatal(err)
 	}
-	get("Add the first site owner")
+	get("Add the first admin")
 }
 
 type previewInbox chan mailer.Message

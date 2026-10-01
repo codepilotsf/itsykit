@@ -2,11 +2,16 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"syscall"
 )
+
+// ErrBusy reports that another process already holds this lock. Callers that
+// know what the lock protects can replace it with more specific guidance.
+var ErrBusy = errors.New("Content or deployment is busy. Please try again shortly.")
 
 func Lock(name string) (func(), error) {
 	root, err := os.OpenRoot(filepath.Dir(name))
@@ -35,7 +40,7 @@ func LockRoot(root *os.Root, name string) (func(), error) {
 	}
 	if err := syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
 		f.Close()
-		return nil, fmt.Errorf("Content or deployment is busy. Please try again shortly.")
+		return nil, ErrBusy
 	}
 	return func() { _ = syscall.Flock(int(f.Fd()), syscall.LOCK_UN); _ = f.Close() }, nil
 }

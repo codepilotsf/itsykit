@@ -1,5 +1,5 @@
 class Flea < Formula
-  desc "Plain HTML websites with inline owner editing"
+  desc "Plain HTML websites with inline admin editing"
   homepage "https://fleacms.com"
   version "@VERSION@"
 

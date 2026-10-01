@@ -50,7 +50,7 @@ func TestFirstOwnerSetupIsLocalOnly(t *testing.T) {
 		h := testEditor(t, Options{Name: "New site", Local: local})
 		w := request(h, "GET", "/admin", "localhost", nil)
 		if local {
-			if w.Code != 503 || !strings.Contains(w.Body.String(), "flea admin owner@example.com") || strings.Contains(w.Body.String(), "restart flea dev") {
+			if w.Code != 503 || !strings.Contains(w.Body.String(), "flea admin admin@example.com") || strings.Contains(w.Body.String(), "restart flea dev") {
 				t.Fatal(w.Code, w.Body.String())
 			}
 			w = request(h, "GET", "/admin", "external.test", nil)

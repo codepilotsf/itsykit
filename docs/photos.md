@@ -1,7 +1,7 @@
 # Photos
 
 Developers designate editable images with a bare `snip` attribute. Signed-in
-owners leave **Editing** on, then click an image to replace its JPEG/PNG or change its
+admins leave **Editing** on, then click an image to replace its JPEG/PNG or change its
 alternative text. **Done** previews the draft; the topbar **Save changes** saves
 it with the page. **Cancel** restores the original. There is no Photos topbar mode.
 Images stay separate from rich text; uploads are public website assets, not private

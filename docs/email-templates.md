@@ -22,8 +22,8 @@ contents; there is no old-path or built-in site-template fallback.
 
 New sites include `"dev": {"email_preview": true}` in `.flea.config.json`.
 While `flea dev` runs, sign-in and contact emails open as browser previews instead
-of being sent. First-run dev asks for the site name and optional owner email,
-never Resend credentials. Approved owners still use the normal code sign-in flow;
+of being sent. First-run dev asks for the site name and optional admin email,
+never Resend credentials. Approved admins still use the normal code sign-in flow;
 copy the real code from the preview. Contact forms still require `contact.to`.
 
 The email window shows subject, sender name/address, recipient, optional Reply-To,

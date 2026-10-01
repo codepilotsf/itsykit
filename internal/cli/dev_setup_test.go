@@ -10,37 +10,24 @@ import (
 	"testing"
 )
 
-func TestDevOwnerSetup(t *testing.T) {
+func TestDevOnboardingFirstRun(t *testing.T) {
+	t.Setenv("RESEND_API_KEY", "")
+	t.Setenv("FLEA_EMAIL_FROM", "")
 	for _, tc := range []struct {
-		name, input                                string
-		interactive, owner, mail, changed, wantErr bool
+		name                 string
+		input                string
+		interactive          bool
+		wantChanged, wantOff bool
+		wantErr              bool
 	}{
-		{name: "new", input: "owner@example.com\ny\n", interactive: true, changed: true},
-		{name: "skip owner", input: "\n", interactive: true},
-		{name: "skip mail", input: "owner@example.com\n\n", interactive: true, changed: true},
+		{name: "add admin", input: "My Site\nowner@example.com\n", interactive: true, wantChanged: true, wantOff: true},
+		{name: "skip admin", input: "\n\n", interactive: true, wantChanged: true, wantOff: true},
+		{name: "invalid admin", input: "My Site\nbad\n", interactive: true, wantOff: true, wantErr: true},
 		{name: "noninteractive"},
-		{name: "configured", interactive: true, owner: true, mail: true},
-		{name: "owner only", input: "\n", interactive: true, owner: true},
-		{name: "mail only", input: "owner@example.com\n", interactive: true, mail: true, changed: true},
-		{name: "invalid owner", input: "bad\n", interactive: true, wantErr: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			t.Setenv("RESEND_API_KEY", "")
-			t.Setenv("FLEA_EMAIL_FROM", "")
-			if tc.mail {
-				t.Setenv("RESEND_API_KEY", "re_test12345678")
-				t.Setenv("FLEA_EMAIL_FROM", "hello@example.com")
-			}
 			root := filepath.Join(t.TempDir(), "sample")
 			if err := Create(root); err != nil {
-				t.Fatal(err)
-			}
-			if tc.owner {
-				if _, _, err := site.AddAdmin(root, "owner@example.com"); err != nil {
-					t.Fatal(err)
-				}
-			}
-			if err := site.SetSiteName(root, "Sample"); err != nil {
 				t.Fatal(err)
 			}
 			p, err := site.Load(root)
@@ -49,29 +36,66 @@ func TestDevOwnerSetup(t *testing.T) {
 			}
 			before, _ := os.ReadFile(filepath.Join(root, ".flea.config.json"))
 			var out bytes.Buffer
-			changed, err := prepareDevOwner(context.Background(), p, strings.NewReader(tc.input), &out, tc.interactive)
-			if (err != nil) != tc.wantErr || changed != tc.changed {
-				t.Fatal(changed, err, out.String())
+			changed, offered, err := prepareDevOwner(context.Background(), p, strings.NewReader(tc.input), &out, tc.interactive)
+			if (err != nil) != tc.wantErr || changed != tc.wantChanged || offered != tc.wantOff {
+				t.Fatalf("changed=%v offered=%v err=%v out=%q", changed, offered, err, out.String())
 			}
 			if strings.Contains(out.String(), "Resend") || strings.Contains(out.String(), "Sender") {
-				t.Fatal("unexpected email prompt", out.String())
+				t.Fatalf("unexpected email prompt: %q", out.String())
+			}
+			if !tc.interactive {
+				if out.Len() != 0 {
+					t.Fatalf("noninteractive prompted: %q", out.String())
+				}
+				return
+			}
+			if tc.wantErr {
+				return
 			}
 			after, _ := os.ReadFile(filepath.Join(root, ".flea.config.json"))
-			if !tc.changed && !bytes.Equal(before, after) {
+			if !bytes.Equal(before, after) && !tc.wantChanged {
 				t.Fatal("unexpected config write")
 			}
-			if tc.changed {
-				loaded, err := site.Load(root)
-				if err != nil || len(loaded.Admin.Emails) != 1 {
-					t.Fatal("owner missing", err)
-				}
+			loaded, err := site.Load(root)
+			if err != nil {
+				t.Fatal(err)
 			}
-			if !tc.interactive || tc.owner && tc.mail {
-				if out.Len() != 0 {
-					t.Fatal("unexpected prompts", out.String())
-				}
+			if !loaded.SiteNameConfigured {
+				t.Fatal("site name not saved on the first run")
+			}
+			if tc.name == "add admin" && len(loaded.Admin.Emails) != 1 {
+				t.Fatalf("admin not saved: %v", loaded.Admin.Emails)
 			}
 		})
+	}
+}
+
+// The skip guidance appears once and later runs never prompt again.
+func TestDevOnboardingDoesNotRepeat(t *testing.T) {
+	root := filepath.Join(t.TempDir(), "sample")
+	if err := Create(root); err != nil {
+		t.Fatal(err)
+	}
+	p, err := site.Load(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out bytes.Buffer
+	changed, offered, err := prepareDevOwner(context.Background(), p, strings.NewReader("\n\n"), &out, true)
+	if err != nil || !changed || !offered {
+		t.Fatalf("first run: changed=%v offered=%v err=%v out=%q", changed, offered, err, out.String())
+	}
+	if !strings.Contains(out.String(), "Add an admin") || !strings.Contains(out.String(), "flea admin") {
+		t.Fatalf("skip guidance missing: %q", out.String())
+	}
+	p, err = site.Load(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out.Reset()
+	changed, offered, err = prepareDevOwner(context.Background(), p, strings.NewReader(""), &out, true)
+	if err != nil || changed || offered || out.Len() != 0 {
+		t.Fatalf("second run: changed=%v offered=%v err=%v out=%q", changed, offered, err, out.String())
 	}
 }
 
@@ -89,8 +113,6 @@ func TestDevNonTerminal(t *testing.T) {
 func TestFirstDevSiteName(t *testing.T) {
 	for _, answer := range []string{"", "My Custom Name"} {
 		t.Run(answer, func(t *testing.T) {
-			t.Setenv("RESEND_API_KEY", "re_test12345678")
-			t.Setenv("FLEA_EMAIL_FROM", "hello@example.com")
 			root := filepath.Join(t.TempDir(), "my-project")
 			if err := Create(root); err != nil {
 				t.Fatal(err)
@@ -103,12 +125,12 @@ func TestFirstDevSiteName(t *testing.T) {
 				t.Fatal(err)
 			}
 			var out bytes.Buffer
-			changed, err := prepareDevOwner(context.Background(), p, strings.NewReader(""), &out, false)
-			if err != nil || changed || out.Len() != 0 {
+			changed, offered, err := prepareDevOwner(context.Background(), p, strings.NewReader(""), &out, false)
+			if err != nil || changed || offered || out.Len() != 0 {
 				t.Fatal("noninteractive prompted", err)
 			}
-			changed, err = prepareDevOwner(context.Background(), p, strings.NewReader(answer+"\n"), &out, true)
-			if err != nil || !changed || !strings.Contains(out.String(), "Site name [My Project]:") {
+			changed, offered, err = prepareDevOwner(context.Background(), p, strings.NewReader(answer+"\n"), &out, true)
+			if err != nil || !changed || offered || !strings.Contains(out.String(), "Site name [My Project]:") {
 				t.Fatal(out.String(), err)
 			}
 			p, err = site.Load(root)
@@ -123,8 +145,8 @@ func TestFirstDevSiteName(t *testing.T) {
 				t.Fatal(p.App)
 			}
 			out.Reset()
-			changed, err = prepareDevOwner(context.Background(), p, strings.NewReader(""), &out, true)
-			if err != nil || changed || out.Len() != 0 {
+			changed, offered, err = prepareDevOwner(context.Background(), p, strings.NewReader(""), &out, true)
+			if err != nil || changed || offered || out.Len() != 0 {
 				t.Fatal("prompt repeated", err, out.String())
 			}
 		})
