@@ -1,6 +1,6 @@
 # FleaCMS
 
-Build pages with HTML, style them with CSS, and let site owners edit their own content. FleaCMS builds the server, and serves multiple sites with HTTPS directly.
+Build pages with HTML, style them with CSS, and let site admins edit their own content. FleaCMS builds the server, and serves multiple sites with HTTPS directly.
 
 ## Getting started
 
@@ -34,7 +34,7 @@ With the `flea` command installed, run this from your site folder:
 flea dev
 ```
 
-On the first run, enter your site name and an optional owner email. New sites
+On the first run, enter your site name and an optional admin email. New sites
 enable `dev.email_preview` in `.flea.config.json`: sign-in and contact emails
 open in your browser without sending or needing Resend credentials. The preview
 looks like an opened email, with sender, recipient, subject and date/time.
@@ -157,7 +157,7 @@ name here; commit it before deploying.
 
 ### Editable content
 
-Add a bare `snip` attribute to an element whose content owners should edit:
+Add a bare `snip` attribute to an element whose content admins should edit:
 
 ```html
 <section snip>
@@ -182,7 +182,7 @@ templates and content together before deployment.
 
 ### Repeated content with multisnips
 
-Use a multisnip for owner-managed lists such as team members:
+Use a multisnip for admin-managed lists such as team members:
 
 ```html
 <article multisnip="team">
@@ -219,7 +219,7 @@ containing a `members` array is available as `data.team.members`:
 ```
 
 Values are escaped. Conditions use dotted paths and also support `{:else}` and
-`{:else if app.email}`. Use multisnips when owners need to manage the list.
+`{:else if app.email}`. Use multisnips when admins need to manage the list.
 
 For negative conditions, use `{#unless app.email}...{/unless}`. It uses the
 inverse of if truthiness and supports `{:else}` and `{:else if dotted.path}`.
@@ -257,12 +257,12 @@ Quote attribute values. Classes, dimensions, stroke attributes, and `aria-` and
 Unavailable icons are omitted with terminal warnings. Invalid syntax or unsafe
 SVGs fail validation.
 
-### Owner sign-in and editing
+### Admin sign-in and editing
 
-Add an approved owner from your site folder:
+Add an approved admin from your site folder:
 
 ```sh
-flea admin owner@example.com
+flea admin admin@example.com
 ```
 
 The command adds the address to `admin.emails`. It starts local email setup only
@@ -270,22 +270,22 @@ when preview mode is off and delivery is unconfigured. Run `flea email`
 separately to configure Resend for real delivery. Local secrets
 go in a private, Git-ignored `.env` file.
 
-Owners visit `/admin`, receive an emailed code, and return to the site to edit.
+Admins visit `/admin`, receive an emailed code, and return to the site to edit.
 **Edit** enables text editing and Page details; **Save changes** publishes the
 draft, and **Cancel** discards it.
 
 Live sign-in requires HTTPS and email delivery. Commit and deploy access changes
-before sharing the live `/admin` link. An empty owner list disables live sign-in;
+before sharing the live `/admin` link. An empty admin list disables live sign-in;
 local dev shows setup guidance.
 
 Sessions survive browser closure, server restarts, and deployments. The default
 idle window is 30 days; set `admin.session_idle_days` to 1–365 to change it.
 Sign out revokes the current browser session. Remove an address from `admin.emails`
-to revoke that owner's access. Do not edit or copy runtime session files.
+to revoke that admin's access. Do not edit or copy runtime session files.
 
 ### Theme editing
 
-Owners choose **Theme** to adjust supported colors, fonts, and spacing. Changes
+Admins choose **Theme** to adjust supported colors, fonts, and spacing. Changes
 preview in their browser until saved; Cancel restores the original appearance.
 Google Font family names can load a preview; system fonts need no download.
 
@@ -297,17 +297,17 @@ Use the stylesheet itself for developer changes beyond those controls.
 Designate an editable image with `<img snip src="/images/team.jpg" alt="Our team">`.
 Dev imports the local JPEG/PNG and generates `src="{snip ID.src}"` and
 `alt="{snip ID.alt}"`. The typed entry in `flea/snips.json` owns those values;
-classes, layout and links stay in the template. Owners click the image in Edit
+classes, layout and links stay in the template. Admins click the image in Edit
 mode, then use the page Save/Cancel. Files live in `flea/media/`; commit processed
 photos and JSON as seeds. Images cannot be nested inside text snips.
 
-To add an owner-selectable photo to a multisnip, use a named image field:
+To add an admin-selectable photo to a multisnip, use a named image field:
 
 ```html
 <img snip="photo" src="/images/person.jpg" alt="Person">
 ```
 
-Owners click the item's photo to choose a library image or upload a JPEG/PNG.
+Admins click the item's photo to choose a library image or upload a JPEG/PNG.
 Done previews the choice; Save changes publishes new uploads to the library.
 Cancel discards the draft without uploading. Empty photos show a
 neutral portrait and an Add photo control during Edit. Normal deployment retains
@@ -319,7 +319,7 @@ live photos; `flea pull --snips-only` retrieves their metadata and files togethe
 Videos require optimized MP4 files with H.264 video, optional AAC-LC audio,
 and fast-start metadata. Files may be up to 25 MiB; Flea does not convert them.
 
-Dev generates src/poster snip bindings. Owners click the video in Edit mode to
+Dev generates src/poster snip bindings. Admins click the video in Edit mode to
 replace it or its poster, then Save changes or Cancel with the page. No separate
 Photos/Videos buttons. Metadata lives in `flea/snips.json`; MP4 files in
 `flea/media/` are Git-ignored.
@@ -405,7 +405,7 @@ Deployment ships committed source; unresolved working-tree changes block it.
 Each branch has its own destination. Use `flea deploy -configure` to change one.
 Email-enabled sites prompt for server-side Resend settings when needed.
 
-### Sync owner changes
+### Sync admin changes
 
 Normal deployment preserves live editable content and theme changes, seeding new
 IDs from your local site. To bring live edits back into your project, stop dev and
@@ -437,7 +437,7 @@ flea backup ../before-redesign.flea-backup
 ```
 
 Use `flea rollback --list` to see retained code releases. Rolling back code retains
-current owner content. `flea restore ../before-redesign.flea-backup` restores
+current admin content. `flea restore ../before-redesign.flea-backup` restores
 backed-up content too and requires confirmation. Backups exclude credentials and
 sessions.
 

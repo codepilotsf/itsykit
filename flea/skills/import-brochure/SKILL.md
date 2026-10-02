@@ -45,13 +45,13 @@ discard legal pages, accessibility text, downloads or form destinations.
   structure without dropping content; do not bypass extraction by inventing IDs.
 - Media stays separate from rich text. Rich regions support text formatting and
   links, not arbitrary scripts, embeds, images or video.
-  Mark owner-editable local JPEG/PNG images with `<img snip src="/images/team.jpg"
+  Mark admin-editable local JPEG/PNG images with `<img snip src="/images/team.jpg"
   alt="Our team">`; dev generates src/alt bindings to one typed JSON snip.
   An explicitly designated logo image can be editable without changing its link.
   Use `<video snip src="/videos/intro.mp4" controls></video>` only for a supplied
   optimized H.264 MP4. Poster images are JPEG/PNG. Keep media outside text snips;
   srcset, picture and competing source children are unsupported for media snips.
-  Preserve layout/playback attributes. Owners edit media in place using page
+  Preserve layout/playback attributes. Admins edit media in place using page
   Save/Cancel, not a separate library. Do not invent binding IDs or duplicate
   editable source/alt/poster values in template literals.
 - Use existing theme tokens, global typography and basic Prewind utilities.
@@ -67,7 +67,7 @@ discard legal pages, accessibility text, downloads or form destinations.
 Run one `flea dev` process to extract authoring regions, then `flea status`.
 Review rewritten templates and snips together. Confirm imported page count, all
 source items, headings, navigation, images, form behavior and private-path handling.
-Check rendered pages at narrow and desktop widths, keyboard navigation and owner
+Check rendered pages at narrow and desktop widths, keyboard navigation and admin
 editing where a test login is available. A successful status check alone is not
 visual verification. Stop and report anything that needs credentials or a product
 decision. Do not deploy, commit, publish, or overwrite live content unless requested.

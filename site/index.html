@@ -1,97 +1,347 @@
 <section class="hero container" aria-labelledby="hero-title">
   <div class="hero-grid items-center">
     <div class="hero-copy">
-      <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> A small CMS for plain HTML</p>
+      <p class="eyebrow">
+        <span class="status-dot" aria-hidden="true"></span> A complete website
+        system for developers
+      </p>
       <h1 id="hero-title">{snip a7Km2pQ9xB}</h1>
       <p class="hero-description">{snip b8Ln3rR0yC}</p>
       <div class="hero-actions flex flex-wrap items-center gap-md">
-        <a class="ui-button ui-brand-1" href="/docs#installation">Get started <span aria-hidden="true">↗</span></a>
-        <a class="quiet-link" href="#editing">See how it works <span aria-hidden="true">↓</span></a>
+        <a class="ui-button ui-brand-1" href="/docs#installation"
+          >Install Flea <span aria-hidden="true">↗</span></a
+        >
+        <a class="quiet-link" href="#system"
+          >See the whole system <span aria-hidden="true">↓</span></a
+        >
       </div>
-      <p class="hero-note">Your files. Your design. Your server.</p>
+      <p class="hero-note">
+        Single binary · No Go, Node or Python · Apple Silicon macOS &amp; x86-64
+        Linux
+      </p>
     </div>
-    <figure class="hero-demo m-0">
-      <div class="demo-heading flex items-center justify-between gap-sm">
-        <span class="inline-flex items-center gap-xs"><span class="status-dot" aria-hidden="true"></span> MADE WITH FLEA</span>
-        <span>Fern &amp; Field · Example site</span>
+    <figure class="hero-visual m-0">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="terminal-dot" aria-hidden="true"></span
+          ><span class="terminal-dot" aria-hidden="true"></span
+          ><span class="terminal-dot" aria-hidden="true"></span>
+          <span class="terminal-title"
+            >terminal — blank server to live site</span
+          >
+        </div>
+        <pre
+          class="terminal-body"
+        ><code><span class="t-comment"># install the CLI — no dependencies</span>
+<span class="t-prompt">$</span> curl -fsSL https://fleacms.com/install.sh | bash
+
+<span class="t-comment"># create a plain-HTML site</span>
+<span class="t-prompt">$</span> flea new my-site &amp;&amp; cd my-site
+
+<span class="t-comment"># build the server over SSH</span>
+<span class="t-prompt">$</span> flea setup
+
+<span class="t-comment"># publish with automatic HTTPS</span>
+<span class="t-prompt">$</span> flea deploy
+<span class="t-ok">✔ deployed · Let's Encrypt HTTPS enabled</span></code></pre>
       </div>
-      <a class="poster-link" href="/images/nursery-editor.jpg" aria-label="View the full-size Flea editor on the Fern and Field example site">
-        <img src="/images/nursery-editor.jpg" width="1100" height="740" alt="Flea's editor on Fern and Field, a fictional plant nursery website. A heading is being edited directly on the page, with formatting controls and Save above." fetchpriority="high" decoding="async">
-      </a>
-      <figcaption class="flex items-center justify-between gap-sm"><span>Editing a heading in FleaCMS.</span><a href="/images/nursery-editor.jpg">View full size <span aria-hidden="true">↗</span></a></figcaption>
+      <figcaption>
+        Flea prepares the server, then deploys the site you built on your
+        machine.
+      </figcaption>
     </figure>
   </div>
   <ul class="hero-facts flex flex-wrap items-center">
-    <li>Plain HTML &amp; CSS</li>
-    <li>No frontend build step</li>
+    <li>Installs in one line</li>
+    <li>Builds the server for you</li>
     <li>On-page editing for your clients</li>
   </ul>
 </section>
 
-<section class="feature-section container" id="editing" aria-labelledby="editing-title">
+<section class="system-section" id="system" aria-labelledby="system-title">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">THE WHOLE SYSTEM</p>
+      <h2 id="system-title">Not just a CMS.</h2>
+      <p class="section-intro">
+        Flea runs the whole trip: the binary on your machine, the server it
+        builds, the deploy, the certificates, and the editing your clients do
+        later.
+      </p>
+    </div>
+    <ul class="system-grid">
+      <li class="cap-card">
+        <span class="cap-icon" aria-hidden="true">{icon server}</span>
+        <h3>Builds your server</h3>
+        <p>
+          Point <code>flea setup</code> at a blank Ubuntu box over SSH. Flea
+          installs itself there and gets the host ready to serve. Nothing to
+          install by hand.
+        </p>
+      </li>
+      <li class="cap-card">
+        <span class="cap-icon" aria-hidden="true">{icon shield-check}</span>
+        <h3>HTTPS, handled</h3>
+        <p>
+          Flea requests and renews Let's Encrypt certificates, redirects
+          <code>www</code>, and serves every site over TLS.
+        </p>
+      </li>
+      <li class="cap-card">
+        <span class="cap-icon" aria-hidden="true">{icon rocket}</span>
+        <h3>Deploy over SSH</h3>
+        <p>
+          Publish a committed Git branch to your own server. One host can serve
+          as many sites as you need.
+        </p>
+      </li>
+      <li class="cap-card">
+        <span class="cap-icon" aria-hidden="true">{icon file-code}</span>
+        <h3>No build step</h3>
+        <p>
+          Plain HTML and CSS with JSON content. No bundler, no database, no Node
+          toolchain to keep alive.
+        </p>
+      </li>
+      <li class="cap-card">
+        <span class="cap-icon" aria-hidden="true">{icon terminal}</span>
+        <h3>A real dev server</h3>
+        <p>
+          Live reload, LAN testing, email previews and
+          <code>flea status</code> validation while you work.
+        </p>
+      </li>
+      <li class="cap-card">
+        <span class="cap-icon" aria-hidden="true">{icon history}</span>
+        <h3>Backups &amp; rollback</h3>
+        <p>
+          Download a complete backup, roll code back while keeping live content,
+          and recover deliberately.
+        </p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section
+  class="feature-section developer-section container"
+  aria-labelledby="dev-title"
+>
   <div class="feature-grid items-center">
     <div class="feature-copy">
-      <p class="eyebrow">THE OWNER’S SIDE</p>
-      <h2 id="editing-title">Their website.<br>Their words.</h2>
-      <p>Owners sign in, click the text they want to change, and save. Photos, videos and repeatable content live right on the page, too. You decide what they can edit.</p>
-      <ol class="edit-steps flex flex-wrap gap-md" aria-label="How editing works">
+      <p class="eyebrow">THE DEVELOPER'S SIDE</p>
+      <h2 id="dev-title">Your markup.<br />One attribute.</h2>
+      <p>
+        Add <code>snip</code> to any element. Flea moves the content into JSON,
+        connects it to the on-page editor, and leaves your classes, layout and
+        links untouched.
+      </p>
+      <p>
+        Repeatable lists use <code>multisnip</code>. Everything else stays
+        developer-managed JSON and plain files you keep in Git.
+      </p>
+      <a class="quiet-link" href="/docs#editable-content"
+        >Meet snips <span aria-hidden="true">↗</span></a
+      >
+    </div>
+    <div class="code-example">
+      <div class="code-label flex items-center justify-between">
+        <span>site/index.html</span><span>HTML</span>
+      </div>
+      <pre><code><span class="code-muted">&lt;section&gt;</span>
+  &lt;h1 <span class="code-accent">snip</span>&gt;A little greener.&lt;/h1&gt;
+  &lt;p <span class="code-accent">snip</span>&gt;
+    Find your next little growing thing.
+  &lt;/p&gt;
+<span class="code-muted">&lt;/section&gt;</span>
+
+&lt;article <span class="code-accent">multisnip</span>="team"&gt;
+  &lt;h2 <span class="code-accent">snip</span>="name"&gt;Sam Rivera&lt;/h2&gt;
+  &lt;img <span class="code-accent">snip</span>="photo" src="/images/sam.jpg" alt=""&gt;
+&lt;/article&gt;</code></pre>
+      <div class="code-note">
+        <span class="code-accent">snip</span> and
+        <span class="code-accent">multisnip</span> — editable without giving up
+        your HTML.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="agent-section" aria-labelledby="agent-title">
+  <div class="container">
+    <div class="agent-grid items-center">
+      <div class="agent-copy">
+        <p class="eyebrow">AI-FRIENDLY</p>
+        <h2 id="agent-title">Agents can build it with you.</h2>
+        <p>
+          Every Flea site ships portable instructions a coding agent
+          understands. Point Claude Code, Codex or another agent at the repo and
+          it can follow your conventions, import an existing site and keep
+          editable content intact.
+        </p>
+        <ul class="agent-list">
+          <li>
+            <span class="status-dot" aria-hidden="true"></span> Skill files
+            checked into Git beside your site
+          </li>
+          <li>
+            <span class="status-dot" aria-hidden="true"></span>
+            <code>AGENTS.md</code> guidance in every project
+          </li>
+          <li>
+            <span class="status-dot" aria-hidden="true"></span> No plugin,
+            account or special runtime required
+          </li>
+          <li>
+            <span class="status-dot" aria-hidden="true"></span> Plain HTML out,
+            so any agent can read it
+          </li>
+        </ul>
+      </div>
+      <div class="code-example">
+        <div class="code-label flex items-center justify-between">
+          <span>agent session</span><span>IMPORT A SITE</span>
+        </div>
+        <pre><code><span class="t-prompt">$</span> import https://acme.com into this site
+
+<span class="code-muted">reading</span> flea/skills/import-brochure/SKILL.md
+<span class="code-muted">fetching</span> pages, images and styles
+<span class="code-muted">rebuilding</span> layout with Prewind
+<span class="code-muted">marking</span> headings, copy and media as snips
+<span class="code-accent">ready</span> — run flea status, then commit</code></pre>
+        <div class="code-note">
+          The bundled import skill is plain Markdown. Bring your own agent.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section
+  class="feature-section container"
+  id="editing"
+  aria-labelledby="editing-title"
+>
+  <div class="feature-grid items-center">
+    <div class="feature-copy">
+      <p class="eyebrow">THE ADMIN'S SIDE</p>
+      <h2 id="editing-title">Their website.<br />Their words.</h2>
+      <p>
+        Admins sign in with an emailed code, click the text, photo or list they
+        want to change, and save. Text, media, repeatable collections and theme
+        controls all live on the page. You decide what they can touch.
+      </p>
+      <ol
+        class="edit-steps flex flex-wrap gap-md"
+        aria-label="How editing works"
+      >
         <li><span>1</span> Click</li>
         <li><span>2</span> Edit</li>
         <li><span>3</span> Save</li>
       </ol>
     </div>
     <figure class="edit-detail m-0">
-      <div class="detail-label flex items-center justify-between gap-sm"><span>EDITABLE TEXT</span><span>On the page</span></div>
-      <img src="/images/nursery-edit-detail.jpg" width="512" height="266" alt="Close-up of the nursery heading being edited inside its green editable outline." loading="lazy" decoding="async">
-      <figcaption>The green outline marks what you can edit.</figcaption>
+      <div class="detail-label flex items-center justify-between gap-sm">
+        <span>EDITING ON THE PAGE</span><span>Fern &amp; Field · example</span>
+      </div>
+      <img
+        src="/images/nursery-editor.jpg"
+        width="1100"
+        height="740"
+        alt="Flea's editor on Fern and Field, a fictional plant nursery website. A heading is being edited directly on the page, with formatting controls and Save above."
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption>The green outline marks what the admin can edit.</figcaption>
     </figure>
-  </div>
-</section>
-
-<section class="feature-section developer-section container" aria-labelledby="html-title">
-  <div class="feature-grid items-center">
-    <div class="feature-copy">
-      <p class="eyebrow">THE DEVELOPER’S SIDE</p>
-      <h2 id="html-title">One attribute.<br>Editable content.</h2>
-      <p>Add <code>snip</code> to your HTML. Flea moves the content into JSON and connects it to the page editor.</p>
-      <p>Your markup, classes and layout stay in your hands.</p>
-      <a class="quiet-link" href="/docs#editable-content">Meet snips <span aria-hidden="true">↗</span></a>
-    </div>
-    <div class="code-example">
-      <div class="code-label flex items-center justify-between"><span>site/index.html</span><span>HTML</span></div>
-      <pre><code><span class="code-muted">&lt;section&gt;</span>
-  &lt;h1 <span class="code-accent">snip</span>&gt;A little greener.&lt;/h1&gt;
-  &lt;p <span class="code-accent">snip</span>&gt;
-    Find your next little growing thing.
-  &lt;/p&gt;
-<span class="code-muted">&lt;/section&gt;</span></code></pre>
-      <div class="code-note"><span class="code-accent">snip</span> is all it takes to make it editable.</div>
-    </div>
   </div>
 </section>
 
 <section class="workflow-section" aria-labelledby="workflow-title">
   <div class="container">
-    <div class="workflow-heading flex flex-wrap items-end justify-between gap-md">
-      <div><p class="eyebrow">FROM FOLDER TO WEBSITE</p><h2 id="workflow-title">A short trip to live.</h2><p class="section-intro">Build locally. Keep your work in Git. Publish to your own server.</p></div>
-      <a class="quiet-link" href="/docs#quickstart">Read the quickstart <span aria-hidden="true">↗</span></a>
+    <div
+      class="workflow-heading flex flex-wrap items-end justify-between gap-md"
+    >
+      <div>
+        <p class="eyebrow">START TO FINISH</p>
+        <h2 id="workflow-title">Five commands to live.</h2>
+        <p class="section-intro">
+          Build locally. Let Flea prepare the server. Publish when you are
+          ready.
+        </p>
+      </div>
+      <a class="quiet-link" href="/docs#quickstart"
+        >Read the quickstart <span aria-hidden="true">↗</span></a
+      >
     </div>
     <ol class="workflow">
-      <li><span class="step-number">01</span><h3>Make a site</h3><p>A clean folder with HTML, CSS and JSON. Start with your own design.</p><pre><code>flea new my-site
-cd my-site</code></pre></li>
-      <li><span class="step-number">02</span><h3>Make it yours</h3><p>Edit your files and see changes in the browser. No frontend build step.</p><pre><code>flea dev</code></pre></li>
-      <li><span class="step-number">03</span><h3>Put it online</h3><p>Publish committed files over SSH. One Flea server can host multiple sites.</p><pre><code>flea deploy</code></pre></li>
+      <li>
+        <span class="step-number">01</span>
+        <h3>Install the CLI</h3>
+        <p>One line. No Go, Node or Python to install first.</p>
+        <div class="copy-code"><pre><code>curl -fsSL https://fleacms.com/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
+      </li>
+      <li>
+        <span class="step-number">02</span>
+        <h3>Start a site</h3>
+        <p>A clean folder of HTML, CSS and JSON. Your design, no build step.</p>
+        <pre><code>flea new my-site
+cd my-site</code></pre>
+      </li>
+      <li>
+        <span class="step-number">03</span>
+        <h3>Build locally</h3>
+        <p>Live reload, editable content and validation while you work.</p>
+        <pre><code>flea dev</code></pre>
+      </li>
+      <li>
+        <span class="step-number">04</span>
+        <h3>Prepare the server</h3>
+        <p>Flea installs itself on a blank Ubuntu host over SSH.</p>
+        <pre><code>flea setup</code></pre>
+      </li>
+      <li>
+        <span class="step-number">05</span>
+        <h3>Publish</h3>
+        <p>Ship the branch and enable HTTPS. One host, many sites.</p>
+        <pre><code>flea deploy</code></pre>
+      </li>
     </ol>
     <div class="install-command items-center">
-      <div><h3>Try Flea 0.5.0</h3><p>Apple Silicon Mac &amp; x86-64 Linux</p></div>
-      <div><pre><code>curl -fsSL https://fleacms.com/install.sh | bash</code></pre><a href="/docs#installation">Installation notes <span aria-hidden="true">↗</span></a></div>
+      <div>
+        <h3>Try Flea 0.6.0</h3>
+        <p>Apple Silicon Mac &amp; x86-64 Linux · no dependencies</p>
+      </div>
+      <div>
+        <div class="copy-code"><pre><code>curl -fsSL https://fleacms.com/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
+        <a href="/docs#installation"
+          >Installation notes <span aria-hidden="true">↗</span></a
+        >
+      </div>
     </div>
   </div>
 </section>
 
 <section class="closing container" aria-labelledby="closing-title">
   <div class="closing-grid items-center">
-    <h2 id="closing-title">Keep the site small.<br><span class="hero-green">Keep the possibilities open.</span></h2>
-    <div><p>For brochure sites, local businesses and the people who keep them current. Bring your HTML and CSS. Flea handles the editing and serving.</p><a class="ui-button ui-brand-1" href="/docs">Explore the docs <span aria-hidden="true">↗</span></a><p class="release-note">0.5.0 is available to try. We’d like your feedback.</p></div>
+    <h2 id="closing-title">
+      Bring your HTML.<br /><span class="hero-green"
+        >Flea brings the server.</span
+      >
+    </h2>
+    <div>
+      <p>
+        For developers who want to own the whole stack, and clients who just
+        want to edit the page. One binary, your own server, and content you can
+        back up and take with you.
+      </p>
+      <a class="ui-button ui-brand-1" href="/docs"
+        >Explore the docs <span aria-hidden="true">↗</span></a
+      >
+      <p class="release-note">
+        0.6.0 is available to try. We’d like your feedback.
+      </p>
+    </div>
   </div>
 </section>

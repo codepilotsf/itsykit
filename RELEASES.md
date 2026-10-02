@@ -14,6 +14,26 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.6.0 preparation, October 1, 2026
+
+Framework commit `04c9b3f`, tag `v0.6.0`. User-facing copy now says "admin"; the first `flea dev`
+explains the optional admin email, points to `flea admin` when skipped, and asks
+only once; the site-in-use message for `dev`, `pull` and `reset` is clearer.
+
+The framework passed tests, race checks, vet, Chrome sign-in/editing regressions,
+bundled build and fresh clean/starter site validation on Apple Silicon macOS.
+The Mac CLI is ad-hoc signed, not notarized. The Linux AMD64 CLI is cross-compiled
+with `CGO_ENABLED=0`; native Linux verification for these 0.6.0 bytes remains pending.
+Both CLIs embed the rebuilt 0.6.0 Linux servers. Release candidates belong under
+`site/releases/0.6.0/`, with SHA256SUMS. The local `site/releases/latest.txt`
+and current website copy target `0.6.0`, as requested. They are not deployed.
+
+Pending: native Linux build/verification, review and commit the website changes,
+publish versioned artifacts, verify both public HTTPS downloads and installation/
+update behavior, then publish the prepared latest.txt and installation copy together.
+Superseded candidates are preserved in the ignored release-work directory, outside
+the public tree. Their earlier checks do not verify the rebuilt 0.6.0 artifacts.
+
 ## 0.5.0 published September 29, 2026
 
 Private framework commit `0994c1f`, immutable tag `v0.5.0`. Adds full opt-in LAN

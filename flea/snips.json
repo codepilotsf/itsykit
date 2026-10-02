@@ -1,18 +1,22 @@
 {
   "pages": {
     "/": {
-      "title": "Plain HTML. Editable content.",
-      "description": "A small CMS for developers who build with plain files, and people who want to update their own website.",
+      "title": "The whole website system for developers",
+      "description": "FleaCMS is a dependency-free website system: one command installs it, prepares your Ubuntu server, deploys plain HTML over SSH and serves it with automatic HTTPS.",
       "snips": {
-        "a7Km2pQ9xB": {"content": "Write the HTML.<br><span class=\"hero-green\">Let your clients edit.</span>"},
-        "b8Ln3rR0yC": {"content": "A small CMS for plain HTML websites. You control the design. Your clients update the words, photos, and videos."}
+        "a7Km2pQ9xB": {
+          "content": "Write plain HTML.<br><span class=\"hero-green\">Flea builds the server.</span>"
+        },
+        "b8Ln3rR0yC": {
+          "content": "A dependency-free website system for developers: one binary that installs in a line, builds your Ubuntu server, deploys over SSH and serves automatic HTTPS. Your clients edit the page."
+        }
       }
     },
     "/docs": {
       "title": "Documentation",
-      "description": "Learn FleaCMS: create a site, make HTML editable, publish over SSH, and keep your content backed up.",
+      "description": "Learn FleaCMS: install a single binary, build with plain HTML, prepare an Ubuntu server, deploy over SSH with HTTPS, and hand editing to admins and agents.",
       "snips": {}
     }
   },
-  "shared": {"snips": {}}
+  "shared": { "snips": {} }
 }

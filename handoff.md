@@ -1,8 +1,13 @@
 # fleacms.com website handoff
 
-Updated September 29, 2026.
+Updated October 1, 2026.
 
-## Current state after website deployment
+The next release is 0.6.0, from framework commit `04c9b3f` and tag `v0.6.0`.
+All current release copy, download links and the local `latest.txt` target 0.6.0.
+These changes are not deployed. Publish and verify the versioned artifacts before
+publishing the prepared pointer and website copy. See RELEASES.md for remaining checks.
+
+## Historical state after the September 29 website deployment
 
 Version 0.5.0 is published. Framework commit `0994c1f` and tag
 `v0.5.0` are pushed. Both native downloads matched their public HTTPS checksums
