@@ -23,14 +23,26 @@ only once; the site-in-use message for `dev`, `pull` and `reset` is clearer.
 The framework passed tests, race checks, vet, Chrome sign-in/editing regressions,
 bundled build and fresh clean/starter site validation on Apple Silicon macOS.
 The Mac CLI is ad-hoc signed, not notarized. The Linux AMD64 CLI is cross-compiled
-with `CGO_ENABLED=0`; native Linux verification for these 0.6.0 bytes remains pending.
+with `CGO_ENABLED=0`; the actual public download passed version and site validation
+on native x86-64 Linux as UID 65534. Site creation also passed with identical staged
+bytes. This was not a native Linux build or a full Linux test-suite run.
 Both CLIs embed the rebuilt 0.6.0 Linux servers. Release candidates belong under
 `site/releases/0.6.0/`, with SHA256SUMS. The local `site/releases/latest.txt`
-and current website copy target `0.6.0`, as requested. They are not deployed.
+and current website copy target `0.6.0`, as requested. The final website/channel
+deployment is pending; the versioned downloads are public and checksum-verified.
 
-Pending: native Linux build/verification, review and commit the website changes,
-publish versioned artifacts, verify both public HTTPS downloads and installation/
-update behavior, then publish the prepared latest.txt and installation copy together.
+The shared server was updated from 0.2.0 to 0.6.0 with site data/configuration
+preserved. Download-only release `20261002-003522-5f12907cc538fdfc0ef629ed` is active.
+Both public binaries match SHA256SUMS; the downloaded Mac binary runs and passes
+ad-hoc signature verification. The final website commit is `b00ba05`, pushed to main.
+
+The 1 GB host exhausted memory during activation. Moving the completed upload
+from RAM-backed `/tmp` to `/var/tmp/flea-deploy.cqbA28hiz3` let the download-only
+deployment finish. The final website activation then lost its deployment process
+to the OOM killer. The prior site remains healthy and latest.txt remains 0.5.0.
+A persistent Go memory target requires Sean's approval; no host setting changed.
+Pending: resolve activation memory use, deploy website/content/update pointer,
+then verify fresh public installs and updates on both required platforms.
 Superseded candidates are preserved in the ignored release-work directory, outside
 the public tree. Their earlier checks do not verify the rebuilt 0.6.0 artifacts.
 
