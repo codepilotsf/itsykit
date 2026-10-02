@@ -67,9 +67,9 @@ Generated sites use `site/` for public templates/assets, `mailers/` for private
 email templates, `flea/` for content/data/media/icons/skills, and
 `.flea.config.json` for configuration. Runtime state is private in
 `flea/runtime/`. Globals use `app.*`; there is no `site.*` alias.
-Generated-site guidance lives in `templates/AGENTS.md` and
-`templates/flea/skills/import-brochure/SKILL.md`; keep it consistent with
-starter syntax, committed, and excluded from serving/deployment.
+Generated-site guidance lives in `templates/AGENTS.md` and the bundled skills in
+`templates/flea/skills/` (`import-brochure` and `fleacms-site`); keep it consistent
+with starter syntax, committed, and excluded from serving/deployment.
 
 New sites enable `dev.email_preview`. Only `flea dev` opens actual outgoing mail
 in private browser previews; production ignores this setting. Keep the first-run

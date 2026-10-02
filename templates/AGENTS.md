@@ -46,12 +46,18 @@ srcset/picture/source elements for a media snip. Local JPEG/PNG and optimized
 H.264 MP4 seeds are imported by dev. Do not invent IDs. Admins click media in
 Edit mode and use the same page Save/Cancel. No Photos/Videos library buttons.
 
-## Available skill
+## Available skills
 
 - **import-brochure**: import an existing small brochure website into this site,
   preserving its content and navigation with basic Prewind styling. Read
   `flea/skills/import-brochure/SKILL.md` when doing that work. This is a portable
   instruction file, not an automatically installed agent plugin.
+
+- **fleacms-site**: build or redesign a site in this repo, especially for one real
+  local business. Decide the site's job, research the real vibe and assets before
+  asking, invent nothing, derive logos from the actual signage as SVG (no bitmaps),
+  and follow the safe editing + dev/verify workflow. Read
+  `flea/skills/fleacms-site/SKILL.md`.
 
 Agent guidance stays in Git, but is excluded from public serving and deployment.
 Do not put credentials in guidance or templates. Ask before adding dependencies,

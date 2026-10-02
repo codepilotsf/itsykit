@@ -190,6 +190,7 @@ my-site/
       sessions.json
     skills/
       import-brochure/SKILL.md
+      fleacms-site/SKILL.md
     data/
       team.json
     icons/

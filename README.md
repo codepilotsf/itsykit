@@ -1386,8 +1386,8 @@ Video requires H.264 plus optional AAC-LC, fast start,
 are Git-ignored and transferred separately during deployment/pull. See
 [videos](docs/videos.md) for storage, validation, fresh-clone recovery and limits.
 
-New sites include AGENTS.md and a portable brochure-import skill at
-`flea/skills/import-brochure/SKILL.md`. These are developer instructions, not a
+New sites include AGENTS.md and portable skills in `flea/skills/`
+(`import-brochure` and `fleacms-site`). These are developer instructions, not a
 runtime dependency or an automatically installed agent integration. They are
 excluded from serving and deployment.
 

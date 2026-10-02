@@ -38,7 +38,7 @@ func TestSessionsAreNeverRuntimeContent(t *testing.T) {
 }
 
 func TestAgentGuidanceIsNotRuntimeContent(t *testing.T) {
-	for _, name := range []string{"AGENTS.md", "checklist.md", "flea/skills", "flea/skills/import-brochure/SKILL.md"} {
+	for _, name := range []string{"AGENTS.md", "checklist.md", "flea/skills", "flea/skills/import-brochure/SKILL.md", "flea/skills/fleacms-site/SKILL.md"} {
 		if Included(name) {
 			t.Fatalf("agent guidance included in runtime: %s", name)
 		}

@@ -1,5 +1,8 @@
 # Publishing FleaCMS
 
+For the manual public release workflow, SemVer rules, low-memory host safeguards
+and recovery steps, follow the [deployment runbook](docs/deployment-runbook.md).
+
 ## V1 distribution plan
 
 The agreed plan is in [next-steps.md](next-steps.md). Source remains private;

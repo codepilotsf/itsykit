@@ -4,6 +4,10 @@ Implementation requirements linked from [AGENTS.md](../../AGENTS.md).
 Read this when the task touches this subsystem. Paths in prose and code are
 relative to the repository root unless stated otherwise.
 
+For the recorded public-release procedure and constrained production host settings,
+read the [deployment runbook](../deployment-runbook.md). Recheck live state and
+obtain authorization before applying host changes or publishing.
+
 ## Recovery
 
 `flea update` changes only the local CLI and bundled servers using bounded HTTPS

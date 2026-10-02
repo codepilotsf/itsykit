@@ -1,4 +1,103 @@
-# fleacms.com website handoff
+# FleaCMS agent handoff
+
+Current handoff recorded October 1, 2026, after release 0.6.1.
+Start here. The older website-design brief below is preserved as history, not
+an instruction to rebuild, relocate or publish the website again.
+
+## Instructions for the next agent
+
+1. Read [AGENTS.md](AGENTS.md), the complete
+   [deployment runbook](docs/deployment-runbook.md), including its handoff notes,
+   and [next-steps.md](next-steps.md). Consult [checklist.md](checklist.md) for
+   manual acceptance evidence and preserve Sean's answers.
+2. Inspect Git status before changing anything. Preserve modified and untracked
+   work. Do not reset, bulk-stage or commit without current permission.
+3. Ask Sean what to work on next unless his new request already specifies it.
+   Pending ideas below are not authorization to implement them.
+4. Do not deploy, publish, push tags or change host settings without current
+   approval. The completed release's authorization is not standing permission.
+5. Use one agent. Keep updates brief and natural, without emojis or em dashes.
+
+## Where things live
+
+- Framework: `/Users/sean/Projects/flea`, branch `main`.
+- Actual public website: `/Users/sean/fleacms-website`, branch `main`. Read its
+  AGENTS.md before editing. Its RELEASES.md and handoff.md contain release evidence.
+- Production: `root@fleacms.com`, shared service for fleacms.com and
+  bookworm.fleacms.com. Preserve both sites' live editable content and theme.
+- The framework's `website/` directory is not the deployed website repository.
+  The historical proposed `/Users/sean/Projects/fleacms.com` path below is obsolete.
+
+## Last verified state
+
+FleaCMS 0.6.1 was deployed and verified: server executable, public website,
+versioned Mac ARM64/Linux AMD64 binaries, stable update channel and Sean's local
+CLI agreed. Public fresh installs and updates from 0.6.0 passed on both platforms,
+with Linux checks run unprivileged and installed hashes matching the manifest.
+Both hosted sites and the social-preview image returned HTTP 200. Recovery was
+complete. This records the last checks, not a guarantee of current live state.
+
+- Release source: framework `89e3472`, immutable tag `v0.6.1`.
+- Deployed website source: `1857a45`.
+- Website activation: `20261002-015019-3e6152722de7e84b956d7054`.
+- Pushed release-record commits: framework `f33db2e`, website `90ab9ac`.
+- Full native Linux build/test coverage, independent clean-machine Mac acceptance
+  and notarization remain open. Do not describe this test release as completed V1 QA.
+
+Version 0.6.1 adds graceful replacement of a same-site dev server, including LAN
+and port changes. Pull/reset remain exclusive. An already-running older binary
+may need one manual stop; never bypass the lock or kill unrelated work.
+The website also has social-preview metadata and a public preview image.
+
+## Low-memory host: read before deploying
+
+The approximately 1 GB production host ran out of memory during upgrade and
+activation, not compilation. The approved safeguards are:
+
+- `GOMEMLIMIT=320MiB` in the service's `60-memory.conf` systemd override.
+- The same target applied separately to remote deploy/upgrade/recovery processes
+  through the scoped SSH wrapper documented in the runbook. Local environment
+  settings and the service override alone do not cover those processes.
+- A 1 GB `/swapfile`, mode 0600, active and persisted in `/etc/fstab`.
+
+Recheck RAM, swap, pending journals and running admin processes before starting.
+Never overlap operations, delete journals to bypass recovery, prune old releases,
+or assume a soft memory target is a hard ceiling. `/tmp` is RAM-backed on the host.
+Use the runbook's full build, SemVer, staging, recovery and verification procedure.
+
+## Pending work and local changes
+
+At this handoff, the framework has uncommitted documentation changes:
+
+- This HANDOFF.md update.
+- New `docs/deployment-runbook.md`, with the full release procedure and additional
+  handoff notes, plus links in RELEASING.md and docs/agents/deployment.md.
+- A separate next-steps.md planning item for a terminal LAN QR code. No QR feature
+  has been implemented; automatic versus opt-in behavior remains undecided.
+
+Preserve all of these. Check actual Git status because this list can become stale.
+Documentation updates after the release have not been committed or deployed.
+
+Other potential follow-ups are reducing asset-loading memory, disk-backed upload
+staging, replacing the operator SSH wrapper with a supported configuration, and
+finishing release acceptance checks. None is an instruction to start that work.
+
+Sean's proposed Linux ARM build machine, `buzz` (last found at 192.168.4.31), is
+not an established runner. SSH failed for Sean and the agent. The reported 24 GB
+RAM and ARM architecture were not verified through login. No source was copied
+or software installed. Sean chose to leave it aside; do not resume SSH repairs
+without a request. The runbook records the diagnostic details.
+
+Before handing off again, record what changed, exact checks, unresolved limits,
+running processes, Git state and any operations still pending. Do not assume an
+interrupted agent turn stopped its local or remote processes.
+
+## Historical website-design brief (superseded where noted above)
+
+The remainder is the September 29 brief, retained for design context. Statements
+that the website does not exist or has not been published are no longer current.
+
+### Original brief: fleacms.com website handoff
 
 Updated September 29, 2026.
 

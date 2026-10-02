@@ -4,6 +4,16 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.6.2 - 2026-10-01
+
+- New sites bundle a second agent skill, `fleacms-site`: build or redesign a
+  site for one real local business. It covers deciding the site's job,
+  research-first vibe discovery, real photos and SVG logos taken from the
+  actual signage, content truth rules, genre-driven design, and a safe
+  editing plus dev/verify workflow.
+- List both bundled skills (`import-brochure` and `fleacms-site`) in the
+  generated AGENTS.md and README.
+
 ## 0.6.1 - 2026-10-01
 
 - Starting `flea dev` again gracefully replaces the same site's existing dev

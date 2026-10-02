@@ -377,14 +377,18 @@ CSRF meta tag, and the `{render /admin/toolbar}` include with the toolbar's
 version/revision fields. These connect your layout to the editor. The server
 supplies the signed-in identity; never configure `app.current_admin` yourself.
 
-### Agent-assisted imports
+### Agent-assisted work
 
-To import an existing brochure site, give your coding agent the source URL or
-export and `flea/skills/import-brochure/SKILL.md`. The bundled instructions cover
-content, navigation, basic Prewind styling, and editable snips.
+Two portable skills ship in `flea/skills/` for coding agents:
 
-`AGENTS.md` points to this skill. Both stay in Git but are excluded from serving
-and deployment; no particular agent plugin is required.
+- **import-brochure**: import an existing brochure site, preserving its content
+  and navigation with basic Prewind styling.
+- **fleacms-site**: build or redesign a site, especially for one real local
+  business, doing the research and capturing the real vibe and assets first.
+
+Point your agent at the relevant `SKILL.md`. `AGENTS.md` links to both. They stay
+in Git but are excluded from serving and deployment; no particular agent plugin is
+required.
 
 ## Deployment
 

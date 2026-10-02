@@ -235,6 +235,16 @@ they appear in this roadmap.
 
 ## Details to resolve when their stage starts
 
+### Planned LAN QR code
+
+- [ ] Print a terminal QR code for the LAN URL so a phone can open the dev site
+  without typing its address. The phone must be on the same reachable network.
+- Decide whether it appears automatically with `flea dev --lan` / `-l` or requires
+  an explicit `--qr` option; handle multiple network addresses sensibly.
+- Encode only the site URL, never credentials or a sign-in bypass. Preserve the
+  existing LAN Host/peer gate and admin authentication. Keep the plain URL visible.
+- This is planned work, not implemented or scheduled for a release.
+
 ### Planned Markdown support
 
 - [ ] Support `.md` pages out of the box, using the same layouts, routing,
