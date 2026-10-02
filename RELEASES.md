@@ -14,6 +14,19 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.6.1 preparation, October 1, 2026
+
+Framework commit `89e3472`, immutable tag `v0.6.1`. Starting dev again replaces
+the same site's server gracefully, including LAN and port changes. Pull/reset
+remain exclusive, and crash recovery removes only stale control sockets.
+
+Mac tests, vet, race checks, bundled builds and replacement checks passed. The
+cross-compiled Linux AMD64 artifact passed native unprivileged checks for site
+creation/status, same-port dev replacement, LAN mode and crash recovery. A full
+native Linux build/test run and clean-machine Mac/notarization remain unverified.
+Both CLIs embed both rebuilt Linux servers. Artifacts live under
+`site/releases/0.6.1/`; publication and final public installer checks are underway.
+
 ## 0.6.0 published October 1, 2026
 
 Framework commit `04c9b3f`, tag `v0.6.0`. User-facing copy now says "admin"; the first `flea dev`

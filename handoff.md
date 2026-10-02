@@ -2,12 +2,13 @@
 
 Updated October 1, 2026.
 
-Version 0.6.0 is published, from framework commit `04c9b3f` and tag `v0.6.0`.
-The website, download links, update channel and shared server all use 0.6.0.
-Active website release: `20261002-004416-449f529af3c1cafa5f4d8c7f`, from commit
-`3ebad34`. Public Mac/Linux installs and updates from 0.5.0 passed with matching
-checksums. Sean approved `GOMEMLIMIT=320MiB` in the service's `60-memory.conf`
-override after activation exhausted the 1 GB host's memory. See RELEASES.md.
+Version 0.6.1 is being published from framework commit `89e3472` and tag `v0.6.1`.
+Current website copy and download links target 0.6.1. It adds automatic graceful
+dev replacement, including LAN/port changes, without interrupting pull/reset.
+Both release binaries passed replacement/crash checks on their native platforms.
+Sean approved `GOMEMLIMIT=320MiB` in the service's `60-memory.conf` override;
+also apply that target to the separate deployment process. See RELEASES.md for
+the active release and final publication evidence.
 
 Social preview update: commit `200edf7`, deployed as
 `20261002-005223-ea8f62a137bd69e5998efc78`. The layout has page-specific canonical,

@@ -56,7 +56,9 @@ and restart dev. Production ignores preview mode and always needs real email
 configuration. Restart dev after changing preview mode or its sender details.
 
 Open [http://localhost:3000](http://localhost:3000). Leave the server running while
-you work; saved changes reload the browser. Run one dev process per site.
+you work; saved changes reload the browser. Running dev again gracefully replaces
+the same site's existing dev server, including LAN mode and port changes.
+Pull/reset remain protected. Stop dev processes started with older binaries once.
 
 Use `flea dev --lan` (or `-l`) to test the full site from another device on a
 trusted private IPv4 network. Open a printed Network URL. Email previews open

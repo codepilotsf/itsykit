@@ -7,6 +7,9 @@ partial drives desktop links and the native mobile popover. `flea reset` replace
 all local files/settings except Git history after confirmation and keeps a private
 sibling backup. Never run it as an incidental cleanup step or deploy automatically.
 
+Starting dev again replaces this site's existing dev server;
+pull/reset remain exclusive. Stop previews you start before handing control back
+unless the user asks to leave them running.
 New sites enable dev.email_preview in .flea.config.json. Local sign-in/contact
 mail opens in the browser without Resend credentials. Preview mode and sender
 details require a dev restart after changes; production ignores the toggle.
