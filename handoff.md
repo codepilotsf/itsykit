@@ -9,6 +9,16 @@ Active website release: `20261002-004416-449f529af3c1cafa5f4d8c7f`, from commit
 checksums. Sean approved `GOMEMLIMIT=320MiB` in the service's `60-memory.conf`
 override after activation exhausted the 1 GB host's memory. See RELEASES.md.
 
+Social preview update: commit `200edf7`, deployed as
+`20261002-005223-ea8f62a137bd69e5998efc78`. The layout has page-specific canonical,
+Open Graph and large-image card metadata; `site/images/social-preview.png` is
+the shared card, with editable HTML artwork under `design/`.
+This activation also required `GOMEMLIMIT=320MiB` on the separate remote
+`flea-server -deploy` process. The service override alone does not constrain that
+process. The one-time environment setting preserved ordinary SSH checks and
+made no additional persistent host changes. Consider this for future deployments
+while the site serves several retained binary releases from memory.
+
 ## Historical state after the September 29 website deployment
 
 Version 0.5.0 is published. Framework commit `0994c1f` and tag
