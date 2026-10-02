@@ -553,8 +553,8 @@ and defaults bare domains to HTTPS. There are no undo/redo toolbar buttons.
 The old dashboard and its save route have been removed; `/admin` is for sign-in.
 
 Visitors receive no editing bar or editing markers. Signed-in pages disable site
-JavaScript and automatic dev reload to protect the session and avoid losing
-unsaved edits. Reload manually after developer changes. Site layouts are not
+JavaScript. During dev, clean pages reload after source changes; unsaved edits,
+active saves and open dialogs defer reload to protect drafts. Site layouts are not
 rewritten; fixed-position headers and unusual layouts still need browser checks.
 
 Reusable toggle styling is in `css/ui.css`: use a native checkbox with
@@ -1242,7 +1242,7 @@ Setup verifies systemd activity and HTTP readiness before reporting success.
 Before changing the server, the installer checks TCP and UDP ports 80 and 443
 on IPv4 and IPv6. It refuses occupied ports unless every listener is verified as
 the existing FleaCMS systemd main process during a confirmed reinstall. Unknown
-admins or failed port checks also stop installation; other services are never stopped.
+process owners or failed port checks also stop installation; other services are never stopped.
 
 Setup connects as root; enter just the hostname or IP. When the server binary
 and configuration already exist, it warns that all sites will go offline and

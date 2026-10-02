@@ -6,6 +6,23 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](CHANGELOG.md)
 for completed changes, and [README.md](README.md) for current usage.
 
+## Current release blockers (October 1, 2026)
+
+- Sean confirmed 0.6.0 as the next release. The framework HEAD and tag match;
+  rebuilt candidates and checksums are staged in the separate website checkout
+  at `/Users/sean/fleacms-website/site/releases/0.6.0/`. Its installation links
+  and update pointer now target 0.6.0, as requested. Superseded candidates are
+  preserved outside the public tree; unrelated website changes remain intact.
+- Verify matching release artifacts on the required platforms, publish immutable
+  versioned downloads and verify public checksums before publishing the prepared
+  update pointer and website copy.
+  The local 0.6.0 tests, race suite, vet, Chrome sign-in/editing checks, bundled
+  build and clean/starter site status checks passed. These do not establish
+  native Linux or live server acceptance for 0.6.0.
+- The older sprint notes below predate the published website and 0.5.0 downloads.
+  Use the separate website's RELEASES.md for recorded publication evidence;
+  do not treat the earlier "hosting pending" notes as current release status.
+
 ## Agreed scope
 
 - Keep the existing CMS feature set. Focus on defects, usability, documentation,
@@ -230,8 +247,7 @@ they appear in this roadmap.
   Preserve contextual escaping, rich-content sanitization and source formatting.
 - Verify conditions, loops, partials, inline HTML and snips together, including
   dev reloads and repeated owner saves. Choose a parser only after reviewing these
-  requirements. This is planned work, not part of the current save-fix patch;
-  release placement remains to be decided.
+  requirements. This is planned work, not yet scheduled for a release.
 
 ### Planned no-mail contact fallback
 

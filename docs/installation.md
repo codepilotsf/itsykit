@@ -1,7 +1,8 @@
 # Installation and updates
 
-Version 0.6.0 is a public test release for Apple Silicon macOS and
-x86-64 Linux. Install it with:
+Version 0.6.0 is the current test release for Apple Silicon macOS and x86-64
+Linux. Its binaries and website update are prepared locally; publication and
+public download verification remain pending. Once published, install it with:
 
 ```sh
 curl -fsSL https://fleacms.com/install.sh | bash
@@ -14,7 +15,7 @@ the profile. `FLEA_INSTALL_DIR` may specify another absolute user-owned director
 Required V1 platforms are Apple Silicon macOS and x86-64 Linux. Other platforms
 must pass native verification before being included in published metadata.
 
-The actual public installer passed installation, reinstall, PATH, new-site,
+The 0.5.0 public installer passed installation, reinstall, PATH, new-site,
 status, dev HTTP and update checks in isolated directories on an existing Mac
 and an existing Ubuntu host. Linux installation ran unprivileged. These are not
 clean-OS tests. The Mac executable is ad-hoc signed, not notarized; independent
