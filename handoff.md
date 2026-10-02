@@ -2,10 +2,12 @@
 
 Updated October 1, 2026.
 
-The next release is 0.6.0, from framework commit `04c9b3f` and tag `v0.6.0`.
-All current release copy, download links and the local `latest.txt` target 0.6.0.
-These changes are not deployed. Publish and verify the versioned artifacts before
-publishing the prepared pointer and website copy. See RELEASES.md for remaining checks.
+Version 0.6.0 is published, from framework commit `04c9b3f` and tag `v0.6.0`.
+The website, download links, update channel and shared server all use 0.6.0.
+Active website release: `20261002-004416-449f529af3c1cafa5f4d8c7f`, from commit
+`3ebad34`. Public Mac/Linux installs and updates from 0.5.0 passed with matching
+checksums. Sean approved `GOMEMLIMIT=320MiB` in the service's `60-memory.conf`
+override after activation exhausted the 1 GB host's memory. See RELEASES.md.
 
 ## Historical state after the September 29 website deployment
 
