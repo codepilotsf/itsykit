@@ -6,19 +6,16 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](CHANGELOG.md)
 for completed changes, and [README.md](README.md) for current usage.
 
-## Current release blockers (October 1, 2026)
+## Current release status (October 1, 2026)
 
-- Sean confirmed 0.6.0 as the next release. The framework HEAD and tag match;
-  rebuilt candidates and checksums are staged in the separate website checkout
-  at `/Users/sean/fleacms-website/site/releases/0.6.0/`. Its installation links
-  and update pointer now target 0.6.0, as requested. Superseded candidates are
-  preserved outside the public tree; unrelated website changes remain intact.
-- Verify matching release artifacts on the required platforms, publish immutable
-  versioned downloads and verify public checksums before publishing the prepared
-  update pointer and website copy.
-  The local 0.6.0 tests, race suite, vet, Chrome sign-in/editing checks, bundled
-  build and clean/starter site status checks passed. These do not establish
-  native Linux or live server acceptance for 0.6.0.
+- Version 0.6.0 is published: website, download links, update channel and shared
+  server executable agree. Public Mac/Linux checksums, fresh installs and updates
+  from 0.5.0 passed, with Linux checks running unprivileged. The local tests, race
+  suite, vet, Chrome checks, bundled build and fresh-site validation also passed.
+- The 1 GB host needed Sean's approved `GOMEMLIMIT=320MiB` service override to
+  complete activation. Preserve this setting during future maintenance. Native
+  Linux full-suite/build verification, clean-machine Mac acceptance and
+  notarization remain open; this is still a test release.
 - The older sprint notes below predate the published website and 0.5.0 downloads.
   Use the separate website's RELEASES.md for recorded publication evidence;
   do not treat the earlier "hosting pending" notes as current release status.
