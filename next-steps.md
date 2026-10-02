@@ -8,12 +8,14 @@ for completed changes, and [README.md](README.md) for current usage.
 
 ## Current release status (October 1, 2026)
 
-- Version 0.6.0 is published: website, download links, update channel and shared
+- Version 0.6.1 is published: website, download links, update channel and shared
   server executable agree. Public Mac/Linux checksums, fresh installs and updates
-  from 0.5.0 passed, with Linux checks running unprivileged. The local tests, race
-  suite, vet, Chrome checks, bundled build and fresh-site validation also passed.
+  from 0.6.0 passed, with Linux checks running unprivileged. The local tests, race
+  suite, vet, bundled build and native dev replacement/crash checks also passed.
 - The 1 GB host needed Sean's approved `GOMEMLIMIT=320MiB` service override to
-  complete activation. Preserve this setting during future maintenance. Native
+  complete activation. The 0.6.1 upgrade additionally needed an approved 1 GB
+  swap file, persisted in /etc/fstab. Apply the memory target to separate upgrade
+  and deployment processes too. Preserve these settings during maintenance. Native
   Linux full-suite/build verification, clean-machine Mac acceptance and
   notarization remain open; this is still a test release.
 - The older sprint notes below predate the published website and 0.5.0 downloads.

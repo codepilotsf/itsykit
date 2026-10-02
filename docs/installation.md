@@ -15,7 +15,7 @@ the profile. `FLEA_INSTALL_DIR` may specify another absolute user-owned director
 Required V1 platforms are Apple Silicon macOS and x86-64 Linux. Other platforms
 must pass native verification before being included in published metadata.
 
-The 0.6.0 public installer passed fresh installation and updates from 0.5.0 on
+The 0.6.1 public installer passed fresh installation and updates from 0.6.0 on
 an existing Mac and Ubuntu host, with installed checksums matching the published
 artifacts. Linux checks ran unprivileged. Site creation and validation also passed.
 These are not
