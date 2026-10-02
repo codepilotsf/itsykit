@@ -70,6 +70,12 @@ being sent. No Resend setup is needed. The preview shows the sender, recipient,
 subject, date/time and actual message, including a usable sign-in code.
 Automated runs never prompt. Use `flea admin` to add an admin later.
 
+Running `flea dev` again gracefully replaces this site's existing dev server,
+including when switching to `--lan` / `-l` or changing ports. The new command
+waits for the old server to stop before opening the site. Pull and reset still
+block dev while they work. Dev servers started with an older binary need to be
+stopped in their terminal once before using automatic replacement.
+
 Set `"dev": {"email_preview": false}` and restart dev to test real delivery;
 configure it explicitly with `flea email`. Production always uses real delivery
 and ignores this toggle. See [email previews](docs/email-templates.md) for details.
@@ -395,8 +401,9 @@ removal restores archived content by ID. Existing referenced content and page
 metadata are preserved. Dev prints `Snips updated in flea/snips.json.` when it writes
 changes. Missing IDs and malformed regions are reported in the terminal.
 
-Local writes are coordinated in memory, with no lock file. Run only one dev
-process per project. Stop older dev processes before updating.
+Local content writes are coordinated in memory. A separate OS lock prevents dev,
+pull and reset from writing concurrently. Starting dev again gracefully stops
+the previous dev server before taking that lock; a crash releases it automatically.
 Server-side deployment/content locks are unchanged.
 A `flea/runtime/.snips-pending.json` recovery record saves the content and
 before/after templates before any replacement. Dev resumes interrupted writes;

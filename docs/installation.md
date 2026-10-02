@@ -1,6 +1,6 @@
 # Installation and updates
 
-Version 0.6.0 is the current test release for Apple Silicon macOS and x86-64
+Version 0.6.1 is the current test release for Apple Silicon macOS and x86-64
 Linux. Its binaries, website and update channel are published and verified.
 Install it with:
 

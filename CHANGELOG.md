@@ -4,6 +4,14 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.6.1 - 2026-10-01
+
+- Starting `flea dev` again gracefully replaces the same site's existing dev
+  server, including LAN/port changes. Pull/reset remain protected, and crashed
+  dev instances do not leave a blocking control socket.
+- Preserve the underlying error when an OS lock fails for a reason other than
+  contention, rather than incorrectly reporting another running command.
+
 ## 0.6.0 - 2026-10-01
 
 - Clarify the message shown when `flea dev`, `pull` or `reset` finds the site

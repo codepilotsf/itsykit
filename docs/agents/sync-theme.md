@@ -71,6 +71,9 @@ escape, declaration, selector, and unsupported-function injection. No raw CSS
 editor. The font-import writer generates only fixed-host Google Fonts URLs from
 validated family names; it never accepts arbitrary stylesheet URLs.
 
-Dev and pull share a nonblocking per-project OS lock in the system temporary
+Dev, pull and reset share a nonblocking per-project OS lock in the system temporary
 directory. Stop dev before pulling; OS lock release on exit handles crashes.
+A new dev invocation may request graceful shutdown from another dev instance
+through its private Unix socket, then wait for this lock. It never interrupts
+pull/reset or bypasses their exclusion. See the runtime guide for control ownership.
 This is separate from the in-process content mutex and remote deploy.lock.

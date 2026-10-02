@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -464,7 +465,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			fmt.Fprint(errOut, usage)
 			return 2
 		}
-		unlock, err := site.LockDevelopment(".")
+		ctx, unlock, err := beginDevelopment(ctx, ".", out)
 		if err != nil {
 			return fail(err)
 		}
@@ -602,6 +603,11 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		case <-ctx.Done():
 			shutdownCtx, stop := context.WithTimeout(context.Background(), 5*time.Second)
 			defer stop()
+			if errors.Is(context.Cause(ctx), errDevReplaced) {
+				// Do not release the site lock while an old request could still
+				// be saving content. The replacement caller has its own timeout.
+				shutdownCtx = context.Background()
+			}
 			if err := server.Shutdown(shutdownCtx); err != nil {
 				server.Close()
 			}

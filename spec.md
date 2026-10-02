@@ -397,8 +397,11 @@ Storage groups entries by route, with shared regions for layouts/partials:
 
 Extraction is dev-only, journaled and serialized. Content is persisted before
 rewriting templates; interrupted work resumes or stops on conflicting edits.
-Local serialization is in-process only, with no lock file; run one dev process
-per project. Every relevant save extracts additions, reindexes labels/routes,
+Local content serialization is in-process. A separate OS lock excludes concurrent
+dev, pull and reset commands. A new dev invocation asks only the same user's dev
+server for that site to shut down through a private Unix socket, then waits for
+the lock before loading or writing. Pull/reset are never interrupted. Every
+relevant save extracts additions, reindexes labels/routes,
 archives removals and restores reintroduced IDs. Existing content and metadata
 are retained. Markers use {snip ID} without quotes; quoted forms are rejected.
 HTML comments do not render snips. IDs contain only ASCII letters and digits.

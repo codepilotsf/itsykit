@@ -40,7 +40,10 @@ func LockRoot(root *os.Root, name string) (func(), error) {
 	}
 	if err := syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
 		f.Close()
-		return nil, ErrBusy
+		if errors.Is(err, syscall.EWOULDBLOCK) || errors.Is(err, syscall.EAGAIN) {
+			return nil, ErrBusy
+		}
+		return nil, fmt.Errorf("acquire file lock: %w", err)
 	}
 	return func() { _ = syscall.Flock(int(f.Fd()), syscall.LOCK_UN); _ = f.Close() }, nil
 }

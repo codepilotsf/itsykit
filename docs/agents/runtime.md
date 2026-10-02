@@ -23,6 +23,14 @@ Fingerprint only at startup or after events to suppress self-generated writes.
 On overflow rescan; on watcher failure stop dev with an error. No polling fallback.
 Browser reload polling is separate and unchanged. Preserve invalid-edit recovery.
 Dev admin pages also receive the revision reload script; production admin pages never do.
+Starting dev again gracefully replaces the same user's dev server for the same
+canonical site root, then applies the new flags. `internal/cli/dev_control.go`
+uses an owner-checked mode-0700 directory under /tmp and a per-site Unix socket;
+there is no HTTP shutdown endpoint or PID-based killing. Hold the existing
+dev/pull/reset lock through shutdown, watcher completion and socket cleanup.
+Never interrupt pull/reset, delete their locks, or proceed if shutdown times out.
+Stale sockets may be removed only after acquiring the site lock; reject other
+file types. Older binaries without this endpoint must be stopped manually once.
 The dev server defaults to loopback and prints localhost URLs with the actual bound
 port. `--lan`/`-l` binds IPv4 interfaces and prints detected RFC1918 addresses.
 The outer devaccess middleware validates exact listener Host/port and actual
