@@ -5,7 +5,7 @@
       "description": "FleaCMS is a dependency-free website system: one command installs it, prepares your Ubuntu server, deploys plain HTML over SSH and serves it with automatic HTTPS.",
       "snips": {
         "a7Km2pQ9xB": {
-          "content": "Write plain HTML.<br><span class=\"hero-green\">Flea builds the server.</span>"
+          "content": "Write plain HTML.\u003cbr\u003e\u003cspan class=\"hero-green\"\u003eFlea builds the server.\u003c/span\u003e"
         },
         "b8Ln3rR0yC": {
           "content": "A dependency-free website system for developers: one binary that installs in a line, builds your Ubuntu server, deploys over SSH and serves automatic HTTPS. Your clients edit the page."
@@ -18,5 +18,7 @@
       "snips": {}
     }
   },
-  "shared": { "snips": {} }
+  "shared": {
+    "snips": {}
+  }
 }
