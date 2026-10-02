@@ -14,7 +14,7 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
-## 0.6.1 preparation, October 1, 2026
+## 0.6.1 published October 1, 2026
 
 Framework commit `89e3472`, immutable tag `v0.6.1`. Starting dev again replaces
 the same site's server gracefully, including LAN and port changes. Pull/reset
@@ -25,7 +25,22 @@ cross-compiled Linux AMD64 artifact passed native unprivileged checks for site
 creation/status, same-port dev replacement, LAN mode and crash recovery. A full
 native Linux build/test run and clean-machine Mac/notarization remain unverified.
 Both CLIs embed both rebuilt Linux servers. Artifacts live under
-`site/releases/0.6.1/`; publication and final public installer checks are underway.
+`site/releases/0.6.1/`. Both public downloads match SHA256SUMS. Fresh public
+installation and updates from 0.6.0 passed on Mac ARM64 and unprivileged native
+Linux AMD64. Sean's installed CLI is also 0.6.1.
+
+The shared server is 0.6.1. Final website release
+`20261002-015019-3e6152722de7e84b956d7054`, from website commit `1857a45`,
+publishes the 0.6.1 homepage, docs links and latest.txt. Historical release
+notes and immutable older downloads retain their original versions.
+
+The 1 GB host still exhausted memory with the soft Go target applied to both
+service and upgrade processes. After recovery, Sean approved a 1 GB /swapfile,
+mode 0600, enabled and persisted in /etc/fstab. The original fstab is retained at
+/etc/fstab.before-flea-swap-20261002. Recovery, server upgrade and website
+deployment then succeeded. Keep GOMEMLIMIT=320MiB for the service and separate
+admin processes. Reducing retained download assets' in-memory footprint remains
+a follow-up; swap provides headroom, not a fix for that allocation pattern.
 
 ## 0.6.0 published October 1, 2026
 

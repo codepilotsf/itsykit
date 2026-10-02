@@ -2,12 +2,14 @@
 
 Updated October 1, 2026.
 
-Version 0.6.1 is being published from framework commit `89e3472` and tag `v0.6.1`.
+Version 0.6.1 is published from framework commit `89e3472` and tag `v0.6.1`.
 Current website copy and download links target 0.6.1. It adds automatic graceful
 dev replacement, including LAN/port changes, without interrupting pull/reset.
 Both release binaries passed replacement/crash checks on their native platforms.
 Sean approved `GOMEMLIMIT=320MiB` in the service's `60-memory.conf` override;
-also apply that target to the separate deployment process. See RELEASES.md for
+also apply that target to separate deployment and upgrade processes. The approved
+1 GB /swapfile is active and persisted in /etc/fstab. Public fresh installs and
+updates from 0.6.0 passed on Mac ARM64 and unprivileged Linux AMD64. See RELEASES.md for
 the active release and final publication evidence.
 
 Social preview update: commit `200edf7`, deployed as
