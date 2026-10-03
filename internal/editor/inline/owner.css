@@ -1,7 +1,16 @@
   :host { display:block; position:sticky; top:0; z-index:2147483647; font:14px/1.4 system-ui,sans-serif; letter-spacing:normal; text-transform:none; color:white; flex:none; grid-column:1/-1; --white:#fff; --light:#dce2e9; --midtone:#64748b; --brand-1:#334155; --link:#334155; --font-semibold:600; --font-normal:400; --border:1px; --rounded:5px; --lighter:#f1f5f9; --darker:#1e293b; --space-xs:8px; --space-sm:12px; }
   * { box-sizing:border-box; } section { position:relative; z-index:2; background:#24272d; box-shadow:0 2px 6px #0003; }
   nav { display:flex; align-items:center; flex-wrap:wrap; gap:6px; padding:8px 16px; }
-  #format { border-top:1px solid #475569; } [hidden] { display:none!important; }
+  section>nav { position:relative; z-index:1; background:#24272d; }
+  .edit-row { display:grid; grid-template-rows:0fr; overflow:hidden; visibility:hidden; }
+  #format { min-height:0; overflow:hidden; padding-block:0; transform:translateY(-100%); }
+  section:has(#edit:checked) .edit-row { grid-template-rows:1fr; visibility:visible; }
+  section:has(#edit:checked) #format { padding-block:8px; border-top:1px solid #475569; transform:translateY(0); }
+  @media(prefers-reduced-motion:no-preference) {
+    .edit-row { transition:grid-template-rows 220ms ease,visibility 220ms; }
+    #format { transition:transform 220ms ease,padding 220ms ease; }
+  }
+  [hidden] { display:none!important; }
   button,select { font:inherit; color:inherit; border:1px solid #64748b; border-radius:5px; background:transparent; padding:0 10px; height:36px; min-height:36px; cursor:pointer; }
   button { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
   button[data-icon] { width:40px; }
@@ -85,7 +94,7 @@
   #theme-panel :focus-visible { outline:2px solid #64748b; outline-offset:3px; }
   #theme-panel input:focus-visible,#theme-panel select:focus-visible { outline-offset:-3px; }
   #theme-panel #theme-title:focus { outline:none; }
-  @media(prefers-reduced-motion:no-preference) { #theme-panel { animation:theme-in 220ms ease-out; } @keyframes theme-in { from {opacity:0;transform:translateX(16px)} to {opacity:1;transform:translateX(0)} } }
+  @media(prefers-reduced-motion:no-preference) { #theme-panel { animation:theme-in 220ms ease-out; } @keyframes theme-in { from {transform:translateX(100%)} to {transform:translateX(0)} } }
 
   .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
   #collection-photo-dialog { width:min(92vw,640px); }

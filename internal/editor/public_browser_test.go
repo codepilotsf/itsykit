@@ -40,13 +40,17 @@ func TestPublicPreviewBrowser(t *testing.T) {
   const before=article.innerHTML, leafBefore=leaf.innerHTML;
   article.style.outline='3px solid purple';
   const originalOutline=article.style.outline;
-  assert(ui && !ui.querySelector('#format').hidden && ui.querySelector('#details').disabled,'browse state');
+  await new Promise(resolve=>setTimeout(resolve,300));
+  assert(ui.querySelector('#format').inert && ui.querySelector('#details').disabled,'browse state');
+  assert(ui.querySelector('.edit-row').getBoundingClientRect().height===0,'browse row still occupies space');
   const browseHeight=root.getBoundingClientRect().height;
   assert(root.getBoundingClientRect().bottom <= document.querySelector('header').getBoundingClientRect().top,'header overlap');
   ui.querySelector('#edit').click();
   assert(!ui.querySelector('.collection-outlines-exit'),'rapid toggle retained stale outlines');
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches)assert(ui.querySelector('#collection-overlays').getAnimations().some(a=>a.effect.getTiming().duration===160),'missing outline fade in');
   window.matchMedia=originalMatchMedia;
+  assert(!ui.querySelector('#format').inert&&root.getBoundingClientRect().height>browseHeight,'Edit did not restore second row');
+  assert(getComputedStyle(ui.querySelector('.edit-row')).transitionDuration==='0s','reduced motion still animates row');
   assert(getComputedStyle(ui.querySelector('#edit')).backgroundColor==='rgb(22, 163, 74)','on switch must be green');
   assert(!ui.querySelector('#status').textContent&&!ui.querySelector('#notice').textContent,'idle hints remain');
   assert(!ui.querySelector('#theme').hidden && !ui.querySelector('#cancel').hidden && !ui.querySelector('#logout').hidden,'edit mode topbar');
@@ -110,7 +114,8 @@ func TestPublicPreviewBrowser(t *testing.T) {
   assert(article.style.outline===originalOutline && leaf.style.outline==='','cancel did not restore outline');
   assert(!article.hasAttribute('contenteditable') && !leaf.hasAttribute('contenteditable'),'editing attributes leaked');
   assert(!ui.querySelector('#format').hidden && ui.querySelector('#details').disabled && ui.querySelector('[data-mark]').disabled && !ui.querySelector('#logout').hidden,'cancel state');
-  assert(root.getBoundingClientRect().height===browseHeight,'toolbar height changed after cancel');
+  await new Promise(resolve=>setTimeout(resolve,300));
+  assert(root.getBoundingClientRect().height===browseHeight,'toolbar did not collapse after leaving Edit');
   ui.querySelector('#edit').click();
   const fontSize=getComputedStyle(leaf).fontSize,originalLeaf=leaf;
   let saves=0,previousVersion=JSON.parse(root.dataset.page).version;
@@ -136,6 +141,9 @@ func TestPublicPreviewBrowser(t *testing.T) {
   article.style.removeProperty('outline');
   assert(parseFloat(document.documentElement.style.getPropertyValue('--flea-toolbar-height'))>0,'public toolbar height token missing');
   assert(!ui.querySelector('#theme-panel').hidden && ui.querySelector('#theme-save').disabled,'theme initial state');
+  await new Promise(resolve=>setTimeout(resolve,300));
+  assert(ui.querySelector('#format').inert&&ui.querySelector('.edit-row').getBoundingClientRect().height===0,'Theme retained edit row');
+  assert(Math.abs(ui.querySelector('#theme-panel').getBoundingClientRect().top-root.getBoundingClientRect().bottom)<1,'Theme did not track collapsed toolbar');
   const closeButton=ui.querySelector('#theme-cancel').getBoundingClientRect(),closeIcon=ui.querySelector('#theme-cancel svg').getBoundingClientRect();assert(Math.abs(closeButton.left+closeButton.width/2-closeIcon.left-closeIcon.width/2)<1&&Math.abs(closeButton.top+closeButton.height/2-closeIcon.top-closeIcon.height/2)<1,'theme close icon not centered');
   assert(ui.querySelectorAll('#theme-fields>details[open]').length===0,'theme sections should start closed');
   assert(ui.querySelector('#edit').disabled && !ui.querySelector('#theme').hidden && !ui.querySelector('#theme-cancel').hidden && !ui.querySelector('#logout').hidden,'theme mode topbar');
@@ -194,6 +202,12 @@ func TestPublicPreviewBrowser(t *testing.T) {
   ui.querySelector('#theme-cancel').click();const closingPanel=ui.querySelector('#theme-panel');assert(!closingPanel.hidden&&closingPanel.inert,'theme hidden before exit animation');assert(closingPanel.getAnimations().some(a=>a.effect.getTiming().duration===220),'theme exit animation missing');
   ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));assert(!closingPanel.hidden&&!closingPanel.inert,'reopening retained stale closing state');
   ui.querySelector('#theme-cancel').click();closingPanel.getAnimations().forEach(a=>a.finish());await new Promise(resolve=>setTimeout(resolve,30));assert(closingPanel.hidden,'theme exit did not finish');window.matchMedia=originalMatchMedia;
+  ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));
+  ui.querySelector('#theme-cancel').click();
+  ui.querySelector('#edit').click();ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));
+  assert(ui.querySelector('#format').inert,'Theme opened from Edit retained interactive row');
+  ui.querySelector('#theme-cancel').click();
+  assert(ui.querySelector('#edit').checked&&!ui.querySelector('#format').inert,'Theme failed to restore Edit row');
   ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));
   const textGroup=[...ui.querySelectorAll('#theme-fields details')].find(d=>d.querySelector('summary').textContent==='Text sizes');
   [...ui.querySelectorAll('#theme-fields>details[open]')].forEach(d=>d.querySelector('summary').click());
@@ -259,7 +273,11 @@ func TestPublicPreviewBrowser(t *testing.T) {
 	cmd := exec.CommandContext(ctx, browser, "--headless", "--disable-gpu", "--force-prefers-reduced-motion", "--disable-background-networking", "--disable-component-update", "--disable-background-mode", "--no-first-run", "--no-default-browser-check", "--user-data-dir="+t.TempDir(), "--dump-dom", "--virtual-time-budget=4000", server.URL)
 	cmd.WaitDelay = 2 * time.Second
 	if screenshot := os.Getenv("FLEA_TEST_SCREENSHOT"); screenshot != "" {
-		cmd.Args = append(cmd.Args, "--window-size=1280,800", "--screenshot="+screenshot)
+		size := os.Getenv("FLEA_TEST_WINDOW_SIZE")
+		if size == "" {
+			size = "1280,800"
+		}
+		cmd.Args = append(cmd.Args, "--window-size="+size, "--screenshot="+screenshot)
 	}
 	output, err := cmd.CombinedOutput()
 	if !strings.Contains(string(output), `<output id="browser-result">PASS</output>`) {

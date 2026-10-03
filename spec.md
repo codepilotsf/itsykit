@@ -564,8 +564,9 @@ saves preserve drafts. /admin is for login, not a dashboard. The signed-in top b
 right-aligned Edit and Sign out buttons. Edit starts editing the current page and
 replaces Edit with Cancel and Save changes. Sign out remains visible after a
 vertical divider. Save is disabled until actual
-changes exist. Page details and formatting stay in a second bar whenever signed
-in, disabled outside Edit. Formatting requires a focused editable region:
+changes exist. Page details and formatting slide out in a second bar during Edit,
+collapsing outside Edit and while Theme is open. Theme slides from the right below
+the measured toolbar height. Both respect reduced motion. Formatting requires a focused editable region:
 normal text, H1–H4, bold, italic, underline, strikethrough, links,
 bullet/numbered lists, and left/center/right alignment. Page details holds title
 and description. Save applies the page's changes together; Cancel discards them,

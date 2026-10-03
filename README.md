@@ -187,8 +187,9 @@ deploying: protocol 22 requires the new structure.
 
 ## Templates
 
-The signed-in formatting row remains visible outside Edit to keep the toolbar's
-height stable. Its controls are disabled until Edit is active; text formatting
+The signed-in formatting row slides out beneath the top bar in Edit and collapses
+when Edit is off or Theme is open. Theme slides in from the right and fills the
+space below the toolbar. Reduced-motion preferences disable these transitions. Text formatting
 also requires an editable region to be focused. Pasting a complete six-digit
 sign-in code submits it automatically. Typing and partial pastes still allow Enter
 or the Sign in button.

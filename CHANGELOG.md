@@ -4,6 +4,14 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.8.0 - 2026-10-03
+
+- Collapse the second toolbar row outside Edit with a slide transition. Theme
+  slides from the right and uses the space below the changing toolbar height.
+  Reduced-motion preferences keep both changes immediate.
+- Existing sites must update `site/admin/_toolbar.html` from the starter alongside
+  the executable. The new edit-row wrapper is required; custom layouts stay unchanged.
+
 ## 0.7.1 - 2026-10-03
 
 - Show certificate setup guidance only when enabling HTTPS for a new domain.

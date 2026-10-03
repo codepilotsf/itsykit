@@ -1,5 +1,9 @@
 # Synchronization and theme editing
 
+The Theme panel slides fully in and out from the right and tracks the toolbar's
+measured bottom during edit-row collapse, resizing and scrolling. Opening Theme
+collapses the edit row; closing restores the preferred editing mode.
+
 Implementation requirements linked from [AGENTS.md](../../AGENTS.md).
 Read this when the task touches this subsystem. Paths in prose and code are
 relative to the repository root unless stated otherwise.

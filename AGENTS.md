@@ -97,7 +97,8 @@ spacing. Preserve vendored CSS/JS. Use `{icon name}` and the flat
 `flea/icons/name.svg` cache; never generate toolbar SVG paths in JavaScript.
 
 Owner edits happen on the page with explicit Save/Cancel. The Edit switch defaults on
-and persists per tab across pages. Save/Cancel remain on the second toolbar row
+and persists per tab across pages. The second row slides beneath the top bar and
+collapses outside Edit, including Theme mode. Save/Cancel remain on the second toolbar row
 and keep editing on. Page Save updates in place from the committed server receipt,
 rebasing Cancel without reloading or replacing editable wrappers. Theme has its own fixed-footer Save and header X; Escape closes
 with dirty-preview confirmation. Use green 2px dashed shadow-root overlays with 6px

@@ -124,6 +124,7 @@ func TestExternalEditorBrowser(t *testing.T) {
 	if os.Getenv("FLEA_TEST_SCREENSHOT") != "" {
 		checks = strings.Replace(checks, "out.textContent='PASS'}catch", "ui.querySelector('#media-dialog').close();out.textContent='PASS'}catch", 1)
 	}
+	checks = strings.Replace(checks, "if(height<90||[...host.shadowRoot.querySelectorAll('nav')].some(nav=>nav.getBoundingClientRect().height<40))throw Error('toolbar collapsed before context');", "const expanded=host.shadowRoot.querySelector('#edit').checked,rowHeight=host.shadowRoot.querySelector('.edit-row').getBoundingClientRect().height;if(height<40||(expanded?rowHeight<40:rowHeight!==0))throw Error('toolbar visibility does not match initial Edit preference');", 1)
 	checks = strings.Replace(checks, "window.initialToolbarIcons=", "if(host.shadowRoot.querySelector('#edit').checked)throw Error('off preference flashed before hydration');sessionStorage.removeItem('flea-editing:'+host.dataset.email);window.initialToolbarIcons=", 1)
 	if os.Getenv("FLEA_TEST_EDIT_ON") == "1" {
 		checks = strings.Replace(checks, "if(host.shadowRoot.querySelector('#edit').checked)throw Error('off preference flashed before hydration');", "if(!host.shadowRoot.querySelector('#edit').checked||host.shadowRoot.querySelector('#details').disabled)throw Error('Edit or Page Details flashed off before hydration');", 1)

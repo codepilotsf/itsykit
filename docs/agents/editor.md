@@ -225,9 +225,11 @@ appear in a second bar. Unlinked-page discovery is deferred. Serve the selected
 local Lucide SVGs without adding npm or a frontend build step.
 Prototype dialogs use compact titles, a bold text-link-style Cancel button on
 the left, and the primary action on the right. Cancel discards dialog changes.
-Keep the second bar visible whenever signed in, including browsing and other modes,
-so leaving Edit does not collapse the toolbar. Disable Page details and formatting
-outside Edit; within Edit, formatting requires an active text region. No content
+Collapse the second bar outside Edit, including Theme mode. Slide it from beneath
+the top row over 220ms, with immediate changes for reduced motion. Restore its
+initial visibility from the Edit preference before paint, and make collapsed controls
+inert. Publish the changing toolbar height during motion for Theme and navigation.
+Within Edit, formatting requires an active text region. No content
 outlines, including on keyboard focus. Modal motion and page-content view transitions
 are subtle and respect reduced motion.
 Keep dialogs open until their exit animation completes, including Cancel, Escape

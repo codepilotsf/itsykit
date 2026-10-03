@@ -188,12 +188,13 @@
     panel.inert=true;
     const finish=()=>{panel.hidden=true;panel.inert=false;};
     if(matchMedia('(prefers-reduced-motion: reduce)').matches)finish();
-    else {const animation=panel.animate([{opacity:1,transform:'translateX(0)'},{opacity:0,transform:'translateX(16px)'}],{duration:220,easing:'ease-in',fill:'forwards'});exitAnimation=animation;animation.finished.then(()=>{if(exitAnimation===animation){finish();animation.cancel();exitAnimation=null;}},()=>{});}
+    else {const animation=panel.animate([{transform:getComputedStyle(panel).transform},{transform:'translateX(100%)'}],{duration:220,easing:'ease-in',fill:'forwards'});exitAnimation=animation;animation.finished.then(()=>{if(exitAnimation===animation){finish();animation.cancel();exitAnimation=null;}},()=>{});}
     $('#theme').setAttribute('aria-expanded','false');$('#theme').removeAttribute('aria-pressed');host.dispatchEvent(new Event('theme-closed'));$('#theme').focus();return true;
   }
   host.addEventListener('theme-open',async()=>{
     if(open){close();return;}if(loading || saving)return;
     exitAnimation?.cancel();exitAnimation=null;panel.inert=false;
+    panel.hidden=true;void panel.offsetWidth;
     open=loading=true;dirty=false;changes={};scaleChanges={};panel.hidden=false;$('#theme').setAttribute('aria-expanded','true');$('#theme').setAttribute('aria-pressed','true');$('#theme-save').disabled=true;fields.replaceChildren();message('Loading theme…');
     $('#edit').disabled=true;$('#cancel').hidden=$('#save').hidden=true;$('#theme-cancel').hidden=$('#theme-save').hidden=false;
     host.style.setProperty('--owner-height',host.getBoundingClientRect().bottom+'px');$('#theme-title').focus();

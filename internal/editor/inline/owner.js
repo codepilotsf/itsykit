@@ -96,6 +96,9 @@
     const span=document.createElement('span');span.textContent=r.node.textContent;return span.innerHTML;
   }
   function controls() {
+    const format=$('#format');
+    if(!editing && format.contains(shadow.activeElement))$('#edit').focus();
+    format.inert=!editing;
     const e=editing?active?.editor:null;
     $('#details').disabled=!editing || saving || expired;
     for(const c of all('[data-mark],[data-list],[data-align],#heading,#link'))c.disabled=!e || saving || expired;
@@ -125,8 +128,9 @@
     $('#status').textContent=saveError || (dirty?'Unsaved changes':'');
     controls();
   }
-  const updateToolbarHeight=()=>{const height=host.getBoundingClientRect().height;document.documentElement.style.scrollPaddingTop=height+12+'px';document.documentElement.style.setProperty('--flea-toolbar-height',height+'px');};
+  const updateToolbarHeight=()=>{const rect=host.getBoundingClientRect(),height=rect.height;host.style.setProperty('--owner-height',rect.bottom+'px');document.documentElement.style.scrollPaddingTop=height+12+'px';document.documentElement.style.setProperty('--flea-toolbar-height',height+'px');};
   updateToolbarHeight();new ResizeObserver(updateToolbarHeight).observe(host);
+  window.addEventListener('scroll',updateToolbarHeight,{passive:true});
   function stop() {
     for(const r of regions) {
       r.editor?.destroy();r.editor=null;r.node.innerHTML=r.html;
