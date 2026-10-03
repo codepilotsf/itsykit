@@ -7,13 +7,14 @@
 #    same bug has produced duplicate lines and an orphaned CSS brace. Whole-file
 #    writes were unaffected.
 #  - `flea dev` appends /flea/runtime/ and /flea/media/*.mp4 to .gitignore on
-#    every run, even when they are already present, duplicating those entries.
+#    every run, even when present. That is benign (duplicate ignore patterns) and
+#    is reported as a note, not a failure, so it does not block commits.
 #
 # Usage:
 #   scripts/check-corruption.sh --staged    # scan staged files (default)
 #   scripts/check-corruption.sh FILE...     # scan the given files
 #
-# Exit status: 1 if anything suspicious is found, else 0.
+# Exit status: 1 if blocking corruption is found, else 0.
 set -u
 bad=0
 
@@ -25,6 +26,7 @@ fi
 [ -z "$files" ] && exit 0
 
 flag() { echo "check-corruption: $1"; bad=1; }
+warn() { echo "check-corruption: note: $1"; }
 
 for f in $files; do
   case "$f" in
@@ -47,11 +49,11 @@ for f in $files; do
   m3=$(awk 'NR>1 && $0==prev && $0 ~ /[^[:space:]]/ && length($0)>3 {print NR": "$0} {prev=$0}' "$f" 2>/dev/null)
   [ -n "$m3" ] && flag "duplicate line in $f:" && echo "$m3" | head -3
 
-  # 4. .gitignore: any repeated (non-adjacent) entry
+  # 4. .gitignore: repeated entries — benign (`flea dev` adds them), so note only.
   case "$f" in
     .gitignore|*.gitignore)
       m4=$(awk '!/^[[:space:]]*$/ && !/^#/ { if (seen[$0]++) print NR": "$0 }' "$f" 2>/dev/null)
-      [ -n "$m4" ] && flag "duplicate ignore entry in $f:" && echo "$m4" | head -3
+      [ -n "$m4" ] && warn "duplicate ignore entry in $f (flea dev adds these; dedupe to silence):" && echo "$m4" | head -3
       ;;
   esac
 
