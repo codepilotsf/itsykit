@@ -2,7 +2,9 @@
 
 ## Current update: October 3, 2026
 
-0.7.0 is being published from framework `1199747`, tag `v0.7.0`.
+0.7.0 is published from framework `1199747`, tag `v0.7.0`.
+Website `a41a758`, activation `20261003-141847-a863aaed91fd5f4c8fa761b8`.
+Public fresh installs/updates passed on Mac ARM64 and unprivileged Linux AMD64.
 Downloads now live in `/var/lib/flea/downloads/fleacms` on the existing host,
 outside this repository and website snapshots. Every retained version and 0.7.0
 passed public manifest/hash checks. Local copies are at

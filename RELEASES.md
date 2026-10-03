@@ -17,7 +17,7 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
-## 0.7.0 publication, October 3, 2026
+## 0.7.0 published October 3, 2026
 
 Framework commit `1199747`, immutable tag `v0.7.0`. Includes reviewed interactive
 design checkpoints in the bundled skills and confined disk-backed release hosting.
@@ -34,7 +34,16 @@ The host mapping was backed up at
 `/etc/flea/server.before-downloads-20261003T141633.json`. Migration initially
 installed server.json with private permissions; restoring its standard 0644 mode
 resolved startup, without weakening the systemd unit. Recovery/health then passed.
-Final website activation and install/update verification are recorded below.
+Final website commit `a41a758`, activation
+`20261003-141847-a863aaed91fd5f4c8fa761b8`. Public assets are about 0.63 MiB,
+down from 247.7 MiB; archive upload was 575 KB. Both sites and social image returned
+200; download Range returned 206; unlisted files and wrong-host requests returned
+404. Fresh public installs, 0.6.2-to-0.7.0 updates and already-current checks passed
+on Mac ARM64 and unprivileged Linux AMD64. Server and Sean's local CLI are 0.7.0.
+Installed and public hashes:
+
+- Mac ARM64: `4985074561d9a438a63a99ad60f69bc519527401674e6d8e8c207cce32ecd1da`
+- Linux AMD64: `63f9ce804c9a72a0a73e43f097a4ce9755e4bd43af85d7095c2e496ed9f6010c`
 
 ## 0.6.1 published October 1, 2026
 
