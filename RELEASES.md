@@ -17,6 +17,17 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.7.1 publication, October 3, 2026
+
+Framework `f4a72ee`, immutable tag `v0.7.1`. Server-side progress uses the
+installed TLS domain list: first-time enablement shows certificate guidance;
+routine deployments show "Checking site health and HTTPS...". Checks and renewal
+are unchanged. Regression tests cover repeat deploys, first enablement, aliases,
+HTTP-only sites and routing-preserving rollback. Full tests/vet and bundled builds
+passed; Mac signature/fresh-site and native unprivileged Linux new/status passed.
+Linux was cross-compiled; full native Linux tests and Mac clean-machine/notarization
+remain unverified. Artifacts are published through the separate download store.
+
 ## 0.7.0 published October 3, 2026
 
 Framework commit `1199747`, immutable tag `v0.7.0`. Includes reviewed interactive
