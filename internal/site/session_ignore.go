@@ -5,8 +5,15 @@ import (
 	"strings"
 )
 
+// sessionIgnoreRules are the lines IgnoreSessionFiles ensures are present in the
+// project's .gitignore.
+var sessionIgnoreRules = []string{"/flea/runtime/", "/flea/media/*.mp4"}
+
 // IgnoreSessionFiles preserves developer rules and keeps private runtime state
 // out of ordinary Git adds. The CLI first checks for already tracked files.
+//
+// It appends only the rules that are not already present, so repeated runs (for
+// example every `flea dev` start) never duplicate existing entries.
 func IgnoreSessionFiles(directory string) error {
 	root, err := os.OpenRoot(directory)
 	if err != nil {
@@ -25,10 +32,28 @@ func IgnoreSessionFiles(directory string) error {
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
-	const rules = "/flea/runtime/\n/flea/media/*.mp4"
-	text := strings.TrimRight(string(data), "\n")
-	if text == rules || strings.HasSuffix(text, "\n"+rules) {
+
+	text := string(data)
+	present := make(map[string]bool)
+	for _, line := range strings.Split(text, "\n") {
+		present[strings.TrimSpace(line)] = true
+	}
+
+	var missing []string
+	for _, rule := range sessionIgnoreRules {
+		if !present[rule] {
+			missing = append(missing, rule)
+		}
+	}
+	if len(missing) == 0 {
 		return nil
 	}
-	return writeSiteFile(root, ".gitignore", []byte(text+"\n"+rules+"\n"))
+
+	// Preserve existing developer rules verbatim; append only what is missing.
+	updated := strings.TrimRight(text, "\n")
+	if updated != "" {
+		updated += "\n"
+	}
+	updated += strings.Join(missing, "\n") + "\n"
+	return writeSiteFile(root, ".gitignore", []byte(updated))
 }
