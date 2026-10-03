@@ -8,6 +8,14 @@ for completed changes, and [README.md](README.md) for current usage.
 
 ## Current release status (October 3, 2026)
 
+- Version 0.8.1 is published. Framework `209b5d3`, tag `v0.8.1`; website
+  `9fd1397`, activation `20261003-230705-de4bfab5fbec8834e722a460`.
+  Runtime/media ignore rules append only when missing, preserving existing bytes.
+  Package/full tests, vet, bundled build and repeated dev-start checks passed.
+  Public Mac/Linux hashes, fresh installs, reinstalls and updates from 0.8.0 passed;
+  Sean's installed CLI is the public 0.8.1 binary. The shared server remains 0.8.0.
+  Existing distribution acceptance limits and Bookworm toolbar caveat below remain.
+
 - Version 0.8.0 is published. Framework `c8a1d96`, tag `v0.8.0`; website
   `3188000`, activation `20261003-171440-ca76afb853e32d0d0309c6ea`.
   The sliding edit row and Theme panel passed browser and reduced-motion checks.
