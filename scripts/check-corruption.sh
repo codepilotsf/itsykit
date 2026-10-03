@@ -1,10 +1,13 @@
 #!/bin/sh
 # check-corruption.sh — catch duplicated-token corruption before it is committed.
 #
-# Context: an agent `edit` tool can intermittently duplicate the token it
-# changes when the replacement is numeric (e.g. 900px -> 900px900px,
-# 0.82 -> 0.828282...). The same class of bug has produced duplicate lines and
-# an orphaned CSS brace. Whole-file writes were unaffected.
+# Context:
+#  - An agent `edit` tool can intermittently duplicate the token it changes when
+#    the replacement is numeric (900px -> 900px900px, 0.82 -> 0.828282...). The
+#    same bug has produced duplicate lines and an orphaned CSS brace. Whole-file
+#    writes were unaffected.
+#  - `flea dev` appends /flea/runtime/ and /flea/media/*.mp4 to .gitignore on
+#    every run, even when they are already present, duplicating those entries.
 #
 # Usage:
 #   scripts/check-corruption.sh --staged    # scan staged files (default)
@@ -44,7 +47,15 @@ for f in $files; do
   m3=$(awk 'NR>1 && $0==prev && $0 ~ /[^[:space:]]/ && length($0)>3 {print NR": "$0} {prev=$0}' "$f" 2>/dev/null)
   [ -n "$m3" ] && flag "duplicate line in $f:" && echo "$m3" | head -3
 
-  # 4. unbalanced braces in CSS (orphaned media query / dropped brace)
+  # 4. .gitignore: any repeated (non-adjacent) entry
+  case "$f" in
+    .gitignore|*.gitignore)
+      m4=$(awk '!/^[[:space:]]*$/ && !/^#/ { if (seen[$0]++) print NR": "$0 }' "$f" 2>/dev/null)
+      [ -n "$m4" ] && flag "duplicate ignore entry in $f:" && echo "$m4" | head -3
+      ;;
+  esac
+
+  # 5. unbalanced braces in CSS (orphaned media query / dropped brace)
   case "$f" in
     *.css)
       o=$(tr -cd '{' < "$f" | wc -c | tr -d ' ')
