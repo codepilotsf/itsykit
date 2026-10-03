@@ -11,7 +11,10 @@ During 0.x development, interfaces may change without backward compatibility.
 - Add matching review checkpoints to the site-building skill and update generated
   README/agent guidance. Explicitly delegated design decisions remain supported.
 - Clarify large-gallery asset handling, media constraints, safe editing, dev reloads
-  and visual verification in both skills. No runtime or deployment protocol changes.
+  and visual verification in both skills.
+- Serve administrator-managed, checksum-verified release downloads from disk,
+  outside website snapshots. Existing public URLs remain unchanged; site archive
+  limits and the deployment protocol are unchanged.
 
 ## 0.6.2 - 2026-10-01
 

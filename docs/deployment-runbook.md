@@ -1,6 +1,6 @@
 # FleaCMS release and deployment runbook
 
-Recorded October 1, 2026, after the 0.6.1 release. This is an operator guide,
+Updated October 3, 2026 for disk-backed download hosting. This is an operator guide,
 not authorization to publish or change a server. Recheck paths, branch mappings,
 host settings and live versions before each release. Read the repository's
 AGENTS.md, [release guide](../RELEASING.md), [deployment requirements](agents/deployment.md)
@@ -189,7 +189,18 @@ wrapper is an operator workaround for the confirmed root destination, not a
 general sudo/SSH configuration feature. Do not disable host-key checks, change
 authentication, or globally replace SSH. Do not rely on it for unmatched commands.
 
-## 4. Publish in two website deployments
+## 4. Publish downloads, then the website
+
+From 0.7.0 onward, follow [download hosting](download-hosting.md): stage artifacts
+outside the website, upload and validate a new immutable version directory in
+`/var/lib/flea/downloads/fleacms`, restart to load the catalogue, and verify public
+hashes before deploying the small website/channel update. Existing versions stay
+in that store and out of site snapshots. Do not copy dist/public/releases version
+directories into website Git. The store is backed up separately from site backups.
+Upgrade the server before enabling the host field on the first migration; keep
+the old channel until all checks pass. Preserve approved memory and swap settings.
+
+### Historical procedure through 0.6.2 (not the current workflow)
 
 1. Put only the new immutable version directory in the website:
    `site/releases/<version>/flea-darwin-arm64`, `flea-linux-amd64`, `SHA256SUMS`.

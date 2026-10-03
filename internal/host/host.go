@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"flea/internal/contact"
@@ -29,6 +30,7 @@ import (
 const HealthPath = "/_flea/health"
 
 type Config struct {
+	Downloads    map[string]string `json:"downloads,omitempty"`
 	Themes       map[string]string `json:"themes,omitempty"`
 	Content      map[string]string `json:"content,omitempty"`
 	Listen       string            `json:"listen"`
@@ -72,6 +74,22 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 		}
 	}
 	handlers := map[string]http.Handler{}
+	downloadHandlers := map[string]*downloads{}
+	downloadRoots := map[string]string{}
+	downloadStores := map[string]*downloads{}
+	for hostname, directory := range config.Downloads {
+		if config.Sites[hostname] == "" || directory == "" {
+			return config, nil, fmt.Errorf("downloads require a configured site and directory")
+		}
+		if downloadStores[directory] == nil {
+			store, e := loadDownloads(directory)
+			if e != nil {
+				return config, nil, fmt.Errorf("downloads for %s: %w", hostname, e)
+			}
+			downloadStores[directory] = store
+		}
+		downloadHandlers[hostname] = downloadStores[directory]
+	}
 	// Aliases share one immutable snapshot. Different content paths for the same
 	// release would make deployment preservation depend on map iteration order.
 	byRoot := map[string]http.Handler{}
@@ -92,6 +110,10 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 			return config, nil, fmt.Errorf("site %s: root must be absolute", host)
 		}
 		key := filepath.Clean(root)
+		if previous, ok := downloadRoots[key]; ok && previous != config.Downloads[host] {
+			return config, nil, fmt.Errorf("aliases must use the same download store")
+		}
+		downloadRoots[key] = config.Downloads[host]
 		contentPath := config.Content[host]
 		themePath := config.Themes[host]
 		var themeCSS *string
@@ -216,6 +238,11 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 				}
 				u := url.URL{Scheme: scheme, Host: target, Path: r.URL.Path, RawPath: r.URL.RawPath, RawQuery: r.URL.RawQuery}
 				http.Redirect(w, r, u.String(), http.StatusPermanentRedirect)
+				return
+			}
+			if store := downloadHandlers[host]; store != nil &&
+				(r.URL.Path == "/releases" || strings.HasPrefix(r.URL.Path, "/releases/")) && r.URL.Path != "/releases/latest.txt" {
+				store.ServeHTTP(w, r)
 				return
 			}
 			handler.ServeHTTP(w, r)

@@ -183,6 +183,20 @@ must select the same content file.
 
 ## Filesystem boundaries
 
+Host configuration may map a site's hostname to an administrator-owned download
+root through `downloads`. Aliases must share that root. `host/downloads.go` loads
+a bounded catalogue of stable-version directories and SHA256SUMS, rejects links,
+unexpected files and writable entries, hashes binaries with streaming reads, and
+pins regular file handles. Requests select exact catalogue URLs and use independent
+SectionReaders, never request-derived file opens. Changed size/mtime fails closed.
+These files are outside Project snapshots, site archives, backup and rollback.
+Versioned bytes are immutable; publishing a new version requires a host restart
+to validate and load the new catalogue. The website still owns latest.txt.
+No deployment protocol change is needed: this is explicit host policy, preserved
+by normal activation, not new site archive syntax. Older executables reject this
+configuration field, so remove it via a reviewed config rollback before reverting
+to a pre-0.7 executable. Never modify existing download bytes in place.
+
 Standalone images/videos are typed snip entries, with direct Image/Video metadata
 and optional direct Poster metadata. Extraction replaces source/alt/poster values
 with typed bindings while preserving developer markup. Owner-only media markers

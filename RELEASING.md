@@ -2,6 +2,10 @@
 
 For the manual public release workflow, SemVer rules, low-memory host safeguards
 and recovery steps, follow the [deployment runbook](docs/deployment-runbook.md).
+Since 0.7.0, versioned binaries live in the host's separate
+[disk-backed download store](docs/download-hosting.md), not the website Git tree.
+Use the store publication procedure before advancing website latest.txt. Older
+sections describing website version directories are historical staging guidance.
 
 ## V1 distribution plan
 

@@ -2,6 +2,12 @@
 
 ## Product and build specification
 
+Implemented in 0.7.0: optional administrator-owned `downloads` host mappings serve
+checksum-validated versioned Flea CLI downloads from pinned disk handles, outside
+website snapshots and RAM asset maps. This is not a general filesystem mount.
+The website retains latest.txt; the 256 MiB site archive limit is unchanged.
+See [download hosting](docs/download-hosting.md) for boundaries and publication.
+
 The agreed public V1 scope and release gates are in [next-steps.md](next-steps.md).
 V1 keeps source private and distributes free binaries without accounts or license
 keys. The one-line installer, local `flea update`, and remote

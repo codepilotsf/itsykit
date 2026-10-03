@@ -1386,6 +1386,10 @@ Video requires H.264 plus optional AAC-LC, fast start,
 are Git-ignored and transferred separately during deployment/pull. See
 [videos](docs/videos.md) for storage, validation, fresh-clone recovery and limits.
 
+For hosting Flea's own release binaries independently of website deployments,
+see [disk-backed download hosting](docs/download-hosting.md). This optional host
+setting does not change ordinary site assets or the 256 MiB site archive limit.
+
 New sites include AGENTS.md and portable skills in `flea/skills/`
 (`import-brochure` and `fleacms-site`). These are developer instructions, not a
 runtime dependency or an automatically installed agent integration. They are

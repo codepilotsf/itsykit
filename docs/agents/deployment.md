@@ -74,6 +74,12 @@ Do not claim real Ubuntu/password/systemd installation was tested without a targ
 
 ### Deployment and HTTPS
 
+Optional host `downloads` maps configured hostnames to absolute administrator-owned
+release stores outside site snapshots. Aliases must match; normal deployment keeps
+this host policy. See [download hosting](../download-hosting.md) for publication,
+verification and rollback boundaries. Never delete retained downloads to shrink a
+site archive, or include the store in site backups. The 256 MiB archive limit remains.
+
 Deploy/https select only the current Git branch's saved destination from
 .flea.config.json's deploy.branches map. Use the actual branch name without a production
 label or environment question. Generate the internal remote site name from the
