@@ -8,10 +8,11 @@ for completed changes, and [README.md](README.md) for current usage.
 
 ## Current release status (October 3, 2026)
 
-- Version 0.7.0 is published: website, download links, update channel and shared
+- Version 0.7.1 is published: website, download links, update channel and shared
   server executable agree. Public Mac/Linux checksums, fresh installs and updates
-  from 0.6.2 passed, with Linux checks running unprivileged. The local tests, race
-  suite, vet, bundled build and generated-skill comparisons also passed.
+  from 0.7.0 passed, with Linux checks running unprivileged. Local tests, vet,
+  bundled build and fresh-site validation passed. Routine HTTPS progress was
+  verified during the real deployment; certificate checks remain unchanged.
 - Versioned downloads now stream from a separate administrator-owned disk store,
   preserving all old URLs and hashes. Website assets fell from 247.7 MiB to
   0.63 MiB; the final archive upload was 575 KB. Keep the 256 MiB archive limit.

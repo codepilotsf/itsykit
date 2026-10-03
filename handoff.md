@@ -1,5 +1,18 @@
 # FleaCMS agent handoff
 
+## Latest patch: 0.7.1, October 3, 2026
+
+Framework `f4a72ee`, tag `v0.7.1`; website `f75d63f`, activation
+`20261003-151507-4d9b7bc05ab6b470b4ae679b`. Server, public channel and local CLI
+are 0.7.1. The server now chooses deployment progress from installed TLS domains:
+first-time enablement keeps setup guidance; repeat deployments say "Checking site
+health and HTTPS...". The latter was observed during this real deployment.
+Readiness/certificate verification is unchanged. Full tests/vet, bundled build,
+Mac signing/fresh-site and native unprivileged Linux smoke checks passed. Public
+fresh installs and 0.7.0 updates passed on both platforms with matching hashes.
+Both sites returned 200 and recovery is clear. Distribution acceptance limits
+below remain; APPS.md is still unrelated, untracked and untouched.
+
 ## Current handoff: October 3, 2026
 
 0.7.0 is published and verified. Framework source `1199747`, immutable tag
