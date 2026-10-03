@@ -17,6 +17,19 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.8.1 release October 3, 2026
+
+Framework `209b5d3`, immutable tag `v0.8.1`, built with Go 1.27.1 on Mac ARM64.
+Fixes repeated `.gitignore` rule appends and preserves existing trailing blank
+lines. Package/full tests, vet, bundled build, Mac signature, fresh-site validation
+and three consecutive dev starts preserving `.gitignore` bytes passed.
+The cross-compiled Linux AMD64 binary passed native unprivileged version/new/status
+checks. Full native Linux build/suite, clean-machine Mac testing and notarization
+remain unverified. Publication and channel verification are recorded below once complete.
+
+- Mac ARM64: `6d9141a3bc4393c2e3d1a0e2f3fc6de1a207b4a9e3955406d865f46c1b37cf31`
+- Linux AMD64: `72ab592758addecde4b91666bec10acc735d949679abc7a2bb66600b0616effc`
+
 ## 0.8.0 published October 3, 2026
 
 Framework `c8a1d96`, immutable tag `v0.8.0`, built with Go 1.27.1 on Mac ARM64.
