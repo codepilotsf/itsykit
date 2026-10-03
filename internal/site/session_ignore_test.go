@@ -47,6 +47,30 @@ func TestIgnoreSessionFilesCreatesGitignore(t *testing.T) {
 	}
 }
 
+func TestIgnoreSessionFilesPreservesContentWhenAppending(t *testing.T) {
+	for _, tc := range []struct{ original, want string }{
+		{"/.env\n\n", "/.env\n\n/flea/runtime/\n/flea/media/*.mp4\n"},
+		{"/.env", "/.env\n/flea/runtime/\n/flea/media/*.mp4\n"},
+		{"\n\n", "\n\n/flea/runtime/\n/flea/media/*.mp4\n"},
+		{"", "/flea/runtime/\n/flea/media/*.mp4\n"},
+		{"/flea/runtime/\n\n", "/flea/runtime/\n\n/flea/media/*.mp4\n"},
+		{"/flea/media/*.mp4\r\n/.env\r\n", "/flea/media/*.mp4\r\n/.env\r\n/flea/runtime/\n"},
+	} {
+		t.Run(tc.original, func(t *testing.T) {
+			dir := t.TempDir()
+			writeGitignore(t, dir, tc.original)
+			for i := 0; i < 3; i++ {
+				if err := IgnoreSessionFiles(dir); err != nil {
+					t.Fatal(err)
+				}
+				if got := readGitignore(t, dir); got != tc.want {
+					t.Fatalf("got %q, want %q", got, tc.want)
+				}
+			}
+		})
+	}
+}
+
 func writeGitignore(t *testing.T, dir, content string) {
 	t.Helper()
 	if err := os.WriteFile(filepath.Join(dir, ".gitignore"), []byte(content), 0o644); err != nil {

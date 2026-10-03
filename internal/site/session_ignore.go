@@ -50,8 +50,8 @@ func IgnoreSessionFiles(directory string) error {
 	}
 
 	// Preserve existing developer rules verbatim; append only what is missing.
-	updated := strings.TrimRight(text, "\n")
-	if updated != "" {
+	updated := text
+	if updated != "" && !strings.HasSuffix(updated, "\n") {
 		updated += "\n"
 	}
 	updated += strings.Join(missing, "\n") + "\n"

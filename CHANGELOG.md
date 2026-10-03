@@ -4,6 +4,11 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.8.1 - 2026-10-03
+
+- Append only missing runtime and media rules to `.gitignore`, regardless of
+  where existing rules appear. Preserve existing content and trailing blank lines.
+
 ## 0.8.0 - 2026-10-03
 
 - Collapse the second toolbar row outside Edit with a slide transition. Theme
