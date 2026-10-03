@@ -381,8 +381,9 @@ supplies the signed-in identity; never configure `app.current_admin` yourself.
 
 Two portable skills ship in `flea/skills/` for coding agents:
 
-- **import-brochure**: import an existing brochure site, preserving its content
-  and navigation with basic Prewind styling.
+- **import-brochure**: import or redesign an existing brochure/portfolio site,
+  preserving its content and navigation. Interactive: choose a direction (two mood
+  boards or references) and approve a sample page before the full build.
 - **fleacms-site**: build or redesign a site, especially for one real local
   business, doing the research and capturing the real vibe and assets first.
 

@@ -1390,6 +1390,9 @@ New sites include AGENTS.md and portable skills in `flea/skills/`
 (`import-brochure` and `fleacms-site`). These are developer instructions, not a
 runtime dependency or an automatically installed agent integration. They are
 excluded from serving and deployment.
+For substantial imports and redesigns, they guide an agent through two design
+directions and a sample-page review before the full build, unless you explicitly
+delegate those choices. Small maintenance edits do not require a new design review.
 
 Editable regions, short IDs, sanitized HTML, page metadata, content-preserving
 deployment, and archived orphan pruning are implemented. Deployment protocol 22

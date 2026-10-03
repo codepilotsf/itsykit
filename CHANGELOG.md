@@ -4,6 +4,15 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.7.0 - 2026-10-03
+
+- Expand the bundled import skill to brochure, portfolio and artist-site redesigns,
+  with two design directions and an approved sample page before the full build.
+- Add matching review checkpoints to the site-building skill and update generated
+  README/agent guidance. Explicitly delegated design decisions remain supported.
+- Clarify large-gallery asset handling, media constraints, safe editing, dev reloads
+  and visual verification in both skills. No runtime or deployment protocol changes.
+
 ## 0.6.2 - 2026-10-01
 
 - New sites bundle a second agent skill, `fleacms-site`: build or redesign a

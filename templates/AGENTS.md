@@ -48,8 +48,10 @@ Edit mode and use the same page Save/Cancel. No Photos/Videos library buttons.
 
 ## Available skills
 
-- **import-brochure**: import an existing small brochure website into this site,
-  preserving its content and navigation with basic Prewind styling. Read
+- **import-brochure**: import or redesign an existing small brochure/portfolio
+  website into this site, preserving its content and navigation, with local assets
+  and editable snips. Work it interactively: offer two directions (mood boards or
+  reference sites), then one sample page, before building everything. Read
   `flea/skills/import-brochure/SKILL.md` when doing that work. This is a portable
   instruction file, not an automatically installed agent plugin.
 

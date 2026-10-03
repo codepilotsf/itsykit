@@ -14,7 +14,7 @@ Two ways an agent ruins a site, and one way it wrecks the repo:
   product*; a slick site for a gritty dive bar is a failed site.
 - **Over-interrogating the owner** — running a long interview for facts it could have
   researched itself, or building before understanding the place.
-- **Racing file writes** — parallel edits and a running dev watcher corrupt templates.
+- **Competing file writes** — multiple writers can overwrite each other's changes.
 
 This skill is the middle path plus the guardrails.
 
@@ -84,10 +84,25 @@ Test: swap the photos and copy out — would the layout fit *any* place? If yes,
 - Mood-words ("quaint", "charming", "hidden gem") are a smell. Use the owner's and the
   regulars' own language.
 
-## 6. Working rhythm
+## 6. Working rhythm — checkpoints, not one-shot builds
 
 Small loops: **research → a one-paragraph vibe read → one question → a tiny draft →
 adjust.** Show work early; do not build everything before the direction is confirmed.
+
+On any substantial job, stop at two explicit checkpoints and wait for a reply:
+
+1. **Direction — two options.** Present two concrete directions (two mood boards, or
+   the two best references) with fonts, colours, mood and why each fits. Let the owner
+   choose one, reject both, or mix. Never silently pick the look.
+2. **One sample page.** Build the home page (or a static mock) and show it before
+   producing every page, then confirm the signature interactions (image zoom/lightbox,
+   gallery rhythm, motion, mobile nav).
+
+Keep each checkpoint to one or two concrete questions. Returning a finished site with
+no owner input is a failed process even when the result is good.
+If the owner explicitly delegates the direction or asks to proceed without pauses,
+honor that instruction, show the chosen direction and sample early, and keep them
+easy to change. Do not require a new design choice for a small maintenance edit.
 
 ## 7. FleaCMS project mechanics
 
@@ -110,29 +125,30 @@ adjust.** Show work early; do not build everything before the direction is confi
 - **One writer per file.** Never issue parallel edit/write calls to the same file — they
   race and interleave, corrupting it. Batch across *different* files only, or write
   sequentially.
-- **Do not run `flea dev` while hand-editing templates**: its watcher rewrites files as
-  it extracts snips and will fight your writes. Stop dev, edit, then start it again.
+- Dev supports watched edits. For bulk template/content rewrites, stop it first
+  to avoid competing extraction writes, then restart and review the result.
 - Editors with **format-on-save** (e.g. Zed) reflow HTML/CSS buffers; close those files
   or expect reformatting.
-- **Write atomically** (a single write, or one shell heredoc) and **verify after every
-  write**: line count, a unique marker (e.g. count of `<!doctype html>`), and no
-  duplicated fragments.
+- Use the environment's supported editing tool with unique context. Review diffs
+  and check for duplicated fragments after edits; a whole-file rewrite or shell
+  heredoc is not inherently safer or atomic.
 
 ## 9. Dev watcher, caching, and the extract/verify loop
 
 - Run `flea dev` **once** to extract new `snip` regions and download referenced icons,
   then stop it. `flea status` validates but does not extract or download.
-- Dev **caches** page metadata and snip content: after editing `flea/snips.json` or page
-  metadata directly, **restart dev** to see the change.
+- Dev watches relevant content and metadata files. Check reload output after edits;
+  if a reload fails, fix the reported error before assuming the new content is live.
 - To change a snip's stored text, edit `flea/snips.json`; the template only holds the
   `{snip ID}`. Do not invent IDs.
 
-## 10. Verify without bitmaps
+## 10. Verify rendering and interactions
 
 Verify by **fetching the rendered HTML** and checking: HTTP 200, `<title>`, resolved
 `{snip}`/`{app}`/`{icon}` (zero unresolved tokens), and the specific copy you changed.
-Avoid rasterizing just to check. If a screenshot is genuinely needed, keep it in a
-scratch directory and never ship it.
+Also inspect the rendered page at desktop and mobile widths and exercise its
+interactions. HTML checks alone do not establish visual correctness. Screenshots
+are appropriate for review; keep temporary captures outside the public site.
 
 ## 11. CSS and header gotchas
 
@@ -154,9 +170,10 @@ scratch directory and never ship it.
 ## Anti-patterns — do not
 
 - Build before deciding the job or learning the vibe.
+- Build every page in one pass without offering two directions or a sample page.
 - Invent menu/hours/history; paraphrase reviews into quotes.
 - Use AI photos of a real business; use bitmaps for logos.
 - Copy a template aesthetic unrelated to the category.
 - Ask the owner things you could research, or dump many questions at once.
-- Edit the same file in parallel, or while a dev watcher runs.
+- Edit the same file in parallel or race bulk rewrites against extraction.
 - Rasterize to "check" and leave artifacts behind.
