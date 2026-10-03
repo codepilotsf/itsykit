@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/mail"
 	"os"
 	"os/exec"
@@ -80,6 +81,7 @@ func (o Options) Validate() error {
 }
 
 type Manager struct {
+	Progress   io.Writer
 	ConfigPath string
 	DataDir    string
 	Restart    func(context.Context) error
@@ -87,7 +89,7 @@ type Manager struct {
 }
 
 func System() Manager {
-	return Manager{ConfigPath: "/etc/flea/server.json", DataDir: "/var/lib/flea", Restart: func(ctx context.Context) error {
+	return Manager{Progress: os.Stdout, ConfigPath: "/etc/flea/server.json", DataDir: "/var/lib/flea", Restart: func(ctx context.Context) error {
 		output, err := exec.CommandContext(ctx, "systemctl", "restart", "flea.service").CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("restart: %w: %s", err, output)
@@ -197,6 +199,7 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	progress := activationProgress(c, o)
 	if c.Sites == nil {
 		c.Sites = map[string]string{}
 	}
@@ -392,6 +395,9 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 	if err = atomicWrite(m.pending(), old, 0600); err != nil {
 		return "", err
 	}
+	if m.Progress != nil {
+		fmt.Fprintln(m.Progress, progress)
+	}
 	if err = atomicWrite(m.ConfigPath, data, 0644); err == nil {
 		err = m.Restart(ctx)
 		if err == nil {
@@ -423,6 +429,34 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 		return "", err
 	}
 	return id, nil
+}
+
+// Use the installed host policy, not local deployment settings, to distinguish
+// first-time HTTPS enablement from an ordinary verification. Verification itself
+// is unchanged, including certificate renewal and readiness failures.
+func activationProgress(c host.Config, o Options) string {
+	configured := map[string]bool{}
+	if c.TLS != nil {
+		for _, domain := range c.TLS.Domains {
+			configured[domain] = true
+		}
+	}
+	if o.HTTPS && !o.keepRouting {
+		for _, domain := range o.Domains {
+			if !configured[domain] {
+				return "Setting up HTTPS certificates. DNS must point here; allow inbound 80/443. This may take two minutes."
+			}
+		}
+		return "Checking site health and HTTPS..."
+	}
+	if o.keepRouting {
+		for _, domain := range o.Domains {
+			if configured[domain] {
+				return "Checking site health and HTTPS..."
+			}
+		}
+	}
+	return "Checking site health..."
 }
 
 func realDirs(base string, parts []string) error {

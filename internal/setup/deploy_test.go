@@ -75,6 +75,7 @@ func TestDeploySSHWorkflow(t *testing.T) {
 func TestHTTPSCommandAndInvalidInput(t *testing.T) {
 	root := repoSite(t)
 	var commandText string
+	var progress bytes.Buffer
 	runner := func(_ context.Context, c command) error {
 		text := strings.Join(c.args, " ")
 		if strings.Contains(text, "FLEA_SYSTEM") {
@@ -91,8 +92,11 @@ func TestHTTPSCommandAndInvalidInput(t *testing.T) {
 		return nil
 	}
 	s := DeploySettings{Target: "root@server", Domain: "example.test", Email: "dev@example.test", AgreeTOS: true}
-	if err := deploy(context.Background(), root, s, true, strings.NewReader(""), io.Discard, io.Discard, runner); err != nil {
+	if err := deploy(context.Background(), root, s, true, strings.NewReader(""), &progress, io.Discard, runner); err != nil {
 		t.Fatal(err)
+	}
+	if strings.Contains(progress.String(), "HTTPS certificates") || strings.Contains(progress.String(), "two minutes") {
+		t.Fatal("client inferred certificate state without server evidence", progress.String())
 	}
 	if !strings.Contains(commandText, "-https -email 'dev@example.test' -agree-tos") || strings.Contains(commandText, "sudo") {
 		t.Fatal(commandText)

@@ -4,6 +4,12 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.7.1 - 2026-10-03
+
+- Show certificate setup guidance only when enabling HTTPS for a new domain.
+  Routine deployments say "Checking site health and HTTPS..." while retaining
+  all readiness, certificate and rollback checks. HTTP-only sites use a health check message.
+
 ## 0.7.0 - 2026-10-03
 
 - Expand the bundled import skill to brochure, portfolio and artist-site redesigns,

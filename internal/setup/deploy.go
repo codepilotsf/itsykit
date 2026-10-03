@@ -319,9 +319,6 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		return fmt.Errorf("branch or commit changed before activation; retry")
 	}
 	fmt.Fprintln(out, "Activating and checking release...")
-	if opts.HTTPS {
-		fmt.Fprintln(out, "Requesting/verifying HTTPS certificates. DNS must point here; allow inbound 80/443. This may take two minutes.")
-	}
 	if err = ssh(ctx, text, true, out); err != nil {
 		return fmt.Errorf("remote activation failed: %w (if SSH disconnected, inspect the server; use sudo flea-server -recover if a recovery journal remains)", err)
 	}

@@ -1386,6 +1386,10 @@ Video requires H.264 plus optional AAC-LC, fast start,
 are Git-ignored and transferred separately during deployment/pull. See
 [videos](docs/videos.md) for storage, validation, fresh-clone recovery and limits.
 
+Routine HTTPS deployments report "Checking site health and HTTPS...". The server
+shows DNS/ports and certificate setup guidance only when enabling HTTPS for a
+domain not already configured; all readiness and certificate checks still run.
+
 For hosting Flea's own release binaries independently of website deployments,
 see [disk-backed download hosting](docs/download-hosting.md). This optional host
 setting does not change ordinary site assets or the 256 MiB site archive limit.

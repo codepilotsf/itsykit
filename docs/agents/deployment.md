@@ -93,6 +93,9 @@ Default the certificate email to Git user.email only when no saved, inherited,
 or explicitly supplied email exists. Keep the prompt editable; do not change Git config.
 Save validated settings without a final save-confirmation question. Deployment
 shows the branch/domain and Ctrl-C notice, then a success URL after activation.
+The server chooses activation progress from its installed TLS domain list: show
+certificate setup guidance only when enabling a new domain, otherwise a concise
+site-health/HTTPS check. Keep verification and renewal behavior unchanged.
 Ask for the SSH username (default root) only when the target does not include
 user@host; save the explicit username. Existing bare targets ask only for the
 missing username. Do not ask about NAT/proxy IP lists during normal setup; retain

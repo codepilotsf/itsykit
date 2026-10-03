@@ -2,6 +2,10 @@
 
 ## Product and build specification
 
+Deployment progress uses installed server TLS state: first-time HTTPS enablement
+shows setup guidance, routine deployments show a concise health/HTTPS check.
+This changes messaging only, not readiness checks or certificate renewal.
+
 Implemented in 0.7.0: optional administrator-owned `downloads` host mappings serve
 checksum-validated versioned Flea CLI downloads from pinned disk handles, outside
 website snapshots and RAM asset maps. This is not a general filesystem mount.
