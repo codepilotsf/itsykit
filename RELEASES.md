@@ -1,8 +1,11 @@
 # Publishing FleaCMS downloads
 
-Public downloads live in `site/releases/<version>/`. Each version directory is
-immutable: never replace published executable bytes or their SHA256SUMS.
-The website repository contains public binaries, not framework source.
+Public downloads live outside this website in the server's administrator-owned
+`/var/lib/flea/downloads/fleacms/<version>/` store. URLs remain
+`https://fleacms.com/releases/<version>/`. Never replace published bytes or hashes.
+The website contains only `site/releases/latest.txt`; do not add binaries back.
+Local retained artifacts are archived in `/Users/sean/fleacms-releases/`.
+Older Git commits contain binaries; do not rewrite that history.
 
 Publish a new version's binaries and checksum manifest first. Fetch them over
 HTTPS and verify their checksums before advancing `site/releases/latest.txt`.
@@ -13,6 +16,25 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 (`linux-amd64`). Do not list additional platforms without native checks.
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
+
+## 0.7.0 publication, October 3, 2026
+
+Framework commit `1199747`, immutable tag `v0.7.0`. Includes reviewed interactive
+design checkpoints in the bundled skills and confined disk-backed release hosting.
+Mac full tests, vet and race checks passed. Both embedded Linux servers were
+rebuilt; Mac ARM64 signature and generated-skill comparisons passed. Linux AMD64
+was cross-compiled and passed native unprivileged version/new/status checks.
+This is not a native Linux build/full-suite run or clean-machine Mac acceptance.
+
+Server upgraded to 0.7.0. All seven retained versions (0.3.0 through 0.7.0, with
+the existing version gaps) passed public HTTPS manifest and binary hash checks
+from the new store before removing their duplicate files from this website.
+No published version was deleted or overwritten. latest.txt remains site-managed.
+The host mapping was backed up at
+`/etc/flea/server.before-downloads-20261003T141633.json`. Migration initially
+installed server.json with private permissions; restoring its standard 0644 mode
+resolved startup, without weakening the systemd unit. Recovery/health then passed.
+Final website activation and install/update verification are recorded below.
 
 ## 0.6.1 published October 1, 2026
 

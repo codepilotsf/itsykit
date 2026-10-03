@@ -1,5 +1,16 @@
 # fleacms.com website handoff
 
+## Current update: October 3, 2026
+
+0.7.0 is being published from framework `1199747`, tag `v0.7.0`.
+Downloads now live in `/var/lib/flea/downloads/fleacms` on the existing host,
+outside this repository and website snapshots. Every retained version and 0.7.0
+passed public manifest/hash checks. Local copies are at
+`/Users/sean/fleacms-releases/`; prior Git history is unchanged. Keep only
+latest.txt under site/releases. See RELEASES.md for final deployment evidence and
+the framework's docs/download-hosting.md for future publishing and backup steps.
+Do not follow older notes below that say to commit versioned binaries in this site.
+
 Updated October 1, 2026.
 
 Version 0.6.1 is published from framework commit `89e3472` and tag `v0.6.1`.
