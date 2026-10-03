@@ -1,5 +1,10 @@
 # fleacms.com website handoff
 
+Latest patch 0.7.1: framework `f4a72ee`, tag `v0.7.1`; website `f75d63f`,
+activation `20261003-151507-4d9b7bc05ab6b470b4ae679b`. Server/channel/local CLI
+agree. Routine deployment's shorter HTTPS message was observed live. Public
+fresh installs and updates from 0.7.0 passed on Mac/Linux. See RELEASES.md.
+
 ## Current update: October 3, 2026
 
 0.7.0 is published from framework `1199747`, tag `v0.7.0`.
