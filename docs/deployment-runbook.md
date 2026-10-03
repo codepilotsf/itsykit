@@ -279,7 +279,20 @@ and confirm their intended branch matches the remote. Preserve unrelated changes
 Finish with website `flea status`, live server version/health, and any remaining
 acceptance limits. Do not turn a successful smoke check into a claim of full QA.
 
-## Latest completed release: 0.7.0
+## Latest completed release: 0.8.0
+
+Framework `c8a1d96`, tag `v0.8.0`; website `3188000`, activation
+`20261003-171440-ca76afb853e32d0d0309c6ea`. Public Mac/Linux hashes, fresh
+installs and updates from 0.7.1 passed; server, channel and local CLI are 0.8.0.
+Naves and Kent received toolbar-only deployments. Existing sites require the
+new starter `site/admin/_toolbar.html` edit-row wrapper with this runtime;
+update those partials before upgrading the shared server. Preserve custom layouts.
+Bookworm was explicitly excluded by Sean: public pages remain healthy, but its
+old toolbar is incompatible with the 0.8.0 editor. No compatibility fallback was
+added. Native Linux full-suite/build and clean Mac/notarization remain open.
+Memory/swap settings are unchanged, and recovery is clear. See website RELEASES.md.
+
+## Historical completed release: 0.7.0
 
 Framework `1199747`, tag `v0.7.0`; website `a41a758`, activation
 `20261003-141847-a863aaed91fd5f4c8fa761b8`. All seven version directories were

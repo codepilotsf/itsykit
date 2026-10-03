@@ -8,6 +8,15 @@ for completed changes, and [README.md](README.md) for current usage.
 
 ## Current release status (October 3, 2026)
 
+- Version 0.8.0 is published. Framework `c8a1d96`, tag `v0.8.0`; website
+  `3188000`, activation `20261003-171440-ca76afb853e32d0d0309c6ea`.
+  The sliding edit row and Theme panel passed browser and reduced-motion checks.
+  Public Mac/Linux downloads, fresh installs and updates from 0.7.1 passed.
+  Naves and Kent received toolbar-only deployments, preserving live content/theme.
+  Bookworm was excluded at Sean's request: its public pages work, but the old
+  toolbar remains incompatible with the shared 0.8.0 editor. Update its partial
+  before using that editor again. Existing distribution acceptance limits remain.
+
 - Version 0.7.1 is published: website, download links, update channel and shared
   server executable agree. Public Mac/Linux checksums, fresh installs and updates
   from 0.7.0 passed, with Linux checks running unprivileged. Local tests, vet,

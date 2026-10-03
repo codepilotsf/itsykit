@@ -1,6 +1,6 @@
 # Installation and updates
 
-Version 0.7.1 is the current published test release for Apple Silicon macOS and
+Version 0.8.0 is the current published test release for Apple Silicon macOS and
 x86-64 Linux. The public installer selects the latest stable test release.
 Install it with:
 
@@ -15,13 +15,17 @@ the profile. `FLEA_INSTALL_DIR` may specify another absolute user-owned director
 Required V1 platforms are Apple Silicon macOS and x86-64 Linux. Other platforms
 must pass native verification before being included in published metadata.
 
-The 0.7.1 public installer passed fresh installation and updates from 0.7.0 on
+The 0.8.0 public installer passed fresh installation and updates from 0.7.1 on
 an existing Mac and Ubuntu host, with installed checksums matching the published
 artifacts. Linux checks ran unprivileged. Site creation and validation also passed.
 These are not
 clean-OS tests. The Mac executable is ad-hoc signed, not notarized; independent
 clean-machine testing remains pending. The website presents this as an early
 test release so invited testers can provide feedback.
+
+For 0.8.0, update existing sites' `site/admin/_toolbar.html` from the current
+starter alongside the executable. Its edit-row wrapper is required for the new
+sliding toolbar. Preserve each site's custom layouts and content.
 
 `flea update` updates only the local CLI and embedded Linux servers. Downloads
 are bounded and checked for checksum, platform and version before replacement.

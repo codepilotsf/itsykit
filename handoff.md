@@ -1,5 +1,28 @@
 # FleaCMS agent handoff
 
+## Latest release: 0.8.0, October 3, 2026
+
+Framework `c8a1d96`, immutable tag `v0.8.0`; website `3188000`, activation
+`20261003-171440-ca76afb853e32d0d0309c6ea`. Server, public channel and Sean's
+installed CLI are 0.8.0; the installed Mac hash matches the public manifest.
+Edit row collapses outside Edit; Theme slides from the right and tracks toolbar
+height. Existing sites must update the starter toolbar partial with the runtime.
+Naves `c59dfff`, activation `20261003-171113-e1b9be7c7e17a28c8aca4ffd`;
+Kent `d80eaeb`, activation `20261003-171202-d490ea0173f4c49cbd1be27a`.
+Both deployments preserved content/theme. Bookworm was explicitly excluded; its
+public page returns 200, but its old editor toolbar is incompatible with 0.8.0.
+Do not mistake a public health check for editor acceptance there.
+
+Tests/vet, bundle build, final browser regressions, native Mac signature/new/status
+and unprivileged Linux smoke checks passed. Public fresh installs and 0.7.1 updates
+passed on both platforms with exact hashes. Linux was cross-compiled; native full
+suite/build and clean Mac/notarization remain open. Website RELEASES.md has hashes.
+Host memory/swap settings are unchanged; no recovery journals remain.
+Private pre-release site backups are /tmp/flea-{naves,kent,website}-before-080.flea-backup.
+Kent's unrelated skill edit and framework APPS.md were preserved. Kent deployed
+from /tmp/flea-kent-release-080. Naves has no Git remote; its commit is local only.
+No OTP mailer changes were made. Earlier release notes below are historical.
+
 ## Latest patch: 0.7.1, October 3, 2026
 
 Framework `f4a72ee`, tag `v0.7.1`; website `f75d63f`, activation
