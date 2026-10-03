@@ -1,6 +1,15 @@
 # fleacms.com website handoff
 
-Latest release 0.8.0: framework `c8a1d96`, tag `v0.8.0`; website `3188000`,
+Latest release 0.8.1: framework `209b5d3`, tag `v0.8.1`; website `9fd1397`,
+activation `20261003-230705-de4bfab5fbec8834e722a460`. Fixes duplicate `.gitignore`
+rules and preserves existing bytes. Public Mac/Linux installs, reinstalls and
+updates from 0.8.0 passed; Sean's installed CLI and the public channel are 0.8.1.
+The shared server stays at 0.8.0; no executable upgrade was needed for this CLI fix.
+Recovery is clear, memory/swap safeguards are unchanged, and test dev processes
+are stopped. See RELEASES.md for hashes and remaining distribution limits.
+Framework APPS.md and the previous installed binary backup remain untouched.
+
+Previous release 0.8.0: framework `c8a1d96`, tag `v0.8.0`; website `3188000`,
 activation `20261003-171440-ca76afb853e32d0d0309c6ea`. Server, public channel
 and Sean's installed CLI agree. Public downloads, fresh installs, updates from
 0.7.1 and already-current checks passed on Mac and unprivileged Linux.
