@@ -17,7 +17,7 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
-## 0.8.0 release, October 3, 2026
+## 0.8.0 published October 3, 2026
 
 Framework `c8a1d96`, immutable tag `v0.8.0`, built with Go 1.27.1 on Mac ARM64.
 The edit row collapses outside Edit; Theme slides from the right and tracks the
@@ -25,7 +25,14 @@ available height. Existing sites require the current starter toolbar partial.
 Full local tests/vet, browser regressions, bundled server builds, Mac signature
 and fresh-site checks passed. The cross-compiled Linux AMD64 CLI passed native
 unprivileged version/new/status checks. Full native Linux build/suite and clean
-Mac/notarization remain unverified. Final publication evidence follows below.
+Mac/notarization remain unverified.
+
+Website source `3188000`, activation `20261003-171440-ca76afb853e32d0d0309c6ea`.
+Shared server and public channel report 0.8.0. Anonymous downloads matched the
+manifest. Fresh installs, updates from 0.7.1 and already-current checks passed
+on Mac ARM64 and unprivileged Linux AMD64, with installed hashes matching below.
+All four public sites, docs and social image returned 200. Recovery is clear;
+existing memory/swap safeguards were preserved. No mailer changes were made.
 
 - Mac ARM64: `f1792257d2c4c62976a934178ef964795a8f91590b18f5a17d8e6fe2c38edbb7`
 - Linux AMD64: `e441b4f5ae3bf4a6c60ede86e9ac10a0d7f4740b72723c726214e46737663596`

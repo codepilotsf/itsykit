@@ -1,5 +1,16 @@
 # fleacms.com website handoff
 
+Latest release 0.8.0: framework `c8a1d96`, tag `v0.8.0`; website `3188000`,
+activation `20261003-171440-ca76afb853e32d0d0309c6ea`. Server, public channel
+and Sean's installed CLI agree. Public downloads, fresh installs, updates from
+0.7.1 and already-current checks passed on Mac and unprivileged Linux.
+The website, Naves and Kent received the required new toolbar wrapper. Bookworm
+was excluded at Sean's request: its public page works, but the old editor toolbar
+is incompatible with the shared 0.8.0 runtime. No OTP mailer work was performed.
+No recovery journals remain; memory/swap policy is unchanged. See RELEASES.md.
+Framework APPS.md and Kent's unrelated skill edit remain untouched. Naves has
+no Git remote, so its toolbar commit is local only. Earlier entries are history.
+
 Latest patch 0.7.1: framework `f4a72ee`, tag `v0.7.1`; website `f75d63f`,
 activation `20261003-151507-4d9b7bc05ab6b470b4ae679b`. Server/channel/local CLI
 agree. Routine deployment's shorter HTTPS message was observed live. Public
