@@ -279,7 +279,18 @@ and confirm their intended branch matches the remote. Preserve unrelated changes
 Finish with website `flea status`, live server version/health, and any remaining
 acceptance limits. Do not turn a successful smoke check into a claim of full QA.
 
-## Last completed release: 0.6.1
+## Latest completed release: 0.7.0
+
+Framework `1199747`, tag `v0.7.0`; website `a41a758`, activation
+`20261003-141847-a863aaed91fd5f4c8fa761b8`. All seven version directories were
+copied to the separate store and every public manifest/binary hash verified.
+The website then removed its duplicate version directories and deployed latest.txt
+and docs as 0.7.0. Local binaries are preserved in /Users/sean/fleacms-releases.
+Upload size was 575 KB. Tests, race, vet and Mac/Linux public installer/update
+checks passed. Native Linux full build/suite and clean Mac/notarization remain open.
+See the website RELEASES.md and docs/download-hosting.md for evidence and procedure.
+
+## Historical completed release: 0.6.1
 
 - Tagged framework source: `89e3472`, tag `v0.6.1`.
 - Deployed website source: `1857a45`.
@@ -313,7 +324,8 @@ These are historical results. Recheck live state instead of assuming it is uncha
 
 - LAN terminal QR codes are a planning item in next-steps.md, not implemented.
   Automatic display with `--lan` versus an explicit `--qr` remains undecided.
-- Reduce asset-loading memory and consider disk-backed upload staging. Investigate
+- Versioned download asset memory was addressed in 0.7.0 by the separate store.
+  For other large site assets, consider disk-backed upload staging. Investigate
   the current loader and immutable snapshot requirements before designing a fix.
   Do not delete old public binaries to make the problem disappear. Test memory
   under simultaneous service startup and admin validation, not just steady state.

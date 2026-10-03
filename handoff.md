@@ -1,5 +1,46 @@
 # FleaCMS agent handoff
 
+## Current handoff: October 3, 2026
+
+0.7.0 is published and verified. Framework source `1199747`, immutable tag
+`v0.7.0`; website source `a41a758`, activation
+`20261003-141847-a863aaed91fd5f4c8fa761b8`. Both repositories were pushed.
+Server, public channel and Sean's local CLI report 0.7.0. Tests, vet, race checks,
+Mac signature/generated-skill checks and native unprivileged Linux smoke checks
+passed. Public fresh installs and updates from 0.6.2 passed on Mac/Linux, including
+already-current behavior. Full native Linux suite/build and clean Mac/notarization
+remain unverified. The website release record has exact hashes and migration notes.
+
+The bundled skills now include interactive design checkpoints. The review corrected
+overbroad watcher/caching and editing claims while preserving the requested process.
+`APPS.md` is unrelated untracked planning work, deliberately left untouched.
+Older notes below about uncommitted runbook/QR changes are superseded: those were
+already included in 0.6.2. QR remains planned, not implemented.
+
+Downloads are now separate from website snapshots. Read
+[download hosting](docs/download-hosting.md) and the updated
+[deployment runbook](docs/deployment-runbook.md). Production store:
+`/var/lib/flea/downloads/fleacms`; local artifact archive:
+`/Users/sean/fleacms-releases/`. All seven published versions and hashes were
+verified over HTTPS before removing duplicate binaries from the website tree.
+Git history and old server releases remain intact. Only latest.txt stays in the
+website; do not add versioned binaries back. Public URLs are unchanged.
+The small website now has about 0.63 MiB of public assets; deployment uploaded
+575 KB. Keep the existing 320 MiB targets and 1 GB swap buffer.
+
+The new host config mapping is explicit administrator policy. Its pre-change
+backup is `/etc/flea/server.before-downloads-20261003T141633.json`. Normal site
+deployments preserve it. Pre-0.7 executables cannot load the field; see rollback
+instructions before attempting an executable downgrade. A migration helper's
+config permission mistake was corrected to Flea's standard 0644 mode; final
+service, download, range, isolation and public-site checks passed. No recovery
+operation or preview server was intentionally left running.
+
+Read current AGENTS.md, inspect both worktrees and live state, and follow Sean's
+new request. Do not treat this handoff as standing deployment authorization.
+
+## Historical handoff through 0.6.1
+
 Current handoff recorded October 1, 2026, after release 0.6.1.
 Start here. The older website-design brief below is preserved as history, not
 an instruction to rebuild, relocate or publish the website again.

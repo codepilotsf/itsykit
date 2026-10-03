@@ -1,7 +1,7 @@
 # Installation and updates
 
-Version 0.7.0 is being prepared for Apple Silicon macOS and x86-64 Linux.
-The public installer selects the latest published stable test release.
+Version 0.7.0 is the current published test release for Apple Silicon macOS and
+x86-64 Linux. The public installer selects the latest stable test release.
 Install it with:
 
 ```sh
@@ -15,7 +15,7 @@ the profile. `FLEA_INSTALL_DIR` may specify another absolute user-owned director
 Required V1 platforms are Apple Silicon macOS and x86-64 Linux. Other platforms
 must pass native verification before being included in published metadata.
 
-The 0.6.1 public installer passed fresh installation and updates from 0.6.0 on
+The 0.7.0 public installer passed fresh installation and updates from 0.6.2 on
 an existing Mac and Ubuntu host, with installed checksums matching the published
 artifacts. Linux checks ran unprivileged. Site creation and validation also passed.
 These are not

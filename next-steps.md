@@ -6,12 +6,16 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](CHANGELOG.md)
 for completed changes, and [README.md](README.md) for current usage.
 
-## Current release status (October 1, 2026)
+## Current release status (October 3, 2026)
 
-- Version 0.6.1 is published: website, download links, update channel and shared
+- Version 0.7.0 is published: website, download links, update channel and shared
   server executable agree. Public Mac/Linux checksums, fresh installs and updates
-  from 0.6.0 passed, with Linux checks running unprivileged. The local tests, race
-  suite, vet, bundled build and native dev replacement/crash checks also passed.
+  from 0.6.2 passed, with Linux checks running unprivileged. The local tests, race
+  suite, vet, bundled build and generated-skill comparisons also passed.
+- Versioned downloads now stream from a separate administrator-owned disk store,
+  preserving all old URLs and hashes. Website assets fell from 247.7 MiB to
+  0.63 MiB; the final archive upload was 575 KB. Keep the 256 MiB archive limit.
+  Follow docs/download-hosting.md; back up the store independently of site backups.
 - The 1 GB host needed Sean's approved `GOMEMLIMIT=320MiB` service override to
   complete activation. The 0.6.1 upgrade additionally needed an approved 1 GB
   swap file, persisted in /etc/fstab. Apply the memory target to separate upgrade
