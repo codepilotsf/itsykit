@@ -1,23 +1,31 @@
 # Flea mini apps — design handoff
 
 Status: design only, not implemented
-Date: 2026-10-03
+Date: 2026-10-04
 Scope: a proposed "apps" capability for Flea
 
-## Current decisions (October 3, supersedes older sections below)
+## Current decisions (October 4, supersedes older sections below)
 
 Related planning: [CodePilot service](service.md). Both documents remain design
 work, not authorization to implement. Service workflow details are being worked
 out separately; Rails is not the default backend for Flea apps.
 
+- Apps extend a mostly static website. Flea handles routing, form forwarding,
+  and rendering; it is not a Rails replacement or a framework for arbitrary
+  application workflows. Complex forms are a reason to reconsider an app's
+  scope before expanding the core contract.
 - Admin login and the editor remain in core. Disregard the older identity
   extraction proposals and phase below.
 - Apps are independent JSON services, normally Go binaries, with a documented
   API for agents writing site-specific templates. Remote APIs can use the same
   contract; incompatible services may need an adapter.
-- Prefer explicit template directives such as `{layout main}` and
-  `{app blog.list}` over settings comments. Exact grammar remains proposed.
-  Responses bind to `blog.*`, not the older `api.blog.*` examples below.
+- Prefer explicit template directives such as `{layout main}` over settings
+  comments. Exact grammar remains proposed. App mounts are declared in site
+  configuration, for example `"apps": {"blog": {"mount": "/articles"}}`.
+  The mount connects routes to the app; no `{app ...}` directive is needed.
+  Reading app data on unrelated pages remains a separate open question.
+- Responses bind under the app name and retain the API envelope: ordinary
+  values use `blog.data.*`, not flattened `blog.*` or older `api.blog.*` paths.
 - Page bindings perform reads before rendering. Ordinary forms perform writes.
   HTTP methods and mounted routes select operations; no mandatory `/apps/`
   prefix, `/submit` suffix, hidden `_action`, or custom action attribute.
@@ -29,8 +37,8 @@ out separately; Rails is not the default backend for Flea apps.
   programmed in site configuration. They are relative to the mount: contact at
   `/deeply/nested/route/contact` redirects to
   `/deeply/nested/route/contact/thanks`. Flea resolves against the mount explicitly,
-  independent of browser trailing-slash behavior. Exact response envelope and
-  mount registration remain open.
+  independent of browser trailing-slash behavior. See the response contract
+  below; remaining registration and transport details are still open.
 - Prefer flat durable storage: `storage/snips.json`, `storage/blog.json`,
   `storage/events.sqlite`, and shared `storage/media/`. App directories are
   optional when needed. Whether storage is at project root or under `flea/`
@@ -46,8 +54,173 @@ out separately; Rails is not the default backend for Flea apps.
   recording, and staging promotion are covered by the separate service planning.
 - A new content API/revision system is deferred, not an app prerequisite.
 - First prove contact, then blog reads/storage, then events or booking. Admin
-  extraction is no longer a phase. Process supervision, packaging, dynamic route
-  grammar, and ZJAX changes below remain proposals requiring verification.
+  extraction is no longer a phase. See the [proposed contact README](contact-app.md).
+  Packaging, dynamic route grammar, and ZJAX changes remain open.
+
+### Packages, configuration, and lifecycle
+
+- Included apps and their optional Go helper package live in this repository,
+  with tests covering both sides of the contract. Source layout and distribution
+  packaging are not yet fixed. Inclusion does not enable every app on every site.
+- Packages may be discovered automatically, but only entries in the main
+  `.flea.config.json` enable them and assign public mounts. Discovery alone must
+  not execute code or register routes.
+- A per-app `app.json` describes the package, not site-specific routing. The
+  agreed fields are `name`, app release `version`, and integer `protocol`.
+  Executable declaration details remain proposed.
+- The contract is named **Flea App Protocol**: for example, Flea App Protocol v1
+  is declared as `"protocol": 1`. App release versions are separate. Verify the
+  running service's protocol, not just the manifest; reject mismatches clearly,
+  without compatibility fallbacks. The handshake still needs specification.
+- Flea manages local apps as child processes in development and production,
+  passing a private listen address and storage location. It owns startup,
+  shutdown, bounded crash-restart backoff, and useful redacted logs. This
+  supersedes the historical proposal for a systemd unit per app.
+- Unavailable apps return a friendly 503 on affected routes; unrelated site
+  pages remain available. Migrations do not run during crash recovery.
+- Remote services use a configured URL and are not supervised by Flea. Exact
+  URL configuration, transport authentication, readiness, resource limits, and
+  process cleanup still need design. Child processes are not security sandboxes.
+- Go helpers are optional: use standard HTTP routing and small handlers, with
+  helpers for request decoding, response envelopes, and service startup. Do not
+  create a config-driven business-logic language or require an ORM. Start with
+  contact and extract helpers justified by actual use.
+- Flea retains email credentials, rendering, delivery, and development previews.
+  Contact validates submissions and calls a narrow private capability to send
+  this site's contact notification, not arbitrary mail. Authorization is scoped
+  to the app and site. Capability transport and remote-service access remain
+  open; see the [contact README](contact-app.md#email-settings-and-security).
+
+### Optional SQLite schema changes
+
+Apps own their schema and numbered SQL migration files, for example
+`migrations/001_create_events.sql` and `002_add_location.sql`. Applied files stay
+unchanged; subsequent schema changes get new files. New databases run them all.
+A small runner tracks applied files, executes each migration in a transaction,
+and records success in that same transaction. Failure stops the update.
+
+Production migrations are an explicit app-update step after a consistent
+database backup, not a side effect of ordinary startup or automatic restart.
+No automatic reverse migrations initially. Update locking, interrupted-update
+recovery, and app/schema compatibility checks remain to be designed. Migration
+SQL belongs in Git; databases do not. Contact requires neither.
+
+### Form request contract
+
+Flea converts ordinary form submissions to a flat JSON object and forwards it
+to the registered app. There is no request `data` wrapper:
+
+```html
+<input name="email">
+<textarea name="message"></textarea>
+```
+
+```json
+{
+  "email": "sean@example.com",
+  "message": "Hello"
+}
+```
+
+- A name submitted once has a string value. Repeated names have an array of
+  strings. The app handles type conversion and validation.
+- Missing fields stay absent, including unchecked checkboxes. A submitted empty
+  field remains an empty string.
+- Names are literal: `address.city` or `sessions[a].date` remain exactly those
+  JSON keys. Flea does not interpret dots, brackets, or indexes as nested data.
+- Flea validates and removes its own CSRF field before forwarding. Existing
+  Origin, host isolation, and other applicable security checks remain required.
+- File uploads need a separate contract and are deferred; do not encode files
+  into this JSON contract.
+
+An app can interpret its own documented field names when needed. Shared nested
+field parsing is not part of the initial scope; revisit only if concrete mini
+apps repeatedly need it.
+
+### GET request contract
+
+Flea forwards query parameters to the mounted app as query parameters, without
+a JSON request body. For example, `/articles?page=2` calls the blog service with
+`?page=2`. The app handles parsing, defaults, and validation; Flea does not convert
+query values to numbers or interpret nested field names. Repeated parameters
+remain repeated parameters.
+
+The app returns the response envelope below, and Flea renders the page with
+that data under the app namespace.
+
+### Mount-relative service routes
+
+Flea strips the configured public mount when calling the app service. The mount
+itself maps to `/`; descendant paths keep their suffix. HTTP methods and query
+parameters are preserved.
+
+| Public request | App service request |
+| --- | --- |
+| `GET /articles` | `GET /` |
+| `GET /articles?page=2` | `GET /?page=2` |
+| `GET /articles/my-post` | `GET /my-post` |
+| `POST /contact` | `POST /` |
+
+Apps document routes relative to their own root, independent of the site's
+mount depth. Match mounts on path-segment boundaries, not arbitrary string
+prefixes: `/articles` must not capture `/articles-extra`. These are URL paths,
+not filesystem paths.
+
+### Response contract
+
+The JSON-only API uses the same structure for reads and writes. Flea exposes
+renderable response fields under the configured app name:
+
+| API field | Shape and purpose | Template path |
+| --- | --- | --- |
+| `data` | Object containing app-owned values | `contact.data.email` |
+| `invalid` | Object mapping field names to validation messages | `contact.invalid.email` |
+| `error` | Single operational failure message, a string | `contact.error` |
+| `flash` | Object containing temporary messages | `contact.flash.notice` |
+| `redirect` | Mount-relative destination, handled by Flea as a server instruction | Not exposed as template data |
+
+Only envelope keys are reserved. Names inside `data` belong to the app; there
+is no `_meta` namespace. `invalid` replaces the proposed `validation` name,
+and the single `error` string replaces the proposed `errors` array.
+
+Validation failure example (HTTP 422):
+
+```json
+{
+  "data": {"email": "not-an-email", "message": "Hello"},
+  "invalid": {"email": "Enter a valid email address."}
+}
+```
+
+Operational failure example (HTTP 503):
+
+```json
+{
+  "error": "We couldn't send your message. Please try again."
+}
+```
+
+Successful submission example (Flea emits HTTP 303):
+
+```json
+{
+  "redirect": "thanks",
+  "flash": {"notice": "Your message was sent."}
+}
+```
+
+Flea preserves declared redisplayable form fields on failure under `data`, not
+passwords or files. Response data is request-local, never written into shared
+published Projects or compiled as template source.
+
+Flash is scoped to the visitor and app. It is available in an immediate render
+or carried across a redirect for the next page render, then expires. Persistence
+and exact consumption rules still need design; assets must not consume it.
+
+Richer template conditions are a separate proposed enhancement, not a
+prerequisite for this contract.
+
+## Historical sketch
 
 The remainder preserves the earlier design sketch for reference. Its "Decided"
 label does not override this section. Reconcile it when drafting the concrete
