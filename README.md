@@ -133,7 +133,7 @@ below. When you're ready to publish, see [deploy a site](#deploy-a-site) and
 
 ```text
 my-site/
-  .flea.config.json       App, admin, contact and deploy.branches settings
+  .flea.config.json       App, admin, apps and deploy.branches settings
   flea/
     snips.json           Rich content and page metadata
     media/               Managed photos and optimized videos
@@ -183,7 +183,7 @@ in `.flea.config.json` and are stripped from release archives and backups.
 This structure is required; there is no old-directory fallback or automatic
 migration. Existing projects need an explicit, collision-checked reorganization.
 Keep template-relative paths and public URLs unchanged. Update the server before
-deploying: protocol 22 requires the new structure.
+deploying: protocol 23 requires the new structure.
 
 ## Templates
 
@@ -298,6 +298,21 @@ Use `{#unless dotted.path}` for the inverse of an if condition:
 Missing/null values, false, zero, empty strings and empty arrays are falsey.
 Unless also supports `{:else if dotted.path}` with the usual positive condition.
 Expressions remain dotted paths, not JavaScript.
+
+### Mini-app forms
+
+`{csrf}` renders a complete hidden `_csrf` input on a public page. Place it in
+HTML element content, not an attribute or textarea. It uses a private visitor
+cookie, independent of admin login. Tokens last up to 24 hours; after a server
+restart an open form must be reloaded. Token-bearing pages are private/no-store.
+Ordinary pages do not create visitor cookies.
+
+The bundled Contact app uses this directive. Configure its mount under
+`apps.contact`; form values and feedback use `contact.data.*`,
+`contact.invalid.*`, `contact.error` and `contact.flash.*`. Admin CSRF fields
+remain unchanged. This is not a general form handler or custom app installer.
+See [Contact](apps/contact/README.md) for its complete contract and the
+[app plan](docs/planning/apps.md) for future apps.
 
 ## JSON configuration and content
 
@@ -616,7 +631,7 @@ browser's session. Removing an admin revokes their sessions. `flea status` shows
 the local session path when admins are configured.
 
 The production service can write the site's private `flea/` directory, not its
-release directory or configuration. Deployment protocol 22 requires the updated
+release directory or configuration. Deployment protocol 23 requires the updated
 server and these permissions; there is no compatibility fallback for older servers.
 
 ### Editing content
@@ -731,7 +746,7 @@ FLEA_EMAIL_FROM="login@your-verified-domain.com"
 ```
 
 Production admin access requires HTTPS. An admin-enabled HTTP-only deployment is
-refused. Protocol 22 requires both the updated server binary and systemd unit, a
+refused. Protocol 23 requires both the updated server binary and systemd unit, a
 service-owned `/etc/flea/deploy.lock`, and writable managed content/runtime directories.
 Fresh setup installs these. Existing servers need an administrator-reviewed upgrade;
 do not use setup's destructive reset to upgrade a server with sites. Existing
@@ -740,47 +755,48 @@ and host config remain root-owned. Each site's `flea/` runtime directory must be
 owned by `flea:flea` (0700). Redeployment prepares content and runtime directories.
 Back up your server before changing installation permissions.
 
-## Email-only contact forms
+## Contact app
 
-Editable email templates live in `mailers/`, including `main.layout.html` and
-HTML/plain-text versions of sign-in and contact messages. They are private,
-watched during dev, and included in deployment. See [email templates](docs/email-templates.md).
+Enable Contact by merging this into `.flea.config.json`:
 
-Add `"contact": { "to": "admin@example.com" }` alongside `app` in
-`.flea.config.json`, then put this in a page template:
-
-```html
-<form method="post" action="/_flea/contact">
-  <label>Name <input name="name" required maxlength="100"></label>
-  <label>Email <input type="email" name="email" required maxlength="254"></label>
-  <label>Message <textarea name="message" required maxlength="5000"></textarea></label>
-  <button type="submit">Send message</button>
-</form>
+```json
+{
+  "apps": {
+    "contact": {
+      "mount": "/contact",
+      "email": {"to": "owner@example.com"}
+    }
+  }
+}
 ```
 
-With `dev.email_preview` enabled, submissions open locally without sending.
-For real local delivery, disable the toggle, run `flea email`, then restart dev.
-Local email settings load automatically from `.env`; shell variables take precedence.
-Restart dev after changing contact settings too.
-Deployment requires HTTPS and prompts for server mail settings if missing.
-Admin access is not required. Omit `contact.to` to disable the endpoint.
-Existing servers need the current runtime before deploying.
+The starter includes `site/contact/index.html` and `site/contact/thanks.html`.
+Its form posts to `/contact` and includes `{csrf}`. Validation re-renders the
+form with status 422 and safe values; success redirects to `/contact/thanks`.
+The destination is relative to the mount, including deeply nested mounts.
+An optional `email.from` overrides the server's default sender. Visitor email
+is Reply-To only. Remove the app entry to disable it.
 
-Messages are plain-text email to the configured recipient, with the visitor's
-address as Reply-To. The browser receives a text confirmation, not a redirect.
-Provider acceptance does not guarantee inbox delivery. No submissions are stored.
-No uploads, inbox, automatic replies, custom fields or delivery queue.
-Only `name`, `email`, `message`, and an optional empty `website` honeypot are accepted.
-A filled honeypot returns a generic confirmation without sending.
+Local `dev.email_preview` opens messages without sending. For real local mail,
+disable preview and run `flea email`. Restart dev after app/email changes.
+Production requires HTTPS and Resend. Site-owned HTML/text email templates
+remain private in `mailers/`. Provider acceptance is not a delivery guarantee.
 
-Requests require matching Origin, production HTTPS, URL-encoded fields and a
-32 KiB maximum body. Limits: 3 attempts/IP/site/15 minutes, 20/site/hour and
-200/server/hour; one active send/site and four/server. Aliases share limits.
-Limits reset on restart. Forwarded headers do not select the client IP.
-This limits abuse but does not stop determined bots or provide process isolation.
-Login mail has separate limits but shares the provider account quota.
-Delivery times out after 10 seconds. An uncertain failure can mean a manual retry
-sends a duplicate; there are no automatic retries. General-purpose forms remain deferred.
+Flea bundles and starts Contact on a private OS-assigned port; no compiler or
+port configuration is needed on the VPS. Ordinary form submissions are converted
+to authenticated JSON requests. Email credentials stay in Flea, not the child
+or browser. Contact has no database, queue, uploads or automatic replies.
+Invalid requests, delivery failures and unavailable apps do not retry a POST.
+
+See the [Contact README](apps/contact/README.md) for form markup, field rules,
+JSON responses, flash, limits and process behavior, and
+[email templates](docs/email-templates.md) for message customization.
+
+This replaces top-level `contact` configuration and `/_flea/contact`, without
+aliases or automatic migration. Update existing forms/config explicitly, add
+`{csrf}`, and move the thank-you page beneath the chosen mount. Deployment
+protocol 23 requires the matching server. Nothing is deployed by a local build.
+External services, generic app installation and blog routes remain planned.
 
 ## Styling with Prewind
 
@@ -1316,7 +1332,7 @@ sudo systemctl restart flea
 ```
 
 Existing installations are not upgraded by rerunning setup. Deployment requires
-the current server executable (deployment protocol 22, unquoted snip syntax).
+the current server executable (deployment protocol 23, unquoted snip syntax).
 For an older installation,
 update the executable and systemd unit deliberately, preserve server.json and all
 sites, and create `/var/lib/flea/certs` owned by `flea:flea` with mode
@@ -1412,7 +1428,7 @@ directions and a sample-page review before the full build, unless you explicitly
 delegate those choices. Small maintenance edits do not require a new design review.
 
 Editable regions, short IDs, sanitized HTML, page metadata, content-preserving
-deployment, and archived orphan pruning are implemented. Deployment protocol 22
+deployment, and archived orphan pruning are implemented. Deployment protocol 23
 requires an updated server binary; older servers are refused before upload.
 Local extraction preserves unreferenced content until deployment. There is no
 Markdown renderer or schema migration engine. Inline rich-text editing and

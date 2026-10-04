@@ -80,7 +80,7 @@ func serveDevError(w http.ResponseWriter, r *http.Request, p *Project, code int,
 		v.Title = "This address doesn’t accept that request."
 		v.Summary = "Website pages support GET and HEAD. Form submissions need a dedicated handler."
 		v.Detail = "Method not allowed: " + r.Method
-		v.Hint = "Check the form’s action and method. Contact forms submit to /_flea/contact; ordinary HTML pages cannot receive POST requests."
+		v.Hint = "Check the form’s action and method. Contact forms submit to their configured app mount, such as /contact; ordinary HTML pages cannot receive POST requests."
 	}
 	var out bytes.Buffer
 	if err := devErrorTemplate.Execute(&out, v); err != nil {

@@ -286,7 +286,7 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 		if o.Sync != nil && o.Sync.WithTheme {
 			css = o.Sync.Theme
 		}
-		if (len(project.Admin.Emails) > 0 || project.Contact.To != "") && !o.HTTPS {
+		if (len(project.Admin.Emails) > 0 || len(project.Apps) > 0) && !o.HTTPS {
 			return "", fmt.Errorf("sites with admin access or contact forms require HTTPS")
 		}
 		contentPath, activeContent, err = m.prepareContentPlan(c, o.Name, id, dest, project, o.Sync)

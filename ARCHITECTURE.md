@@ -13,26 +13,54 @@ Template names and public URLs stay relative to site/, not the project root.
 Extraction journals use physical site/ paths. All *.layout.html files are private.
 Root `.flea.config.json` is the only admitted dotfile. Deployment destinations
 are nested in deploy.branches; archive packing removes deploy while retaining
-runtime settings. Configuration reads stay bounded and confined. Protocol 22
+runtime settings. Configuration reads stay bounded and confined. Protocol 23
 requires this structure, with no alternate old-layout loader.
 
 Mail templates are private runtime files in `mailers/`. The shared inclusion
 policy retains them for watching, deployment and backups; the email renderer
-loads them separately from web pages and snip extraction. Protocol 22 requires
+loads them separately from web pages and snip extraction. Protocol 23 requires
 this location, with no old-directory fallback.
 
-Email-only forms use internal/contact, configured by contact.to. Host routing
-binds handlers to fixed recipients and shares them across aliases. Validate Origin,
-TLS and bounded fields before synchronous, timed mailer.Send. Visitor input sets
-Reply-To and text, never recipient, sender, site or paths. Per-site/IP limits and
-a shared contact budget bound work. No submission storage exists. Distinct site
-roots cannot share content inodes. These are trusted in-process services, not an
-OS sandbox; provider quota remains shared with login mail. Configuration is
-captured at startup. See README for the implemented limits.
+FleaCMS has a developer CLI and persistent website server sharing the site loader
+and renderer. The bundled Contact mini app is a separate child executable, not
+a general application framework. There is no database, background job queue or
+public deployment administration API.
 
-FleaCMS has two entry points: a developer CLI and a persistent website server.
-Both use the same site loader and renderer. There is no application runtime,
-database, background job framework, or administration API exposed over HTTP.
+`apps.contact` enables a validated mount, fixed recipient and optional sender
+override. `apps/contact` owns validation and JSON outcomes; `internal/appruntime`
+owns the child transport. `internal/appmanager` supervises it only during actual
+dev/host runs. Loading, status, validation and extraction never launch apps.
+Aliases share a site runtime. `internal/appbundle` embeds only its target's
+executable; build scripts compile the child before the parent. One verified
+private temporary executable is shared by all sites in the parent process.
+Listener fd 3, credential pipe fd 4 and parent-liveness fd 5 avoid port races,
+argv/environment secrets and orphaned children. Five attempts use bounded
+1/2/4/8-second backoff. Children receive a minimal environment, not provider
+credentials. Child processes are not OS sandboxes.
+
+`internal/contact.Delivery` is a private, site-bound email capability. Its separate
+bearer credential is not a general relay: an exact currently admitted submission
+can send only once. Recipient, sender, subject and templates are chosen by Flea.
+Visitor email is Reply-To only. Per-site/IP limits and a shared contact budget
+bound work. No submission storage exists. Provider quota is shared with login
+mail. App settings are startup-bound; a changed registration fails closed until
+restart. Other site pages remain usable.
+
+`internal/appapi` owns Flea App Protocol v1 types, mount validation, flat form
+decoding and bounded authenticated HTTP calls. It never imports site or editor.
+`internal/site/app_bridge.go` renders request-local envelopes, confined relative
+redirects and bounded flash. Contact GET/HEAD routes render without service reads;
+POST forwards JSON. The flash store has at most 256 entries/site, five-minute
+expiry, and visitor/host/app/destination binding. Only successful GET rendering
+consumes a claim. No credentials or messages enter logs, site files or archives.
+Custom-service registration, dynamic read-route declarations and storage remain
+planned; see [Contact's contract](apps/contact/README.md).
+`internal/formguard` owns anonymous visitor CSRF independently of editor sessions.
+Each site Server retains a lazy signing key across snapshot reloads; no Project,
+disk file or per-visitor server map holds it. `{csrf}` calls a request-local
+renderer only when evaluated. Cookies commit after successful rendering; pages
+with tokens are private/no-store. Validation creates no tokens. Restarting the
+server invalidates open forms. Contact requires this protection; admin handling is unchanged.
 
 Read this alongside README.md for the supported behavior and AGENTS.md for
 development rules. spec.md also describes features that are not implemented.
@@ -147,7 +175,7 @@ bounded file reads rather than allocating each file in full.
 A `Project` is immutable after publication. Public config values come from `app`
 (app.site_name for the display name), never admin/mail settings. An omitted name
 gets a read-only folder default. Interactive dev saves it with confined,
-RawMessage-preserving writes; deployment requires a committed name. Protocol 22
+RawMessage-preserving writes; deployment requires a committed name. Protocol 23
 requires the app namespace without a site alias. Its exported maps exist for internal
 inspection, not concurrent editing. HTTP handlers select from validated maps;
 they never turn request paths into filesystem reads. Template output is buffered
@@ -256,7 +284,7 @@ sites before replacement; failed readiness restores the saved old executable.
 
 `sitefiles.Included` is a runtime inclusion policy, not a public-URL policy.
 Configuration and content belong in an archive but remain private over HTTP.
-Site configuration uses only `.flea.config.json`; protocol 22 rejects older
+Site configuration uses only `.flea.config.json`; protocol 23 rejects older
 server contracts before upload, including the inline-save/formatting contract.
 There is no extensionless-name fallback.
 Do not combine this predicate with the server's URL checks.
@@ -441,7 +469,7 @@ origin and CSRF validation remain exact.
 Both environments use a private `flea/runtime/sessions.json`: below the project locally,
 below `/var/lib/flea/sites/<name>/` in production. Production's `flea/` is service-owned
 0700, beside content/releases, not inside either. Code and parent directories remain
-administrator-owned. Deployment protocol 22 requires these runtime permissions.
+administrator-owned. Deployment protocol 23 requires these runtime permissions.
 Host derives this stable location from the administrator-configured managed content
 path; aliases share storage, distinct sites must not. No request chooses a path.
 Candidate host validation is read-only; actual startup prunes expired/removed owners.

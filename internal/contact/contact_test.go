@@ -3,104 +3,131 @@ package contact
 import (
 	"context"
 	"errors"
-	"flea/internal/mailer"
-	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	contactapp "flea/apps/contact"
+	"flea/internal/mailer"
 	"time"
 )
 
 type sendFunc func(context.Context, mailer.Message) error
 
 func (f sendFunc) Send(c context.Context, m mailer.Message) error { return f(c, m) }
-func request() *http.Request {
-	r := httptest.NewRequest("POST", "https://example.test"+Path, strings.NewReader("name=Visitor&email=visitor%40example.test&message=Hello"))
-	r.Header.Set("Origin", "https://example.test")
-	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	return r
+
+var submission = contactapp.Submission{Name: "Visitor", Email: "visitor@example.test", Message: "Hello"}
+
+const notification = `{"name":"Visitor","email":"visitor@example.test","message":"Hello"}`
+
+func notify(d *Delivery, body string) *httptest.ResponseRecorder {
+	r := httptest.NewRequest("POST", "/", strings.NewReader(body))
+	r.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	d.ServeHTTP(w, r)
+	return w
+}
+func delivery(sender mailer.Sender) *Delivery {
+	return &Delivery{Email: Email{To: "owner@example.test", From: "support@example.test"}, Sender: sender, Budget: &Budget{}, Render: func(_ string, fields map[string]string) (mailer.Message, error) {
+		return mailer.Message{Text: fields["message"]}, nil
+	}}
 }
 func TestDeliveryAndLimits(t *testing.T) {
 	calls := 0
-	h := New(Config{To: "owner@example.test"}, "site", sendFunc(func(ctx context.Context, m mailer.Message) error {
+	d := delivery(sendFunc(func(ctx context.Context, m mailer.Message) error {
 		calls++
-		if m.To != "owner@example.test" || m.ReplyTo != "visitor@example.test" || !strings.Contains(m.Text, "Hello") {
+		if m.To != "owner@example.test" || m.From != "support@example.test" || m.ReplyTo != submission.Email || m.Text != "Hello" {
 			t.Fatal(m)
 		}
 		if _, ok := ctx.Deadline(); !ok {
 			t.Fatal("missing deadline")
 		}
 		return nil
-	}), &Budget{}, false, nil)
+	}))
+	if w := notify(d, notification); w.Code != 403 {
+		t.Fatal("unreserved notification", w.Code)
+	}
 	for i := 0; i < 4; i++ {
-		w := httptest.NewRecorder()
-		h.ServeHTTP(w, request())
-		want := 200
+		release, ok := d.Reserve(context.Background(), "127.0.0.1", submission)
 		if i == 3 {
-			want = 429
+			if ok {
+				release()
+				t.Fatal("missing IP limit")
+			}
+			break
 		}
-		if w.Code != want {
+		if !ok {
+			t.Fatal("early limit")
+		}
+		if w := notify(d, strings.Replace(notification, "Hello", "Other", 1)); w.Code != 403 {
+			t.Fatal("changed submission", w.Code)
+		}
+		if w := notify(d, notification); w.Code != 204 {
 			t.Fatal(w.Code, w.Body.String())
 		}
+		if w := notify(d, notification); w.Code != 403 {
+			t.Fatal("duplicate notification", w.Code)
+		}
+		release()
 	}
 	if calls != 3 {
 		t.Fatal(calls)
 	}
 }
-func TestRejectedRequestsNeverSend(t *testing.T) {
-	cases := []struct {
-		name   string
-		change func(*http.Request)
-		status int
-	}{
-		{"foreign origin", func(r *http.Request) { r.Header.Set("Origin", "https://other.test") }, 403},
-		{"missing origin", func(r *http.Request) { r.Header.Del("Origin") }, 403},
-		{"http", func(r *http.Request) { r.TLS = nil }, 403},
-		{"query recipient", func(r *http.Request) { r.URL.RawQuery = "to=evil@example.test" }, 400},
-		{"method", func(r *http.Request) { r.Method = "GET" }, 405},
-		{"upload", func(r *http.Request) { r.Header.Set("Content-Type", "multipart/form-data") }, 415},
-		{"encoded path", func(r *http.Request) { r.URL.RawPath = "/%5fflea/contact" }, 404},
+func TestFailureIsSingleUse(t *testing.T) {
+	d := delivery(sendFunc(func(context.Context, mailer.Message) error { return errors.New("secret provider response") }))
+	release, ok := d.Reserve(context.Background(), "127.0.0.1", submission)
+	if !ok {
+		t.Fatal("reserve")
 	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			h := New(Config{To: "owner@example.test"}, "site", sendFunc(func(context.Context, mailer.Message) error { t.Fatal("sent rejected request"); return nil }), &Budget{}, false, nil)
-			r := request()
-			tc.change(r)
-			w := httptest.NewRecorder()
-			h.ServeHTTP(w, r)
-			if w.Code != tc.status {
-				t.Fatal(w.Code, w.Body.String())
-			}
-		})
+	defer release()
+	w := notify(d, notification)
+	if w.Code != 503 || strings.Contains(w.Body.String(), "secret") {
+		t.Fatal(w.Code, w.Body.String())
 	}
-	for _, body := range []string{"name=A&email=a%40b.test&message=X&to=evil", "name=A&name=B&email=a%40b.test&message=X", "name=A&email=a%40b.test&message=X&site_id=other", "name=A&email=invalid&message=X", "name=A&email=a%40b.test&message=" + strings.Repeat("X", 33000)} {
-		h := New(Config{To: "owner@example.test"}, "site", nil, &Budget{}, false, nil)
-		r := request()
-		r.Body = http.NoBody
-		r = httptest.NewRequest("POST", "https://example.test"+Path, strings.NewReader(body))
-		r.Header = request().Header
-		w := httptest.NewRecorder()
-		h.ServeHTTP(w, r)
-		if w.Code != 400 {
+	if notify(d, notification).Code != 403 {
+		t.Fatal("failed delivery was retried")
+	}
+}
+func TestConcurrentRequestsAndCancellation(t *testing.T) {
+	started := make(chan struct{})
+	d := delivery(sendFunc(func(ctx context.Context, _ mailer.Message) error { close(started); <-ctx.Done(); return ctx.Err() }))
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	release, ok := d.Reserve(ctx, "127.0.0.1", submission)
+	if !ok {
+		t.Fatal("reserve")
+	}
+	defer release()
+	done := make(chan int, 1)
+	go func() { done <- notify(d, notification).Code }()
+	<-started
+	if undo, ok := d.Reserve(ctx, "127.0.0.2", submission); ok {
+		undo()
+		t.Fatal("concurrent submission admitted")
+	}
+	cancel()
+	if code := <-done; code != 503 {
+		t.Fatal(code)
+	}
+	if d.Budget.active != 0 {
+		t.Fatal("capacity leaked")
+	}
+}
+func TestInvalidCapabilityAndConfig(t *testing.T) {
+	d := delivery(sendFunc(func(context.Context, mailer.Message) error { t.Fatal("sent rejected request"); return nil }))
+	for _, body := range []string{`{}`, `{"name":"A","name":"B"}`, `{"name":"Visitor","email":"visitor@example.test","message":"Hello","to":"evil@example.test"}`} {
+		if w := notify(d, body); w.Code != 422 {
 			t.Fatal(w.Code)
 		}
 	}
-}
-func TestFailureAndHoneypot(t *testing.T) {
-	h := New(Config{To: "owner@example.test"}, "site", sendFunc(func(context.Context, mailer.Message) error { return errors.New("secret provider response") }), &Budget{}, false, nil)
-	for i := 0; i < 2; i++ {
-		w := httptest.NewRecorder()
-		h.ServeHTTP(w, request())
-		if w.Code != 502 || strings.Contains(w.Body.String(), "secret") {
-			t.Fatal(w.Code, w.Body.String())
+	for _, value := range []string{"", "Owner <owner@example.test>", "a@example.test\r\nBcc: evil@example.test", "invalid"} {
+		if (Email{To: value}).Validate() == nil {
+			t.Fatal(value)
 		}
 	}
-	r := httptest.NewRequest("POST", "https://example.test"+Path, strings.NewReader("name=A&email=a%40b.test&message=X&website=spam"))
-	r.Header = request().Header
-	w := httptest.NewRecorder()
-	h.ServeHTTP(w, r)
-	if w.Code != 200 {
-		t.Fatal(w.Code)
+	if (Email{To: "owner@example.test", From: "invalid"}).Validate() == nil {
+		t.Fatal("invalid from")
 	}
 }
 func TestBudget(t *testing.T) {
@@ -130,38 +157,4 @@ func TestBudget(t *testing.T) {
 		t.Fatal("did not recover")
 	}
 	b.release()
-}
-
-func TestConcurrentRequestsAndCancellation(t *testing.T) {
-	started := make(chan struct{})
-	h := New(Config{To: "owner@example.test"}, "site", sendFunc(func(ctx context.Context, _ mailer.Message) error {
-		close(started)
-		<-ctx.Done()
-		return ctx.Err()
-	}), &Budget{}, false, nil)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	done := make(chan int, 1)
-	go func() { w := httptest.NewRecorder(); h.ServeHTTP(w, request().WithContext(ctx)); done <- w.Code }()
-	<-started
-	w := httptest.NewRecorder()
-	h.ServeHTTP(w, request())
-	if w.Code != 429 {
-		t.Fatal(w.Code)
-	}
-	cancel()
-	if code := <-done; code != 502 {
-		t.Fatal(code)
-	}
-	if h.active || h.budget.active != 0 {
-		t.Fatal("capacity leaked")
-	}
-}
-func TestConfig(t *testing.T) {
-	for _, s := range []string{"Owner <owner@example.test>", "a@example.test\r\nBcc: evil@example.test", "invalid"} {
-		c := Config{To: s}
-		if c.Validate() == nil {
-			t.Fatal(s)
-		}
-	}
 }

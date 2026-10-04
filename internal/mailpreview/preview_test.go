@@ -95,6 +95,26 @@ func TestPreviewMessageAndIsolation(t *testing.T) {
 	}
 }
 
+func TestPreviewSenderOverride(t *testing.T) {
+	p, address := fixture(t)
+	if err := p.Send(context.Background(), mailer.Message{To: "owner@example.test", From: "support@example.test", Text: "Hello"}); err != nil {
+		t.Fatal(err)
+	}
+	w := get(p, *address)
+	if w.Code != 200 || !strings.Contains(w.Body.String(), "support@example.test") || strings.Contains(w.Body.String(), "hello@example.test") {
+		t.Fatal("override missing", w.Body.String())
+	}
+	if err := p.Send(context.Background(), mailer.Message{To: "owner@example.test", From: "invalid", Text: "Hello"}); err == nil {
+		t.Fatal("invalid sender accepted")
+	}
+	if err := p.Send(context.Background(), mailer.Message{To: "owner@example.test", Text: "Default"}); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(get(p, *address).Body.String(), "hello@example.test") {
+		t.Fatal("override changed default")
+	}
+}
+
 func TestLANPreviewRequiresCapabilityAndApprovedRequest(t *testing.T) {
 	p, address := fixture(t)
 	if err := p.Send(context.Background(), mailer.Message{To: "owner@example.test", Text: "Private LAN preview"}); err != nil {

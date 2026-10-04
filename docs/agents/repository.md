@@ -40,6 +40,14 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `internal/setup/ssh.go`: shared SSH/SCP connection policy and target formatting.
 - `internal/release/protocol.go`: shared CLI/server archive compatibility marker.
 - `internal/site/template.go`: template parser, partial resolution, and data lookup.
+- `internal/formguard/`: stateless anonymous form CSRF, separate from admin auth.
+- `internal/appapi/`: mini-app protocol, mounts and bounded authenticated HTTP transport.
+- `apps/contact/`: included Contact validation, manifest and canonical contract.
+- `internal/contact/`: site-bound single-use email capability and shared budget.
+- `internal/appmanager/`: managed child launch, readiness, backoff and cleanup.
+- `internal/appruntime/` and `cmd/flea-contact/`: private child transport and entry point.
+- `internal/appbundle/`: matching-platform Contact executable; build before its parent.
+- `internal/site/apps.go`, `app_bridge.go`, `flash.go`: registration, public dispatch and private flash.
 - `internal/site/icons.go`: on-demand pinned Lucide downloads, private cache,
   geometry-only SVG validation, and icon directive compilation.
 - `internal/site/icons_test.go`: offline icon resolution, escaping, and security tests.

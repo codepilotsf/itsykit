@@ -71,6 +71,11 @@ installation instructions and live deployment before publishing it.
 End users install only FleaCMS. Setup uses native SSH/SCP and extracts the
 matching bundled static Linux server; neither machine needs Go or source code.
 Both Linux architectures are gzip-compressed inside each CLI, with SHA-256 hashes.
+Each CLI/server also embeds a separate matching-platform Contact child. Build it
+first with scripts/bundle-app.sh; scripts/build.sh and scripts/release.sh do this
+in dependency order. Release tests require FLEA_REQUIRE_APP_BUNDLE=1, including
+real child launch, handshake and shutdown. No Go compiler is needed on the VPS.
+A source-only go build can omit or reuse stale bundles and is not a release.
 Setup needs SSH access, not a release host or package registry connection.
 Framework contributors and CI still need Go 1.26 or newer. Deploy also uses Git,
 as required by the existing committed-source workflow.

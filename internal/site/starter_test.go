@@ -31,7 +31,7 @@ func TestStarterEditableCopyAndNavigation(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Contact has six editable headings/paragraphs; form labels stay in HTML.
-	for route, minimum := range map[string]int{"/": 9, "/team": 2, "/contact": 6, "/thank-you": 2} {
+	for route, minimum := range map[string]int{"/": 9, "/team": 2, "/contact": 6, "/contact/thanks": 2} {
 		if page := p.Content.Pages[route]; page == nil || len(page.Snips) < minimum {
 			t.Errorf("%s lacks editable starter copy", route)
 		}
@@ -40,8 +40,8 @@ func TestStarterEditableCopyAndNavigation(t *testing.T) {
 		t.Error("missing shared footer snip")
 	}
 	s := NewProductionServer(p, nil)
-	body := html.UnescapeString(request(s, "GET", "/contact").Body.String())
-	for _, want := range []string{`href="/team"`, `>Team</a>`, `href="/contact"`, `action="/_flea/contact"`, `name="website"`, `name="message"`, "Let's talk."} {
+	body := html.UnescapeString(request(s, "GET", "https://example.test/contact").Body.String())
+	for _, want := range []string{`href="/team"`, `>Team</a>`, `href="/contact"`, `action="/contact"`, `name="_csrf"`, `name="website"`, `name="message"`, "Let's talk."} {
 		if !strings.Contains(body, want) {
 			t.Errorf("missing %s", want)
 		}

@@ -46,11 +46,28 @@ for completed changes, and [README.md](README.md) for current usage.
 
 ## Agreed scope
 
+Separately approved mini-app work is tracked in [the app plan](docs/planning/apps.md).
+The approved managed Contact batch now implements launch, fixed render-only
+routes, private email capability, redirects/flash and replacement of the old
+contact route/config. See apps/contact/README.md and CHANGELOG.md.
+The [isolated Linux Contact check](docs/benchmarks/2026-10-04-contact-apps.md)
+passed startup, child replacement, graceful shutdown and abrupt parent-exit tests.
+Thirty tiny Contact-enabled sites peaked at 55.43 MiB sampled total PSS; the
+test unit peaked at 61.6 MiB. Its 221 OS threads also warrant a task-budget review.
+An isolated real Resend send using the app sender override also passed provider
+acceptance, redirect and flash checks. Sean confirmed inbox receipt, the app's
+sender override and Reply-To.
+Next acceptance: HTML/text appearance and default-sender checks, representative mixed workloads,
+longer soaks and deployment peaks. No deployment is
+authorized by this note. General read-route declarations, custom/remote
+registration, databases, storage moves and ZJAX remain separate work.
+
 Capacity follow-up: the [isolated 1/10/30-site VPS probe](docs/benchmarks/2026-10-04-multisite.md)
 passed on a 1 GB host with synthetic traffic and overlapping read-only validation.
 Still measure representative client workloads, editor/uploads, longer soak times,
 and actual deployment peaks. Include descriptor limits, total RSS and OS cache,
-not just heap. Mini-app hosting remains provisional until its costs are measured.
+not just heap. The first Contact measurements are recorded above; heavier apps
+and real client workloads still need their own capacity checks.
 
 - Keep the existing CMS feature set. Focus on defects, usability, documentation,
   installation, updates, website design and release verification.
@@ -293,13 +310,13 @@ they appear in this roadmap.
   usable sender configuration; expose only a boolean, never credentials or errors.
 - When production mail is unavailable, replace the form with a styled unavailable
   notice. Offer a mailto link only from a separately configured, explicitly public
-  contact address. Never expose admin.emails or contact.to automatically.
+  contact address. Never expose admin.emails or apps.contact.email.to automatically.
 - Give owners/developers setup guidance, not visitors. Missing mail must not bypass
   OTP authentication or silently capture/store submissions.
 - If delivery fails after a visitor has typed, preserve their fields and show an
   honest retry message in the site layout, not a success page or bare error.
 - Verify no-key, no-recipient, preview, configured delivery and transient failure
-  states. This is planned, not implemented; existing delivery behavior is unchanged.
+  states. The availability notice remains planned; safe 503 field redisplay is now implemented by Contact.
 
 ## Remaining release decisions
 

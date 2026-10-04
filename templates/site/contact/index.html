@@ -15,30 +15,37 @@
   <div class="bg-white border border-light rounded-lg p-lg">
     <h2 snip class="text-lg mt-0">Send us a message</h2>
     <p snip class="text-sm text-dark mb-md">All fields are required.</p>
-    <form method="post" action="/_flea/contact" class="flex flex-col gap-md">
+    {#if contact.error}<p role="alert">{contact.error}</p>{/if}
+    <form method="post" action="/contact" class="flex flex-col gap-md">
+      {csrf}
       <label class="form-field my-0 text-sm"
         >Your name<input
           name="name"
+          value="{contact.data.name}"
           autocomplete="name"
           maxlength="100"
           required
       /></label>
+      {#if contact.invalid.name}<p role="alert">{contact.invalid.name}</p>{/if}
       <label class="form-field my-0 text-sm"
         >Email address<input
           name="email"
+          value="{contact.data.email}"
           type="email"
           autocomplete="email"
           maxlength="254"
           required
       /></label>
+      {#if contact.invalid.email}<p role="alert">{contact.invalid.email}</p>{/if}
       <label class="form-field my-0 text-sm"
         >Message<textarea
           name="message"
           maxlength="5000"
           placeholder="How can we help?"
           required
-        ></textarea>
+        >{contact.data.message}</textarea>
       </label>
+      {#if contact.invalid.message}<p role="alert">{contact.invalid.message}</p>{/if}
       <div hidden>
         <label
           >Leave this empty<input

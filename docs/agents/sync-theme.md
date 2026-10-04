@@ -25,7 +25,7 @@ Use three-way comparisons per snip and metadata field; theme merges as a whole
 CSS file. Conflicts have no default: keep live, use local, or cancel. Noninteractive
 conflicts stop. Collect all decisions before activation, then compare the expected
 snapshot under deploy.lock. Never hold that lock while prompting. SSH-only state
-export is bounded and excludes configuration/runtime credentials. Protocol 22
+export is bounded and excludes configuration/runtime credentials. Protocol 23
 requires state export, reviewed sync plans, and managed themes.
 
 Managed live CSS lives beside content as <release-id>.json.theme.css; host.Themes

@@ -2,6 +2,7 @@ package site
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/fs"
@@ -10,7 +11,6 @@ import (
 	"sort"
 	"strings"
 
-	"flea/internal/contact"
 	"flea/internal/sitefiles"
 	"flea/internal/snips"
 )
@@ -26,7 +26,7 @@ type Project struct {
 	adminTemplates     map[string]*template.Template
 	Admin              AdminAccess
 	Dev                DevSettings
-	Contact            contact.Config
+	Apps               map[string]MiniApp
 	Content            *snips.Store
 	rich               map[string]template.HTML
 	contentIndex       map[string]snips.Entry
@@ -46,6 +46,7 @@ type Project struct {
 	Warnings           []string
 	SnipsUpdated       bool // A dev extraction changed templates or the active content index.
 	missingIcons       map[string]string
+	csrfTemplates      map[*template.Template]bool
 }
 
 func Load(root string) (*Project, error) {
@@ -86,10 +87,11 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 	}
 	p.signature = fingerprint(root)
 	var config struct {
-		Dev     DevSettings    `json:"dev"`
-		App     map[string]any `json:"app"`
-		Admin   AdminAccess    `json:"admin"`
-		Contact contact.Config `json:"contact"`
+		Dev     DevSettings     `json:"dev"`
+		App     map[string]any  `json:"app"`
+		Admin   AdminAccess     `json:"admin"`
+		Contact json.RawMessage `json:"contact"`
+		Apps    json.RawMessage `json:"apps"`
 	}
 	// Reject symbolic links throughout the site to keep both public and private
 	// reads within the project. Deployment can reuse this validation boundary.
@@ -119,6 +121,10 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 		return nil, err
 	}
 	p.App = config.App
+	p.Apps, err = decodeApps(config.Apps)
+	if err != nil {
+		return nil, err
+	}
 	if _, exists := p.App["current_admin"]; exists {
 		return nil, fmt.Errorf("app.current_admin is reserved for the authenticated request; remove it from config")
 	}
@@ -127,10 +133,9 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 	}
 	p.Admin = config.Admin
 	p.Dev = config.Dev
-	if err := config.Contact.Validate(); err != nil {
-		return nil, err
+	if config.Contact != nil {
+		return nil, fmt.Errorf("contact settings now belong in apps.contact; see the Contact app documentation")
 	}
-	p.Contact = config.Contact
 	if p.App == nil {
 		return nil, fmt.Errorf(".flea.config.json: app must be a JSON object")
 	}
@@ -320,6 +325,9 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 			return nil, err
 		}
 	}
+	if err = p.validateApps(); err != nil {
+		return nil, err
+	}
 	for route, t := range p.Pages {
 		if _, err = p.render(t, route); err != nil {
 			return nil, fmt.Errorf("%s: %w", routes[route], err)
@@ -363,9 +371,15 @@ func (p *Project) buildTemplate(file string, layout bool) (*template.Template, e
 		if e != nil {
 			return nil, e
 		}
+		if e := checkCSRFContexts(strings.ReplaceAll(compiled, `[[NW template "body" $ NW]]`, body)); e != nil {
+			return nil, fmt.Errorf("%s: %w", selected, e)
+		}
 		source = `[[NW define "body" NW]]` + body + `[[NW end NW]]` + compiled
 	}
-	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"snipField": p.snipField, "multiPhoto": multiPhoto, "multiRows": p.multiRows, "multiValue": multiValue, "multiBoundary": multiBoundary, "multiItemBoundary": multiItemBoundary, "lookup": lookup, "collection": collection, "richFlea": func(id string, owner bool) template.HTML {
+	if err := checkCSRFContexts(source); err != nil {
+		return nil, fmt.Errorf("%s: %w", file, err)
+	}
+	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"csrfField": csrfField, "snipField": p.snipField, "multiPhoto": multiPhoto, "multiRows": p.multiRows, "multiValue": multiValue, "multiBoundary": multiBoundary, "multiItemBoundary": multiItemBoundary, "lookup": lookup, "collection": collection, "richFlea": func(id string, owner bool) template.HTML {
 		if owner {
 			return template.HTML("<!--snip-start:"+id+"-->") + p.rich[id] + template.HTML("<!--snip-end:"+id+"-->")
 		}
@@ -373,6 +387,12 @@ func (p *Project) buildTemplate(file string, layout bool) (*template.Template, e
 	}}).Parse(source)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
+	}
+	if strings.Contains(source, csrfAction) {
+		if p.csrfTemplates == nil {
+			p.csrfTemplates = map[*template.Template]bool{}
+		}
+		p.csrfTemplates[t] = true
 	}
 	return t, nil
 }
@@ -386,6 +406,10 @@ func (p *Project) renderWithBody(t *template.Template, route string, admin map[s
 }
 
 func (p *Project) renderPage(t *template.Template, route string, admin map[string]any, owner bool) ([]byte, error) {
+	return p.renderRequest(t, route, admin, owner, nil)
+}
+
+func (p *Project) renderRequest(t *template.Template, route string, admin map[string]any, owner bool, inputs *renderInputs) ([]byte, error) {
 	title := "Home"
 	if route != "/" {
 		parts := strings.Split(strings.Trim(route, "/"), "/")
@@ -430,6 +454,16 @@ func (p *Project) renderPage(t *template.Template, route string, admin map[strin
 	data["videos"] = videos
 	data["admin"] = admin
 	data["__ownerPreview"] = owner
+	data["__request"] = inputs
+	if inputs != nil && inputs.appName != "" {
+		if _, exists := data[inputs.appName]; exists {
+			return nil, fmt.Errorf("app name conflicts with a template namespace")
+		}
+		data[inputs.appName] = inputs.appData
+		var out appRenderBuffer
+		err := t.Execute(&out, data)
+		return out.Bytes(), err
+	}
 	var out bytes.Buffer
 	err := t.Execute(&out, data)
 	return out.Bytes(), err

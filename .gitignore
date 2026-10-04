@@ -3,6 +3,8 @@
 /dist/
 /internal/serverbundle/assets/*.gz
 /internal/serverbundle/assets/*.sha256
+/internal/appbundle/assets/*/*.gz
+/internal/appbundle/assets/*/*.sha256
 
 # macOS metadata
 .DS_Store

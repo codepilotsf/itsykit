@@ -49,9 +49,9 @@ and extraction. HTML/text bodies support escaped app.* and email.* values only;
 the HTML layout has one {slot}. Keep recipient, subject, sender and Reply-To outside
 templates. Both renderers use a capped writer, not a post-allocation size check.
 Site runtime always wires RenderEmail; missing templates fail delivery without a
-compatibility fallback. The optional nil renderer in low-level auth/contact tests
+compatibility fallback. The optional nil renderer in low-level auth tests
 is not a site-level fallback. flea email preview emits fake-data HTML without sending.
-Contact success_path is developer-configured, local-only, never visitor-selected.
+Contact's success destination is fixed as mount-relative `thanks`, never visitor-selected.
 
 New sites enable dev.email_preview. Only the dev CLI wires internal/mailpreview
 as a Sender and mounts its random-token loopback route. Keep at most 20 messages
@@ -65,16 +65,40 @@ Preview mode/sender changes require restart; real local delivery remains explici
 
 ## Routing and isolation
 
-Email-only contact forms live in internal/contact. Configure contact.to in site
-JSON; POST /_flea/contact accepts only name/email/message/website. Bind handlers
-and recipients to the loaded site, never request-selected IDs or addresses.
-Aliases share limits; distinct roots must not share a content file, including
-hardlinks. Keep exact Origin checks, production HTTPS, bounded bodies, per-site/IP
-limits and a shared server contact budget. Visitor email is Reply-To only; send
-plain text through mailer.Sender. Do not store submissions or queue work.
-Local contact settings require restarting dev. Deployment configures mail for
-contact-only sites too. See README for limits and setup. Protocol 22 requires
-the contact runtime. Test cross-site recipients and aliases without live email.
+Mini apps use internal/appapi and internal/formguard. The included Contact app
+is publicly mounted by apps.contact and launched only during actual dev/host
+startup, never Project loading or status. See apps/contact/README.md for the
+canonical contract. internal/appmanager supervises children; internal/appruntime
+implements the child transport; internal/appbundle packages target-specific
+executables. Keep credentials in inherited pipes and an already-bound listener
+handoff. Never pass provider environment to children. Preserve parent-liveness
+cleanup, bounded restarts and per-site process isolation; this is not an OS sandbox.
+Only Contact is configurable today; custom/remote registration remains planned.
+Never forward browser cookies or Authorization as service credentials. Keep
+upstream redirects and POST retries disabled, response/deadline/concurrency
+bounds enforced, and app values request-local. Anonymous form cookies are signed,
+site/origin-bound and independent of admin sessions; reject duplicate/missing/
+expired tokens before any app call. Preserve keys across Project reloads, never
+inside Projects, logs or archives. Full restart invalidates forms. Only an
+actually evaluated `{csrf}` may issue a cookie after a successful render.
+
+Contact validation lives in apps/contact. internal/contact provides its narrow
+site-bound email capability, with a separate bearer token and an exact single-use
+reservation for the admitted submission. Recipients and optional email.from come
+from apps.contact.email, never request data. Visitor email is Reply-To only.
+Aliases share limits; distinct roots cannot share content files, including hardlinks.
+Keep exact Origin/CSRF, production HTTPS, bounded bodies, site/IP limits and the
+shared server budget. Private HTML/text mailers use mailer.Sender, including dev
+preview. Do not store submissions or queue work. No old route/config aliases.
+
+Contact GET/HEAD renders the form or thanks page without an upstream read;
+POST at the mount invokes the service. Redirects must remain under the mount.
+Flash is bounded (256 entries/site, five-minute expiry), visitor/host/app/route
+bound, and consumed only after a successful GET render. HEAD, assets, failed
+renders and other pages cannot consume it. Changed app settings require restart;
+never silently use an old recipient for a changed registration. Deployment
+configures email for app-only sites too. Protocol 23 requires the managed runtime.
+Test cross-site recipients, credentials, flashes and aliases without live email.
 
 `index.html` maps to `/`. `about.html` and `about/index.html`
 both map to `/about`; providing both is a route collision. Explicit `.html`

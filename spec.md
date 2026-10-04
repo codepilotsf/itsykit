@@ -36,7 +36,7 @@ shared page Save/Cancel applies all changes together. Photo fields offer existin
 library images in a thumbnail picker and JPEG/PNG uploads, with a selected-photo
 preview and contextual alt text. Private previews publish only with page Save.
 Editable `mailers/` templates and local
-email preview are implemented; see docs/email-templates.md. Protocol 22 requires
+email preview are implemented; see docs/email-templates.md. Protocol 23 requires
 these runtime features. Adaptive streaming and automatic retention remain planned.
 
 Dev reloads authenticated public pages when safe, restoring edit mode and scroll.
@@ -63,7 +63,7 @@ Editable state: `flea pull` retrieves live snips and theme CSS into local files,
 with `--snips-only` / `--theme-only` selectors. Plain deployment preserves live
 state; `--with-snips` / `--with-theme` publish intentional local changes using
 scoped pull baselines and explicit conflict resolution. No config/session/secret
-sync. Protocol 22 checks reviewed state under the activation lock. See README
+sync. Protocol 23 checks reviewed state under the activation lock. See README
 for first-pull conflicts, whole-file theme merging, and local write-failure limits.
 
 Every owner can open Theme beside Editing. A right panel edits supported existing
@@ -107,9 +107,13 @@ Use `flea <command> --help` for command details without starting the command.
 Development policy: prefer the current design over backward compatibility at
 this early stage. Ask the user before adding compatibility or migration layers.
 
-Email-only contact forms are implemented: contact.to fixes the recipient;
-POST /_flea/contact validates name/email/message and sends plain-text mail.
-No submissions are stored. See README for HTTPS, mail setup and abuse limits.
+The included Contact mini app is implemented locally. apps.contact specifies
+mount and email.to, with optional email.from. POST at the mount validates
+name/email/message through an authenticated JSON child service; Flea owns
+private email templates and delivery. Success redirects to mount/thanks;
+validation returns 422 and operational failures 503, preserving safe fields.
+No submissions are stored. Old contact config/routes are not supported.
+See apps/contact/README.md for the complete contract and acceptance limits.
 
 The developer CLI also provides `flea admin [email]`: prompt when omitted,
 create or append to admin.emails in the existing JSON config, skip duplicates,
@@ -124,7 +128,7 @@ on authenticated activity. Active editing renews at most once a minute; idle tab
 do not. Sessions survive browser closure, restart and deploy. Logout and owner
 removal revoke sessions. Store hashed tokens and host/CSRF/expiry metadata only,
 with private permissions, bounded reads, locking and atomic saves. Never ship
-session state in Git or release archives. Deployment protocol 22 requires the
+session state in Git or release archives. Deployment protocol 23 requires the
 private writable runtime directory; OTPs remain memory-only.
 
 **Status:** first implementation specification  
@@ -437,7 +441,7 @@ Aliases pointing to the same release must select the same content snapshot;
 conflicting paths are rejected and valid aliases share a loaded serving snapshot.
 After successful activation, unreferenced entries move to an archive map, retaining
 last remote content. References are lexical, including false/empty branches and
-unused partials. Failed activation leaves previous content untouched. Protocol 22
+unused partials. Failed activation leaves previous content untouched. Protocol 23
 is required. No automatic archive deletion or rollback command exists yet.
 
 ### Values, conditions, and loops
@@ -483,6 +487,14 @@ The expression model is intentionally constrained:
 
 Values interpolated by `{path}` are contextually escaped. Short-ID snips render
 sanitized HTML by default; unrestricted raw HTML is not supported.
+
+Mini apps use `{csrf}` as an explicit hidden-input directive in public HTML
+element content, independent of admin sessions. Signed visitor cookies and form
+tokens expire after 24 hours or restart; template reloads retain the key.
+The bundled Contact app has public mount routing, private managed launch,
+email capability, mount-relative redirects and bounded visitor flash. Admin
+form fields remain unchanged. General app installation, remote registrations,
+dynamic read routes and databases remain planned in docs/planning/apps.md.
 
 ## Snip format and schemas
 
@@ -722,7 +734,7 @@ flea rollback
   confirmation, and commit message. Respect Git hooks and signing. Declining or
   failure stops deployment. Sites within larger repositories commit manually.
 
-- Requires deployment protocol 22 before upload, offering first-time setup when absent. Validates the
+- Requires deployment protocol 23 before upload, offering first-time setup when absent. Validates the
   packaged site, uploads over SSH/SCP, stages, and atomically switches host config.
 - Restarts and verifies revision/hostname; restores the prior config on failure.
 - Uses native SSH and the saved current-branch mapping in .flea.config.json. The first

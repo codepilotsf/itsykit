@@ -88,6 +88,9 @@ func (p *Preview) Send(ctx context.Context, m mailer.Message) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
+	if m.From != "" && !mailer.ValidAddress(m.From) {
+		return fmt.Errorf("the configured sender email address is invalid")
+	}
 	if len(m.HTML) > 256<<10 || len(m.Text) > 256<<10 || len(m.To)+len(m.Subject)+len(m.ReplyTo) > 8192 {
 		return fmt.Errorf("email preview exceeds size limits")
 	}
@@ -104,7 +107,11 @@ func (p *Preview) Send(ctx context.Context, m mailer.Message) error {
 		p.messages[len(p.messages)-1] = message{}
 		p.messages = p.messages[:len(p.messages)-1]
 	}
-	p.messages = append(p.messages, message{Message: m, ID: id, FromName: p.name, FromAddress: p.address, Created: now, Date: now.Format("Monday, January 2, 2006 at 3:04 PM MST"), DateTime: now.Format(time.RFC3339)})
+	from := p.address
+	if m.From != "" {
+		from = m.From
+	}
+	p.messages = append(p.messages, message{Message: m, ID: id, FromName: p.name, FromAddress: from, Created: now, Date: now.Format("Monday, January 2, 2006 at 3:04 PM MST"), DateTime: now.Format(time.RFC3339)})
 	p.mu.Unlock()
 	address := p.origin + Path + id
 	if err := p.open(ctx, address); err != nil && p.logger != nil {

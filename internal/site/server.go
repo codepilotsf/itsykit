@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	"flea/internal/formguard"
 	"flea/internal/sitefiles"
 	"flea/internal/viewer"
 )
@@ -30,10 +31,12 @@ type Server struct {
 	revision   uint64
 	logger     *log.Logger
 	production bool
+	forms      *formguard.Guard
+	apps       appState
 }
 
 func NewServer(p *Project, loggers ...*log.Logger) *Server {
-	s := &Server{project: p}
+	s := &Server{project: p, forms: formguard.New(p.Root, true)}
 	if len(loggers) > 0 {
 		s.logger = loggers[0]
 	}
@@ -43,6 +46,7 @@ func NewServer(p *Project, loggers ...*log.Logger) *Server {
 func NewProductionServer(p *Project, logger *log.Logger) *Server {
 	s := NewServer(p, logger)
 	s.production = true
+	s.forms = formguard.New(p.Root, false)
 	return s
 }
 
@@ -194,6 +198,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Site synchronization is incomplete.", http.StatusServiceUnavailable)
 		return
 	}
+	if p != nil && loadErr == nil && safeURL(r.URL.Path) {
+		if mount, _, ok := s.appFor(p, r.URL.Path); ok {
+			s.serveInstalledApp(w, r, mount)
+			return
+		}
+	}
 	if r.Method != "GET" && r.Method != "HEAD" {
 		w.Header().Set("Allow", "GET, HEAD")
 		s.serveError(w, r, p, http.StatusMethodNotAllowed, revision, nil)
@@ -223,7 +233,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				admin["revision"] = fmt.Sprint(revision)
 			}
 		}
-		body, err := p.renderPage(t, r.URL.Path, admin, owner)
+		var inputs *renderInputs
+		var commitForm func(http.ResponseWriter)
+		if p.csrfTemplates[t] {
+			inputs, commitForm = s.formRender(r)
+		}
+		body, err := p.renderRequest(t, r.URL.Path, admin, owner, inputs)
 		if err != nil {
 			s.serveError(w, r, p, 500, revision, err)
 			return
@@ -239,6 +254,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		} else if !s.production {
 			body = withReload(body, revision)
+		}
+		if commitForm != nil {
+			commitForm(w)
 		}
 		writeHTML(w, r, 200, body)
 		return

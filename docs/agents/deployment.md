@@ -119,7 +119,7 @@ upload, and activation; fail if the branch/commit changes during deploy. Build
 the snapshot from immutable Git objects, including when the site is a subfolder.
 Resolve missing icons in the temporary snapshot, never the working directory.
 The deploy section contains settings only, never credentials, and is stripped
-from the uploaded config. Runtime app/admin/contact settings are retained.
+from the uploaded config. Runtime app/admin/apps settings are retained.
 Deploy packages committed site/ pages/assets/partials, .flea.config.json,
 mailers/, flea/snips.json, flea/media/, flea/data/, legacy flea/snips/, and flea/icons/. Validate
 the actual packaged snapshot locally and the extracted release remotely.
@@ -128,8 +128,11 @@ and releases exceeding 256 MiB or 10,000 entries.
 
 Deployment administration runs through SSH/sudo via the installed server binary,
 never HTTP. The browser editor has content-only permissions, not deployment powers.
-Protocol 22 requires persistent-session runtime directories, the contact
-runtime and unquoted snip syntax.
+Protocol 23 requires persistent-session runtime directories, the bundled Contact
+child/runtime and current site/config syntax. Old top-level contact settings are
+rejected, not migrated. Build each matching Contact executable before its parent.
+Verify child launch/cleanup under the real systemd unit separately; local tests
+do not establish native Linux or email acceptance.
 Setup does not upgrade existing installations.
 If an authenticated server probe confirms that FleaCMS is absent, offer setup
 and continue deployment after a successful install and fresh server check. Reuse

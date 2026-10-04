@@ -534,6 +534,8 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			logger.Printf("Warning: %s", warning)
 		}
 		handler := site.NewServer(p, logger)
+		stopApps := handler.StartApps(ctx, sender, &contact.Budget{})
+		defer stopApps()
 		var httpHandler http.Handler = handler
 		{
 			httpHandler = devAdmin(p.Root, fmt.Sprint(p.App["site_name"]), handler, logger, previewSender)
@@ -544,20 +546,8 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				logger.Print("Admin sign-in needs email setup. Run flea email.")
 			}
 		}
-		if p.Contact.To != "" {
-			form := contact.New(p.Contact, p.Root, sender, &contact.Budget{}, true, logger)
-			form.RenderEmail = handler.RenderEmail
-			next := httpHandler
-			httpHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == contact.Path {
-					form.ServeHTTP(w, r)
-				} else {
-					next.ServeHTTP(w, r)
-				}
-			})
-			if sender == nil {
-				logger.Print("Contact forms need email setup. Run flea email, then restart dev.")
-			}
+		if len(p.Apps) > 0 && sender == nil {
+			logger.Print("Contact forms need email setup. Run flea email, then restart dev.")
 		}
 		if preview != nil {
 			next := httpHandler
@@ -646,7 +636,7 @@ func createSite(target string, starter bool) error {
 		if entry.IsDir() {
 			return nil
 		}
-		if !starter && (name == "site/team.html" || name == "site/contact.html" || name == "site/thank-you.html" || name == "site/test.html") {
+		if !starter && (name == "site/team.html" || strings.HasPrefix(name, "site/contact/") || name == "site/test.html") {
 			return nil
 		}
 		body, err := templates.Files.ReadFile(name)

@@ -35,6 +35,7 @@ func TestLANDevWorkflow(t *testing.T) {
 	if _, _, err := site.AddAdmin(root, "owner@example.test"); err != nil {
 		t.Fatal(err)
 	}
+	enableTestContact(t, root)
 	var photo bytes.Buffer
 	if err := png.Encode(&photo, image.NewRGBA(image.Rect(0, 0, 8, 8))); err != nil {
 		t.Fatal(err)
@@ -59,15 +60,9 @@ func TestLANDevWorkflow(t *testing.T) {
 	public := site.NewServer(p)
 	mail := make(previewInbox, 4)
 	admin := devAdmin(root, "LAN test", public, nil, mail)
-	form := contact.New(contact.Config{To: "contact@example.test", SuccessPath: "/thank-you"}, root, mail, &contact.Budget{}, true, nil)
-	form.RenderEmail = public.RenderEmail
-	h := devaccess.WrapLAN(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == contact.Path {
-			form.ServeHTTP(w, r)
-		} else {
-			admin.ServeHTTP(w, r)
-		}
-	}), []string{"192.168.1.5"}, 3000)
+	stopApps := public.StartApps(context.Background(), mail, &contact.Budget{})
+	defer stopApps()
+	h := devaccess.WrapLAN(admin, []string{"192.168.1.5"}, 3000)
 	request := func(handler http.Handler, method, path string, values url.Values, cookie *http.Cookie, origin string) *httptest.ResponseRecorder {
 		t.Helper()
 		r := httptest.NewRequest(method, "http://192.168.1.5:3000"+path, strings.NewReader(values.Encode()))
@@ -99,15 +94,15 @@ func TestLANDevWorkflow(t *testing.T) {
 	if w := request(admin, "GET", "/admin", nil, nil, origin); w.Code != 403 {
 		t.Fatal("LAN enabled without middleware", w.Code)
 	}
-	if w := request(form, "POST", contact.Path, nil, nil, origin); w.Code != 403 {
+	if w := request(public, "POST", "/contact", nil, nil, origin); w.Code != 403 {
 		t.Fatal("contact LAN enabled by default", w.Code)
 	}
 	productionAdmin := devaccess.WrapLAN(editor.New(editor.Options{Emails: []string{"owner@example.test"}}), []string{"192.168.1.5"}, 3000)
 	if w := request(productionAdmin, "GET", "/admin", nil, nil, origin); w.Code != 403 || !strings.Contains(w.Body.String(), "HTTPS") {
 		t.Fatal("LAN context bypassed production HTTPS")
 	}
-	productionForm := devaccess.WrapLAN(contact.New(contact.Config{To: "contact@example.test"}, root, mail, &contact.Budget{}, false, nil), []string{"192.168.1.5"}, 3000)
-	if w := request(productionForm, "POST", contact.Path, nil, nil, origin); w.Code != 403 || !strings.Contains(w.Body.String(), "HTTPS") {
+	productionForm := devaccess.WrapLAN(site.NewProductionServer(p, nil), []string{"192.168.1.5"}, 3000)
+	if w := request(productionForm, "POST", "/contact", nil, nil, origin); w.Code != 403 {
 		t.Fatal("LAN context bypassed production contact HTTPS")
 	}
 	w := req("GET", "/admin", nil, nil)
@@ -249,16 +244,15 @@ func TestLANDevWorkflow(t *testing.T) {
 	if w := req("POST", "/admin/activity", url.Values{"csrf": {csrf}}, session); w.Code != 204 {
 		t.Fatal("activity", w.Code)
 	}
-	if w := req("POST", contact.Path, url.Values{"name": {"Visitor"}, "email": {"visitor@example.test"}, "message": {"LAN contact test"}}, nil); w.Code != 303 {
-		t.Fatal("contact", w.Code, w.Body.String())
-	}
-	select {
-	case message := <-mail:
-		if message.To != "contact@example.test" {
-			t.Fatal("wrong recipient")
+	if submitTestContact(t, h, origin, "192.168.1.9:54321", "LAN contact test") {
+		select {
+		case message := <-mail:
+			if message.To != "contact@example.test" {
+				t.Fatal("wrong recipient")
+			}
+		case <-time.After(time.Second):
+			t.Fatal("missing contact preview")
 		}
-	case <-time.After(time.Second):
-		t.Fatal("missing contact preview")
 	}
 	before := req("GET", "/_flea/reload", nil, nil).Body.String()
 	if err := os.WriteFile(filepath.Join(root, "site/test.html"), []byte("<p>LAN reload test</p>"), 0644); err != nil {

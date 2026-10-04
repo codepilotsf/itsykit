@@ -78,12 +78,13 @@ func TestDevPreviewSignsInAndRendersContactWithoutCredentials(t *testing.T) {
 	t.Setenv("RESEND_API_KEY", "")
 	t.Setenv("FLEA_EMAIL_FROM", "")
 	root := filepath.Join(t.TempDir(), "site")
-	if err := Create(root); err != nil {
+	if err := createSite(root, true); err != nil {
 		t.Fatal(err)
 	}
 	if _, _, err := site.AddAdmin(root, "owner@example.test"); err != nil {
 		t.Fatal(err)
 	}
+	enableTestContact(t, root)
 	p, err := site.Load(root)
 	if err != nil {
 		t.Fatal(err)
@@ -93,6 +94,8 @@ func TestDevPreviewSignsInAndRendersContactWithoutCredentials(t *testing.T) {
 	}
 	public := site.NewServer(p)
 	mail := make(previewInbox, 2)
+	stopApps := public.StartApps(context.Background(), mail, &contact.Budget{})
+	defer stopApps()
 	h := devAdmin(root, "Test", public, nil, mail)
 	request := func(handler http.Handler, method, path string, form url.Values, cookie *http.Cookie) *httptest.ResponseRecorder {
 		r := httptest.NewRequest(method, "http://127.0.0.1:3000"+path, strings.NewReader(form.Encode()))
@@ -136,11 +139,8 @@ func TestDevPreviewSignsInAndRendersContactWithoutCredentials(t *testing.T) {
 	if w.Code != 303 {
 		t.Fatal("preview code unusable", w.Code, w.Body.String())
 	}
-	form := contact.New(contact.Config{To: "contact@example.test", SuccessPath: "/thank-you"}, root, mail, &contact.Budget{}, true, nil)
-	form.RenderEmail = public.RenderEmail
-	w = request(form, "POST", contact.Path, url.Values{"name": {"Visitor"}, "email": {"visitor@example.test"}, "message": {"Hello from the local form"}}, nil)
-	if w.Code != 303 {
-		t.Fatal(w.Code, w.Body.String())
+	if !submitTestContact(t, h, "http://127.0.0.1:3000", "127.0.0.1:54321", "Hello from the local form") {
+		return
 	}
 	select {
 	case m = <-mail:

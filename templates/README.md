@@ -4,6 +4,9 @@ Build pages with HTML, style them with CSS, and let site admins edit their own c
 
 ## Getting started
 
+The included Contact mini app uses a normal HTML form and `{csrf}`. Enable it
+only on sites that need it, as described below. Other mini apps remain planned.
+
 For a new project, install FleaCMS first, then run:
 
 ```sh
@@ -337,15 +340,22 @@ automatic deletion. Video fields in multisnips are not supported.
 
 ### Contact forms
 
-The starter includes `site/contact.html` and `site/thank-you.html`. Set
-`contact.to` alongside `app` in `.flea.config.json`. Local preview mode needs no
+The starter includes `site/contact/index.html` and `site/contact/thanks.html`.
+Merge `"apps": {"contact": {"mount": "/contact", "email": {"to": "owner@example.com"}}}`
+into `.flea.config.json`, preserving other settings. Local preview mode needs no
 provider credentials. For real delivery, configure email with `flea email`.
 Restart dev after changing contact settings.
 
-The form posts to `/_flea/contact` with `name`, `email`, `message`, and the hidden
+The form posts to `/contact` with `{csrf}`, `name`, `email`, `message`, and the hidden
 `website` field. Keep those names intact. Messages are emailed, not stored.
-Omitting `contact.to` disables delivery. General-purpose form handling is not
+Removing `apps.contact` disables the app. General-purpose form handling is not
 available.
+
+Validation re-renders with `contact.data.*` and `contact.invalid.*`; delivery
+failure supplies `contact.error`. Success redirects to the mount's `/thanks`
+page, where `contact.flash.notice` is available once. These are escaped values,
+not template source. Optional `email.from` overrides the configured sender;
+visitor email remains Reply-To. There is no old contact config/route alias.
 
 ### Email templates
 

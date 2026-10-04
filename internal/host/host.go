@@ -93,6 +93,7 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 	// Aliases share one immutable snapshot. Different content paths for the same
 	// release would make deployment preservation depend on map iteration order.
 	byRoot := map[string]http.Handler{}
+	var appSites []*site.Server
 	contentPaths := map[string]string{}
 	themePaths := map[string]string{}
 	sessionOwners := map[string]string{}
@@ -181,6 +182,7 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 			}
 		}
 		public := site.NewProductionServer(project, logger)
+		appSites = append(appSites, public)
 		handlers[host] = public
 		if len(project.Admin.Emails) > 0 {
 			if contentPath == "" {
@@ -193,18 +195,6 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 					dashboard.ServeHTTP(w, r)
 				} else {
 					dashboard.ServePublic(w, r, public)
-				}
-			})
-		}
-		if project.Contact.To != "" {
-			form := contact.New(project.Contact, key, sender, contactBudget, false, logger)
-			form.RenderEmail = public.RenderEmail
-			next := handlers[host]
-			handlers[host] = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path == contact.Path {
-					form.ServeHTTP(w, r)
-				} else {
-					next.ServeHTTP(w, r)
 				}
 			})
 		}
@@ -253,7 +243,26 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 		}
 		http.NotFound(w, r)
 	})
-	return config, handler, nil
+	return config, &runtimeHandler{Handler: handler, sites: appSites, sender: sender, budget: contactBudget}, nil
+}
+
+type runtimeHandler struct {
+	http.Handler
+	sites  []*site.Server
+	sender mailer.Sender
+	budget *contact.Budget
+}
+
+func (h *runtimeHandler) start(ctx context.Context) func() {
+	var stops []func()
+	for _, s := range h.sites {
+		stops = append(stops, s.StartApps(ctx, h.sender, h.budget))
+	}
+	return func() {
+		for _, stop := range stops {
+			stop()
+		}
+	}
 }
 
 func Run(ctx context.Context, configPath string, logger *log.Logger) error {
@@ -281,6 +290,10 @@ func serve(ctx context.Context, config Config, handler http.Handler, logger *log
 		return err
 	}
 	defer listener.Close()
+	if runtime, ok := handler.(*runtimeHandler); ok {
+		stop := runtime.start(ctx)
+		defer stop()
+	}
 	newServer := func(h http.Handler) *http.Server {
 		return &http.Server{Handler: h, ErrorLog: logger, ReadHeaderTimeout: 10 * time.Second, ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second}
 	}

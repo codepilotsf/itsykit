@@ -69,6 +69,9 @@ Generated sites use `site/` for public templates/assets, `mailers/` for private
 email templates, `flea/` for content/data/media/icons/skills, and
 `.flea.config.json` for configuration. Runtime state is private in
 `flea/runtime/`. Globals use `app.*`; there is no `site.*` alias.
+Mini apps use the Flea App Protocol and explicit `{csrf}` form controls. Only
+bundled Contact is enabled today; see the runtime/template guides and its README.
+Do not change admin form contracts or infer support for arbitrary app installation.
 Generated-site guidance lives in `templates/AGENTS.md` and the bundled skills in
 `templates/flea/skills/` (`import-brochure` and `fleacms-site`); keep it consistent
 with starter syntax, committed, and excluded from serving/deployment.
@@ -88,6 +91,9 @@ six-person fictional team. `flea reset` confirms before resetting all local file
 except `.git`, with a private sibling recovery copy; it never deploys.
 Starter navigation links Team and Contact, with editable page copy and footer.
 Keep form controls developer-managed; see the templates guide for starter scope.
+Contact is enabled only by apps.contact (mount and email.to); its starter form
+uses `{csrf}` and mount-relative thanks. See apps/contact/README.md for the
+protocol, process and email boundaries. Custom/remote app registration is planned.
 Keep access pages simple and visually consistent using the shared `admin-access`
 layout; visual polish must not change authentication or code-autofill behavior.
 Starter styling uses Inter, warm neutral surfaces and forest-green primary actions,
@@ -133,7 +139,8 @@ Browser tests use
 `FLEA_TEST_BROWSER='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'`.
 
 Rebuild after source or starter changes with `scripts/build.sh`: it refreshes
-both embedded Linux servers before building `bin/flea`. Plain `go build` can
+the matching Contact child before each parent, then both embedded Linux servers
+before building `bin/flea`. Plain `go build` can
 embed stale bundles. Do not overlap this build with tests compiling the bundles.
 Generate a fresh temporary site, compare relevant starter files, and finish
 with `flea status` in the generated/example site. Exclude local agent guidance

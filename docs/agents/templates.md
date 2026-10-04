@@ -20,7 +20,7 @@ folder default and saves the answer. Saved names must be nonempty strings.
 Read-only/noninteractive loads use the folder default without writing; deployment
 requires a committed name so temporary release directories never change it.
 Use this exact filename everywhere; no extensionless configuration fallback.
-Deployment protocol 22 requires the JSON-suffixed configuration filename and
+Deployment protocol 23 requires the JSON-suffixed configuration filename and
 inline editing with the updated rich-content sanitization policy.
 Owner-editable snips live in flea/snips.json: pages map canonical routes to title,
 description, and snips; shared.snips holds reusable regions; archive holds removed
@@ -31,7 +31,7 @@ Generate {snip ID} without quotes. Quoted markers are rejected; HTML comments
 are ordinary comments and never render content or count as references, except
 the leading flea page-settings comment described below.
 Reject old flea attributes, directives, content paths and recovery journals;
-never silently ignore or migrate them. Protocol 22 enforces the snip format.
+never silently ignore or migrate them. Protocol 23 enforces the snip format.
 Do not add layout-changing borders to editable content. Show dashed editable
 boundaries using shadow-root overlays, stronger on hover/focus. Suppress the
 native editable wrapper outline and restore developer styling when editing ends.
@@ -92,7 +92,7 @@ media and icon files in release snapshots. The config is the sole dotfile except
 Private runtime and skills never enter archives. Keep the project-root read boundary
 separate from the site/ template boundary: logical template names remain site-relative,
 while extraction journal edit paths begin with site/. No old-directory fallback or
-automatic migration. Protocol 22 prevents old servers receiving this structure.
+automatic migration. Protocol 23 prevents old servers receiving this structure.
 
 `flea new` initializes Git on main without staging files or creating a commit.
 Default creation is minimal: layout, navigation, index, styles/logo, error pages,
@@ -120,9 +120,11 @@ settings and icon caches in version control by default.
   partials, and stay private. _500.html remains standalone. No YAML dependency.
 - The starter's header and footer live directly in `main.layout.html`. Do not
   generate separate `_header.html` or `_footer.html` files by default.
-- The starter includes a welcome page, contact/thank-you pages, and a team
+- The starter includes a welcome page, contact/contact-thanks pages, and a team
   multisnip example with six fictional members and neutral replaceable portraits.
-  Contact delivery requires contact.to and email settings.
+  Contact delivery requires apps.contact with mount and email.to. The pages live
+  at site/contact/index.html and site/contact/thanks.html; apps are disabled in
+  the starter config until a recipient is chosen.
   Navigation uses Team and Contact; keep /test as an unlinked example. Seed
   editable headings/body copy on Home, Team, Contact and Thank you, plus the
   shared footer. Keep snips outside form controls and navigation. Contact uses
@@ -143,6 +145,13 @@ settings and icon caches in version control by default.
   `_404.html` uses the global layout; write it as page content for `{slot}`.
   `_500.html` remains standalone so error handling does not depend on the layout.
 - Data uses dotted paths such as `{app.site_name}` and `{data.home.title}`.
+  `{csrf}` renders a whole hidden `_csrf` input on public pages, not a raw token
+  value. Include it in Contact forms. Keep it in ordinary element content;
+  attributes, textarea and foreign/raw-text contexts are unsupported. Comments
+  and script/style contents remain inert. Validation and non-public renderers
+  generate no visitor token. Do not replace admin CSRF controls.
+  App values retain their envelope: contact.data.name, contact.invalid.name,
+  contact.error and contact.flash.notice. Never compile them as template source.
   Conditions use `{#if app.email}...{/if}`; loops use
   `{#each data.home.items as item}...{/each}`. Includes inherit loop aliases.
   Support `{#unless dotted.path}...{/unless}` with inverted if truthiness.

@@ -65,3 +65,33 @@ func TestResendSenderName(t *testing.T) {
 		t.Fatal("accepted header injection")
 	}
 }
+
+func TestConfiguredSenderOverride(t *testing.T) {
+	s := NewResend(Settings{APIKey: "re_test123456", From: "info@example.test", Name: "Support"})
+	calls := 0
+	s.client.Transport = transport(func(r *http.Request) (*http.Response, error) {
+		calls++
+		var payload struct {
+			From string `json:"from"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+			t.Fatal(err)
+		}
+		a, err := mail.ParseAddress(payload.From)
+		if err != nil || a.Address != "support@example.test" || a.Name != "Support" {
+			t.Fatal(payload.From, err)
+		}
+		return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader(`{}`))}, nil
+	})
+	if err := s.Send(context.Background(), Message{From: "support@example.test", To: "owner@example.test"}); err != nil {
+		t.Fatal(err)
+	}
+	for _, value := range []string{"bad", "Other <other@example.test>", "a@example.test\r\nBcc: other@example.test"} {
+		if err := s.Send(context.Background(), Message{From: value}); err == nil {
+			t.Fatal("invalid override accepted")
+		}
+	}
+	if calls != 1 || s.settings.From != "info@example.test" {
+		t.Fatal("default mutated or invalid request sent")
+	}
+}

@@ -6,6 +6,16 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Add the bundled Contact mini app with explicit `{csrf}`, private managed
+  process startup, authenticated JSON forwarding and a single-use email capability.
+  Validation preserves safe fields; success redirects with visitor-bound flash.
+  App email.from can override the server sender, including in dev previews.
+- Replace top-level contact settings and /_flea/contact with apps.contact and a
+  configured mount. Starter pages now use /contact and /contact/thanks.
+  No aliases or automatic migration; deployment protocol 23 requires the new
+  server. Admin/editor remain core. Custom apps, remote registration and storage
+  are still planned. Live mail, Linux/systemd and capacity acceptance remain open.
+
 - Stream large static assets and managed photos from validated file handles
   instead of keeping their full contents on the Go heap. Keep small assets and
   theme CSS in memory. Stream fingerprinting and photo validation as well.

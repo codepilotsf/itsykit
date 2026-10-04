@@ -197,7 +197,7 @@ load .env into the production host. FLEA_EMAIL_NAME supplies the sender display
 name. Keep Sender and setup Checker interfaces separate from the Resend adapter.
 Admin addresses and sign-in mail settings update without a dev restart.
 
-Protocol 22 also requires the service unit and lock/content/runtime permissions, not
+Protocol 23 also requires the service unit and lock/content/runtime permissions, not
 just a binary swap. Do not reset a live installation as an upgrade. Setup creates
 the lock owned by flea, and activation grants write access only to each content
 and private runtime directory. Keep release/config parents root-owned. Browser edits and extraction

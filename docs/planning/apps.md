@@ -1,13 +1,16 @@
-# Flea mini apps — design handoff
+# Flea mini apps: design handoff
 
-Status: design only, not implemented
+Status: managed Contact and protocol/CSRF implemented locally; broader apps remain planned
 Date: 2026-10-04
-Scope: a proposed "apps" capability for Flea
+Scope: the included Contact app and future Flea mini apps
 
 ## Current decisions (October 4, supersedes older sections below)
 
 Related planning: [CodePilot service](service.md). Both documents remain design
-work, not authorization to implement. Service workflow details are being worked
+work, except for the approved foundation and managed Contact batches below.
+Current supported behavior is in [Contact's README](../../apps/contact/README.md).
+That README supersedes proposed launch/email details in older sections here.
+Service workflow details are being worked
 out separately; Rails is not the default backend for Flea apps.
 
 - Apps extend a mostly static website. Flea handles routing, form forwarding,
@@ -54,7 +57,7 @@ out separately; Rails is not the default backend for Flea apps.
   recording, and staging promotion are covered by the separate service planning.
 - A new content API/revision system is deferred, not an app prerequisite.
 - First prove contact, then blog reads/storage, then events or booking. Admin
-  extraction is no longer a phase. See the [proposed contact README](contact-app.md).
+  extraction is no longer a phase. See the [Contact handoff](contact-app.md).
   Packaging, dynamic route grammar, and ZJAX changes remain open.
 
 ### Packages, configuration, and lifecycle
@@ -71,16 +74,18 @@ out separately; Rails is not the default backend for Flea apps.
 - The contract is named **Flea App Protocol**: for example, Flea App Protocol v1
   is declared as `"protocol": 1`. App release versions are separate. Verify the
   running service's protocol, not just the manifest; reject mismatches clearly,
-  without compatibility fallbacks. The handshake still needs specification.
+  without compatibility fallbacks. See the authenticated handshake below.
 - Flea manages local apps as child processes in development and production,
-  passing a private listen address and storage location. It owns startup,
+  passing an already-open private listener and storage location. It owns startup,
   shutdown, bounded crash-restart backoff, and useful redacted logs. This
   supersedes the historical proposal for a systemd unit per app.
 - Unavailable apps return a friendly 503 on affected routes; unrelated site
   pages remain available. Migrations do not run during crash recovery.
-- Remote services use a configured URL and are not supervised by Flea. Exact
-  URL configuration, transport authentication, readiness, resource limits, and
-  process cleanup still need design. Child processes are not security sandboxes.
+- Separately managed services, local or remote, use a configured `url` and are
+  not supervised by Flea. See the connection contract below. Readiness timing,
+  resource limits, and process cleanup still need design. Child processes are
+  not security sandboxes. Always-running process policy remains subject to
+  measuring real app overhead; the static-site benchmark did not test apps.
 - Go helpers are optional: use standard HTTP routing and small handlers, with
   helpers for request decoding, response envelopes, and service startup. Do not
   create a config-driven business-logic language or require an ORM. Start with
@@ -90,6 +95,155 @@ out separately; Rails is not the default backend for Flea apps.
   this site's contact notification, not arbitrary mail. Authorization is scoped
   to the app and site. Capability transport and remote-service access remain
   open; see the [contact README](contact-app.md#email-settings-and-security).
+- App email settings use `apps.<name>.email` in the site's main config, never
+  `mail`. An optional `from` overrides the server-wide default sender for that
+  site's app; it must be provider-authorized. Contact requires an explicit `to`
+  recipient. Sender selection comes from trusted configuration, not request
+  JSON. Provider credentials remain separate from site configuration.
+
+### Connections and local launch contract
+
+Two modes share the same Flea App Protocol. These settings are proposed, not
+supported by the current server.
+
+**Managed package:** the site's main `.flea.config.json` enables an installed
+app with a mount, without a service URL or port:
+
+```json
+{
+  "apps": {
+    "contact": {"mount": "/contact"}
+  }
+}
+```
+
+Flea asks the OS for an available port by binding to `127.0.0.1:0`. Port zero
+means automatic assignment, not a literal destination port or custom `:auto`
+syntax. Flea keeps the listener open and passes it to the child; it must not
+probe a free port, close it, and race to reopen it. The Go helper accepts that
+inherited listener. Flea records its address and completes an authenticated
+identity/protocol handshake before forwarding app requests.
+
+On shutdown, both Flea and the child must release their listener references.
+A restart may receive a new port without changing the public mount. Exact
+descriptor handoff, launch arguments, and credential delivery remain to be
+specified. This local launch contract is separate from the HTTP/JSON protocol.
+
+**External service:** a URL in the same site's main config selects a service
+whose process and port are managed independently:
+
+```json
+{
+  "apps": {
+    "custom": {
+      "mount": "/custom",
+      "url": "http://127.0.0.1:5000"
+    }
+  }
+}
+```
+
+For example, a Python/Flask service can implement the protocol without Go helpers
+or listener inheritance. It binds its own port; an occupied port causes its
+startup to fail. Flea verifies the expected app identity and supported protocol,
+not merely that something accepts connections. It never starts, stops, or
+reassigns ports for external services.
+
+For a service on another machine, use HTTPS:
+
+```json
+{
+  "apps": {
+    "custom": {
+      "mount": "/custom",
+      "url": "https://apps.example.com:5555"
+    }
+  }
+}
+```
+
+If this is foobar.com's config, requests to `https://foobar.com/custom` go
+through Flea to that endpoint. `apps.example.com` can resolve to the remote
+server's IP. A hostname simplifies certificate management; an IP URL would
+still need a valid certificate for that IP. Response values appear under
+`custom.data.*`. Mount stripping and query forwarding follow the same rules as
+managed apps. The service address and credentials are never sent to the browser.
+
+### Connection security
+
+- Browser-to-Flea traffic uses production HTTPS. Flea-to-remote-app traffic
+  also requires HTTPS with certificate verification.
+- Local calls use ordinary HTTP on loopback. Documentation may call this
+  "localhost HTTP", but the managed listener and caller use `127.0.0.1`
+  explicitly to avoid IPv4/IPv6 resolution mismatches. Never bind managed apps
+  to `0.0.0.0`. Localhost is not an authentication boundary.
+- Flea generates a random credential scoped to one managed app and site for
+  authenticated calls/handshake. The app receives a separate credential for
+  any authorized callback capability, such as sending a contact notification.
+- External services use explicitly provisioned credentials outside committed
+  configuration. For a multi-site service, its credential must identify and
+  authorize the site, not a visitor-supplied domain or site identifier.
+- Keep credentials out of URLs, logs, public assets, Git, releases, and backups.
+  Exact secret storage, launch-time injection, and rotation remain open.
+  Never infer compatibility from a manifest
+  alone or fall back to an unauthenticated service.
+- This assumes a trusted server without untrusted tenants running arbitrary
+  code. Loopback plus tokens is not isolation from privileged local processes.
+- Remote callback access to Flea's private capabilities remains unresolved.
+  Registering a remote app does not expose a public mail endpoint automatically.
+
+### Authenticated handshake
+
+Before forwarding submissions or data requests, Flea calls the service's
+private `GET /_flea/handshake` endpoint with its app/site-scoped credential:
+
+```http
+GET /_flea/handshake
+Authorization: Bearer <secret-token>
+```
+
+The app authenticates the request before returning HTTP 200 with JSON:
+
+```json
+{
+  "name": "contact",
+  "version": "0.1.0",
+  "protocol": 1
+}
+```
+
+Flea checks the expected app name and supported protocol. `version` identifies
+the app release; it need not equal Flea's version. An open port or a readable
+manifest is not sufficient. A missing or incorrect credential denies access
+before any app operation. The local Go helper handles the authentication checks;
+external services implement the same contract.
+
+The same authorization header accompanies subsequent Flea-to-app requests.
+The token is a long, cryptographically random secret: possession grants its
+defined access, not proof of a human identity. Flea supplies managed apps with
+the secret privately during launch. External services require matching credentials
+provisioned on both sides. Browser authorization headers must not be passed
+through as app credentials.
+
+The handshake is service-internal and must never be forwarded through a public
+mount, including a visitor request to `/contact/_flea/handshake`. Callback mail
+access uses a separate token with narrower permissions, not this service token.
+Handshake timing, response limits, and exact rejection statuses still need to
+be specified before implementation.
+
+### Human-facing setup and errors
+
+The normal managed-app setup is to enable Contact, choose its public page and
+recipient, and let Flea handle listener assignment, secrets, and connection
+checks. This describes the intended experience, not an implemented setup UI.
+Keep protocol mechanics out of routine prompts while retaining useful, redacted
+diagnostics for developers.
+
+Explain what failed and the next action. For an app whose newer protocol is
+unsupported, say "Contact couldn't start because it needs a newer version of
+Flea." Do not use that explanation for every mismatch: wrong app identity,
+rejected credentials, and an unavailable service need their own accurate messages.
+Never expose tokens or internal service details to public website visitors.
 
 ### Optional SQLite schema changes
 
@@ -128,7 +282,7 @@ to the registered app. There is no request `data` wrapper:
   field remains an empty string.
 - Names are literal: `address.city` or `sessions[a].date` remain exactly those
   JSON keys. Flea does not interpret dots, brackets, or indexes as nested data.
-- Flea validates and removes its own CSRF field before forwarding. Existing
+- Flea validates and removes its `_csrf` field before forwarding. Existing
   Origin, host isolation, and other applicable security checks remain required.
 - File uploads need a separate contract and are deferred; do not encode files
   into this JSON contract.
@@ -136,6 +290,125 @@ to the registered app. There is no request `data` wrapper:
 An app can interpret its own documented field names when needed. Shared nested
 field parsing is not part of the initial scope; revisit only if concrete mini
 apps repeatedly need it.
+
+### Site globals and CSRF rendering
+
+Keep `app.*` for site globals, with explicitly documented Flea-owned names
+such as existing `app.current_admin`. Reject configuration that defines a
+reserved name; never silently override it. CSRF adds no reserved global or
+public raw-token binding. This is separate from an installed app's response
+namespace, such as `contact.data.*`.
+
+Authors explicitly include the CSRF control in forms:
+
+```html
+<form method="post" action="/contact">
+  {csrf}
+  <!-- App fields -->
+</form>
+```
+
+The `{csrf}` directive renders the complete hidden input named `_csrf`,
+with its request-local token safely escaped in the value attribute. It is an
+HTML markup directive, not a data expression; permit it only in element-content
+contexts, never within attributes, scripts, or styles. There is no public
+`app.csrf` token binding. This supersedes the earlier raw-token proposal.
+
+Flea does not scan forms and inject hidden fields automatically. The token is
+not stored site content or app-service response data. Rendering must not
+mutate the published Project or share a visitor's token through cached HTML.
+Flea checks the token and exact Origin before forwarding a submission; missing
+or invalid tokens are rejected without calling the app. Strip `_csrf` from the
+forwarded JSON. The field name belongs to Flea, not an app's business data.
+
+This lifecycle is implemented. Contact now requires `{csrf}`; admin forms keep
+their existing controls. Public Contact mounts are enabled only by apps.contact.
+
+### First implementation batch (approved October 4)
+
+Implemented in `internal/formguard`, `internal/appapi` and the site renderer.
+The historical scope below records the first batch, before Contact replacement.
+The second approved batch now adds public Contact dispatch and managed lifecycle;
+see its status below. Verification is not inferred from a checklist.
+
+Before replacement, code review on October 4 found that the old contact handler
+enforces exact Origin, HTTPS, bounded URL-encoded bodies and submission limits,
+but has no visitor CSRF token. Editor login uses a cookie/form comparison and
+authenticated editing uses persisted session tokens (`internal/editor/auth.go`).
+Do not make public forms depend on admin sessions or change those flows.
+`internal/site/server.go` renders compiled templates per request and already
+defaults responses to no-store; it does not retain finished page HTML.
+
+Build the security and protocol foundation first, using a test service to prove
+the round trip. This batch does not replace the working contact handler or
+advertise a ready-to-install app.
+
+1. Add `{csrf}` compilation and request-local rendering, including layouts and
+   partials. Preserve the rule that comments and raw script/style content are
+   not evaluated. Reject directive use in unsupported HTML contexts. Loading,
+   validation and status checks must not generate visitor cookies or secrets.
+2. Add anonymous visitor protection independent of editor authentication.
+   Design: a random visitor nonce in a signed, host-only HttpOnly
+   cookie, and an HMAC-authenticated form token bound to that nonce, the site,
+   exact origin and expiry. Use standard-library cryptography, unambiguous
+   message encoding and constant-time verification, not an unsigned cookie
+   comparison. Production cookies use Secure, Path=/, no Domain and a __Host-
+   name; trusted HTTP dev uses a separate site-specific cookie name. SameSite=Lax
+   avoids replacing a valid cookie on ordinary incoming top-level navigation.
+   This follows the signed-token approach described in the
+   [OWASP CSRF guidance](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html).
+3. Start with a fixed 24-hour visitor/form lifetime. Reuse a valid visitor nonce
+   rather than rotating on each render or submission; existing tabs and normal
+   validation retries remain usable until expiry. Issue cookies only when the
+   directive actually renders, and commit them only after successful rendering.
+   No per-visitor server map or database. Keep a random per-site signing key in
+   runtime memory, outside immutable Projects, retained across template reloads.
+   A full server restart invalidates forms: return a clear 403 reload instruction,
+   never automatically replay a submission. Restart persistence is deferred.
+   Simultaneous first visits without a cookie can race; fail safely and test the
+   reload recovery rather than promising uninterrupted first-use multi-tab forms.
+4. Keep exact Origin, approved host/HTTPS and devaccess checks. Require exactly
+   one cookie and one `_csrf` POST field, rejecting malformed, missing, duplicate
+   or expired values before any app call. Never take the token from a query.
+   Strip `_csrf` from forwarded JSON. Token-bearing HTML is private/no-store;
+   ordinary pages must not acquire visitor cookies or per-visitor state.
+5. Define tested internal protocol types and mount validation: reject reserved
+   namespaces, core-route conflicts and overlapping app mounts. Use literal flat
+   form fields, preserving repeated values. Initially accept bounded URL-encoded
+   forms only; multipart and files remain unsupported. Contact's existing 32 KiB
+   request bound is the starting default, not an unbounded generic decoder.
+6. Exercise authenticated HTTP transport against a local test service: handshake,
+   mount stripping, unchanged GET query parameters, form-to-JSON POST, and
+   request-local `data`/`invalid`/`error` rendering. Never forward browser cookies
+   or Authorization. Disable automatic upstream redirects and POST retries.
+   Bounds: 2-second handshake, 15-second ordinary request deadline,
+   4 KiB handshake and 1 MiB response bodies, at most four calls per client and
+   64 process-wide, with no waiting queue. App HTML output is capped at 2 MiB
+   during rendering. Malformed, oversized or unavailable upstream responses fail
+   safely with 503; application validation uses 422. Production process launch
+   and publicly enabled app routing are not part of this foundation batch.
+
+Acceptance: regression tests cover token/cookie tampering, expiry, duplicate
+fields, cross-host/site and visitor isolation, reload/restart behavior, concurrent
+renders, context escaping, mount conflicts, upstream timeouts/size bounds and
+unchanged admin/contact behavior. Run Go tests, race tests, vet, the bundled build
+and a fresh generated-site status check. No deployment, live email or commits.
+
+### Managed Contact batch (approved and implemented locally October 4)
+
+Contact now has bundled child launch/cleanup, fixed render-only form/thanks routes,
+a private email capability, mount-relative redirects, visitor-scoped flash and
+starter/config replacement. There are no legacy aliases or migration fallbacks.
+The matching-platform executable is bundled before compiling each parent; the
+site package does not carry redundant executables. Deployment protocol 23 prevents
+old servers accepting the new site contract. See [Contact](../../apps/contact/README.md)
+for inherited descriptors, credentials, bounds and configuration.
+
+The [isolated Linux Contact check](../benchmarks/2026-10-04-contact-apps.md)
+passed initial lifecycle tests and a 1/10/30-site memory probe. Real email,
+longer soaks and representative app-capacity acceptance remain open.
+General read-route declarations, custom/remote-service provisioning, databases,
+storage moves and ZJAX remain separate work. No deployment has been performed.
 
 ### GET request contract
 

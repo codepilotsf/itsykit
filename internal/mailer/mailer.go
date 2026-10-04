@@ -15,9 +15,16 @@ import (
 	"time"
 )
 
-type Message struct{ To, Subject, Text, ReplyTo, HTML string }
+// From is an optional trusted configuration override, never a visitor field.
+type Message struct{ To, Subject, Text, ReplyTo, HTML, From string }
 type Sender interface {
 	Send(context.Context, Message) error
+}
+
+// ValidAddress accepts one plain email address, without a display name.
+func ValidAddress(value string) bool {
+	a, err := mail.ParseAddress(value)
+	return err == nil && a.Address == value && len(value) <= 254 && !strings.ContainsAny(value, "\r\n\x00")
 }
 
 type Settings struct {
@@ -61,6 +68,12 @@ func NewResend(s Settings) *Resend {
 
 func (s *Resend) Send(ctx context.Context, m Message) error {
 	from := s.settings.From
+	if m.From != "" {
+		if !ValidAddress(m.From) {
+			return fmt.Errorf("The configured sender email address is invalid.")
+		}
+		from = m.From
+	}
 	if s.settings.Name != "" {
 		from = (&mail.Address{Name: s.settings.Name, Address: from}).String()
 	}

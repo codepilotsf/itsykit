@@ -173,6 +173,8 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 		token := strings.TrimSpace(source[i+1 : end])
 		var rendered string
 		switch {
+		case token == "csrf":
+			rendered = csrfAction
 		case token == "icon" || strings.HasPrefix(token, "icon ") || strings.HasPrefix(token, "icon\t") || strings.HasPrefix(token, "icon\n"):
 			var err error
 			rendered, err = p.compileIcon(token, lookup)
@@ -341,7 +343,11 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 		b := blocks[len(blocks)-1]
 		return fail(b.start, fmt.Errorf("unclosed %s block; expected {/%s}", b.kind, b.kind))
 	}
-	return out.String(), nil
+	compiled := out.String()
+	if err := checkCSRFContexts(compiled); err != nil {
+		return fail(0, err)
+	}
+	return compiled, nil
 }
 
 func lookup(data any, path string) any {

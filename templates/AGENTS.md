@@ -37,6 +37,14 @@ ordinary css/navigation.css imported by global.css, not runtime-injected styles.
 Use `{#unless dotted.path}...{/unless}` for negative conditions. Like if, it
 supports `{:else}` and `{:else if dotted.path}`; conditions are dotted paths only.
 
+`{csrf}` renders the complete hidden input required inside a Contact form.
+Enable apps.contact with mount and email.to in .flea.config.json; optional
+email.from overrides the server sender. Post to the mount, such as /contact.
+Use contact.data.*, contact.invalid.*, contact.error and contact.flash.*.
+Contact needs the mount's index.html and thanks.html. No old contact config or
+/_flea/contact alias exists. Restart dev after app settings change. Do not replace
+admin CSRF controls. Other app packages and remote registrations are not supported yet.
+
 Use bare snip attributes to designate editable text, images or videos. Text
 extracts to {snip ID}; an img extracts to src="{snip ID.src}" and
 alt="{snip ID.alt}", a video to src and poster bindings. The generated JSON
