@@ -85,6 +85,15 @@ validation, confined reads, symlink rejection, and immutable asset snapshots.
 Treat all Project maps and Content as immutable after publication. Build a new
 Project for reloads. Keep project-file confinement separate from administrator-owned
 absolute-path writes; their trust assumptions differ.
+Ordinary assets above 64 KiB and all managed photos stream from load-time pinned
+regular-file handles. Smaller assets and theme CSS retain byte snapshots. Reject
+linked streamed files; requests only select validated map entries, never open
+paths. Independent readers preserve concurrent Range/HEAD behavior. Size/mtime
+changes return 503 before headers or interrupt an active transfer. Replace files
+atomically, never mutate published streamed files in place. Unpublished failed
+loads close handles immediately; published snapshots/readers retain them until
+os.File cleanup. Monitor file-descriptor use alongside heap at hosting scale.
+Fingerprinting and photo checksum validation stream with bounded buffers.
 Do not replace validated route maps with request-derived filesystem reads.
 Production keeps detailed errors in server logs and generic/custom HTTP error
 pages. Local dev uses the ordinary 404 template and embedded diagnostics for 405/500 when

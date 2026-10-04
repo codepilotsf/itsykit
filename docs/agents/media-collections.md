@@ -46,7 +46,12 @@ VideoAssets include typed active/archive entries for loading and transport.
 Use bounded decoding, EXIF orientation, metadata-stripping re-encoding and 2048px
 resizing. Require session and header CSRF before acquiring the global upload slot
 or parsing a large body; also keep normal Origin/form CSRF checks. Files are public.
-Publish validated immutable bytes, never request-derived filesystem reads. Preserve
+Validate photo hashes/dimensions through bounded readers, then pin regular-file
+handles for streaming rather than retaining encoded photos on the Go heap.
+Reject symlinks/hardlinks. Size/mtime changes fail closed before serving and
+during reads; atomic replacement leaves old snapshots on their original handle.
+Preserve handle lifetime through active requests and close failed loads.
+Publish validated immutable files, never request-derived filesystem reads. Preserve
 photos in ordinary deployment and include them in snip synchronization and backup.
 Retain old file versions; no automatic destructive pruning.
 Multisnip image authoring uses named img snip attributes. Import local seed photos;

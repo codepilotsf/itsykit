@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
@@ -111,13 +112,21 @@ func fingerprint(root string) string {
 		if !d.Type().IsRegular() {
 			return fmt.Errorf("unsupported file: %s", name)
 		}
-		b, e := readFile(r, name)
+		f, e := openSiteFile(r, name, 100<<20)
 		if e != nil {
 			return e
 		}
-		fmt.Fprintf(h, "%d:", len(b))
-		h.Write(b)
-		return nil
+		defer f.Close()
+		info, e := f.Stat()
+		if e != nil {
+			return e
+		}
+		fmt.Fprintf(h, "%d:", info.Size())
+		n, e := io.Copy(h, io.NewSectionReader(f, 0, info.Size()))
+		if e == nil && (n != info.Size() || !(fileAsset{f, info}).unchanged()) {
+			return fmt.Errorf("file changed while hashing: %s", name)
+		}
+		return e
 	})
 	if err != nil {
 		fmt.Fprint(h, err)
@@ -239,6 +248,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if data, ok := p.AssetData[r.URL.Path]; ok {
 		http.ServeContent(w, r, path.Base(r.URL.Path), time.Time{}, bytes.NewReader(data))
+		return
+	}
+	if p.serveAssetFile(w, r) {
 		return
 	}
 	s.serveError(w, r, p, 404, revision, nil)

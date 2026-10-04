@@ -4,6 +4,14 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## Unreleased
+
+- Stream large static assets and managed photos from validated file handles
+  instead of keeping their full contents on the Go heap. Keep small assets and
+  theme CSS in memory. Stream fingerprinting and photo validation as well.
+- Reject hard-linked streamed assets. Detected in-place changes fail closed;
+  atomically replaced files retain their original bytes in existing snapshots.
+
 ## 0.8.1 - 2026-10-03
 
 - Append only missing runtime and media rules to `.gitignore`, regardless of

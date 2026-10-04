@@ -30,6 +30,8 @@ This is the framework repository; `templates/` is the canonical starter.
   `../bookworm` is the site in scope.
 - Keep published Projects immutable, reads confined, and request paths separate
   from filesystem paths. Never compile JSON or owner values as template source.
+  Stream large assets/photos from validated handles; preserve mutation checks
+  and snapshot lifetime rules in the runtime guide.
 - Preserve session, exact Origin, CSRF, CSP, host isolation and content-version
   checks. No login bypass or weakened security to make tests pass.
 - Normal deployment preserves live editable content and theme. Explicit sync,

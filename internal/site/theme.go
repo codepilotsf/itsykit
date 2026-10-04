@@ -18,6 +18,7 @@ func LoadWithMedia(root string, content *snips.Store, css *string, mediaRoot str
 	}
 	if css != nil {
 		if len(*css) > theme.MaxBytes {
+			p.closeAssetFiles()
 			return nil, fmt.Errorf("theme too large")
 		}
 		p.Assets["/css/theme.css"] = "site/css/theme.css"

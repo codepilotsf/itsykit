@@ -20,6 +20,21 @@ func readFile(root *os.Root, name string) ([]byte, error) {
 	return readFileBounded(root, name, 100<<20)
 }
 func readFileBounded(root *os.Root, name string, limit int64) ([]byte, error) {
+	f, err := openSiteFile(root, name, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	data, err := io.ReadAll(io.LimitReader(f, limit+1))
+	if int64(len(data)) > limit {
+		return nil, fmt.Errorf("file exceeds size limit: %s", name)
+	}
+	return data, err
+}
+
+// openSiteFile is for load-time, caller-selected paths, never request paths.
+// The caller owns the validated handle and must close it or retain it in a snapshot.
+func openSiteFile(root *os.Root, name string, limit int64) (*os.File, error) {
 	if !fs.ValidPath(name) || strings.ContainsAny(name, "\\\x00") {
 		return nil, fmt.Errorf("invalid site path: %q", name)
 	}
@@ -40,22 +55,20 @@ func readFileBounded(root *os.Root, name string, limit int64) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
 	actual, err := f.Stat()
 	if err != nil {
+		f.Close()
 		return nil, err
 	}
-	if !os.SameFile(info, actual) {
+	if !actual.Mode().IsRegular() || !os.SameFile(info, actual) {
+		f.Close()
 		return nil, fmt.Errorf("file changed while loading: %s", name)
 	}
 	if actual.Size() > limit {
+		f.Close()
 		return nil, fmt.Errorf("file exceeds size limit: %s", name)
 	}
-	data, err := io.ReadAll(io.LimitReader(f, limit+1))
-	if int64(len(data)) > limit {
-		return nil, fmt.Errorf("file exceeds size limit: %s", name)
-	}
-	return data, err
+	return f, nil
 }
 
 func readJSON(root *os.Root, path string, target any) error {

@@ -10,6 +10,7 @@ import (
 	"image/color"
 	"image/jpeg"
 	"image/png"
+	"io"
 	"regexp"
 	"unicode/utf8"
 )
@@ -40,17 +41,26 @@ func Validate(photos map[string]Photo) error {
 	return nil
 }
 func CheckBytes(p Photo, b []byte) error {
+	return CheckReader(p, bytes.NewReader(b), int64(len(b)))
+}
+
+// CheckReader validates encoded bytes without retaining the full photo in memory.
+func CheckReader(p Photo, r io.ReaderAt, size int64) error {
 	if !Filename.MatchString(p.File) {
 		return fmt.Errorf("invalid photo filename")
 	}
-	if len(b) > MaxFile {
+	if size < 0 || size > MaxFile {
 		return fmt.Errorf("photo exceeds 8 MiB")
 	}
-	sum := sha256.Sum256(b)
-	if len(p.File) < 64 || hex.EncodeToString(sum[:]) != p.File[:64] {
+	h := sha256.New()
+	n, err := io.Copy(h, io.NewSectionReader(r, 0, size))
+	if err != nil {
+		return err
+	}
+	if n != size || hex.EncodeToString(h.Sum(nil)) != p.File[:64] {
 		return fmt.Errorf("photo checksum mismatch")
 	}
-	c, format, err := image.DecodeConfig(bytes.NewReader(b))
+	c, format, err := image.DecodeConfig(io.NewSectionReader(r, 0, size))
 	if err != nil {
 		return err
 	}

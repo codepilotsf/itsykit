@@ -46,6 +46,12 @@ for completed changes, and [README.md](README.md) for current usage.
 
 ## Agreed scope
 
+Capacity follow-up: the [isolated 1/10/30-site VPS probe](docs/benchmarks/2026-10-04-multisite.md)
+passed on a 1 GB host with synthetic traffic and overlapping read-only validation.
+Still measure representative client workloads, editor/uploads, longer soak times,
+and actual deployment peaks. Include descriptor limits, total RSS and OS cache,
+not just heap. Mini-app hosting remains provisional until its costs are measured.
+
 - Keep the existing CMS feature set. Focus on defects, usability, documentation,
   installation, updates, website design and release verification.
 - Include the agreed local email-preview addition: new sites preview outgoing

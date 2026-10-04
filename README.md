@@ -880,7 +880,15 @@ introduced through this feature. Browse names at [Lucide](https://lucide.dev/ico
 
 URLs are case sensitive. Trailing slashes other than `/` return 404, without redirects. URLs containing `.html` (case insensitive), dot segments, doubled slashes, backslashes, NUL, or residual percent signs return 404. Standard percent encoding is decoded once by Go's HTTP parser and then validated; encoded private names are still private. Filenames that cannot produce an accepted URL fail validation.
 
-Files and directories beginning with `_` or `.` are private, including configuration and snips. `/admin` is reserved and cannot be a page or asset. `/_flea/reload` is a development-only version endpoint, not a filesystem route. Symlinks and nonregular files in the included site tree are rejected. Reads use confined directory handles with file identity checks. Requests serve only preloaded route maps and immutable asset bytes, never request-derived filesystem paths.
+Files and directories beginning with `_` or `.` are private, including configuration and snips. `/admin` is reserved and cannot be a page or asset. `/_flea/reload` is a development-only version endpoint, not a filesystem route. Symlinks and nonregular files in the included site tree are rejected. Reads use confined directory handles with file identity checks. Requests serve only validated route maps, never request-derived filesystem paths.
+
+Assets larger than 64 KiB and managed photos stream from pinned file handles,
+keeping their full contents off the Go heap. Smaller assets and theme CSS remain
+in memory; managed videos already stream. Streamed files cannot be hard-linked.
+Replace files atomically and let dev reload, or deploy a new release. Editing a
+streamed file in place causes detected size/timestamp changes to return 503
+(or interrupt a transfer already in progress), rather than serve changed bytes
+from an old snapshot. The operating system manages file caching.
 
 ## Reload behavior
 

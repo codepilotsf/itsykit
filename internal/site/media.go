@@ -12,32 +12,71 @@ func ManagedMediaRoot(contentPath string) string {
 	return filepath.Join(filepath.Dir(contentPath), "media")
 }
 func (p *Project) loadMedia() error {
-	total := 0
-	seen := map[string][]byte{}
+	var total int64
+	seen := map[string]fileAsset{}
 	for _, photo := range p.Content.ImageAssets() {
-		if data, ok := seen[photo.File]; ok {
-			if err := media.CheckBytes(photo, data); err != nil {
+		route := "/media/" + photo.File
+		if prior, ok := seen[photo.File]; ok {
+			if err := media.CheckReader(photo, prior.file, prior.info.Size()); err != nil {
 				return err
 			}
 			continue
 		}
-		data, err := ReadPhoto(p.MediaRoot, photo.File)
+		f, err := openPhoto(p.MediaRoot, photo.File)
 		if err != nil {
 			return fmt.Errorf("photo library: %w", err)
 		}
-		if err = media.CheckBytes(photo, data); err != nil {
+		info, err := f.Stat()
+		if err != nil {
+			f.Close()
 			return err
 		}
-		seen[photo.File] = data
-		total += len(data)
+		a := fileAsset{f, info}
+		if err := a.validateLinks(); err != nil {
+			f.Close()
+			return err
+		}
+		if err = media.CheckReader(photo, f, info.Size()); err != nil {
+			f.Close()
+			return err
+		}
+		if !a.unchanged() {
+			f.Close()
+			return fmt.Errorf("photo changed while loading")
+		}
+		total += info.Size()
 		if total > media.MaxTotal {
+			f.Close()
 			return fmt.Errorf("photo library exceeds 64 MiB")
 		}
-		route := "/media/" + photo.File
 		p.Assets[route] = "flea/media/" + photo.File
-		p.AssetData[route] = data
+		delete(p.AssetData, route)
+		if prior, ok := p.assetFiles[route]; ok {
+			prior.file.Close()
+		}
+		p.assetFiles[route] = a
+		seen[photo.File] = a
 	}
 	return nil
+}
+
+func openPhoto(root, name string) (*os.File, error) {
+	if !media.Filename.MatchString(name) {
+		return nil, fmt.Errorf("invalid photo filename")
+	}
+	info, err := os.Lstat(root)
+	if err != nil {
+		return nil, err
+	}
+	if !info.IsDir() {
+		return nil, fmt.Errorf("photo directory is not a real directory")
+	}
+	r, err := os.OpenRoot(root)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+	return openSiteFile(r, name, media.MaxFile)
 }
 func ReadPhoto(root, name string) ([]byte, error) {
 	if !media.Filename.MatchString(name) {

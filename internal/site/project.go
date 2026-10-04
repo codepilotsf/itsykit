@@ -38,6 +38,7 @@ type Project struct {
 	Pages              map[string]*template.Template
 	Assets             map[string]string
 	AssetData          map[string][]byte
+	assetFiles         map[string]fileAsset
 	Errors             map[int]*template.Template
 	files              map[string]string
 	signature          string
@@ -71,6 +72,13 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 	}
 	defer boundary.Close()
 	p := &Project{Root: root, Snips: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
+	loaded := false
+	defer func() {
+		if !loaded {
+			p.closeAssetFiles()
+		}
+	}()
+	p.assetFiles = map[string]fileAsset{}
 	p.MediaRoot = mediaRoot
 	p.syncOnly = syncOnly
 	if p.MediaRoot == "" {
@@ -300,11 +308,9 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 	}
 	// Assets are immutable snapshots, never opened from a request-controlled path.
 	for route, path := range p.Assets {
-		data, e := readFile(boundary, path)
-		if e != nil {
+		if e := p.loadAsset(boundary, route, path); e != nil {
 			return nil, e
 		}
-		p.AssetData[route] = data
 	}
 	if err = p.loadMedia(); err != nil {
 		return nil, err
@@ -335,6 +341,7 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 	for _, name := range names {
 		p.Warnings = append(p.Warnings, p.missingIcons[name])
 	}
+	loaded = true
 	return p, nil
 }
 

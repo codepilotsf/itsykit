@@ -273,6 +273,13 @@ Rules:
 7. An unmatched route returns `_404.html` with HTTP status 404, wrapped in `main.layout.html` when present. The 404 template contains page content for `{slot}`, not a separate HTML document.
 8. An unexpected request-time/internal rendering failure returns `_500.html` with HTTP status 500. This fallback must remain deliberately simple.
 
+Implemented asset storage: ordinary files above 64 KiB and managed photos stream
+from pinned, validated regular-file handles. Smaller assets and theme CSS remain
+byte snapshots. No request opens a filesystem path. Streamed files reject links;
+size/mtime changes fail closed (503 before headers, interrupted transfer afterward).
+Published files must be replaced atomically, not changed in place. Managed videos
+also stream. OS caching is separate from retained Go heap.
+
 In dev, 404 responses use the site's ordinary error template; 405/500 responses
 show self-contained diagnostic pages to loopback peers using a localhost/loopback
 Host, or explicitly authorized LAN requests. Include escaped error text,

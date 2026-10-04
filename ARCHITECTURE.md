@@ -130,6 +130,20 @@ partials are checked, including unused ones. Routes and snip page ownership use
 the same filename conversion. Legacy named snips and `data.*` share a namespace
 and one JSON-directory loader; collisions are errors.
 
+Asset snapshots are hybrid: ordinary files up to 64 KiB and theme CSS keep byte
+snapshots; larger assets and all managed photos retain confined regular-file
+handles instead of payload buffers. Requests use independent SectionReaders,
+never path opens. Streamed files reject hardlinks as well as symlinks. Size/mtime
+checks before headers fail with 503; checks around each read stop an active
+transfer if the file changes. This assumes published files are not modified in
+place, like videos; it is not protection against a privileged writer restoring
+file metadata deliberately. Atomic replacement preserves the old open inode.
+Failed loads close their handles; published handles are reclaimed by os.File
+cleanup after snapshots and active readers become unreachable. This trades heap
+retention for file descriptors, whose limits need capacity testing. No disk cache
+copies or new writable site directories are created. Fingerprinting streams
+bounded file reads rather than allocating each file in full.
+
 A `Project` is immutable after publication. Public config values come from `app`
 (app.site_name for the display name), never admin/mail settings. An omitted name
 gets a read-only folder default. Interactive dev saves it with confined,
@@ -225,7 +239,8 @@ are 256/270 MiB to accommodate both photos and videos alongside site code.
 
 Photo metadata belongs to snips.Store, while hash-named bytes live in local media/
 or the production content directory's media/ child. LoadWithMedia overlays only
-catalogued, checksum-checked bytes into the immutable asset map. Browser uploads
+catalogued, checksum/dimension-checked file handles into the serving asset map.
+Photo checks stream encoded bytes without retaining full image buffers. Browser uploads
 decode/re-encode bounded JPEG/PNG under the content lock before saving metadata.
 An interrupted save can leave an unreferenced immutable photo; old bytes are never
 silently removed. Deployment seeds missing files and retains live metadata. Pull

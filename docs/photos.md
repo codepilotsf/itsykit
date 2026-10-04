@@ -69,7 +69,9 @@ Standalone image metadata lives in typed snip entries in `flea/snips.json`;
 multisnip photo choices use its `media` map. Local processed files live in
 `flea/media/`, named by their SHA-256 hash. Commit both. Original developer seed images
 are not removed. Production uploads live in the site's managed content directory,
-outside immutable code releases; only validated snapshot bytes are publicly served.
+outside immutable code releases. Validated photos stream from pinned file handles,
+not permanent Go-heap buffers. Never modify hash-named files in place: detected
+changes make the asset unavailable until a valid snapshot is loaded.
 
 Normal deployment preserves live photos and seeds new ones. `flea pull` and
 `flea pull --snips-only` retrieve photo metadata and referenced files together.
