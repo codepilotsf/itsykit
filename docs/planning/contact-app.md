@@ -40,7 +40,12 @@ The canonical usage and API contract now lives in
   flash passed. Sean confirmed inbox receipt, From `sean@fleacms.com`, and
   To/Reply-To `sean@codepilot.com`. HTML/text appearance and a real default-sender
   send remain unverified. See [the opt-in check](../../scripts/contact-email-check/README.md).
-- Longer Linux/systemd soaks and restart-budget exhaustion. The initial isolated
+- Longer Linux/systemd soaks and restart-budget exhaustion on Linux. Local
+  regression tests cover exactly five failed process launches, cancellation at
+  retry backoff, bounded shutdown during an active submission with one sender
+  attempt, and ordinary pages/assets remaining available without Contact.
+  The exhaustion test uses an immediately exiting test executable, not repeated
+  crashes of an already-ready Contact child. The initial isolated
   startup, single-child crash, shutdown and parent-death checks passed; see the
   [Linux Contact report](../benchmarks/2026-10-04-contact-apps.md).
 - Representative per-app memory/descriptor costs and deployment peaks.
