@@ -77,4 +77,4 @@ Next: repeat with representative client sites, mixed editor/upload work, a
 longer soak, and the first actual mini app before settling production capacity
 or always-running app-process policy.
 
-Reproduction details: [capacity probe](../../scripts/capacity/README.md).
+Reproduction details: [capacity probe](../../../scripts/capacity/README.md).

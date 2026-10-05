@@ -13,12 +13,13 @@ flea update-server
 flea update-server --recover
 ```
 
-Server-wide site administration takes an explicit SSH target and needs no local
-site or saved deployment settings:
+Server-wide site administration needs no local site or saved deployment settings.
+It accepts an explicit SSH target (otherwise it asks for the server login, for
+example `root@fleacms.com`):
 
 ```sh
-flea server sites <ssh-target>
-flea server remove <ssh-target> <site-name>
+flea server list [ssh-target]
+flea server remove [ssh-target] [site-name]
 ```
 
 ## Rollback
@@ -76,15 +77,15 @@ restore and power-loss behavior still need disposable-server verification.
 
 ## Removing a site
 
-`flea server sites <ssh-target>` lists managed sites, their grouped domains and
-aliases, redirects, HTTPS domains and current release. It is read-only and does
-not take the deployment lock, so it also works while a recovery journal is
-pending.
+`flea server list [ssh-target]` shows each site's name and branch, then its HTTPS
+domains, then its HTTP-only domains, then redirects. It is read-only and does not
+take the deployment lock, so it also works while a recovery journal is pending.
 
-`flea server remove <ssh-target> <site-name>` unregisters one site's routing
+`flea server remove [ssh-target] [site-name]` unregisters one site's routing
 after the server prints the exact affected domains and you type the exact site
-name. It is unregister/offline only: it deletes no files. Site files stay under
-`/var/lib/flea/sites/<name>` and cached certificates stay under
+name. Omitting the site name lists the managed sites and asks for one by its
+exact name. It is unregister/offline only: it deletes no files. Site files stay
+under `/var/lib/flea/sites/<name>` and cached certificates stay under
 `/var/lib/flea/certs`, but retained files are not restored automatically:
 content lookup follows active routing, so re-deploying the same stable site name
 starts from the current project and cannot recover content left behind. Back up

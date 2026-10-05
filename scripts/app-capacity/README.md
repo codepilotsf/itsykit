@@ -58,4 +58,4 @@ Create them with `go test -c` for `./internal/site`, `./internal/appruntime` and
 they do not verify Resend. Native execution of cross-compiled tests is not a
 native build or full Linux test suite.
 
-Recorded result: [October 4 Contact check](../../docs/benchmarks/2026-10-04-contact-apps.md).
+Recorded result: [October 4 Contact check](../../docs/agents/benchmarks/2026-10-04-contact-apps.md).

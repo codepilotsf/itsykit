@@ -9,7 +9,7 @@ Scope: the included Contact app and future Flea mini apps
 CodePilot service planning lives in the separate codepilot-hub project.
 This document remains design work, except for the approved foundation and
 managed Contact batches below.
-Current supported behavior is in [Contact's README](../../apps/contact/README.md).
+Current supported behavior is in [Contact's README](../../../apps/contact/README.md).
 That README supersedes proposed launch/email details in older sections here.
 Service workflow details are being worked
 out separately; Rails is not the default backend for Flea apps.
@@ -58,7 +58,7 @@ out separately; Rails is not the default backend for Flea apps.
   recording, and staging promotion are covered by the separate service planning.
 - A new content API/revision system is deferred, not an app prerequisite.
 - First prove contact, then blog reads/storage, then events or booking. Admin
-  extraction is no longer a phase. See the [Contact handoff](contact-app.md).
+  extraction is no longer a phase. See [Contact's README](../../../apps/contact/README.md).
   Packaging, dynamic route grammar, and ZJAX changes remain open.
 
 ### Packages, configuration, and lifecycle
@@ -95,7 +95,7 @@ out separately; Rails is not the default backend for Flea apps.
   Contact validates submissions and calls a narrow private capability to send
   this site's contact notification, not arbitrary mail. Authorization is scoped
   to the app and site. Capability transport and remote-service access remain
-  open; see the [contact README](contact-app.md#email-settings-and-security).
+  open; see [Contact's README](../../../apps/contact/README.md).
 - App email settings use `apps.<name>.email` in the site's main config, never
   `mail`. An optional `from` overrides the server-wide default sender for that
   site's app; it must be provider-authorized. Contact requires an explicit `to`
@@ -402,7 +402,7 @@ a private email capability, mount-relative redirects, visitor-scoped flash and
 starter/config replacement. There are no legacy aliases or migration fallbacks.
 The matching-platform executable is bundled before compiling each parent; the
 site package does not carry redundant executables. Deployment protocol 23 prevents
-old servers accepting the new site contract. See [Contact](../../apps/contact/README.md)
+old servers accepting the new site contract. See [Contact](../../../apps/contact/README.md)
 for inherited descriptors, credentials, bounds and configuration.
 
 The [isolated Linux Contact check](../benchmarks/2026-10-04-contact-apps.md)
@@ -794,6 +794,6 @@ target. Consider proving the runtime on the contact form first (Phase 0).
 ## References
 
 - zjax library: `/Users/sean/Projects/zjax`
-- Flea architecture: `ARCHITECTURE.md`, `spec.md`, `next-steps.md`
+- Flea architecture: `../architecture.md`, `../spec.md`, `../next-steps.md`
 - Flea skill references (authoring, commands, deployment): installed at
   `~/.config/opencode/skills/fleacms/references/`

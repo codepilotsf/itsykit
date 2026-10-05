@@ -164,6 +164,6 @@ Contact unavailable until restart. Other pages remain usable. Shutdown closes
 the parent-liveness pipe, waits briefly and kills a stuck child. No migration
 runs on startup or recovery. Normal shutdown removes the extracted executable;
 abrupt termination can leave its private temporary directory. Processes are not
-OS sandboxes. The [initial Linux capacity check](../../docs/benchmarks/2026-10-04-contact-apps.md)
+OS sandboxes. The [initial Linux capacity check](../../docs/agents/benchmarks/2026-10-04-contact-apps.md)
 covered 30 lightweight Contact sites; heavier workloads and longer soaks still
 need measurement before making production-capacity guarantees.

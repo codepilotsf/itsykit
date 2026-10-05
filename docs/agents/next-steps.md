@@ -3,8 +3,8 @@
 Agreed September 28, 2026. V1 is ready for other developers to download and use
 without Sean's help. Release when the checks pass, with no fixed deadline.
 This is the working plan, not a claim that planned commands or releases exist.
-Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](CHANGELOG.md)
-for completed changes, and [README.md](README.md) for current usage.
+Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
+for completed changes, and [README.md](../../README.md) for current usage.
 
 ## Current release status (October 3, 2026)
 
@@ -42,7 +42,7 @@ for completed changes, and [README.md](README.md) for current usage.
 - Versioned downloads now stream from a separate administrator-owned disk store,
   preserving all old URLs and hashes. Website assets fell from 247.7 MiB to
   0.63 MiB; the final archive upload was 575 KB. Keep the 256 MiB archive limit.
-  Follow docs/download-hosting.md; back up the store independently of site backups.
+  Follow docs/agents/download-hosting.md; back up the store independently of site backups.
 - The 1 GB host needed Sean's approved `GOMEMLIMIT=320MiB` service override to
   complete activation. The 0.6.1 upgrade additionally needed an approved 1 GB
   swap file, persisted in /etc/fstab. Apply the memory target to separate upgrade
@@ -55,11 +55,11 @@ for completed changes, and [README.md](README.md) for current usage.
 
 ## Agreed scope
 
-Separately approved mini-app work is tracked in [the app plan](docs/planning/apps.md).
+Separately approved mini-app work is tracked in [the app plan](planning/apps.md).
 The approved managed Contact batch now implements launch, fixed render-only
 routes, private email capability, redirects/flash and replacement of the old
 contact route/config. See apps/contact/README.md and CHANGELOG.md.
-The [isolated Linux Contact check](docs/benchmarks/2026-10-04-contact-apps.md)
+The [isolated Linux Contact check](benchmarks/2026-10-04-contact-apps.md)
 passed startup, child replacement, graceful shutdown and abrupt parent-exit tests.
 Thirty tiny Contact-enabled sites peaked at 55.43 MiB sampled total PSS; the
 test unit peaked at 61.6 MiB. Its 221 OS threads also warrant a task-budget review.
@@ -71,7 +71,7 @@ longer soaks and deployment peaks. No deployment is
 authorized by this note. General read-route declarations, custom/remote
 registration, databases, storage moves and ZJAX remain separate work.
 
-Capacity follow-up: the [isolated 1/10/30-site VPS probe](docs/benchmarks/2026-10-04-multisite.md)
+Capacity follow-up: the [isolated 1/10/30-site VPS probe](benchmarks/2026-10-04-multisite.md)
 passed on a 1 GB host with synthetic traffic and overlapping read-only validation.
 Still measure representative client workloads, editor/uploads, longer soak times,
 and actual deployment peaks. Include descriptor limits, total RSS and OS cache,
@@ -165,7 +165,7 @@ the recorded failures have a verified retest result.
   reinstall, local update and failed-update preservation on both required platforms.
 - [ ] Verify the downloaded Mac artifact on a clean machine, including platform
   trust/signing/notarization requirements for the chosen delivery method.
-- [x] Update [RELEASING.md](RELEASING.md), native Mac/Linux CI matrix and user docs.
+- [x] Update [RELEASING.md](releasing.md), native Mac/Linux CI matrix and user docs.
   The manual publish-stage job prepares artifacts only; actual hosting is pending.
 
 Done when a developer can install and update from the documented command without
@@ -199,7 +199,7 @@ Do not claim optional platforms work solely because they cross-compile.
   pull passed on September 29. Interrupted/failure and version-change checks remain.
 - [ ] Record exact tested versions/platforms and outcomes. Track certificate
   renewal monitoring separately; initial issuance does not prove long-term renewal.
-- [ ] Exercise `flea server sites` and `flea server remove` on the disposable host:
+- [ ] Exercise `flea server list` and `flea server remove` on the disposable host:
   multi-site/aliases, exact-name cancellation, stale-review rejection including
   a commit-only change, restart/probe failure rollback and interrupted recovery
   with `flea-server -recover`. Confirm the shared-service restart briefly affects

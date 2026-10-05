@@ -4,6 +4,16 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.10.0 - 2026-10-05
+
+- Rename `flea server sites` to `flea server list` without an alias. `flea server
+  list` and `flea server remove` now prompt for the server login (for example
+  `root@fleacms.com`) when no target is given, and `flea server remove` without a
+  site name lists the installed managed sites and asks for one by exact name
+  before the existing exact-name confirmation. Normal listing shows each site's
+  name and branch, then HTTPS domains, then HTTP-only domains, then redirects,
+  without the release or repeated plain domain lines. Removal review is unchanged.
+
 ## 0.9.0 - 2026-10-05
 
 - Add `flea server sites <ssh-target>` and `flea server remove <ssh-target>

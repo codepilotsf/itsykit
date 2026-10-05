@@ -54,4 +54,4 @@ and kernel charges. Do not call RSS the total host RAM requirement.
 This is a short capacity sanity check, not a saturation test, long-running leak
 test, PageSpeed result, or a guarantee for arbitrary client sites.
 
-See [the recorded VPS run](../../docs/benchmarks/2026-10-04-multisite.md).
+See [the recorded VPS run](../../docs/agents/benchmarks/2026-10-04-multisite.md).

@@ -5,7 +5,7 @@ Read this when the task touches this subsystem. Paths in prose and code are
 relative to the repository root unless stated otherwise.
 
 For the recorded public-release procedure and constrained production host settings,
-read the [deployment runbook](../deployment-runbook.md). Recheck live state and
+read the [deployment runbook](deployment-runbook.md). Recheck live state and
 obtain authorization before applying host changes or publishing.
 
 ## Recovery
@@ -45,7 +45,7 @@ then upload. Limit extraction to 100 MiB, honor cancellation and remove failed
 outputs. No network/compiler fallback. Never import serverbundle from the server.
 Build with bash scripts/build.sh: refresh both CGO-disabled Linux variants before
 embedding into the native CLI. Plain go build may embed stale assets. CI still
-builds/tests on native Linux/Mac runners; see RELEASING.md.
+builds/tests on native Linux/Mac runners; see docs/agents/releasing.md.
 Setup refuses unexpected existing
 installation paths/accounts and occupied port 80, and does not change SSH,
 firewalls, packages, or existing sites. It installs a dedicated non-login service
@@ -76,7 +76,7 @@ Do not claim real Ubuntu/password/systemd installation was tested without a targ
 
 Optional host `downloads` maps configured hostnames to absolute administrator-owned
 release stores outside site snapshots. Aliases must match; normal deployment keeps
-this host policy. See [download hosting](../download-hosting.md) for publication,
+this host policy. See [download hosting](download-hosting.md) for publication,
 verification and rollback boundaries. Never delete retained downloads to shrink a
 site archive, or include the store in site backups. The 256 MiB archive limit remains.
 
@@ -181,11 +181,13 @@ Never include keys in archives or logs.
 
 ### Server-wide site administration
 
-`flea server sites <ssh-target>` lists installed sites without a local project:
-managed names, grouped domains/aliases, redirects, HTTPS domains and the current
-release, in deterministic name order. It is read-only and may inspect a server
-with a pending recovery journal. `flea server remove <ssh-target> <site-name>`
-unregisters one site after typing the exact name.
+`flea server list [ssh-target]` lists installed sites without a local project:
+each site's name and branch, then HTTPS domains, then HTTP-only domains, then
+redirects, in deterministic name order, without the release or repeated plain
+domain lines. It is read-only and may inspect a server with a pending recovery
+journal. `flea server remove [ssh-target] [site-name]` unregisters one site after
+typing the exact name; when the site name is omitted, it lists the managed sites
+and asks for one by its exact name.
 
 Removal is unregister/offline only: it deletes no files. Site files remain under
 `/var/lib/flea/sites/<name>` and cached certificates under `/var/lib/flea/certs`,
@@ -196,8 +198,9 @@ Back up or pull the site before removal if a later deployment must keep its
 current content. Removal restarts the shared service, so other sites are briefly
 unavailable. No restore feature is added.
 
-`flea server` connects only over native SSH to the explicit target. It never
-needs a local config, Git repository or site. The target must run the current
+`flea server` connects only over native SSH. Give the target explicitly, or omit
+it to be prompted for the server login; an SSH alias or bare host is kept as-is.
+It never needs a local config, Git repository or site. The target must run the current
 deployment protocol; an older or incomplete server is reported and no remote
 configuration is rewritten by hand. Non-root targets use the existing sudo
 policy. Validate the target and site name, and single-quote every remote

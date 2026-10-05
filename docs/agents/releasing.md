@@ -1,9 +1,9 @@
 # Publishing FleaCMS
 
 For the manual public release workflow, SemVer rules, low-memory host safeguards
-and recovery steps, follow the [deployment runbook](docs/deployment-runbook.md).
+and recovery steps, follow the [deployment runbook](deployment-runbook.md).
 Since 0.7.0, versioned binaries live in the host's separate
-[disk-backed download store](docs/download-hosting.md), not the website Git tree.
+[disk-backed download store](download-hosting.md), not the website Git tree.
 Use the store publication procedure before advancing website latest.txt. Older
 sections describing website version directories are historical staging guidance.
 
@@ -19,7 +19,7 @@ The public test release is hosted by the separate website repository at
 actual public installer/update checks. Versioned binaries, SHA256SUMS,
 latest.txt and install.sh are live on fleacms.com. Clean-machine Mac testing
 and notarization remain unverified; do not describe this as a completed V1 release.
-See [installation and trust](docs/installation.md).
+See [installation and trust](../installation.md).
 
 Required CLI targets are macOS ARM64 and Linux AMD64. Add macOS AMD64 and Linux
 ARM64 only if building and verifying them takes little extra work. The current

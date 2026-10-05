@@ -70,20 +70,23 @@ Command details
 
 `
 
-const serverUsage = `Usage: flea server sites <ssh-target>
-       flea server remove <ssh-target> <site-name>
+const serverUsage = `Usage: flea server list [ssh-target]
+       flea server remove [ssh-target] [site-name]
 
 List or remove sites installed on a FleaCMS server over SSH. No local site,
-Git repository or saved deployment settings are required.
+Git repository or saved deployment settings are required. Omit the SSH target to
+be asked for the server login.
 
-  sites    List managed sites with their domains, aliases and current release.
+  list     List sites with their HTTPS and HTTP domains and redirects.
   remove   Unregister one site's hostnames. Keeps every release, content file,
-           media file, session and certificate on disk. Requires typing the
-           exact site name. Removal restarts the shared service, so other sites
-           are briefly unavailable; when no HTTPS hostnames remain it disables
-           automatic HTTPS while cached certificates stay on disk. Retained
-           content is not restored automatically by redeploying the same name;
-           back up or pull the site first if a later deployment must keep it.
+           media file, session and certificate on disk. Omit the site name to
+           choose from the managed sites installed on the server. Requires typing
+           the exact site name. Removal restarts the shared service, so other
+           sites are briefly unavailable; when no HTTPS hostnames remain it
+           disables automatic HTTPS while cached certificates stay on disk.
+           Retained content is not restored automatically by redeploying the
+           same name; back up or pull the site first if a later deployment must
+           keep it.
 
 Both commands reject servers running an older FleaCMS protocol; update the
 server first. Nothing is deleted or pruned.
@@ -643,27 +646,33 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	}
 }
 
-// runServer handles server-wide site administration over an explicit SSH target.
+// runServer handles server-wide site administration over an SSH target. The
+// target and site name may be given explicitly; otherwise they are prompted for.
 func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.Writer) int {
-	switch {
-	case len(args) == 0, args[0] == "--help", args[0] == "-h":
+	if len(args) == 0 || args[0] == "--help" || args[0] == "-h" {
 		fmt.Fprint(out, serverUsage)
 		return 0
-	case args[0] == "sites":
+	}
+	switch args[0] {
+	case "list":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			fmt.Fprint(out, serverUsage)
 			return 0
 		}
-		if len(args) != 2 || strings.HasPrefix(args[1], "-") {
-			fmt.Fprintln(errOut, "Usage: flea server sites <ssh-target>")
+		if len(args) > 2 || (len(args) == 2 && strings.HasPrefix(args[1], "-")) {
+			fmt.Fprintln(errOut, "Usage: flea server list [ssh-target]")
 			return 2
 		}
-		if err := setup.ServerSites(ctx, args[1], in, out, errOut); err != nil {
+		target := ""
+		if len(args) == 2 {
+			target = args[1]
+		}
+		if err := setup.ServerList(ctx, target, in, out, errOut); err != nil {
 			fmt.Fprintln(errOut, "flea:", err)
 			return 1
 		}
 		return 0
-	case args[0] == "remove":
+	case "remove":
 		if len(args) >= 2 && (args[1] == "--help" || args[1] == "-h") {
 			fmt.Fprint(out, serverUsage)
 			return 0
@@ -672,11 +681,18 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 			fmt.Fprint(out, serverUsage)
 			return 0
 		}
-		if len(args) != 3 || strings.HasPrefix(args[1], "-") || strings.HasPrefix(args[2], "-") {
-			fmt.Fprintln(errOut, "Usage: flea server remove <ssh-target> <site-name>")
+		if len(args) > 3 || (len(args) >= 2 && strings.HasPrefix(args[1], "-")) || (len(args) == 3 && strings.HasPrefix(args[2], "-")) {
+			fmt.Fprintln(errOut, "Usage: flea server remove [ssh-target] [site-name]")
 			return 2
 		}
-		if err := setup.ServerRemove(ctx, args[1], args[2], in, out, errOut); err != nil {
+		target, name := "", ""
+		if len(args) >= 2 {
+			target = args[1]
+		}
+		if len(args) == 3 {
+			name = args[2]
+		}
+		if err := setup.ServerRemove(ctx, target, name, in, out, errOut); err != nil {
 			fmt.Fprintln(errOut, "flea:", err)
 			return 1
 		}

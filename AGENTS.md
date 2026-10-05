@@ -7,12 +7,12 @@ This is the framework repository; `templates/` is the canonical starter.
 
 - Inspect `git status --short` before editing. Preserve existing modified,
   deleted and untracked work. Do not reset, bulk-stage or commit without permission.
-- Use [next-steps.md](next-steps.md) for the agreed V1 scope, sprint order and
-  release criteria, and [checklist.md](checklist.md)
+- Use [next-steps.md](docs/agents/next-steps.md) for the agreed V1 scope, sprint order and
+  release criteria, and [checklist.md](docs/agents/checklist.md)
   for manual QA; preserve the user's checklist answers. Neither authorizes
   unrelated implementation, deployment or publication.
 - Inspect relevant code and tests. [README.md](README.md) describes supported
-  behavior; [spec.md](spec.md) also contains future plans. Resolve disagreements
+  behavior; [spec.md](docs/agents/spec.md) also contains future plans. Resolve disagreements
   against current code rather than assuming planned features exist.
 - Use one agent unless the user authorizes delegation. Search narrowly with
   `rg`, read relevant sections, and keep logs and progress reports focused.
@@ -48,7 +48,7 @@ This is the framework repository; `templates/` is the canonical starter.
 Before editing a subsystem, read its linked guide and applicable feature docs.
 For work crossing subsystems, read each affected guide. These are requirements,
 not optional background. Do not load every guide for an unrelated small change.
-Read [ARCHITECTURE.md](ARCHITECTURE.md) for implementation changes involving
+Read [ARCHITECTURE.md](docs/agents/architecture.md) for implementation changes involving
 dependencies, trust boundaries, loading, transactions or publication.
 
 | Task | Required guide and references |
@@ -61,7 +61,7 @@ dependencies, trust boundaries, loading, transactions or publication.
 | CLI help/dev, file watching, routing, diagnostics, contact, email rendering | [Runtime](docs/agents/runtime.md); [email templates](docs/email-templates.md) when relevant |
 | SSH/setup, deploy, host/TLS, archives, rollback, backup, restore, server site administration, upgrade | [Deployment](docs/agents/deployment.md); [recovery](docs/recovery.md) |
 | Owner toolbar, authentication, sessions, onboarding, mail configuration, editor prototype | [Editor](docs/agents/editor.md); media/theme guides for those modes |
-| Versions, packaging and releases | [RELEASING.md](RELEASING.md) and version rules below |
+| Versions, packaging and releases | [RELEASING.md](docs/agents/releasing.md) and version rules below |
 
 ## Site and UI essentials
 
@@ -118,9 +118,22 @@ its shell. Preserve drafts after errors and during source reloads.
 
 ## Verification
 
-Documentation-only changes need link, requirement-preservation and whitespace
-checks, not the runtime suite. For implementation changes, format changed Go
-files, add meaningful regression coverage, and run from this repository:
+Choose verification by behavior and risk, not line count. A one-line security
+change can need broad checks; a display-only change usually does not.
+
+- Documentation, skill instructions and copy-only changes: review the diff for
+  accuracy, consistency and preserved requirements; check links when changed.
+  No runtime suite or build is required.
+- Small, isolated implementation changes: format changed Go files, add or update
+  meaningful regression tests, and run tests for affected packages. Build once
+  when executable behavior changes.
+- Security, persistence, deployment behavior, concurrency, shared infrastructure
+  or broad changes: run the full checks below plus relevant integration checks.
+  Presentation-only changes to administration commands can use the isolated-change
+  path when authorization, confirmation, target selection and mutation safeguards
+  remain intact and are reviewed. Broaden checks when downstream effects are unclear.
+
+Full checks, run from this repository:
 
 ```sh
 go test ./...
@@ -128,9 +141,17 @@ go vet ./...
 bash scripts/build.sh
 ```
 
-Run `go test -race ./...` for concurrency, reload or shared-state changes.
-Use targeted tests while iterating, then the required final checks. Loopback
-tests need bind permission; a sandbox bind failure is not a product failure.
+For concurrency, reload or shared-state changes, also run race tests for affected
+packages; use `go test -race ./...` when effects cross package boundaries or are
+unclear. Use targeted tests while iterating and required broader checks once on
+the final implementation. After corrections, rerun checks invalidated by the
+changes, not every passing check automatically. Reviewers inspect existing
+evidence rather than repeat suites without a specific concern or evidence gap.
+When using DeepSeek delegation, DeepSeek owns builds, tests and troubleshooting;
+the lead reviews the diff and results. Report what was and was not checked.
+Before publication, run the full release checks against the final candidate as
+specified in [RELEASING.md](docs/agents/releasing.md).
+Loopback tests need bind permission; a sandbox bind failure is not a product failure.
 
 On this Mac use `/usr/local/go/bin/go` if needed, with
 `GOCACHE=/tmp/flea-go-cache` when the default cache is restricted. For the
@@ -138,12 +159,13 @@ build script, set `GO_BINARY=/usr/local/go/bin/go` if necessary.
 Browser tests use
 `FLEA_TEST_BROWSER='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'`.
 
-Rebuild after source or starter changes with `scripts/build.sh`: it refreshes
+When a build is required, use `scripts/build.sh`: it refreshes
 the matching Contact child before each parent, then both embedded Linux servers
 before building `bin/flea`. Plain `go build` can
 embed stale bundles. Do not overlap this build with tests compiling the bundles.
-Generate a fresh temporary site, compare relevant starter files, and finish
-with `flea status` in the generated/example site. Exclude local agent guidance
+For starter, packaging, loading or site-creation changes, generate a fresh
+temporary site, compare relevant starter files, and finish with `flea status`
+there. This smoke test is not required for unrelated CLI tweaks. Exclude local agent guidance
 from comparisons unless deliberately changing it. Restart dev after rebuilding;
 site-file reloads do not reload Go code. Verify installed binary paths before
 assuming they point to this checkout.
@@ -154,13 +176,15 @@ Update this guide and affected `docs/agents/` references in the same task when
 architecture, template syntax, CLI, starter conventions, supported features or
 workflow changes. Keep the root concise; put subsystem requirements in the
 linked guide instead of duplicating them here. Update README.md and applicable
-spec.md sections for behavior changes, ARCHITECTURE.md for responsibility changes,
-and generated-site/import guidance for starter changes.
+docs/agents/spec.md sections for behavior changes, docs/agents/architecture.md
+for responsibility changes, and generated-site/import guidance for starter
+changes.
 
-Keep next-steps.md for priorities, open decisions, pending verification and
-deferred work. Remove stale notes; completed changes belong in CHANGELOG.md,
-usage in README.md. Keep planned behavior distinct from implemented behavior;
-public installation remains unverified until release hosting and native checks pass.
+Keep docs/agents/next-steps.md for priorities, open decisions, pending
+verification and deferred work. Remove stale notes; completed changes belong in
+CHANGELOG.md, usage in README.md. Keep planned behavior distinct from implemented
+behavior; public installation remains unverified until release hosting and native
+checks pass.
 See docs/installation.md for local update behavior and release trust.
 
 Use Semantic Versioning from `internal/buildinfo/version.go`. Local VERSION

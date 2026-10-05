@@ -108,6 +108,6 @@ b2800b4fedeb782402e4fdc93824d149e858f0dd8bf69822291660f715f61d4c  probe
 baf9a18870d6375e17a08eaf6db14ec519970328554d8aca65edc7a1bccb3cce  manager.test
 ```
 
-See the [probe instructions](../../scripts/app-capacity/README.md) and the earlier
+See the [probe instructions](../../../scripts/app-capacity/README.md) and the earlier
 [static-site capacity check](2026-10-04-multisite.md). Their workloads differ;
 do not treat the tables as a controlled before/after comparison.

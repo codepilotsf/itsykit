@@ -7,9 +7,11 @@ relative to the repository root unless stated otherwise.
 Core commands include `flea new <site-name>`, `flea status`,
 `flea dev [-port 3000]`, `flea setup`, `flea version`,
 `flea deploy`, `flea admin [email]`, and `flea https`.
-`flea server sites <ssh-target>` and `flea server remove <ssh-target> <site-name>`
+`flea server list [ssh-target]` and `flea server remove [ssh-target] [site-name]`
 administer sites on a server directly, without a local site, Git repository or
-saved deployment settings.
+saved deployment settings. An omitted target is prompted for (the server login,
+for example root@fleacms.com); an omitted site name lists the managed sites and
+asks for one by its exact name.
 See README.md for pull, synchronization, recovery and the complete command list.
 `flea email` configures local Resend delivery interactively.
 Run status/dev from a generated site. Setup runs from the Mac over native SSH.

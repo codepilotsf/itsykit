@@ -54,7 +54,7 @@ POST forwards JSON. The flash store has at most 256 entries/site, five-minute
 expiry, and visitor/host/app/destination binding. Only successful GET rendering
 consumes a claim. No credentials or messages enter logs, site files or archives.
 Custom-service registration, dynamic read-route declarations and storage remain
-planned; see [Contact's contract](apps/contact/README.md).
+planned; see [Contact's contract](../../apps/contact/README.md).
 `internal/formguard` owns anonymous visitor CSRF independently of editor sessions.
 Each site Server retains a lazy signing key across snapshot reloads; no Project,
 disk file or per-visitor server map holds it. `{csrf}` calls a request-local
@@ -63,7 +63,7 @@ with tokens are private/no-store. Validation creates no tokens. Restarting the
 server invalidates open forms. Contact requires this protection; admin handling is unchanged.
 
 Read this alongside README.md for the supported behavior and AGENTS.md for
-development rules. spec.md also describes features that are not implemented.
+development rules. docs/agents/spec.md also describes features that are not implemented.
 
 ## Where to start
 

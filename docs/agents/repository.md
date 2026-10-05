@@ -10,7 +10,7 @@ from runtime loading, public assets and deployment via sitefiles. This does not
 install or assume a particular agent plugin. Update skill conventions alongside
 template changes; test imports without publishing or using live credentials.
 
-Read `ARCHITECTURE.md` for dependency direction, trust boundaries, transaction
+Read `docs/agents/architecture.md` for dependency direction, trust boundaries, transaction
 ordering, and review follow-ups. Keep it current when those responsibilities change.
 
 - `cmd/flea/main.go`: executable entry point.

@@ -10,7 +10,7 @@ Implemented in 0.7.0: optional administrator-owned `downloads` host mappings ser
 checksum-validated versioned Flea CLI downloads from pinned disk handles, outside
 website snapshots and RAM asset maps. This is not a general filesystem mount.
 The website retains latest.txt; the 256 MiB site archive limit is unchanged.
-See [download hosting](docs/download-hosting.md) for boundaries and publication.
+See [download hosting](download-hosting.md) for boundaries and publication.
 
 The agreed public V1 scope and release gates are in [next-steps.md](next-steps.md).
 V1 keeps source private and distributes free binaries without accounts or license
@@ -494,7 +494,7 @@ tokens expire after 24 hours or restart; template reloads retain the key.
 The bundled Contact app has public mount routing, private managed launch,
 email capability, mount-relative redirects and bounded visitor flash. Admin
 form fields remain unchanged. General app installation, remote registrations,
-dynamic read routes and databases remain planned in docs/planning/apps.md.
+dynamic read routes and databases remain planned in docs/agents/planning/apps.md.
 
 ## Snip format and schemas
 
@@ -634,9 +634,11 @@ live separately under content/<release-id>.json, selected by the host config.
 Successful activation archives/prunes unreferenced IDs; failed activation restores
 the prior code and content paths. See docs/recovery.md for the current rollback contract.
 
-Current implementation: `flea server sites <ssh-target>` lists installed sites
-read-only and `flea server remove <ssh-target> <site-name>` unregisters one
-site's routing after an exact typed confirmation. Removal deletes no files:
+Current implementation: `flea server list [ssh-target]` lists installed sites
+read-only and `flea server remove [ssh-target] [site-name]` unregisters one
+site's routing after an exact typed confirmation. An omitted target is prompted
+for and an omitted site name lists the managed sites and asks for one by its
+exact name. Removal deletes no files:
 releases, content, media, sessions, certificates and downloads are retained under
 the stable site's data directory, but retained content is not restored
 automatically by redeploying the same name. It uses the deployment lock, an

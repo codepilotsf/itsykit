@@ -1,22 +1,34 @@
 # Installation and updates
 
-Version 0.9.0 is the current test release for Apple Silicon macOS and x86-64
+Version 0.10.0 is the current test release for Apple Silicon macOS and x86-64
 Linux. The public installer selects the latest stable release from
-`https://fleacms.com/releases/latest.txt`; until 0.9.0 publication completes,
+`https://fleacms.com/releases/latest.txt`; until 0.10.0 publication completes,
 that channel may still report the previous version.
 
-## Upgrading to 0.9.0
+## Upgrading to 0.10.0
 
-0.9.0 adds the bundled Contact app and requires deployment protocol 23. Update
-the shared server with `flea update-server` before deploying sites that use the
-new runtime, and update existing sites from the current starter where their
-templates changed. The top-level `contact` settings and the `/_flea/contact`
-route are replaced by `apps.contact` with a configured `mount`; there is no alias
-or automatic migration, and old settings are rejected rather than converted.
-Starter Contact pages use the mount (for example `/contact`) with a
-mount-relative `thank-you` target, and their form includes an explicit CSRF
-control. Custom layouts and content are otherwise preserved. Real Contact
-delivery, the native Linux full suite and clean-Mac acceptance remain unverified.
+0.10.0 renames `flea server sites` to `flea server list` with no alias. Both
+`flea server list` and `flea server remove` now prompt for the server login when
+the SSH target is omitted, and `flea server remove` without a site name lists the
+installed managed sites and asks for one by its exact name before the existing
+exact-name confirmation. The listing keeps the site name and branch, groups
+domains by HTTPS/HTTP, and puts redirects last; release details and duplicate
+domain lines are omitted. Removal safeguards are unchanged. Run `flea update`
+to install the CLI.
+
+The bundled Contact app and deployment protocol 23 are unchanged from 0.9.0;
+this CLI update does not require upgrading a protocol-23 server. When upgrading
+from a pre-0.9.0 server, update the shared server with
+`flea update-server` before deploying sites that use the new runtime, and update
+existing sites from the current starter where their templates changed. The
+top-level `contact` settings and the `/_flea/contact` route are replaced by
+`apps.contact` with a configured `mount`; there is no alias or automatic
+migration, and old settings are rejected rather than converted. Starter Contact
+pages use the mount (for example `/contact`) with a mount-relative `thank-you`
+target, and their form includes an explicit CSRF control. Custom layouts and
+content are otherwise preserved. Isolated Contact delivery has passed; broader
+production mail acceptance, the native Linux full suite and clean-Mac acceptance
+remain open.
 
 Install it with:
 

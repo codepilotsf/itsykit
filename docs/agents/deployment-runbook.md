@@ -3,8 +3,8 @@
 Updated October 3, 2026 for disk-backed download hosting. This is an operator guide,
 not authorization to publish or change a server. Recheck paths, branch mappings,
 host settings and live versions before each release. Read the repository's
-AGENTS.md, [release guide](../RELEASING.md), [deployment requirements](agents/deployment.md)
-and [recovery guide](recovery.md) first.
+AGENTS.md, [release guide](releasing.md), [deployment requirements](deployment.md)
+and [recovery guide](../recovery.md) first.
 
 ## Repositories and destinations
 
@@ -73,7 +73,7 @@ Confirm the installed CLI path/version separately from `bin/flea`.
 
 The preferred release matrix uses native runners through `scripts/release.sh`:
 Linux AMD64/ARM64 server builds, then Mac ARM64 and Linux AMD64 CLI builds embedding
-both servers. See RELEASING.md for prerequisites. Run
+both servers. See releasing.md for prerequisites. Run
 `CI_COMMIT_TAG=v<version> bash scripts/stage-release.sh` only with verified
 `dist/flea-darwin-arm64` and `dist/flea-linux-amd64` artifacts. It stages files;
 it does not upload them. Use a fresh staging directory rather than overwriting one.
@@ -270,7 +270,7 @@ On Mac ARM64 and native Linux AMD64:
 
 Update the website's RELEASES.md and handoff.md with provenance, activation IDs,
 exact checks, recovery events and remaining limits. Update current status in the
-framework's docs/installation.md and next-steps.md. Do not rewrite historical
+framework's docs/installation.md and docs/agents/next-steps.md. Do not rewrite historical
 release records. Documentation-only follow-up commits excluded from the deployed
 snapshot do not require another site deployment.
 
@@ -330,7 +330,7 @@ The website then removed its duplicate version directories and deployed latest.t
 and docs as 0.7.0. Local binaries are preserved in /Users/sean/fleacms-releases.
 Upload size was 575 KB. Tests, race, vet and Mac/Linux public installer/update
 checks passed. Native Linux full build/suite and clean Mac/notarization remain open.
-See the website RELEASES.md and docs/download-hosting.md for evidence and procedure.
+See the website RELEASES.md and docs/agents/download-hosting.md for evidence and procedure.
 
 ## Historical completed release: 0.6.1
 
@@ -364,7 +364,7 @@ These are historical results. Recheck live state instead of assuming it is uncha
 
 ### Work intentionally left open
 
-- LAN terminal QR codes are a planning item in next-steps.md, not implemented.
+- LAN terminal QR codes are a planning item in docs/agents/next-steps.md, not implemented.
   Automatic display with `--lan` versus an explicit `--qr` remains undecided.
 - Versioned download asset memory was addressed in 0.7.0 by the separate store.
   For other large site assets, consider disk-backed upload staging. Investigate
@@ -374,7 +374,7 @@ These are historical results. Recheck live state instead of assuming it is uncha
 - Consider a supported way to configure admin-process memory targets so operators
   no longer need the SSH wrapper. This is a proposal, not an implemented option.
 - Finish the native Linux/full-suite and clean-machine Mac/notarization acceptance
-  work before describing distribution as fully verified. Consult checklist.md;
+  work before describing distribution as fully verified. Consult docs/agents/checklist.md;
   do not replace the user's manual answers with inferred passes.
 
 ### Local Linux build-machine investigation
@@ -416,5 +416,5 @@ remaining tests; and any running processes or uncommitted work. Explicitly say
 what was not deployed or verified. Stop temporary previews unless asked otherwise.
 
 At the time this runbook was written, the runbook and its guide links were not
-committed. The separate next-steps.md QR-code planning edit was also uncommitted.
+committed. The separate docs/agents/next-steps.md QR-code planning edit was also uncommitted.
 Preserve those changes and ask before committing if no current permission exists.

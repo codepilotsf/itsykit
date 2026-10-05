@@ -23,38 +23,64 @@ type serverAdmin struct {
 	root   bool
 }
 
-// ServerSites lists the sites installed on an explicit SSH target. It never
-// requires a local site and never mutates remote state.
-func ServerSites(ctx context.Context, target string, in io.Reader, out, errOut io.Writer) error {
-	return serverSites(ctx, target, in, out, errOut, execute)
+// ServerList lists the sites installed on an SSH target. An empty target is
+// prompted for. It never requires a local site and never mutates remote state.
+func ServerList(ctx context.Context, target string, in io.Reader, out, errOut io.Writer) error {
+	return serverList(ctx, target, in, out, errOut, execute)
 }
 
-func serverSites(ctx context.Context, target string, in io.Reader, out, errOut io.Writer, run runner) error {
+func serverList(ctx context.Context, target string, in io.Reader, out, errOut io.Writer, run runner) error {
+	target, err := promptServerTarget(ctx, target, in, out)
+	if err != nil {
+		return err
+	}
 	return withServerAdmin(ctx, target, in, out, errOut, run, func(r serverAdmin) error {
-		raw, err := captureAdmin(ctx, "/usr/local/bin/flea-server -list-sites", r.ssh, r.root)
+		sites, err := fetchSites(ctx, r)
 		if err != nil {
 			return err
-		}
-		var sites []admin.SiteSummary
-		if err = json.Unmarshal(raw, &sites); err != nil {
-			return fmt.Errorf("could not read the server's site list")
 		}
 		printServerSites(out, r.target, sites)
 		return nil
 	})
 }
 
+// fetchSites reads the server's read-only inventory. No local project or saved
+// deployment settings are involved.
+func fetchSites(ctx context.Context, r serverAdmin) ([]admin.SiteSummary, error) {
+	raw, err := captureAdmin(ctx, "/usr/local/bin/flea-server -list-sites", r.ssh, r.root)
+	if err != nil {
+		return nil, err
+	}
+	var sites []admin.SiteSummary
+	if err = json.Unmarshal(raw, &sites); err != nil {
+		return nil, fmt.Errorf("could not read the server's site list")
+	}
+	return sites, nil
+}
+
 // ServerRemove unregisters one site's routing after an exact typed confirmation.
-// It never deletes releases, content, media, sessions, certificates or downloads.
+// An empty target or site name is prompted for; a prompted name is chosen from
+// the managed sites installed on the server. It never deletes releases, content,
+// media, sessions, certificates or downloads.
 func ServerRemove(ctx context.Context, target, name string, in io.Reader, out, errOut io.Writer) error {
 	return serverRemove(ctx, target, name, in, out, errOut, execute)
 }
 
 func serverRemove(ctx context.Context, target, name string, in io.Reader, out, errOut io.Writer, run runner) error {
-	if !admin.ValidSiteName(name) {
+	if name != "" && !admin.ValidSiteName(name) {
 		return fmt.Errorf("invalid site name %q; use 1-64 letters, digits, hyphens or underscores", name)
 	}
+	target, err := promptServerTarget(ctx, target, in, out)
+	if err != nil {
+		return err
+	}
 	return withServerAdmin(ctx, target, in, out, errOut, run, func(r serverAdmin) error {
+		if name == "" {
+			name, err = selectManagedSite(ctx, r, in, out)
+			if err != nil {
+				return err
+			}
+		}
 		raw, err := captureAdmin(ctx, "/usr/local/bin/flea-server -site-info "+shellQuote(name), r.ssh, r.root)
 		if err != nil {
 			return err
@@ -80,6 +106,63 @@ func serverRemove(ctx context.Context, target, name string, in io.Reader, out, e
 		}
 		return r.ssh(ctx, command, !r.root, out)
 	})
+}
+
+// promptServerTarget asks for the SSH login only when none was given. The exact
+// native target is kept, including SSH aliases and bare hosts.
+func promptServerTarget(ctx context.Context, target string, in io.Reader, out io.Writer) (string, error) {
+	if strings.TrimSpace(target) != "" {
+		return target, nil
+	}
+	answer, err := ask(ctx, in, out, "Server login (for example root@fleacms.com)", "")
+	if err != nil {
+		return "", err
+	}
+	if strings.TrimSpace(answer) == "" {
+		return "", fmt.Errorf("enter a server login, for example root@fleacms.com")
+	}
+	return answer, nil
+}
+
+// selectManagedSite lists the managed sites and asks for one by its exact name.
+// Unmanaged sites are excluded and there are no numeric choices, so every valid
+// site name (including one made only of digits) is unambiguous. Empty or unknown
+// input re-prompts; EOF and cancellation return before any mutation.
+func selectManagedSite(ctx context.Context, r serverAdmin, in io.Reader, out io.Writer) (string, error) {
+	sites, err := fetchSites(ctx, r)
+	if err != nil {
+		return "", err
+	}
+	managed := make([]admin.SiteSummary, 0, len(sites))
+	for _, site := range sites {
+		if site.Managed {
+			managed = append(managed, site)
+		}
+	}
+	if len(managed) == 0 {
+		return "", fmt.Errorf("no managed sites are installed on %s; nothing to remove", r.target)
+	}
+	fmt.Fprintf(out, "\nManaged sites on %s:\n", r.target)
+	for _, site := range managed {
+		fmt.Fprintf(out, "  %s  %s\n", site.Name, siteDomainLabel(site))
+	}
+	for {
+		answer, err := ask(ctx, in, out, "\nSelect a site by exact name", "")
+		if err != nil {
+			return "", err
+		}
+		answer = strings.TrimSpace(answer)
+		if answer == "" {
+			fmt.Fprintln(out, "Enter the exact name of a listed site.")
+			continue
+		}
+		for _, site := range managed {
+			if site.Name == answer {
+				return site.Name, nil
+			}
+		}
+		fmt.Fprintf(out, "No managed site named %q. Enter the exact name of a listed site.\n", answer)
+	}
 }
 
 // withServerAdmin verifies SSH, the installed binary and the deployment
@@ -135,30 +218,71 @@ func printServerSites(out io.Writer, target string, sites []admin.SiteSummary) {
 		return
 	}
 	fmt.Fprintf(out, "Sites on %s:\n", target)
-	for _, site := range sites {
-		fmt.Fprintln(out)
-		if site.Branch != "" {
-			fmt.Fprintf(out, "%s  (branch %s)\n", site.Name, site.Branch)
-		} else {
-			fmt.Fprintf(out, "%s\n", site.Name)
+	for i, site := range sites {
+		if i > 0 {
+			fmt.Fprintln(out)
 		}
-		for _, domain := range site.Domains {
-			fmt.Fprintf(out, "  %s\n", domain)
-		}
-		if site.Release != "" {
-			fmt.Fprintf(out, "  release %s\n", site.Release)
-		}
-		for _, redirect := range site.Redirects {
-			fmt.Fprintf(out, "  redirect %s\n", redirect)
-		}
-		if len(site.HTTPS) > 0 {
-			fmt.Fprintf(out, "  https %s\n", strings.Join(site.HTTPS, ", "))
-		}
-		if !site.Managed {
-			fmt.Fprintln(out, "  not managed by this server")
-		}
+		printSiteSummary(out, site)
 	}
 	fmt.Fprintln(out)
+}
+
+// printSiteSummary shows the site's name and branch heading first, then its
+// HTTPS domains, then HTTP-only domains, then any unmanaged warning, and
+// redirects last. Domains are labelled by scheme under the heading and never
+// repeated as plain lines; the release is omitted.
+func printSiteSummary(out io.Writer, site admin.SiteSummary) {
+	if site.Branch != "" {
+		fmt.Fprintf(out, "%s  (branch %s)\n", site.Name, site.Branch)
+	} else {
+		fmt.Fprintf(out, "%s\n", site.Name)
+	}
+	https, http := splitDomains(site)
+	if len(https) > 0 {
+		fmt.Fprintf(out, "  https %s\n", strings.Join(https, ", "))
+	}
+	if len(http) > 0 {
+		fmt.Fprintf(out, "  http %s\n", strings.Join(http, ", "))
+	}
+	if !site.Managed {
+		fmt.Fprintln(out, "  not managed by this server")
+	}
+	for _, redirect := range site.Redirects {
+		fmt.Fprintf(out, "  redirect %s\n", redirect)
+	}
+}
+
+// splitDomains separates a site's domains into HTTPS and HTTP-only groups,
+// preserving the sorted order returned by the server.
+func splitDomains(site admin.SiteSummary) (https, http []string) {
+	secure := make(map[string]bool, len(site.HTTPS))
+	for _, domain := range site.HTTPS {
+		secure[domain] = true
+	}
+	for _, domain := range site.Domains {
+		if secure[domain] {
+			https = append(https, domain)
+		} else {
+			http = append(http, domain)
+		}
+	}
+	return https, http
+}
+
+// siteDomainLabel is one compact scheme-labelled summary for selection lists.
+func siteDomainLabel(site admin.SiteSummary) string {
+	https, http := splitDomains(site)
+	var parts []string
+	if len(https) > 0 {
+		parts = append(parts, "https "+strings.Join(https, ", "))
+	}
+	if len(http) > 0 {
+		parts = append(parts, "http "+strings.Join(http, ", "))
+	}
+	if len(parts) == 0 {
+		return "(no domains)"
+	}
+	return strings.Join(parts, "; ")
 }
 
 func printSiteReview(out io.Writer, target string, info admin.SiteSummary) {

@@ -312,7 +312,7 @@ The bundled Contact app uses this directive. Configure its mount under
 `contact.invalid.*`, `contact.error` and `contact.flash.*`. Admin CSRF fields
 remain unchanged. This is not a general form handler or custom app installer.
 See [Contact](apps/contact/README.md) for its complete contract and the
-[app plan](docs/planning/apps.md) for future apps.
+[app plan](docs/agents/planning/apps.md) for future apps.
 
 ## JSON configuration and content
 
@@ -1265,7 +1265,7 @@ server version. The current version is recorded in `internal/buildinfo/version.g
 see [CHANGELOG.md](CHANGELOG.md) for release notes. `bash scripts/build.sh`
 produces a build of that version with both
 servers from the same source. Plain `go build` does not refresh embedded servers
-and is not the supported installation build. See [RELEASING.md](RELEASING.md).
+and is not the supported installation build. See [RELEASING.md](docs/agents/releasing.md).
 
 Setup installs `/usr/local/bin/flea-server`, `/etc/flea/server.json`, and
 `/etc/systemd/system/flea.service`. It creates a dedicated non-login `flea`
@@ -1346,20 +1346,24 @@ use `flea update-server`; it does not migrate service units or configuration.
 
 ### List or remove sites on a server
 
-These commands manage sites already installed on a server. They take an explicit
-SSH target and do not need a local site, Git repository or saved deployment
-settings:
+These commands manage sites already installed on a server. They accept an
+explicit SSH target and do not need a local site, Git repository or saved
+deployment settings. Omit the target to be asked for the server login, for
+example `root@fleacms.com`:
 
 ```sh
-flea server sites root@server
+flea server list root@server
 flea server remove root@server example
 ```
 
-`flea server sites` lists each managed site with its domains and aliases,
-redirects, HTTPS domains and current release. It is read-only.
+`flea server list` shows each site's name and branch, then its HTTPS domains,
+then its HTTP-only domains, then any redirects. It omits the release and never
+repeats the domains as plain lines, and is read-only.
 
 `flea server remove` unregisters one site's hostnames after showing the exact
-affected domains and asking you to type the site name. It only stops routing:
+affected domains and asking you to type the site name. Omit the site name to see
+the managed sites installed on the server and enter one by its exact name.
+It only stops routing:
 site files stay under `/var/lib/flea/sites/<name>` and cached certificates stay
 under `/var/lib/flea/certs`. Removal rewrites the shared server config and
 restarts the service, so other sites are briefly unavailable; their routing and
@@ -1443,7 +1447,7 @@ shows DNS/ports and certificate setup guidance only when enabling HTTPS for a
 domain not already configured; all readiness and certificate checks still run.
 
 For hosting Flea's own release binaries independently of website deployments,
-see [disk-backed download hosting](docs/download-hosting.md). This optional host
+see [disk-backed download hosting](docs/agents/download-hosting.md). This optional host
 setting does not change ordinary site assets or the 256 MiB site archive limit.
 
 New sites include AGENTS.md and portable skills in `flea/skills/`
