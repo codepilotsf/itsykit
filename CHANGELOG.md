@@ -4,7 +4,7 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
-## Unreleased
+## 0.9.0 - 2026-10-05
 
 - Add `flea server sites <ssh-target>` and `flea server remove <ssh-target>
   <site-name>` for server-wide site administration independent of a local site.

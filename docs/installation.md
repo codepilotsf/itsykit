@@ -1,7 +1,23 @@
 # Installation and updates
 
-Version 0.8.0 is the current published test release for Apple Silicon macOS and
-x86-64 Linux. The public installer selects the latest stable test release.
+Version 0.9.0 is the current test release for Apple Silicon macOS and x86-64
+Linux. The public installer selects the latest stable release from
+`https://fleacms.com/releases/latest.txt`; until 0.9.0 publication completes,
+that channel may still report the previous version.
+
+## Upgrading to 0.9.0
+
+0.9.0 adds the bundled Contact app and requires deployment protocol 23. Update
+the shared server with `flea update-server` before deploying sites that use the
+new runtime, and update existing sites from the current starter where their
+templates changed. The top-level `contact` settings and the `/_flea/contact`
+route are replaced by `apps.contact` with a configured `mount`; there is no alias
+or automatic migration, and old settings are rejected rather than converted.
+Starter Contact pages use the mount (for example `/contact`) with a
+mount-relative `thank-you` target, and their form includes an explicit CSRF
+control. Custom layouts and content are otherwise preserved. Real Contact
+delivery, the native Linux full suite and clean-Mac acceptance remain unverified.
+
 Install it with:
 
 ```sh
