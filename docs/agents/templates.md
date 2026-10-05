@@ -120,10 +120,10 @@ settings and icon caches in version control by default.
   partials, and stay private. _500.html remains standalone. No YAML dependency.
 - The starter's header and footer live directly in `main.layout.html`. Do not
   generate separate `_header.html` or `_footer.html` files by default.
-- The starter includes a welcome page, contact/contact-thanks pages, and a team
+- The starter includes a welcome page, contact/contact-thank-you pages, and a team
   multisnip example with six fictional members and neutral replaceable portraits.
   Contact delivery requires apps.contact with mount and email.to. The pages live
-  at site/contact/index.html and site/contact/thanks.html; apps are disabled in
+  at site/contact/index.html and site/contact/thank-you.html; apps are disabled in
   the starter config until a recipient is chosen.
   Navigation uses Team and Contact; keep /test as an unlinked example. Seed
   editable headings/body copy on Home, Team, Contact and Thank you, plus the

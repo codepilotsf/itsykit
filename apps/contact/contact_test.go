@@ -40,5 +40,8 @@ func TestFlows(t *testing.T) {
 		if w.Code != tc.status || calls != tc.calls || strings.Contains(w.Body.String(), "provider-secret") || strings.Contains(w.Body.String(), "attacker") {
 			t.Fatal(w.Code, w.Body.String(), calls)
 		}
+		if w.Code == 200 && !strings.Contains(w.Body.String(), `"redirect":"thank-you"`) {
+			t.Fatal("success must use mount-relative thank-you", w.Body.String())
+		}
 	}
 }

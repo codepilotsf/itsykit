@@ -41,7 +41,7 @@ supports `{:else}` and `{:else if dotted.path}`; conditions are dotted paths onl
 Enable apps.contact with mount and email.to in .flea.config.json; optional
 email.from overrides the server sender. Post to the mount, such as /contact.
 Use contact.data.*, contact.invalid.*, contact.error and contact.flash.*.
-Contact needs the mount's index.html and thanks.html. No old contact config or
+Contact needs the mount's index.html and thank-you.html. No old contact config or
 /_flea/contact alias exists. Restart dev after app settings change. Do not replace
 admin CSRF controls. Other app packages and remote registrations are not supported yet.
 

@@ -12,11 +12,11 @@ The canonical usage and API contract now lives in
   extracted executable shared within the parent process. No compiler on the VPS.
 - Main-config registration at apps.contact: mount, required email.to, optional
   email.from. Admin/editor remain core. No old config or route aliases.
-- Fixed render-only form and thanks routes. POST at the mount forwards to POST /.
+- Fixed render-only form and thank-you routes. POST at the mount forwards to POST /.
   Generic read-route declarations remain deferred until an app needs them.
 - Flea App Protocol v1, flat form JSON, request-local data/invalid/error/flash
   envelope, explicit {csrf} and signed anonymous visitor protection.
-- Mount-relative thanks redirect and bounded visitor/host/app/destination flash:
+- Mount-relative thank-you redirect and bounded visitor/host/app/destination flash:
   256 entries/site, five-minute expiry, consume after successful GET rendering.
   HEAD/assets/other pages cannot consume it; failed renders release the claim.
   Concurrent tabs share one app cookie; last response cookie wins.
@@ -44,7 +44,12 @@ The canonical usage and API contract now lives in
   startup, single-child crash, shutdown and parent-death checks passed; see the
   [Linux Contact report](../benchmarks/2026-10-04-contact-apps.md).
 - Representative per-app memory/descriptor costs and deployment peaks.
-- Real-browser form accessibility and optional ZJAX enhancement.
+- Broader accessibility/device coverage and optional ZJAX enhancement. Local
+  Chrome checks passed required fields, keyboard order, server validation with
+  preserved values, safe delivery failure, the `/contact/thank-you` redirect
+  and single confirmation copy. Safari displayed the HTML and expanded plain-text
+  email previews correctly. These preview checks did not send real email or
+  establish email-client rendering acceptance.
 
 Local regression tests cover ordinary HTML success, invalid fields, delivery
 failure, nested mounts, scoped flash, host aliases/recipients, dev preview, LAN

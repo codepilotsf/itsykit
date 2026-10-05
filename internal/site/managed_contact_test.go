@@ -31,7 +31,7 @@ func TestManagedContact(t *testing.T) {
 	root := fixture(t)
 	put(t, root, ".flea.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/deep/contact","email":{"to":"owner@example.test","from":"support@example.test"}}}}`)
 	put(t, root, "deep/contact/index.html", `<form method="post" action="/deep/contact">{csrf}<input name="name" value="{contact.data.name}"><input name="email" value="{contact.data.email}"><textarea name="message">{contact.data.message}</textarea><p>{contact.invalid.email}</p><p>{contact.error}</p></form>`)
-	put(t, root, "deep/contact/thanks.html", `<h1>Thanks</h1><p>{contact.flash.notice}</p>`)
+	put(t, root, "deep/contact/thank-you.html", `<h1>Thanks</h1><p>{contact.flash.notice}</p>`)
 	put(t, root, "mailers/main.layout.html", `<html>{slot}</html>`)
 	for _, kind := range []string{"sign-in", "contact"} {
 		put(t, root, "mailers/"+kind+".email.html", `<p>{email.message}</p>`)
@@ -95,7 +95,7 @@ func TestManagedContact(t *testing.T) {
 		t.Fatal(w.Code, w.Body.String())
 	}
 	w = post("v@example.test")
-	if w.Code != 303 || w.Header().Get("Location") != "/deep/contact/thanks" || calls.Load() != 1 {
+	if w.Code != 303 || w.Header().Get("Location") != "/deep/contact/thank-you" || calls.Load() != 1 {
 		t.Fatal(w.Code, w.Body.String())
 	}
 	flash := w.Result().Cookies()
@@ -105,12 +105,15 @@ func TestManagedContact(t *testing.T) {
 	if get("/about", cookie, flash[0]).Code != 200 {
 		t.Fatal("ordinary page failed")
 	}
-	w = get("/deep/contact/thanks", cookie, flash[0])
+	w = get("/deep/contact/thank-you", cookie, flash[0])
 	if !strings.Contains(w.Body.String(), "Your message was sent.") {
 		t.Fatal("missing flash", w.Body.String())
 	}
-	if strings.Contains(get("/deep/contact/thanks", cookie, flash[0]).Body.String(), "Your message was sent.") {
+	if strings.Contains(get("/deep/contact/thank-you", cookie, flash[0]).Body.String(), "Your message was sent.") {
 		t.Fatal("flash replayed")
+	}
+	if get("/deep/contact/thanks").Code != 404 {
+		t.Fatal("superseded success route must not be an alias")
 	}
 	fail.Store(true)
 	w = post("v@example.test")

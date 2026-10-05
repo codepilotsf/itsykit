@@ -23,7 +23,7 @@ func TestAppRegistration(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			root := fixture(t)
 			put(t, root, "contact/index.html", `<form>{csrf}</form>`)
-			put(t, root, "contact/thanks.html", `Thanks`)
+			put(t, root, "contact/thank-you.html", `Thanks`)
 			put(t, root, ".flea.config.json", `{"app":{"site_name":"Test"},`+tc.settings+`}`)
 			_, err := Load(root)
 			if (err == nil) != tc.valid {
@@ -33,7 +33,7 @@ func TestAppRegistration(t *testing.T) {
 	}
 	root := fixture(t)
 	put(t, root, "contact/index.html", `Form`)
-	put(t, root, "contact/thanks.html", `Thanks`)
+	put(t, root, "contact/thank-you.html", `Thanks`)
 	put(t, root, "contact/style.css", `body { color: red; }`)
 	put(t, root, ".flea.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.test"}}}}`)
 	if _, err := Load(root); err == nil {

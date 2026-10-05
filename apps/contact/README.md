@@ -24,7 +24,7 @@ sender, for example `support@example.com`; the address must be authorized by
 Resend. The visitor's address is Reply-To only. Credentials never belong here.
 Remove the `apps.contact` entry to disable the app. No `{app ...}` tag is needed.
 
-Create `site/contact/index.html` and `site/contact/thanks.html`, using your
+Create `site/contact/index.html` and `site/contact/thank-you.html`, using your
 normal layout. `flea new example --starter` includes both, but leaves apps
 disabled until you choose a recipient. Do not also create `site/contact.html`.
 Restart dev after changing app settings; deployment activates production settings.
@@ -80,7 +80,7 @@ query-supplied form settings or nested field decoding.
 | --- | --- | --- |
 | `GET /contact` | None | Render empty form |
 | `POST /contact` | `POST /` | Validate and attempt delivery |
-| `GET /contact/thanks` | None | Render thanks and available flash |
+| `GET /contact/thank-you` | None | Render thank-you and available flash |
 
 HEAD renders without a body and never consumes flash. Other routes below this
 mount return 404. Read-only Contact pages do not depend on a healthy child.
@@ -88,7 +88,7 @@ Contact's two read-only routes are fixed in Flea; a general read-route registry
 for future apps is not implemented.
 
 At mount `/deep/contact`, use the corresponding templates and form action.
-Success always goes to `/deep/contact/thanks`, not `/thanks`. Destinations are
+Success always goes to `/deep/contact/thank-you`, not `/thank-you`. Destinations are
 app behavior, not expressions in config and not selected by visitor input.
 
 The service receives flat JSON, without a `data` wrapper:
@@ -100,7 +100,7 @@ The service receives flat JSON, without a `data` wrapper:
 On success the service returns HTTP 200:
 
 ```json
-{"redirect":"thanks","flash":{"notice":"Your message was sent."}}
+{"redirect":"thank-you","flash":{"notice":"Your message was sent."}}
 ```
 
 Flea turns this into a browser 303. The thank-you page may display

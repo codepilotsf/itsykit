@@ -79,7 +79,7 @@ func submitTestContact(t *testing.T, h http.Handler, origin, peer, message strin
 		time.Sleep(20 * time.Millisecond)
 	}
 	w = post("visitor@example.test")
-	if w.Code != 303 || w.Header().Get("Location") != "/contact/thanks" {
+	if w.Code != 303 || w.Header().Get("Location") != "/contact/thank-you" {
 		t.Fatal(w.Code, w.Body.String())
 	}
 	return true

@@ -18,7 +18,7 @@ func TestFlashIsolationAndConsumption(t *testing.T) {
 	r := httptest.NewRequest("POST", origin+"/contact", nil)
 	r.AddCookie(visitor)
 	w := httptest.NewRecorder()
-	s.storeFlash(w, r, "contact", "/contact/thanks", map[string]string{"notice": "Sent"})
+	s.storeFlash(w, r, "contact", "/contact/thank-you", map[string]string{"notice": "Sent"})
 	cookies := w.Result().Cookies()
 	if len(cookies) != 1 {
 		t.Fatal("missing flash")
@@ -52,19 +52,19 @@ func TestFlashIsolationAndConsumption(t *testing.T) {
 		app                 string
 		duplicate           bool
 	}{
-		{"HEAD", origin, "/contact/thanks", visitor, "contact", false},
+		{"HEAD", origin, "/contact/thank-you", visitor, "contact", false},
 		{"GET", origin, "/about", visitor, "contact", false},
-		{"GET", "https://alias.test", "/contact/thanks", visitor, "contact", false},
-		{"GET", origin, "/contact/thanks", other, "contact", false},
-		{"GET", origin, "/contact/thanks", nil, "contact", false},
-		{"GET", origin, "/contact/thanks", visitor, "other", false},
-		{"GET", origin, "/contact/thanks", visitor, "contact", true},
+		{"GET", "https://alias.test", "/contact/thank-you", visitor, "contact", false},
+		{"GET", origin, "/contact/thank-you", other, "contact", false},
+		{"GET", origin, "/contact/thank-you", nil, "contact", false},
+		{"GET", origin, "/contact/thank-you", visitor, "other", false},
+		{"GET", origin, "/contact/thank-you", visitor, "contact", true},
 	} {
 		if get(tc.method, tc.host, tc.route, tc.who, tc.app, tc.duplicate) != nil {
 			t.Fatal("flash escaped scope", tc)
 		}
 	}
-	request := httptest.NewRequest("GET", origin+"/contact/thanks", nil)
+	request := httptest.NewRequest("GET", origin+"/contact/thank-you", nil)
 	request.AddCookie(visitor)
 	request.AddCookie(flash)
 	values, rollback := s.takeFlash(request, "contact")
@@ -99,7 +99,7 @@ func TestFlashExpiryAndCapacity(t *testing.T) {
 	r.AddCookie(cookie)
 	for i := 0; i < 257; i++ {
 		w := httptest.NewRecorder()
-		s.storeFlash(w, r, "contact", "/contact/thanks", map[string]string{"notice": "Sent"})
+		s.storeFlash(w, r, "contact", "/contact/thank-you", map[string]string{"notice": "Sent"})
 		if i == 256 && len(w.Result().Cookies()) != 0 {
 			t.Fatal("unbounded flash")
 		}
@@ -111,7 +111,7 @@ func TestFlashExpiryAndCapacity(t *testing.T) {
 		entry.expires = time.Now().Add(-time.Second)
 	}
 	w := httptest.NewRecorder()
-	s.storeFlash(w, r, "contact", "/contact/thanks", map[string]string{"notice": "New"})
+	s.storeFlash(w, r, "contact", "/contact/thank-you", map[string]string{"notice": "New"})
 	if len(s.apps.flashes.entries) != 1 || len(w.Result().Cookies()) != 1 {
 		t.Fatal("expiry did not release capacity")
 	}

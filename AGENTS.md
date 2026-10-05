@@ -92,7 +92,7 @@ except `.git`, with a private sibling recovery copy; it never deploys.
 Starter navigation links Team and Contact, with editable page copy and footer.
 Keep form controls developer-managed; see the templates guide for starter scope.
 Contact is enabled only by apps.contact (mount and email.to); its starter form
-uses `{csrf}` and mount-relative thanks. See apps/contact/README.md for the
+uses `{csrf}` and mount-relative `thank-you`. See apps/contact/README.md for the
 protocol, process and email boundaries. Custom/remote app registration is planned.
 Keep access pages simple and visually consistent using the shared `admin-access`
 layout; visual polish must not change authentication or code-autofill behavior.

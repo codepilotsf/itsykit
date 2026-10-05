@@ -13,7 +13,7 @@ import (
 
 func (s *Server) serveInstalledApp(w http.ResponseWriter, r *http.Request, mount appapi.Mount) {
 	readonly := r.Method == "GET" || r.Method == "HEAD"
-	if r.URL.Path != mount.Path && !(readonly && r.URL.Path == mount.Path+"/thanks") {
+	if r.URL.Path != mount.Path && !(readonly && r.URL.Path == mount.Path+"/thank-you") {
 		http.NotFound(w, r)
 		return
 	}

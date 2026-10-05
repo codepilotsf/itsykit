@@ -340,7 +340,7 @@ automatic deletion. Video fields in multisnips are not supported.
 
 ### Contact forms
 
-The starter includes `site/contact/index.html` and `site/contact/thanks.html`.
+The starter includes `site/contact/index.html` and `site/contact/thank-you.html`.
 Merge `"apps": {"contact": {"mount": "/contact", "email": {"to": "owner@example.com"}}}`
 into `.flea.config.json`, preserving other settings. Local preview mode needs no
 provider credentials. For real delivery, configure email with `flea email`.
@@ -352,7 +352,7 @@ Removing `apps.contact` disables the app. General-purpose form handling is not
 available.
 
 Validation re-renders with `contact.data.*` and `contact.invalid.*`; delivery
-failure supplies `contact.error`. Success redirects to the mount's `/thanks`
+failure supplies `contact.error`. Success redirects to the mount's `/thank-you`
 page, where `contact.flash.notice` is available once. These are escaped values,
 not template source. Optional `email.from` overrides the configured sender;
 visitor email remains Reply-To. There is no old contact config/route alias.

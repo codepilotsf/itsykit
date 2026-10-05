@@ -32,8 +32,8 @@ func (p *Project) validateApps() error {
 			return err
 		}
 		mounts = append(mounts, appapi.Mount{Name: name, Path: cfg.Mount})
-		if p.Pages[cfg.Mount] == nil || p.Pages[cfg.Mount+"/thanks"] == nil {
-			return fmt.Errorf("Contact needs pages at its mount and mount/thanks")
+		if p.Pages[cfg.Mount] == nil || p.Pages[cfg.Mount+"/thank-you"] == nil {
+			return fmt.Errorf("Contact needs pages at its mount and mount/thank-you")
 		}
 	}
 	return appapi.ValidateMounts(mounts, assets, []string{"/releases"})

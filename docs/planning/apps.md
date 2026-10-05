@@ -33,13 +33,13 @@ out separately; Rails is not the default backend for Flea apps.
   HTTP methods and mounted routes select operations; no mandatory `/apps/`
   prefix, `/submit` suffix, hidden `_action`, or custom action attribute.
 - An app has a configurable mount path. Contact mounted at `/contact` receives
-  `POST /contact`. Success redirects with 303 to `/contact/thanks`; validation
+  `POST /contact`. Success redirects with 303 to `/contact/thank-you`; validation
   failure renders the contact page with values/errors and status 422. Service
   failure renders a generic error with status 503.
 - Destinations are fixed in app behavior and documented in its README, not
   programmed in site configuration. They are relative to the mount: contact at
   `/deeply/nested/route/contact` redirects to
-  `/deeply/nested/route/contact/thanks`. Flea resolves against the mount explicitly,
+  `/deeply/nested/route/contact/thank-you`. Flea resolves against the mount explicitly,
   independent of browser trailing-slash behavior. See the response contract
   below; remaining registration and transport details are still open.
 - Prefer flat durable storage: `storage/snips.json`, `storage/blog.json`,
@@ -396,7 +396,7 @@ and a fresh generated-site status check. No deployment, live email or commits.
 
 ### Managed Contact batch (approved and implemented locally October 4)
 
-Contact now has bundled child launch/cleanup, fixed render-only form/thanks routes,
+Contact now has bundled child launch/cleanup, fixed render-only form/thank-you routes,
 a private email capability, mount-relative redirects, visitor-scoped flash and
 starter/config replacement. There are no legacy aliases or migration fallbacks.
 The matching-platform executable is bundled before compiling each parent; the
@@ -477,7 +477,7 @@ Successful submission example (Flea emits HTTP 303):
 
 ```json
 {
-  "redirect": "thanks",
+  "redirect": "thank-you",
   "flash": {"notice": "Your message was sent."}
 }
 ```

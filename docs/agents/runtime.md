@@ -51,7 +51,7 @@ templates. Both renderers use a capped writer, not a post-allocation size check.
 Site runtime always wires RenderEmail; missing templates fail delivery without a
 compatibility fallback. The optional nil renderer in low-level auth tests
 is not a site-level fallback. flea email preview emits fake-data HTML without sending.
-Contact's success destination is fixed as mount-relative `thanks`, never visitor-selected.
+Contact's success destination is fixed as mount-relative `thank-you`, never visitor-selected.
 
 New sites enable dev.email_preview. Only the dev CLI wires internal/mailpreview
 as a Sender and mounts its random-token loopback route. Keep at most 20 messages
@@ -91,7 +91,7 @@ Keep exact Origin/CSRF, production HTTPS, bounded bodies, site/IP limits and the
 shared server budget. Private HTML/text mailers use mailer.Sender, including dev
 preview. Do not store submissions or queue work. No old route/config aliases.
 
-Contact GET/HEAD renders the form or thanks page without an upstream read;
+Contact GET/HEAD renders the form or thank-you page without an upstream read;
 POST at the mount invokes the service. Redirects must remain under the mount.
 Flash is bounded (256 entries/site, five-minute expiry), visitor/host/app/route
 bound, and consumed only after a successful GET render. HEAD, assets, failed

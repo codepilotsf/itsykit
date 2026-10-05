@@ -65,9 +65,9 @@ template changes. Templates are bounded to 128 KiB after layout composition, and
 rendering stops at 256 KiB per body. Live mailbox rendering/delivery still needs
 testing with the actual provider and email clients.
 
-The starter includes `/contact` and `/contact/thanks`. Enable `apps.contact` with
+The starter includes `/contact` and `/contact/thank-you`. Enable `apps.contact` with
 `mount: "/contact"` and `email.to` for the intended recipient. Optional `email.from`
 overrides the server default and must be authorized by Resend. Preview mode needs
 no credentials; run `flea email` for real delivery. Restart dev after app/email
-changes. Success redirects to `thanks` relative to the mount; no config expression
+changes. Success redirects to `thank-you` relative to the mount; no config expression
 or visitor field selects it. See the [Contact contract](../apps/contact/README.md).

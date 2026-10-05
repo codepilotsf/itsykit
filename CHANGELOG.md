@@ -6,12 +6,14 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Use mount-relative `thank-you` for Contact success and remove the starter's
+  duplicate delivery confirmation.
 - Add the bundled Contact mini app with explicit `{csrf}`, private managed
   process startup, authenticated JSON forwarding and a single-use email capability.
   Validation preserves safe fields; success redirects with visitor-bound flash.
   App email.from can override the server sender, including in dev previews.
 - Replace top-level contact settings and /_flea/contact with apps.contact and a
-  configured mount. Starter pages now use /contact and /contact/thanks.
+  configured mount. Starter pages now use /contact and /contact/thank-you.
   No aliases or automatic migration; deployment protocol 23 requires the new
   server. Admin/editor remain core. Custom apps, remote registration and storage
   are still planned. Live mail, Linux/systemd and capacity acceptance remain open.

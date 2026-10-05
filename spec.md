@@ -110,7 +110,7 @@ this early stage. Ask the user before adding compatibility or migration layers.
 The included Contact mini app is implemented locally. apps.contact specifies
 mount and email.to, with optional email.from. POST at the mount validates
 name/email/message through an authenticated JSON child service; Flea owns
-private email templates and delivery. Success redirects to mount/thanks;
+private email templates and delivery. Success redirects to mount/thank-you;
 validation returns 422 and operational failures 503, preserving safe fields.
 No submissions are stored. Old contact config/routes are not supported.
 See apps/contact/README.md for the complete contract and acceptance limits.

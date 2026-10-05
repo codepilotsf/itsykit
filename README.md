@@ -770,9 +770,9 @@ Enable Contact by merging this into `.flea.config.json`:
 }
 ```
 
-The starter includes `site/contact/index.html` and `site/contact/thanks.html`.
+The starter includes `site/contact/index.html` and `site/contact/thank-you.html`.
 Its form posts to `/contact` and includes `{csrf}`. Validation re-renders the
-form with status 422 and safe values; success redirects to `/contact/thanks`.
+form with status 422 and safe values; success redirects to `/contact/thank-you`.
 The destination is relative to the mount, including deeply nested mounts.
 An optional `email.from` overrides the server's default sender. Visitor email
 is Reply-To only. Remove the app entry to disable it.

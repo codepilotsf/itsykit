@@ -74,7 +74,7 @@ func run(from, to string) error {
 	if err = write(".flea.config.json", cfg); err != nil {
 		return err
 	}
-	for name, body := range map[string]string{"site/contact/index.html": `<form method="post" action="/contact">{csrf}</form><p>{contact.invalid.email}</p><p>{contact.error}</p>`, "site/contact/thanks.html": `<h1>Thanks</h1><p>{contact.flash.notice}</p>`} {
+	for name, body := range map[string]string{"site/contact/index.html": `<form method="post" action="/contact">{csrf}</form><p>{contact.invalid.email}</p><p>{contact.error}</p>`, "site/contact/thank-you.html": `<h1>Thanks</h1><p>{contact.flash.notice}</p>`} {
 		if err = write(name, []byte(body)); err != nil {
 			return err
 		}
@@ -152,10 +152,10 @@ func run(from, to string) error {
 	}
 	io.Copy(io.Discard, response.Body)
 	response.Body.Close()
-	if response.StatusCode != 303 || response.Header.Get("Location") != "/contact/thanks" || sender.calls.Load() != 1 {
+	if response.StatusCode != 303 || response.Header.Get("Location") != "/contact/thank-you" || sender.calls.Load() != 1 {
 		return fmt.Errorf("Contact did not confirm acceptance (HTTP %d); no automatic retry", response.StatusCode)
 	}
-	response, err = client.Get(server.URL + "/contact/thanks")
+	response, err = client.Get(server.URL + "/contact/thank-you")
 	if err != nil {
 		return fmt.Errorf("email accepted; thank-you request failed")
 	}

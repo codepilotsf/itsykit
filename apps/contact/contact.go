@@ -107,5 +107,5 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	reply(w, 200, appapi.Envelope{Redirect: "thanks", Flash: map[string]string{"notice": "Your message was sent."}})
+	reply(w, 200, appapi.Envelope{Redirect: "thank-you", Flash: map[string]string{"notice": "Your message was sent."}})
 }
