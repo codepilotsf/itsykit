@@ -343,15 +343,21 @@ automatic deletion. Video fields in multisnips are not supported.
 
 ### Contact forms
 
-The starter includes `site/contact.html` and `site/thank-you.html`. Set
-`contact.to` alongside `app` in `.flea.config.json`. Local preview mode needs no
-provider credentials. For real delivery, configure email with `flea email`.
-Restart dev after changing contact settings.
+The starter includes `site/contact/index.html` and
+`site/contact/thank-you.html`. Enable the bundled Contact app under
+`apps.contact` in `.flea.config.json`, with a `mount` and the recipient in
+`email.to`. This replaces the earlier top-level `contact` settings and the
+`/_flea/contact` route; there is no alias or automatic migration, and deployment
+requires protocol 23. Local preview mode needs no provider credentials. For real
+delivery, configure email with `flea email`. Restart dev after changing contact
+settings.
 
-The form posts to `/_flea/contact` with `name`, `email`, `message`, and the hidden
-`website` field. Keep those names intact. Messages are emailed, not stored.
-Omitting `contact.to` disables delivery. General-purpose form handling is not
-available.
+The form posts to the mount (for example `/contact`) with `name`, `email`,
+`message`, and the hidden `website` field, and includes an explicit `{csrf}`
+control. Keep those names and the control intact. Success redirects to the
+mount-relative `thank-you` page with a visitor-bound notice. Messages are
+emailed, not stored, and validation re-renders the form with safe values.
+General-purpose form handling is not available.
 
 ### Email templates
 
