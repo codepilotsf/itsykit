@@ -6,8 +6,9 @@ Scope: the included Contact app and future Flea mini apps
 
 ## Current decisions (October 4, supersedes older sections below)
 
-Related planning: [CodePilot service](service.md). Both documents remain design
-work, except for the approved foundation and managed Contact batches below.
+CodePilot service planning lives in the separate codepilot-hub project.
+This document remains design work, except for the approved foundation and
+managed Contact batches below.
 Current supported behavior is in [Contact's README](../../apps/contact/README.md).
 That README supersedes proposed launch/email details in older sections here.
 Service workflow details are being worked
