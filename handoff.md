@@ -1,6 +1,26 @@
 # fleacms.com website handoff
 
-## Current release: 0.9.0 published October 5, 2026
+## Current release: 0.10.0 published October 5, 2026
+
+Framework tag `v0.10.0` (`d6a7f7c`). Website `b95eabb` is deployed as
+`20261005-203837-d9261af00e49e2d96f2fd52f`; the homepage, docs and `latest.txt`
+show 0.10.0 and the installer is unchanged. The 0.10.0 directory was staged
+beside the download store, verified and validated under the deployment lock
+before the shared service restarted to load it; no journals remain. Anonymous
+HTTPS downloads matched both published hashes and an old-release manifest check
+passed. Public fresh install, reinstall, 0.9.0-to-0.10.0 update and
+already-current checks passed on Mac ARM64 and native unprivileged Linux AMD64
+with matching hashes. `flea update` replaced Sean's installed CLI, which now
+reports 0.10.0. Renames `flea server sites` to `flea server list` and prompts
+for the server login when the target is omitted.
+
+The shared server executable remains **0.9.0-rc.1 / protocol 23**; it was not
+upgraded, only restarted to load the new catalogue. All four active sites are
+healthy, live content and themes were preserved, recovery is clear and
+memory/swap safeguards are unchanged. Test dev processes are stopped. Native
+Linux full-suite, clean-machine Mac and notarization remain open. See RELEASES.md.
+
+## Previous release: 0.9.0 published October 5, 2026
 
 Framework tag `v0.9.0` (`e599a5e`). Website `5ac7101` is deployed as
 `20261005-172223-0d03e392e05da991928a068b`; the homepage, docs and

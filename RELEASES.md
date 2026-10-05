@@ -17,6 +17,34 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.10.0 published October 5, 2026
+
+Framework tag `v0.10.0` (`d6a7f7c`), built with Go 1.27.1 on Mac ARM64 from the
+clean tag (`vcs.modified=false`). Renames `flea server sites` to `flea server
+list` with no alias; `list` and `remove` now prompt for the server login when the
+SSH target is omitted. The bundled Contact app and deployment protocol 23 are
+unchanged from 0.9.0.
+
+The 0.10.0 directory was staged beside the store, its manifest verified, and it
+was validated and atomically installed under the deployment lock; the shared
+service was restarted only after validation to load the catalogue, and no
+recovery journals remained. Anonymous HTTPS downloads matched both published
+hashes and an 0.9.0 manifest/binary check still passed. Public fresh install,
+reinstall, 0.9.0-to-0.10.0 update and already-current checks passed on Mac ARM64
+and native unprivileged Linux AMD64 with installed hashes matching below. The
+homepage, docs and `latest.txt` show 0.10.0; the installer is unchanged. Website
+source `b95eabb`, activation `20261005-203837-d9261af00e49e2d96f2fd52f`.
+
+The shared server executable remains `0.9.0-rc.1` / protocol 23; it was not
+upgraded, only restarted to load the new download catalogue. All four active
+sites are healthy, live content and themes were preserved, recovery is clear and
+memory/swap policy is unchanged. `flea update` replaced Sean's installed CLI.
+Test dev processes were stopped. Full native Linux build/suite, clean-machine Mac
+testing and notarization remain unverified.
+
+- Mac ARM64: `9502a45980b7abbcfc015fb5fd3268831ed17b6f6f758fd3dd86829b3eadee74`
+- Linux AMD64: `f6c2b6f34df19f9fa702741463835d1ab52869f340649c6e92dfa56ffedd9725`
+
 ## 0.9.0 published October 5, 2026
 
 Framework tag `v0.9.0` (`e599a5e`), built with Go 1.27.1 on Mac ARM64 from the
