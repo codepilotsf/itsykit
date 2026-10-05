@@ -21,6 +21,8 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `internal/setup/deploy.go`: native SSH/SCP deployment and local deployment settings.
 - `internal/release/`: bounded, confined runtime-only archive packing and extraction.
 - `internal/admin/`: privileged release activation, lock, recovery journal, and probes.
+- `internal/admin/sites.go`: read-only site inventory and unregister (retaining files).
+- `internal/setup/server.go`: SSH-only server-wide site listing and removal over an explicit target.
 - `internal/editor/`: inline editing, in-memory OTPs, persistent rolling sessions,
   CSRF and external same-origin editor assets. Sign-in markup lives in templates/site/admin/.
 - `internal/editstore/`: conflict-checked content saves and validated snapshot publication.

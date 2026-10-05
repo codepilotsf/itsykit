@@ -96,6 +96,8 @@ reset, deployment, or content synchronization. Backups may contain secrets.
 | Embedded Linux servers and bounded verified extraction | `internal/serverbundle/` |
 | Bounded release archives and compatibility marker | `internal/release/` |
 | Privileged activation, readiness, recovery | `internal/admin/deploy.go` |
+| Read-only site inventory and unregister | `internal/admin/sites.go` |
+| SSH server-wide site listing and removal | `internal/setup/server.go` |
 | Preserved-content staging during activation | `internal/admin/content.go` |
 | Owner authentication and inline editing | `internal/editor/` |
 | Content-save authorization boundaries and publication | `internal/editstore/` |
@@ -367,6 +369,16 @@ the active release/content pair, and compare a content digest from the submitted
 form. They sanitize and validate a replacement snapshot before atomically saving
 and publishing it. Local saves use the extraction lock instead. HTTP requests never
 choose a filesystem destination. Sessions persist independently of releases.
+
+Server-wide site administration is read-only listing plus unregister/offline
+removal, invoked over SSH without a local site. It deletes no files and reuses the
+same deployment lock, expected-state digest (including branch/commit bookkeeping),
+recovery journal, restart/probe and rollback paths as activation. It removes only
+the target's routing and target-owned ancillary entries, preserving unrelated
+sites' entries; when no HTTPS hostnames remain, it clears the TLS allowlist and
+disables automatic HTTPS while cached certificates stay on disk. Config activation
+restarts the shared service, briefly affecting other sites. Retained content is
+not restored automatically. Ambiguous redirects and unmanaged roots fail closed.
 
 Authentication/session persistence belongs to `editor`, content persistence to `editstore`, and delivery to
 `mailer`. The only email-provider dependency is the Sender interface; only Resend

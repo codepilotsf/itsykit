@@ -53,6 +53,7 @@ Publish your site
   restore          Restore a site backup after confirmation
   update-server    Update the server without resetting sites
   https            Configure HTTPS for your site
+  server           List or remove sites on a server over SSH
 
 Other commands
   update           Update this CLI and its bundled servers
@@ -66,6 +67,26 @@ Get started
 
 Command details
   flea <command> --help
+
+`
+
+const serverUsage = `Usage: flea server sites <ssh-target>
+       flea server remove <ssh-target> <site-name>
+
+List or remove sites installed on a FleaCMS server over SSH. No local site,
+Git repository or saved deployment settings are required.
+
+  sites    List managed sites with their domains, aliases and current release.
+  remove   Unregister one site's hostnames. Keeps every release, content file,
+           media file, session and certificate on disk. Requires typing the
+           exact site name. Removal restarts the shared service, so other sites
+           are briefly unavailable; when no HTTPS hostnames remain it disables
+           automatic HTTPS while cached certificates stay on disk. Retained
+           content is not restored automatically by redeploying the same name;
+           back up or pull the site first if a later deployment must keep it.
+
+Both commands reject servers running an older FleaCMS protocol; update the
+server first. Nothing is deleted or pruned.
 
 `
 
@@ -345,6 +366,8 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		return 0
+	case "server":
+		return runServer(ctx, args[1:], os.Stdin, out, errOut)
 	case "help", "-h", "--help":
 		fmt.Fprint(out, usage)
 		return 0
@@ -616,6 +639,50 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	default:
 		fmt.Fprint(errOut, usage)
+		return 2
+	}
+}
+
+// runServer handles server-wide site administration over an explicit SSH target.
+func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.Writer) int {
+	switch {
+	case len(args) == 0, args[0] == "--help", args[0] == "-h":
+		fmt.Fprint(out, serverUsage)
+		return 0
+	case args[0] == "sites":
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprint(out, serverUsage)
+			return 0
+		}
+		if len(args) != 2 || strings.HasPrefix(args[1], "-") {
+			fmt.Fprintln(errOut, "Usage: flea server sites <ssh-target>")
+			return 2
+		}
+		if err := setup.ServerSites(ctx, args[1], in, out, errOut); err != nil {
+			fmt.Fprintln(errOut, "flea:", err)
+			return 1
+		}
+		return 0
+	case args[0] == "remove":
+		if len(args) >= 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprint(out, serverUsage)
+			return 0
+		}
+		if len(args) == 3 && (args[2] == "--help" || args[2] == "-h") {
+			fmt.Fprint(out, serverUsage)
+			return 0
+		}
+		if len(args) != 3 || strings.HasPrefix(args[1], "-") || strings.HasPrefix(args[2], "-") {
+			fmt.Fprintln(errOut, "Usage: flea server remove <ssh-target> <site-name>")
+			return 2
+		}
+		if err := setup.ServerRemove(ctx, args[1], args[2], in, out, errOut); err != nil {
+			fmt.Fprintln(errOut, "flea:", err)
+			return 1
+		}
+		return 0
+	default:
+		fmt.Fprint(errOut, serverUsage)
 		return 2
 	}
 }

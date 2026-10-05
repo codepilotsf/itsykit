@@ -6,6 +6,16 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Add `flea server sites <ssh-target>` and `flea server remove <ssh-target>
+  <site-name>` for server-wide site administration independent of a local site.
+  Listing is read-only; removal is unregister/offline only and retains every
+  release, content file, media file, session and certificate. Removal requires
+  typing the exact site name, rejects state that changed since review including a
+  commit-only change, blocks on pending recovery and reuses the deployment lock,
+  journal, probe and rollback paths. It restarts the shared service, so other
+  sites are briefly unavailable, and disables automatic HTTPS when no HTTPS
+  hostnames remain while cached certificates stay on disk. Retained content is
+  not restored automatically by redeploying the same name.
 - Use mount-relative `thank-you` for Contact success and remove the starter's
   duplicate delivery confirmation.
 - Add the bundled Contact mini app with explicit `{csrf}`, private managed

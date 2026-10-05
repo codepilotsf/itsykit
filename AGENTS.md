@@ -59,7 +59,7 @@ dependencies, trust boundaries, loading, transactions or publication.
 | Pull, explicit deploy sync, managed CSS, Theme UI | [Synchronization and theme](docs/agents/sync-theme.md) |
 | HTML/CSS, Prewind, icons, starter styling | [Styling and icons](docs/agents/styling.md); `../prewind/README.md` |
 | CLI help/dev, file watching, routing, diagnostics, contact, email rendering | [Runtime](docs/agents/runtime.md); [email templates](docs/email-templates.md) when relevant |
-| SSH/setup, deploy, host/TLS, archives, rollback, backup, restore, upgrade | [Deployment](docs/agents/deployment.md); [recovery](docs/recovery.md) |
+| SSH/setup, deploy, host/TLS, archives, rollback, backup, restore, server site administration, upgrade | [Deployment](docs/agents/deployment.md); [recovery](docs/recovery.md) |
 | Owner toolbar, authentication, sessions, onboarding, mail configuration, editor prototype | [Editor](docs/agents/editor.md); media/theme guides for those modes |
 | Versions, packaging and releases | [RELEASING.md](RELEASING.md) and version rules below |
 

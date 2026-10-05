@@ -634,6 +634,19 @@ live separately under content/<release-id>.json, selected by the host config.
 Successful activation archives/prunes unreferenced IDs; failed activation restores
 the prior code and content paths. See docs/recovery.md for the current rollback contract.
 
+Current implementation: `flea server sites <ssh-target>` lists installed sites
+read-only and `flea server remove <ssh-target> <site-name>` unregisters one
+site's routing after an exact typed confirmation. Removal deletes no files:
+releases, content, media, sessions, certificates and downloads are retained under
+the stable site's data directory, but retained content is not restored
+automatically by redeploying the same name. It uses the deployment lock, an
+expected-state digest covering routing, ancillary entries and branch/commit
+bookkeeping, the existing recovery journal, restart/probe and rollback paths, and
+fails closed on ambiguous redirects or unmanaged roots. Restarting the shared
+service briefly affects other sites; when no HTTPS hostnames remain afterwards,
+automatic HTTPS is disabled while cached certificates stay on disk. No public
+HTTP administration API is added.
+
 Each deployment creates an immutable release. The host switches to it atomically.
 
 ```text

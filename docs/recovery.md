@@ -13,6 +13,14 @@ flea update-server
 flea update-server --recover
 ```
 
+Server-wide site administration takes an explicit SSH target and needs no local
+site or saved deployment settings:
+
+```sh
+flea server sites <ssh-target>
+flea server remove <ssh-target> <site-name>
+```
+
 ## Rollback
 
 Rollback republishes earlier code as a new release while preserving current admin
@@ -65,3 +73,34 @@ review. Keep backups and test upgrades on a disposable server first.
 
 Local automated tests cover failure and recovery paths. Live SSH/systemd upgrade,
 restore and power-loss behavior still need disposable-server verification.
+
+## Removing a site
+
+`flea server sites <ssh-target>` lists managed sites, their grouped domains and
+aliases, redirects, HTTPS domains and current release. It is read-only and does
+not take the deployment lock, so it also works while a recovery journal is
+pending.
+
+`flea server remove <ssh-target> <site-name>` unregisters one site's routing
+after the server prints the exact affected domains and you type the exact site
+name. It is unregister/offline only: it deletes no files. Site files stay under
+`/var/lib/flea/sites/<name>` and cached certificates stay under
+`/var/lib/flea/certs`, but retained files are not restored automatically:
+content lookup follows active routing, so re-deploying the same stable site name
+starts from the current project and cannot recover content left behind. Back up
+or pull the site before removal if a later deployment must keep its current
+content. No restore command is added.
+
+Removal rewrites the shared server config and restarts the service, so other
+sites are briefly unavailable. Other sites' routing and ancillary entries are
+preserved. When no HTTPS hostnames remain afterwards, automatic HTTPS is disabled
+and cached certificates stay on disk.
+
+Removal uses the same deployment/content lock, expected-state digest, recovery
+journal, restart/probe and rollback paths as deployment. If the site changed
+between review and confirmation, removal stops. If a deployment or executable
+upgrade is pending, removal stops. An interrupted removal leaves the existing
+`deploy.pending.json`; run `sudo flea-server -recover` to restore the previous
+configuration. Removing the last site is supported and still probes server
+readiness. Live SSH/systemd removal and recovery still need disposable-server
+verification.

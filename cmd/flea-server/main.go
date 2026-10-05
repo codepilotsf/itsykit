@@ -31,6 +31,9 @@ func main() {
 	rollback := flag.String("rollback", "", "restore retained code, preserving live content (root only)")
 	expectedRelease := flag.String("expected-release", "", "reviewed active release ID")
 	export := flag.Bool("export-state", false, "export admin-editable state (root only)")
+	listSites := flag.Bool("list-sites", false, "list managed sites (read-only)")
+	siteInfo := flag.String("site-info", "", "print reviewed state for one managed site (read-only)")
+	removeSite := flag.String("remove-site", "", "unregister a managed site, retaining its files (root only)")
 	planPath := flag.String("sync-plan", "", "reviewed sync plan accompanying deployment")
 	version := flag.Bool("version", false, "print FleaCMS release version")
 	config := flag.String("config", "/etc/flea/server.json", "server JSON configuration")
@@ -181,6 +184,33 @@ func main() {
 			if err == nil {
 				fmt.Printf("Activated release %s\n", revision)
 			}
+		}
+	} else if *listSites || *siteInfo != "" {
+		if *config != "/etc/flea/server.json" {
+			logger.Print("Site administration uses the installed server config.")
+			os.Exit(1)
+		}
+		if *listSites {
+			var sites []admin.SiteSummary
+			sites, err = admin.System().Sites()
+			if err == nil {
+				err = json.NewEncoder(os.Stdout).Encode(sites)
+			}
+		} else {
+			var info admin.SiteSummary
+			info, err = admin.System().SiteInfo(*siteInfo)
+			if err == nil {
+				err = json.NewEncoder(os.Stdout).Encode(info)
+			}
+		}
+	} else if *removeSite != "" {
+		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {
+			logger.Print("Site removal requires root and the installed server config.")
+			os.Exit(1)
+		}
+		err = admin.System().RemoveSite(ctx, *removeSite, *expectedState)
+		if err == nil {
+			fmt.Println("Removed site from routing. Releases, content, media, sessions and certificates retained.")
 		}
 	} else if *check {
 		err = host.Check(ctx, *config)

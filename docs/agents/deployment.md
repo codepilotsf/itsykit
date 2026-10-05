@@ -178,3 +178,49 @@ the data parent and releases are root-owned. Only certificates, managed content
 and private runtime directories and the precreated deployment lock are writable
 by the service.
 Never include keys in archives or logs.
+
+### Server-wide site administration
+
+`flea server sites <ssh-target>` lists installed sites without a local project:
+managed names, grouped domains/aliases, redirects, HTTPS domains and the current
+release, in deterministic name order. It is read-only and may inspect a server
+with a pending recovery journal. `flea server remove <ssh-target> <site-name>`
+unregisters one site after typing the exact name.
+
+Removal is unregister/offline only: it deletes no files. Site files remain under
+`/var/lib/flea/sites/<name>` and cached certificates under `/var/lib/flea/certs`,
+but retained content is not restored automatically.
+Re-deploying the same stable name starts from the current project; because
+content lookup follows active routing, it cannot recover content left behind.
+Back up or pull the site before removal if a later deployment must keep its
+current content. Removal restarts the shared service, so other sites are briefly
+unavailable. No restore feature is added.
+
+`flea server` connects only over native SSH to the explicit target. It never
+needs a local config, Git repository or site. The target must run the current
+deployment protocol; an older or incomplete server is reported and no remote
+configuration is rewritten by hand. Non-root targets use the existing sudo
+policy. Validate the target and site name, and single-quote every remote
+argument.
+
+The server computes an expected-state digest over exactly the routing and
+ancillary entries removal would change. Review prints it; removal recomputes it
+under the existing deployment/content lock and refuses if the site changed since
+review. The operation blocks on a pending deployment or executable recovery and
+removes only the target's `sites`, `content`, `themes`, `downloads`, owned
+redirects, TLS allowlist entries and site/branch/commit bookkeeping. The digest
+covers branch and commit, so a commit-only change since review also fails closed.
+Other sites' routing and ancillary entries are preserved. Removing the site that
+owns the last HTTPS hostname clears the TLS allowlist and disables automatic
+HTTPS, while cached certificates stay on disk; removal that leaves other HTTPS
+hostnames preserves those TLS settings. A redirect that touches the target at
+only one end, or a site whose root is outside the managed data directory, fails
+closed.
+
+Removal reuses the existing atomic config publication, recovery journal,
+restart/probe and failure rollback paths. The prior config is journaled to
+`deploy.pending.json` before replacement; a failure restores it. Because config
+activation restarts the shared service, other sites are briefly unavailable. An
+interrupted removal is recovered with `sudo flea-server -recover`, exactly like
+an interrupted deployment. Removing the last site is supported and probes generic
+server readiness. Removal never prunes retained content or media.

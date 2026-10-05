@@ -68,7 +68,7 @@ func TestHelpWithoutSite(t *testing.T) {
 			t.Fatalf("%v: code=%d stdout=%q stderr=%q", args, code, out.String(), errOut.String())
 		}
 	}
-	for _, command := range []string{"new", "dev", "status", "admin", "email", "setup", "deploy", "https", "version", "pull", "update", "update-server"} {
+	for _, command := range []string{"new", "dev", "status", "admin", "email", "setup", "deploy", "https", "version", "pull", "update", "update-server", "server"} {
 		for _, flag := range []string{"--help", "-h"} {
 			var out, errOut bytes.Buffer
 			if code := Run(context.Background(), []string{command, flag}, &out, &errOut); code != 0 || errOut.Len() != 0 || !strings.Contains(out.String(), "Usage: flea "+command) || !strings.HasSuffix(out.String(), "\n\n") {

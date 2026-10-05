@@ -1344,6 +1344,33 @@ content directories (flea-owned 0750) and create each managed site's private
 after replacing the unit. For executable-only updates on a current installation,
 use `flea update-server`; it does not migrate service units or configuration.
 
+### List or remove sites on a server
+
+These commands manage sites already installed on a server. They take an explicit
+SSH target and do not need a local site, Git repository or saved deployment
+settings:
+
+```sh
+flea server sites root@server
+flea server remove root@server example
+```
+
+`flea server sites` lists each managed site with its domains and aliases,
+redirects, HTTPS domains and current release. It is read-only.
+
+`flea server remove` unregisters one site's hostnames after showing the exact
+affected domains and asking you to type the site name. It only stops routing:
+site files stay under `/var/lib/flea/sites/<name>` and cached certificates stay
+under `/var/lib/flea/certs`. Removal rewrites the shared server config and
+restarts the service, so other sites are briefly unavailable; their routing and
+settings are preserved, except that when no HTTPS hostnames remain afterwards,
+automatic HTTPS is disabled while cached certificates stay on disk. Retained
+files are not restored automatically: re-deploying the same site name starts from
+the current project and cannot recover content left behind, so back up or pull
+the site first if a later deployment must keep its current content. An interrupted
+removal is recovered with `sudo flea-server -recover`. Both commands reject
+servers running an older FleaCMS protocol; update the server first.
+
 ## Local installation details
 
 For a persistent local installation, from the repository:
