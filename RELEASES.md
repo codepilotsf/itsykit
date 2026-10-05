@@ -17,6 +17,32 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.9.0 published October 5, 2026
+
+Framework tag `v0.9.0` (`e599a5e`), built with Go 1.27.1 on Mac ARM64 from the
+clean tag (`vcs.modified=false`). Adds the bundled Contact app with protocol 23
+and server-wide site administration, replacing top-level `contact` with
+`apps.contact`. Full native Linux build/suite, clean-machine Mac testing and
+notarization remain unverified.
+
+Website source `5ac7101`, activation `20261005-172223-0d03e392e05da991928a068b`.
+The 0.9.0 directory was staged beside the store, verified and validated under the
+deployment lock, then the shared service was restarted to load it; no recovery
+journals remained. Anonymous HTTPS downloads matched both published hashes, and
+an 0.8.1 manifest/binary check passed. Public fresh install, reinstall,
+0.8.1-to-0.9.0 update and already-current checks passed on Mac ARM64 and native
+unprivileged Linux AMD64 with installed hashes matching below. The public
+channel, homepage and docs show 0.9.0; the installer is unchanged.
+
+The shared server executable remains `0.9.0-rc.1` / protocol 23. It was not
+upgraded, only restarted to load the new download catalogue. All four active
+sites are healthy, live content and themes were preserved, recovery is clear and
+memory/swap policy is unchanged. `flea update` replaced Sean's installed CLI.
+Test dev processes were stopped.
+
+- Mac ARM64: `ab076b61597836348000f7d0d0f956f38b269c43fffb03abdd41711824037950`
+- Linux AMD64: `b6ab6639c5b3c9f72b7195c7198f41b67872115bc86182fe40fa5775d54608d2`
+
 ## Private server rollout October 5, 2026 (not a public release)
 
 Server 0.9.0-rc.1 / protocol 23 from framework `3447cb7`. The standard bundled

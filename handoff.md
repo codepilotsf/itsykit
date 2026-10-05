@@ -1,16 +1,35 @@
 # fleacms.com website handoff
 
-## Current server rollout: October 5, 2026
+## Current release: 0.9.0 published October 5, 2026
+
+Framework tag `v0.9.0` (`e599a5e`). Website `5ac7101` is deployed as
+`20261005-172223-0d03e392e05da991928a068b`; the homepage, docs and
+`latest.txt` show 0.9.0 and the installer is unchanged. The 0.9.0 directory was
+staged beside the download store and validated under the deployment lock before
+the shared service restarted to load it; no journals remain. Anonymous HTTPS
+downloads matched both published hashes and an old-release manifest check passed.
+Public fresh install, reinstall, 0.8.1-to-0.9.0 update and already-current checks
+passed on Mac ARM64 and native unprivileged Linux AMD64 with matching hashes.
+`flea update` replaced Sean's installed CLI, which now reports 0.9.0.
+
+The shared server executable remains **0.9.0-rc.1 / protocol 23**; it was not
+upgraded, only restarted to load the new catalogue. All four active sites are
+healthy, live content and themes were preserved, recovery is clear and
+memory/swap safeguards are unchanged. Test dev processes are stopped. Native
+Linux full-suite, clean-machine Mac and notarization remain open. See RELEASES.md.
+
+## Previous private rollout: 0.9.0-rc.1, October 5, 2026 (not a public release)
 
 Shared server is **0.9.0-rc.1 / protocol 23**, framework `3447cb7`. Website
-`7ef4e6e` is deployed as `20261005-163126-76b53507e24be701230d2e89` with Contact.
-Atlas `b2f768a` is deployed; Bookworm is unregistered with all files retained.
+`7ef4e6e` was deployed as `20261005-163126-76b53507e24be701230d2e89` with Contact.
+Atlas `b2f768a` was deployed; Bookworm is unregistered with all files retained.
 Kent and Naves were not redeployed. All four sites are healthy and recovery is
 clear. Live content and themes were preserved. Both Contact forms passed CSRF,
 validation and no-email success checks; real delivery was not tested this time.
-Public downloads, latest.txt and Sean's installed CLI remain **0.8.1**. No RC tag
-or public artifacts were published. See RELEASES.md and the framework deployment
-runbook for details. The entries below describe earlier releases.
+Public downloads, latest.txt and Sean's installed CLI remained **0.8.1** at that
+time. No RC tag or public artifacts were published. See RELEASES.md and the
+framework deployment runbook for details. The entries below describe earlier
+releases.
 
 Latest release 0.8.1: framework `209b5d3`, tag `v0.8.1`; website `9fd1397`,
 activation `20261003-230705-de4bfab5fbec8834e722a460`. Fixes duplicate `.gitignore`
