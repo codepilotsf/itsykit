@@ -17,6 +17,20 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## Private server rollout October 5, 2026 (not a public release)
+
+Server 0.9.0-rc.1 / protocol 23 from framework `3447cb7`. The standard bundled
+build produced Mac CLI SHA-256
+`505642a47e0c558b4bfb3a4737bb4a408894768d2c836391784f53397e437fe6`.
+Website `7ef4e6e`, activation `20261005-163126-76b53507e24be701230d2e89`, adds
+Contact at `/contact` with `/contact/thank-you`. Atlas was also updated;
+Bookworm's routing was removed with its files retained. All remaining sites are
+healthy, content/themes preserved and recovery clear. Contact CSRF/422/honeypot
+303 checks passed on both sites without sending email. Real delivery, native
+Linux full-suite and clean-Mac acceptance remain unverified for this rollout.
+Public downloads, installer and channel remain 0.8.1. No RC artifacts or tag
+were published. Documentation-only follow-up commits are not deployed snapshots.
+
 ## 0.8.1 published October 3, 2026
 
 Framework `209b5d3`, immutable tag `v0.8.1`, built with Go 1.27.1 on Mac ARM64.

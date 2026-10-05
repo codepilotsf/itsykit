@@ -1,5 +1,17 @@
 # fleacms.com website handoff
 
+## Current server rollout: October 5, 2026
+
+Shared server is **0.9.0-rc.1 / protocol 23**, framework `3447cb7`. Website
+`7ef4e6e` is deployed as `20261005-163126-76b53507e24be701230d2e89` with Contact.
+Atlas `b2f768a` is deployed; Bookworm is unregistered with all files retained.
+Kent and Naves were not redeployed. All four sites are healthy and recovery is
+clear. Live content and themes were preserved. Both Contact forms passed CSRF,
+validation and no-email success checks; real delivery was not tested this time.
+Public downloads, latest.txt and Sean's installed CLI remain **0.8.1**. No RC tag
+or public artifacts were published. See RELEASES.md and the framework deployment
+runbook for details. The entries below describe earlier releases.
+
 Latest release 0.8.1: framework `209b5d3`, tag `v0.8.1`; website `9fd1397`,
 activation `20261003-230705-de4bfab5fbec8834e722a460`. Fixes duplicate `.gitignore`
 rules and preserves existing bytes. Public Mac/Linux installs, reinstalls and
