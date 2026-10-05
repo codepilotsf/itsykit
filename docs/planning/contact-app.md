@@ -44,8 +44,12 @@ The canonical usage and API contract now lives in
   regression tests cover exactly five failed process launches, cancellation at
   retry backoff, bounded shutdown during an active submission with one sender
   attempt, and ordinary pages/assets remaining available without Contact.
-  The exhaustion test uses an immediately exiting test executable, not repeated
-  crashes of an already-ready Contact child. The initial isolated
+  Exhaustion tests cover both immediately exiting executables and five distinct
+  ready helper children that complete real authenticated protocol handshakes
+  before being told to exit. They verify client withdrawal/replacement, final
+  unavailability and recorded child-process cleanup. The latter uses the real
+  supervisor with a test protocol helper, not the bundled Contact executable.
+  The initial isolated
   startup, single-child crash, shutdown and parent-death checks passed; see the
   [Linux Contact report](../benchmarks/2026-10-04-contact-apps.md).
 - Representative per-app memory/descriptor costs and deployment peaks.
