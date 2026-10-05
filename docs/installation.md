@@ -1,9 +1,10 @@
 # Installation and updates
 
 Version 0.10.0 is the current test release for Apple Silicon macOS and x86-64
-Linux. The public installer selects the latest stable release from
-`https://fleacms.com/releases/latest.txt`; until 0.10.0 publication completes,
-that channel may still report the previous version.
+Linux. It was published October 5, 2026; the public installer selects the latest
+stable release from `https://fleacms.com/releases/latest.txt`, which reports
+0.10.0. The shared server stays `0.9.0-rc.1` / protocol 23, so this CLI release
+needs no server update.
 
 ## Upgrading to 0.10.0
 

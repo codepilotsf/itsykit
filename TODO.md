@@ -2,7 +2,7 @@
 
 ## Next
 
-- [ ] Release 0.10.0 (`flea server list` rename and docs); commit, tag and publish when approved.
+- [x] Release 0.10.0 (`flea server list` rename and docs); committed, tagged and published October 5, 2026.
 
 ## Backlog
 

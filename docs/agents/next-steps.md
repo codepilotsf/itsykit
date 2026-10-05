@@ -6,7 +6,16 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
-## Current release status (October 3, 2026)
+## Current release status (October 5, 2026)
+
+- Version 0.10.0 is published. Framework `d6a7f7c`, tag `v0.10.0`; website
+  `b95eabb`, activation `20261005-203837-d9261af00e49e2d96f2fd52f`. The CLI
+  renames `flea server sites` to `flea server list` and prompts for the server
+  login when the SSH target is omitted. Public Mac/Linux hashes, fresh install,
+  reinstall, 0.9.0-to-0.10.0 update and already-current checks passed on Mac ARM64
+  and native unprivileged Linux AMD64. All four sites are healthy, content and
+  themes preserved and recovery clear; the shared server remains `0.9.0-rc.1` /
+  protocol 23. Native Linux full-suite, clean-Mac and notarization remain open.
 
 - Private server rollout `0.9.0-rc.1` completed October 5, 2026 from framework
   `3447cb7`, using the standard bundled build. The shared server runs protocol

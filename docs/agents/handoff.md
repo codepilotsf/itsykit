@@ -4,6 +4,17 @@ Start here in a fresh conversation. Read AGENTS.md and the relevant subsystem
 guides before acting. This handoff records completed work, not authorization for
 new production changes. Do not repeat the completed rollout.
 
+## Public release 0.10.0 (October 5, 2026)
+
+Framework tag `v0.10.0` (`d6a7f7c`), website `b95eabb`, activation
+`20261005-203837-d9261af00e49e2d96f2fd52f`. Renames `flea server sites` to
+`flea server list` and prompts for the server login when the SSH target is
+omitted. Fresh install, reinstall, 0.9.0-to-0.10.0 update and already-current
+checks passed on Mac ARM64 and native unprivileged Linux AMD64 with installed
+hashes matching the public manifest. The shared server executable and the live
+rollout below remain `0.9.0-rc.1` / protocol 23. See website RELEASES.md and
+docs/installation.md.
+
 ## Working arrangement
 
 Use the global skill `/Users/sean/.codex/skills/deepseek-orchestrator/SKILL.md`.
@@ -67,7 +78,7 @@ Never publish backups or print private configuration/credentials.
 ## What remains
 
 - No new implementation task is selected. Ask Sean what to tackle next.
-- Push new commits only with authorization. Public 0.9.0 release is separate.
+- Push new commits only with authorization. 0.10.0 is now the public release.
 - `flea server sites` passed live inventory. The new `server remove` command
   still needs disposable-host live QA; Bookworm used the one-time old-protocol
   script, not that command. Removal retains files but does not automatically
