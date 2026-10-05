@@ -2,6 +2,12 @@
   "app": {"site_name": "FleaCMS"},
   "dev": {"email_preview": true},
   "admin": {"emails": [], "session_idle_days": 30},
+  "apps": {
+    "contact": {
+      "mount": "/contact",
+      "email": {"to": "sean@codepilot.com", "from": "sean@fleacms.com"}
+    }
+  },
   "deploy": {
     "branches": {
       "main": {
