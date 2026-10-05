@@ -279,7 +279,36 @@ and confirm their intended branch matches the remote. Preserve unrelated changes
 Finish with website `flea status`, live server version/health, and any remaining
 acceptance limits. Do not turn a successful smoke check into a claim of full QA.
 
-## Latest completed release: 0.8.0
+## Private server rollout: 0.9.0-rc.1, October 5, 2026
+
+Framework `3447cb7`; standard bundled build, Mac CLI SHA-256
+`505642a47e0c558b4bfb3a4737bb4a408894768d2c836391784f53397e437fe6`.
+Shared server is 0.9.0-rc.1 / protocol 23. Public downloads and the installed
+CLI remain 0.8.1; no RC tag or public artifacts were published.
+
+Atlas interim `e9dd946`, activation `20261005-162654-c4165eb23f351ba4f70e2c8c`,
+temporarily disabled Contact while retaining its routing and live content.
+Bookworm (`v1-acceptance-main`) was then unregistered through explicitly approved
+one-time protocol-22 maintenance, with all 20 releases and other files retained.
+Config backup: `/var/backups/flea/server.json.before-bookworm-removal-20261005-162928`.
+Five verified site backups remain locally in `/Users/sean/fleacms-backups`.
+
+Supported `update-server` succeeded, followed by Atlas `b2f768a`, activation
+`20261005-163105-49d3e6e8f1cdb06b0ee73e86`, and website `7ef4e6e`, activation
+`20261005-163126-76b53507e24be701230d2e89`. Kent and Naves were not redeployed.
+All four sites are healthy. Themes and content match backups except Atlas's
+intentional thank-you route move, whose snips were preserved. Both Contact forms
+passed CSRF rejection, validation feedback and honeypot success redirect checks;
+no real email was sent. Two Contact children run under the existing service policy.
+No rollback was required and no recovery journals remain. Memory/swap safeguards
+are unchanged. Live inventory passed; the new removal command still needs live QA.
+
+The one-time script is not a supported reusable tool: its review mode used BSD
+`mktemp -t` syntax and needed a transient shell adapter on Linux. Do not reuse it
+on protocol 23. Use the new site commands for future approved administration.
+Native Linux full-suite and clean-Mac acceptance remain open.
+
+## Historical completed release: 0.8.0
 
 Framework `c8a1d96`, tag `v0.8.0`; website `3188000`, activation
 `20261003-171440-ca76afb853e32d0d0309c6ea`. Public Mac/Linux hashes, fresh

@@ -8,12 +8,14 @@ for completed changes, and [README.md](README.md) for current usage.
 
 ## Current release status (October 3, 2026)
 
-- Private server rollout candidate `0.9.0-rc.1` prepared October 5, 2026
-  (unreleased and untagged). Version metadata was set and the standard bundled
-  build produced `bin/flea` 0.9.0-rc.1 with protocol-23 servers, for the
-  controlled server only. No public download, tag, website change or live
-  deployment is part of this candidate; public publication remains a separate,
-  explicitly authorized step.
+- Private server rollout `0.9.0-rc.1` completed October 5, 2026 from framework
+  `3447cb7`, using the standard bundled build. The shared server runs protocol
+  23; Atlas `b2f768a` and website `7ef4e6e` are deployed with Contact. Bookworm
+  is unregistered with files retained. All remaining sites are healthy, content
+  and themes preserved, and recovery clear. Contact CSRF/validation/no-email
+  success checks passed; real delivery was not tested in this rollout. Public
+  downloads and the installed CLI remain 0.8.1; no RC tag or artifacts published.
+  See the deployment runbook for activation IDs and recovery evidence.
 
 - Version 0.8.1 is published. Framework `209b5d3`, tag `v0.8.1`; website
   `9fd1397`, activation `20261003-230705-de4bfab5fbec8834e722a460`.
@@ -203,10 +205,11 @@ Do not claim optional platforms work solely because they cross-compile.
   with `flea-server -recover`. Confirm the shared-service restart briefly affects
   other sites, that removing the last HTTPS hostname disables automatic HTTPS
   with cached certificates retained, and that redeploying the same name does not
-  silently restore retained content. The currently shared live host still reports
-  protocol 22, so it cannot be managed until its server is updated deliberately;
-  bootstrap that upgrade with the documented manual steps instead of bypassing
-  protocol validation. No automatic migration or aliasing is added.
+  silently restore retained content. The shared host was upgraded to protocol 23
+  on October 5; live inventory passed. Bookworm removal used a separately
+  approved one-time protocol-22 maintenance script, not the new removal command,
+  so it does not establish live acceptance of that command. No automatic
+  migration or aliasing is added.
 
 Done when the documented developer workflow and recovery paths work on the real
 target, with no unexplained data loss, permission failures or manual rescue steps.
