@@ -54,6 +54,37 @@ srcset/picture/source elements for a media snip. Local JPEG/PNG and optimized
 H.264 MP4 seeds are imported by dev. Do not invent IDs. Admins click media in
 Edit mode and use the same page Save/Cancel. No Photos/Videos library buttons.
 
+## Styling: Prewind first
+
+Follow Prewind's global-first approach, not a parallel component CSS system.
+Use existing shared defaults and theme tokens for typography, colors, links,
+buttons and forms. Use supported Prewind utilities for layout, spacing, sizing,
+alignment and responsive adjustments. Check the loaded Prewind version and its
+documentation before choosing classes; do not assume Tailwind syntax exists.
+
+- Before adding custom CSS, check whether existing defaults or Prewind utilities
+  already express the design. Do not duplicate utilities with custom selectors.
+- Do not introduce BEM naming (`block__element`, `block--modifier`), page-specific
+  styling frameworks or parallel utility systems. Preserve existing custom work;
+  this rule does not authorize an unrelated rewrite of existing classes.
+- Custom CSS is for genuinely unsupported behavior or visual details. Before
+  introducing an exception, explain what Prewind cannot reasonably express and
+  obtain the user's approval. Put approved shared rules in the existing CSS
+  architecture and layers; do not add an overriding layer to bypass utilities.
+- Preserve useful boilerplate behavior, including sticky/fixed headers,
+  translucent backgrounds, backdrop blur, mobile navigation and transitions,
+  unless the user explicitly requests a change. A screenshot artifact is not
+  a reason to change the actual site's behavior.
+- Pass these constraints to any authorized implementation worker. Delegation
+  does not relax them; the lead must review the resulting markup and CSS.
+
+Before expanding an approved sample into the full site, review its markup and
+CSS against these rules. Visual approval alone is not approval of a different
+styling architecture. Before calling work complete, inspect every added or
+changed CSS selector, remove utility duplication, and report any remaining
+custom CSS with its reason and approval. Verify the preserved layout behavior
+in the browser, not only in screenshots.
+
 ## Available skills
 
 - **import-brochure**: import or redesign an existing small brochure/portfolio
