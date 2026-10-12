@@ -1,9 +1,31 @@
 # Installation and updates
 
-Version 0.12.0 is the current test release for Apple Silicon macOS and AMD64/ARM64
+Version 0.13.0 is the current test release for Apple Silicon macOS and AMD64/ARM64
 Linux. Published October 12, 2026; the public installer selects it from
 `https://fleacms.com/releases/latest.txt`. The shared server remains 0.9.0-rc.1 /
 protocol 23; this release needs no remote server upgrade.
+
+## Upgrading to 0.13.0
+
+Run `flea update` for the improved `flea status`. Local validation, page/asset/
+editable-area counts and Git state appear first. The command automatically checks
+this branch's saved deployment over SSH, showing terminal progress and separate
+website, code, content and theme results. No remote flag is needed. With no saved
+destination it finishes locally. Status remains read-only; a scoped pull baseline
+is needed to identify which side changed. Remote failures exit 1; differences exit 0.
+
+Published October 12, 2026 from clean tag `v0.13.0` (`bd668a1`), Go 1.27.1.
+Native Linux ARM64 and Mac full tests, real-bundle race checks, vet and bundled
+builds passed. All three CLIs embed identical verified Linux server payloads.
+Linux AMD64 was cross-compiled off production and smoke-tested natively as an
+unprivileged user. Native AMD64 full-suite/build, clean-Mac acceptance and
+notarization remain open; tag pipeline 358 is pending without native runners.
+
+Public install/reinstall, checksums/version, 0.12.0-to-0.13.0 updates and
+already-current checks passed on all three platforms. Published CLIs passed
+initial commits, default/starter status and dev routes. The final ARM64 CLI also
+passed local-first output, animated progress and remote comparison against the
+configured website. Older published versions and hashes remain unchanged.
 
 ## Upgrading to 0.12.0
 

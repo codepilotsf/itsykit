@@ -8,6 +8,16 @@ for completed changes, and [README.md](../../README.md) for current usage.
 
 ## Current release status (October 12, 2026)
 
+- Version 0.13.0 is published: framework `bd668a1`, tag `v0.13.0`; website
+  `1f8d4bf`, activation `20261012-182752-488ee26bcaf1fb17ddf715ec`. Status now
+  prints local information first and automatically compares the current branch's
+  saved deployment with terminal progress. Native ARM64 Linux/Mac full checks
+  and public install/reinstall/update, initial-commit and dev smoke checks on all
+  three platforms passed. Content/themes and routing are preserved, all hosted
+  domains healthy and recovery clear. Shared server stays `0.9.0-rc.1` / protocol
+  23. Native AMD64 full-suite/build, clean-Mac/notarization and native CI setup
+  remain open; tag pipeline 358 is pending. Release verification was manual.
+
 - Version 0.12.0 is published: framework `a227ff4`, tag `v0.12.0`; website
   `6ebdb00`, activation `20261012-174635-ec70336ae4e81090c4bc0c21`. Linux ARM64
   now has a public CLI. Native ARM64 Linux/Mac full checks and public installation,
