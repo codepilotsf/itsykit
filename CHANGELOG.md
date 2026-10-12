@@ -4,7 +4,7 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
-## Unreleased
+## 0.11.0 - 2026-10-12
 
 - `flea new` now creates an `Initial site` commit on main and prints commands
   to connect and push to a remote repository. Git identity, hooks and signing
