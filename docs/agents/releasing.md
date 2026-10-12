@@ -21,16 +21,16 @@ latest.txt and install.sh are live on fleacms.com. Clean-machine Mac testing
 and notarization remain unverified; do not describe this as a completed V1 release.
 See [installation and trust](../installation.md).
 
-Required CLI targets are macOS ARM64 and Linux AMD64. Add macOS AMD64 and Linux
-ARM64 only if building and verifying them takes little extra work. The current
-pipeline below provides this build matrix but has not been run remotely. Public
-artifacts are hosted in the website's versioned release directories without
-opening the source repository. The registry instructions below are historical.
+CLI release targets are macOS ARM64, Linux AMD64 and Linux ARM64. Each uses a
+native runner for tests, race checks, vet and bundled CLI smoke tests. macOS AMD64
+remains outside the public release matrix. This pipeline has not been run
+remotely. Public artifacts are hosted in the website's versioned release
+directories without opening the source repository. The registry instructions below are historical.
 
 `scripts/release.sh client <arch>` now supports native Linux as well as Mac
 runners. Each needs both previously built Linux server artifacts in dist/.
-After required native CLI checks, `scripts/stage-release.sh` prepares only
-`dist/public/install.sh`, `releases/latest.txt`, and immutable
+After native CLI checks for all three targets, `scripts/stage-release.sh`
+prepares only `dist/public/install.sh`, `releases/latest.txt`, and immutable
 `releases/<version>/` binaries plus SHA256SUMS. It requires a matching stable tag
 and refuses an existing version staging directory. It does not upload anything.
 Publish the version directory first, verify anonymous HTTPS downloads, then
@@ -85,7 +85,7 @@ as required by the existing committed-source workflow.
 The repository's .gitlab-ci.yml builds tagged releases on native runners:
 
 - linux-amd64 and linux-arm64 for server builds and tests.
-- macos-arm64 and linux-amd64 for CLI builds and tests.
+- macos-arm64, linux-amd64 and linux-arm64 for CLI builds and tests.
 
 Register trusted shell runners with those exact tags. Each needs Go, Git, Bash,
 gzip and shasum; the publishing Linux runner also needs curl. Race tests need a C
@@ -108,7 +108,7 @@ GitLab package API: https://docs.gitlab.com/user/packages/generic_packages/
    Commit the changes and run the tests.
 2. Create and push a new immutable tag, for example v0.2.0.
 3. Both native Linux jobs test and build static server binaries.
-4. The native Mac ARM64 and Linux AMD64 jobs embed both Linux artifacts using
+4. The native Mac ARM64 and both Linux CLI jobs embed both Linux artifacts using
    scripts/bundle.sh, test extraction and build CLIs with the same version.
 5. Review the artifacts, then run the manual publish-stage job. Despite its
    stage name, it only prepares downloadable `dist/public/` CI artifacts.
@@ -117,9 +117,9 @@ GitLab package API: https://docs.gitlab.com/user/packages/generic_packages/
 6. Test the downloaded Mac CLI on a clean Mac and setup on a disposable Ubuntu
    machine for each architecture before announcing the release or updating a tap.
 
-Artifacts are raw executables named flea-linux-amd64, flea-darwin-arm64,
-flea-server-linux-amd64, and flea-server-linux-arm64. A Homebrew formula
-can install the appropriate Mac binary directly, with its release SHA-256 and
+Artifacts are raw executables named flea-linux-amd64, flea-linux-arm64,
+flea-darwin-arm64, flea-server-linux-amd64, and flea-server-linux-arm64.
+A Homebrew formula can install the appropriate Mac binary directly, with its release SHA-256 and
 no Go dependency. Creating/publishing that tap remains a separate step.
 
 ## Development builds

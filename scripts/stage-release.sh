@@ -6,7 +6,7 @@ version=$(flea_version release)
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'Only stable versions enter the public update channel.' >&2; exit 1; }
 output="dist/public/releases/$version"
 [[ ! -e "$output" ]] || { echo 'Public staging already exists; use a fresh build directory.' >&2; exit 1; }
-files=(flea-darwin-arm64 flea-linux-amd64)
+files=(flea-darwin-arm64 flea-linux-amd64 flea-linux-arm64)
 for file in "${files[@]}"; do
   [[ -f "dist/$file" && ! -L "dist/$file" ]] || { echo "Missing native-verified artifact: $file" >&2; exit 1; }
 done
