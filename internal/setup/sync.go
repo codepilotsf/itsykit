@@ -38,9 +38,6 @@ func baselinePath(ctx context.Context, root string, s DeploySettings) (string, e
 		return "", e
 	}
 	path = strings.TrimSpace(path)
-	if e = os.MkdirAll(path, 0700); e != nil {
-		return "", e
-	}
 	h := sha256.Sum256([]byte(destination(s) + "\n" + root))
 	return filepath.Join(path, hex.EncodeToString(h[:])+".json"), nil
 }
@@ -71,6 +68,9 @@ func readBaseline(ctx context.Context, root string, s DeploySettings) (syncstate
 func saveBaseline(ctx context.Context, root string, s DeploySettings, b syncstate.Baseline) error {
 	p, e := baselinePath(ctx, root, s)
 	if e != nil {
+		return e
+	}
+	if e = os.MkdirAll(filepath.Dir(p), 0700); e != nil {
 		return e
 	}
 	b.Destination = destination(s)

@@ -117,6 +117,9 @@ dialog Done separate from publishing with page Save changes.
 The declarative toolbar and its icons render before bootstrap; do not recreate
 its shell. Preserve drafts after errors and during source reloads.
 
+`flea status` shows local validation first, then automatically checks the current
+branch's saved remote. Keep it read-only; see the runtime and sync guides.
+
 ## Verification
 
 Choose verification by behavior and risk, not line count. A one-line security

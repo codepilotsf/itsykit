@@ -782,7 +782,7 @@ flea rollback
 
 `flea status`
 
-- Shows local project validity or remote deployment/certificate/release status, depending on flags/context.
+- Prints local validity, site counts and Git state first, then automatically checks the current branch's saved remote over SSH. Separately reports website reachability, deployed commit, content and theme differences. Direction requires a scoped pull baseline. No remote flag; no mapping finishes locally.
 
 `flea logs`
 

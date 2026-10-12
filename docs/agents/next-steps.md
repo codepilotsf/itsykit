@@ -396,7 +396,7 @@ Ask one question at a time; these need not delay independent work.
   design. Do not change SSH privileges before that design is agreed.
 - Components beyond partials, new slot/input syntax and broader template abstractions.
 - Clustering, high availability, independent site runtimes and service/schema migrations.
-- Deployment-setting consolidation, remote status/logs and automatic release retention.
+- Deployment-setting consolidation, remote logs and automatic release retention.
 - Further legacy-format cleanup under the no-backward-compatibility policy.
 - Public writable editing demo and unrelated new feature requests.
 

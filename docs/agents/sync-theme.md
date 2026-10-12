@@ -81,3 +81,14 @@ A new dev invocation may request graceful shutdown from another dev instance
 through its private Unix socket, then wait for this lock. It never interrupts
 pull/reset or bypasses their exclusion. See the runtime guide for control ownership.
 This is separate from the in-process content mutex and remote deploy.lock.
+
+## Status comparison
+
+Plain `flea status` automatically reads the current branch's saved deployment.
+It compares code separately from editable content and theme. Only scoped pull
+baselines for the exact destination establish change direction. Without one,
+report differences with unknown direction, never guess that live edits caused them.
+Content differences count active snip values, metadata fields, collections and
+media-library entries; ignore developer labels, ownership and retained archives.
+Status reads baselines without creating directories and never saves them, pulls,
+resolves conflicts or publishes. Matching values need no baseline.
