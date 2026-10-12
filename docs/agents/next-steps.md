@@ -6,7 +6,17 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
-## Current release status (October 5, 2026)
+## Current release status (October 12, 2026)
+
+- Version 0.11.0 is published from framework `9759a51`, tag `v0.11.0`; website
+  `26ed807`, activation `20261012-164409-6fcf3b6569f135a51848d882`. Public Mac ARM64
+  and unprivileged Linux AMD64 install/reinstall/update, initial-commit and dev
+  smoke checks passed. All six sites are healthy, live content/themes preserved;
+  shared server remains `0.9.0-rc.1` / protocol 23. Mac full checks passed; AMD64
+  was cross-compiled and smoke-tested natively. Native AMD64 full-suite/build,
+  clean-Mac and notarization remain open. Linux ARM64 CLI support is excluded.
+  Tag pipeline 356 remains pending because native runner tags are not configured;
+  this release used manual verification.
 
 - Version 0.10.0 is published. Framework `d6a7f7c`, tag `v0.10.0`; website
   `b95eabb`, activation `20261005-203837-d9261af00e49e2d96f2fd52f`. The CLI

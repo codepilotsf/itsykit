@@ -9,6 +9,23 @@ Start with `flea new breakfast-qa`, enter that folder, and run `flea dev`.
 These are manual acceptance checks, not a claim that live delivery, deployment,
 or every browser has already been tested.
 
+## Public 0.11.0 release verification, October 12, 2026
+
+Clean framework commit `9759a51`, tag `v0.11.0`, Go 1.27.1 on Mac ARM64. Native
+Mac full tests, race suite requiring real Contact/server bundles, vet, bundled
+build and ad-hoc signature checks passed. Both Linux server bundles were rebuilt.
+Linux AMD64 was cross-compiled off production and tested there unprivileged;
+this does not establish native AMD64 build/full-suite acceptance.
+
+Public Mac ARM64 and Linux AMD64 downloads matched SHA256SUMS. Fresh installer,
+reinstall, 0.10.0-to-0.11.0 update and already-current checks passed on both native
+platforms. Default and starter creation produced clean `Initial site` commits on
+main; status and dev homepage/team/contact checks passed. Test dev processes were
+stopped. All six hosted sites returned HTTPS 200, content/theme hashes matched
+before/after, and recovery is clear. Shared server remains 0.9.0-rc.1 / protocol 23.
+Linux ARM64 CLI support is excluded. Clean-Mac/notarization and existing manual
+browser/mail/recovery acceptance below remain open.
+
 ## Automated retest, September 28, 2026
 
 Original manual answers below are preserved. Diagnostic regression tests verify

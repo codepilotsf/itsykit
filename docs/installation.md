@@ -1,12 +1,30 @@
 # Installation and updates
 
-Version 0.10.0 is the current test release for Apple Silicon macOS and x86-64
-Linux. It was published October 5, 2026; the public installer selects the latest
+Version 0.11.0 is the current test release for Apple Silicon macOS and x86-64
+Linux. It was published October 12, 2026; the public installer selects the latest
 stable release from `https://fleacms.com/releases/latest.txt`, which reports
-0.10.0. The shared server stays `0.9.0-rc.1` / protocol 23, so this CLI release
+0.11.0. The shared server stays `0.9.0-rc.1` / protocol 23, so this CLI release
 needs no server update.
 
-## Upgrading to 0.10.0
+## Upgrading to 0.11.0
+
+`flea new` now creates an `Initial site` commit on main and prints commands to
+connect and push to a remote repository. It respects Git identity, hooks and
+signing settings. A failed commit preserves the site and prints retry instructions;
+`--skip-git` skips Git setup. Existing sites and remote repositories are unchanged.
+Run `flea update` for the CLI. The bundled Contact app and protocol 23 are
+unchanged, so this release needs no remote server update.
+
+Public fresh installation, reinstall, 0.10.0-to-0.11.0 update and already-current
+checks passed on Mac ARM64 and unprivileged native Linux AMD64. Installed hashes
+matched the public manifest. Default/starter site creation, the initial commit,
+status and dev routes passed on both platforms. The release came from clean commit
+`9759a51`, built with Go 1.27.1 on Mac ARM64; the Linux AMD64 CLI was
+cross-compiled and verified natively, not built or fully tested on a native AMD64
+runner. Native Mac tests, race checks, vet and signature verification passed;
+clean-machine Mac acceptance and notarization remain open.
+
+## Changes introduced in 0.10.0
 
 0.10.0 renames `flea server sites` to `flea server list` with no alias. Both
 `flea server list` and `flea server remove` now prompt for the server login when

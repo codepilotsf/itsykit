@@ -2,21 +2,20 @@
 
 ## Install
 
-The planned public installation command is:
+Install the current test release for Apple Silicon Mac or x86-64 Linux:
 
 ```sh
 curl -fsSL https://fleacms.com/install.sh | bash
 ```
 
-Public downloads are not published yet. Until then, authorized source-checkout
-users can build with Go 1.26 or newer:
+Authorized source-checkout users can build with Go 1.26 or newer:
 
 ```sh
 bash scripts/build.sh
 export PATH="$PWD/bin:$PATH"
 ```
 
-The release installer will use `~/.local/bin` without sudo and print any needed
+The installer uses `~/.local/bin` without sudo and prints any needed
 PATH instructions. See [installation and updates](docs/installation.md).
 
 ## Create your first site
