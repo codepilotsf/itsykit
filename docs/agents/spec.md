@@ -882,6 +882,9 @@ These are intentionally not blockers for the initial routing/template prototype:
 FleaCMS is meaningfully usable when a developer can:
 
 1. Install the CLI through the one-line fleacms.com installer on a supported platform.
+   Release CI covers Apple Silicon macOS and Linux AMD64/ARM64 with native tests;
+   public ARM64 Linux installation requires a newly published release (0.10.0
+   contains only macOS ARM64 and Linux AMD64).
 2. Run `flea new my-site` and receive a working starter site.
 3. Run `flea dev` with no language runtime, Node modules, database, Docker, or external web-server setup.
 4. Add `about-us/history.html` and see it at `/about-us/history`.

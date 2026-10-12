@@ -4,6 +4,12 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## Unreleased
+
+- Include the Linux ARM64 CLI in native release testing and public staging,
+  alongside Linux AMD64 and Apple Silicon macOS. Installer errors now identify
+  the release and platform when its verified download is missing.
+
 ## 0.10.0 - 2026-10-05
 
 - Rename `flea server sites` to `flea server list` without an alias. `flea server
