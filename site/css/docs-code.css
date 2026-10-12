@@ -1,8 +1,26 @@
-/* Prism token colors; keep block layout and inline code in the site styles. */
+/* Dark code blocks inspired by Zed's One Dark palette. */
 @layer styles {
+  .docs-content pre {
+    background: #282c34;
+    color: #dce1e8;
+    color-scheme: dark;
+    scrollbar-color: #697386 #282c34;
+  }
+
+  .docs-content pre:focus-visible {
+    outline: 2px solid #61afef;
+    outline-offset: 3px;
+  }
+
+  .docs-content pre ::selection {
+    background: #46566f;
+    color: #ffffff;
+  }
+
   .docs-content pre > code {
     font-size: inherit;
-    color: var(--black);
+    color: inherit;
+    background: transparent;
     white-space: inherit;
     overflow-wrap: normal;
     tab-size: 2;
@@ -12,35 +30,57 @@
   .docs-content pre .token.prolog,
   .docs-content pre .token.doctype,
   .docs-content pre .token.cdata {
-    color: #536258;
+    color: #a2abb9;
   }
 
   .docs-content pre .token.punctuation {
-    color: #536258;
+    color: #abb2bf;
   }
 
   .docs-content pre .token.tag,
-  .docs-content pre .token.keyword,
-  .docs-content pre .token.boolean,
   .docs-content pre .token.property {
-    color: #176b36;
+    color: #e99a9f;
+  }
+
+  .docs-content pre .token.keyword {
+    color: #cfa4ed;
+  }
+
+  .docs-content pre .token.function,
+  .docs-content pre .token.class-name {
+    color: #7dc3f5;
   }
 
   .docs-content pre .token.attr-name,
-  .docs-content pre .token.function,
-  .docs-content pre .token.builtin,
+  .docs-content pre .token.builtin {
+    color: #e5c07b;
+  }
+
+  .docs-content pre .token.boolean,
   .docs-content pre .token.number {
-    color: #795018;
+    color: #e5ac80;
   }
 
   .docs-content pre .token.string,
   .docs-content pre .token.attr-value {
-    color: #104c28;
+    color: #a8cc8c;
   }
 
   .docs-content pre .token.operator,
   .docs-content pre .token.variable,
   .docs-content pre .token.entity {
-    color: #4c5686;
+    color: #75c9d5;
+  }
+
+  .docs-content .copy-button {
+    background: #323844;
+    border-color: #596273;
+    color: #dce1e8;
+  }
+
+  .docs-content .copy-button:hover:not(:disabled),
+  .docs-content .copy-button.is-copied {
+    color: #a8cc8c;
+    border-color: #a8cc8c;
   }
 }

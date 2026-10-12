@@ -45,7 +45,7 @@
   .docs-content section { padding-top:45px; margin-top:40px; border-top:1px solid var(--light); scroll-margin-top:1rem; }
   .docs-content h2 { font-size:2rem; margin:0 0 18px; }
   .docs-content h3 { font-size:1.2rem; margin-top:28px; }
-  .docs-content pre { border:1px solid var(--light); padding:22px; font-size:.91rem; line-height:1.75; white-space:pre; overflow-wrap:normal; }
+  .docs-content pre { border:1px solid #424957; padding:22px; font-size:.91rem; line-height:1.75; white-space:pre; overflow-wrap:normal; }
   .docs-content p,.docs-content li { color:var(--darker); }
   .notice { padding:20px 24px; border-left:3px solid var(--brand-1); background:var(--brand-1-light); border-radius:0 6px 6px 0; }
   .notice p { margin:0; }
