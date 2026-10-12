@@ -2,6 +2,10 @@
 
 ## Install
 
+Release builds cover Apple Silicon macOS and Linux AMD64/ARM64. The published
+0.11.0 release covers macOS ARM64 and Linux AMD64; ARM64 Linux downloads require
+the next verified release.
+
 Install the current test release for Apple Silicon Mac or x86-64 Linux:
 
 ```sh

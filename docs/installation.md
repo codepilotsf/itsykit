@@ -6,6 +6,15 @@ stable release from `https://fleacms.com/releases/latest.txt`, which reports
 0.11.0. The shared server stays `0.9.0-rc.1` / protocol 23, so this CLI release
 needs no server update.
 
+## Linux ARM64 availability
+
+Release builds and public staging now include Linux ARM64 (`aarch64`) alongside
+Mac ARM64 and Linux AMD64. Each new ARM64 release must pass native installation,
+update, site creation/dev/status and bundled Contact checks. The published 0.11.0
+manifest has no ARM64 Linux CLI; public installation requires a new immutable
+release containing it. Adding a download does not enlarge existing platform
+binaries. Missing-download errors identify the release and selected platform.
+
 ## Upgrading to 0.11.0
 
 `flea new` now creates an `Initial site` commit on main and prints commands to

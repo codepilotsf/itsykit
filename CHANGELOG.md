@@ -4,6 +4,12 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## Unreleased
+
+- Add Linux ARM64 CLI release builds and public staging alongside Linux AMD64
+  and Apple Silicon macOS. Missing installer downloads now identify the selected
+  release and platform while preserving checksum verification.
+
 ## 0.11.0 - 2026-10-12
 
 - `flea new` now creates an `Initial site` commit on main and prints commands
