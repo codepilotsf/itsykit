@@ -6,14 +6,16 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
-## Pending Linux ARM64 release
-
-- Linux ARM64 CLI native jobs and public staging now accompany Mac ARM64 and
-  Linux AMD64. Publish a new immutable version after native checks, then verify
-  public install/reinstall/update on ARM64 before advertising availability.
-  The existing 0.11.0 downloads and hashes stay immutable.
-
 ## Current release status (October 12, 2026)
+
+- Version 0.12.0 is published: framework `a227ff4`, tag `v0.12.0`; website
+  `6ebdb00`, activation `20261012-174635-ec70336ae4e81090c4bc0c21`. Linux ARM64
+  now has a public CLI. Native ARM64 Linux/Mac full checks and public installation,
+  reinstall, update, initial-commit and dev smoke checks on all three platforms
+  passed. All six sites are healthy; content/themes preserved and recovery clear.
+  Shared server stays `0.9.0-rc.1` / protocol 23. Native AMD64 build/full-suite,
+  clean-Mac/notarization and native CI runner setup remain open. Tag pipeline
+  357 is pending; this release used manual verification.
 
 - Version 0.11.0 is published from framework `9759a51`, tag `v0.11.0`; website
   `26ed807`, activation `20261012-164409-6fcf3b6569f135a51848d882`. Public Mac ARM64
@@ -112,9 +114,8 @@ and real client workloads still need their own capacity checks.
   account or license key. Do not describe FleaCMS as open source.
 - Primary installation is one copy-and-paste shell command from fleacms.com,
   ideally without sudo. Homebrew and native installer packages are deferred.
-- CLI release targets: Apple Silicon macOS and AMD64/ARM64 Linux. Advertise
-  ARM64 Linux only after publishing and verifying its new download. Intel Mac
-  remains deferred.
+- CLI release targets: Apple Silicon macOS and AMD64/ARM64 Linux, all with
+  verified public downloads. Intel Mac remains deferred.
 - Support single-server Ubuntu deployments. Multi-developer permissions,
   clustering, high availability and separate per-site runtimes are deferred.
 - Add `flea update` for the local CLI and its bundled server executables.

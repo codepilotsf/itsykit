@@ -1,19 +1,28 @@
 # Installation and updates
 
-Version 0.11.0 is the current test release for Apple Silicon macOS and x86-64
-Linux. It was published October 12, 2026; the public installer selects the latest
-stable release from `https://fleacms.com/releases/latest.txt`, which reports
-0.11.0. The shared server stays `0.9.0-rc.1` / protocol 23, so this CLI release
-needs no server update.
+Version 0.12.0 is the current test release for Apple Silicon macOS and AMD64/ARM64
+Linux. Published October 12, 2026; the public installer selects it from
+`https://fleacms.com/releases/latest.txt`. The shared server remains 0.9.0-rc.1 /
+protocol 23; this release needs no remote server upgrade.
 
-## Linux ARM64 availability
+## Upgrading to 0.12.0
 
-Release builds and public staging now include Linux ARM64 (`aarch64`) alongside
-Mac ARM64 and Linux AMD64. Each new ARM64 release must pass native installation,
-update, site creation/dev/status and bundled Contact checks. The published 0.11.0
-manifest has no ARM64 Linux CLI; public installation requires a new immutable
-release containing it. Adding a download does not enlarge existing platform
-binaries. Missing-download errors identify the release and selected platform.
+This is the first public Linux ARM64 (`aarch64`) CLI release. The same curl
+installer now selects its verified download. Each platform has a separate binary,
+so ARM64 support does not enlarge the Mac or Linux AMD64 downloads. Existing users
+run `flea update`. Missing-download errors identify the selected release/platform.
+Published 0.11.0 and older artifacts and hashes remain unchanged.
+
+Public install/reinstall, checksum/version and already-current checks passed on
+all three native platforms, including default/starter initial commits, status and
+dev routes. Mac/Linux AMD64 updates from public 0.11.0 passed; ARM64 updated from
+a local 0.11.0 fixture because no public ARM64 0.11.0 binary exists.
+
+Clean tag `v0.12.0` (`a227ff4`), Go 1.27.1. Native Linux ARM64 and Mac full tests,
+race checks with real bundles, vet and bundled builds passed. All CLIs contain the
+same verified Linux server binaries. Linux AMD64 was cross-compiled and checked
+natively without a production compiler; native AMD64 build/full-suite acceptance
+remains open. Mac ad-hoc signatures passed; clean-Mac/notarization remain open.
 
 ## Upgrading to 0.11.0
 
