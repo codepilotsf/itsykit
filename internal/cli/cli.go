@@ -40,7 +40,7 @@ Build your site
   new <site-name>  Create a new site
   reset            Reset this local site to a clean start
   dev              Start the local development server
-  status           Check your site for errors
+  status           Show local and remote site status
   admin [email]    Add an admin who can edit content
   email            Set up email delivery
 
@@ -458,7 +458,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "status":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea status\n\nCheck the current site's configuration, templates, and content.\nRun this command from your site folder.")
+			fmt.Fprintln(out, "Usage: flea status\n\nShow local validation and Git state, then check this branch's saved remote.\nCompares deployed code, editable content and theme over SSH.\nRun this command from your site folder.")
 			fmt.Fprintln(out)
 			return 0
 		}
@@ -470,16 +470,12 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if err != nil {
 			return fail(err)
 		}
-		content, _ := p.Content.Index()
-		fmt.Fprintf(out, "Valid local project: %s\n%d pages, %d assets, %d snips\n", p.App["site_name"], len(p.Pages), len(p.Assets), len(p.Snips)+len(content))
-		if len(p.Admin.Emails) > 0 {
-			fmt.Fprintf(out, "Local sessions: %s (%d-day idle expiry)\n", filepath.Join(p.Root, "flea", "runtime", "sessions.json"), p.Admin.SessionIdleDays)
+		terminal := false
+		if file, ok := out.(*os.File); ok {
+			terminal = devTerminal(ctx, file)
 		}
-		for _, warning := range p.Warnings {
-			fmt.Fprintf(errOut, "Warning: %s\n", warning)
-		}
-		for _, route := range p.Routes() {
-			fmt.Fprintln(out, " ", route)
+		if err = setup.Status(ctx, p, os.Stdin, out, errOut, terminal); err != nil {
+			return fail(err)
 		}
 		return 0
 	case "dev":

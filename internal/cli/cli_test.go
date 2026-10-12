@@ -107,7 +107,7 @@ func TestCLI(t *testing.T) {
 	}
 	t.Chdir("demo")
 	var out bytes.Buffer
-	if code := Run(context.Background(), []string{"status"}, &out, io.Discard); code != 0 || !strings.Contains(out.String(), "Valid local project") {
+	if code := Run(context.Background(), []string{"status"}, &out, io.Discard); code != 0 || !strings.Contains(out.String(), "Valid configuration, templates and content") {
 		t.Fatal(code, out.String())
 	}
 	if err := os.WriteFile("site/index.html", []byte("{broken syntax}"), 0644); err != nil {
@@ -163,7 +163,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	run(temp, "new", "--starter", "smoke")
 	root := filepath.Join(temp, "smoke")
-	if got := run(root, "status"); !strings.Contains(got, "Valid local project: Smoke") {
+	if got := run(root, "status"); !strings.Contains(got, "Smoke\n") {
 		t.Fatal(got)
 	}
 	cmd := exec.Command(binary, "dev", "-port", "0")

@@ -111,7 +111,7 @@ Run these from your site's folder:
 | --- | --- |
 | `flea dev` | Preview your site at http://localhost:3000 with browser reloads. |
 | `flea dev -port 8080` | Preview on a different port. |
-| `flea status` | Check configuration, routes, templates, and content without starting a server. |
+| `flea status` | Show local validation and Git state, then compare the current branch with its saved deployment. |
 | `flea reset` | Reset the local site to the clean default after confirmation, keeping a private backup. |
 | `flea deploy` | Configure the current branch's destination, then publish its committed files. |
 | `flea deploy -configure` | Change that branch's saved deployment settings and deploy. |
@@ -119,8 +119,44 @@ Run these from your site's folder:
 | `flea version` | Show the installed version. |
 
 The preview server is local to your machine. Use `-port 0` to choose an available
-port automatically. `status` works offline; missing icons produce warnings while
-otherwise valid sites still pass.
+port automatically. `flea status` prints local validation, page/asset/editable-area
+counts and Git state first. If the current branch has a saved destination, it then
+checks the remote over native SSH automatically. There is no remote flag. It shows
+website reachability, deployed commit, editable content and theme separately.
+A terminal shows a spinner while checking; redirected output uses a plain progress
+line. Remote checks have a one-minute deadline and use the usual SSH/sudo credentials.
+
+Content and theme changes are classified as local, remote or conflicting only
+when a previous `flea pull` recorded a baseline for that exact destination and
+scope. Otherwise, status reports differences with unknown direction. Content
+comparison includes active editable areas, page metadata, collections and media
+libraries; developer labels and retained archives are excluded. Status never
+pulls, saves deployment settings, updates baselines or publishes anything.
+Without a named branch or saved destination, it finishes locally without network
+access. A failed remote check preserves the local summary and exits with code 1;
+ordinary differences are informational and exit successfully. Missing icons remain
+warnings rather than validation failures.
+
+```text
+T3docs
+/home/sean/Projects/t3docs
+
+Local
+  Files        Valid configuration, templates and content
+  Site         1 page, 7 assets, 2 editable areas
+  Git          main, no uncommitted changes
+
+Checking remote...
+Deployment
+  Website      https://example.com
+  Server       sean@example.com
+  Connection   Reachable
+  Code         Matches latest local commit
+  Content      0 local, 3 remote, 0 conflicting changes
+  Theme        Matches local
+
+Next: run flea pull to review content and theme differences.
+```
 
 `flea new my-site` creates a Git repository on `main` with an `Initial site`
 commit, ready to push. Use `flea new my-site --skip-git` if the site belongs in
@@ -628,8 +664,8 @@ The starter ignores `/flea/runtime/sessions.json` and `/flea/runtime/.sessions-*
 rules exist and refuses already tracked session files. Do not commit, edit, or
 copy session state. To sign everyone out, stop the server and delete only that
 site's `flea/runtime/sessions.json`, then start it again. Logout removes just the current
-browser's session. Removing an admin revokes their sessions. `flea status` shows
-the local session path when admins are configured.
+browser's session. Removing an admin revokes their sessions. Session files stay
+private; status reports site and deployment information.
 
 The production service can write the site's private `flea/` directory, not its
 release directory or configuration. Deployment protocol 23 requires the updated
@@ -858,9 +894,10 @@ the server renders cached geometry as inline SVG. Keep the cached SVG files
 in version control for reproducible, offline use. Unused cached files are retained.
 Deploy uses the same resolver before packaging; no standalone site build command exists.
 
-`flea status` remains read-only and offline. Missing icons are warnings,
-not validation failures: status exits successfully if the rest of the project
-is valid. Missing icons and failed downloads render nothing in their place;
+`flea status` remains read-only. It checks the branch's configured remote but
+never fetches missing icons. Missing icons are warnings, not local validation
+failures; unavailable configured remotes still produce a failed status check.
+Missing icons and failed downloads render nothing in their place;
 the rest of the page serves normally, with no browser error message or 500.
 Dev prints one warning per unresolved icon at startup or reload, including the
 template location and download failure when available. Warnings are not repeated
@@ -1481,7 +1518,7 @@ explicit `flea pull` synchronization are supported. Keep backups before manual e
 This release provides local development, SSH setup/deployment, automatic HTTPS,
 email-code authentication, inline editing, multisnips, theme editing and a JPEG/PNG
 image/video snips. Rollback, site backups/restoration and executable-only server upgrades
-are supported; see [recovery](docs/recovery.md). Release pruning, remote logs/status
+are supported; see [recovery](docs/recovery.md). Release pruning and remote logs
 commands, general-purpose forms, general field schemas, per-edit revision history
 and adaptive video streaming remain deferred. Deployment briefly restarts the service
 and preserves remote admin content. Developer-managed images may remain in `images/`.

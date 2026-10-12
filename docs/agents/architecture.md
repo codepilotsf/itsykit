@@ -348,6 +348,13 @@ save reindexes references and archives removed IDs; reintroduced IDs recover
 their content. Server deployment still uses its cross-process file lock. This is recoverable
 multi-file editing, not an atomic filesystem transaction across all files.
 
+`setup.Status` owns the local-first deployment diagnostic, using existing native
+SSH/protocol checks and bounded snapshot, inventory and history readers. It checks
+that the active release, branch and domains agree before comparing commits.
+`syncstate.CompareContent` and `CompareValue` are pure read-only comparisons;
+they classify direction only with the corresponding destination-scoped baseline.
+Public reachability is a separate bounded HEAD probe, never evidence of code sync.
+
 ### Remote activation
 
 1. The CLI captures a clean Git commit, validates and packages its runtime files,

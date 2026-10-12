@@ -14,7 +14,18 @@ for example root@fleacms.com); an omitted site name lists the managed sites and
 asks for one by its exact name.
 See README.md for pull, synchronization, recovery and the complete command list.
 `flea email` configures local Resend delivery interactively.
-Run status/dev from a generated site. Setup runs from the Mac over native SSH.
+Run status/dev from a generated site. Setup uses native SSH.
+`flea status` prints local validation, counts and Git state before automatically
+checking the current named branch's saved deployment. Do not add a remote flag,
+prompt for deployment setup, or select another branch's destination. Without a
+mapping it finishes locally. Terminal output animates Checking remote; redirected
+output stays plain. Stop animation before diagnostics or sudo prompts and always
+join its goroutine on completion/cancellation. Remote work has a 60-second deadline.
+Read-only status must not create a pull-baseline directory or refresh the Git index.
+Use the existing SSH/protocol and bounded snapshot/history/inventory readers;
+compare exact active release/branch/domain identity before reporting code state.
+Website HEAD probes validate normal TLS and do not follow redirects. Unavailable
+remote checks exit 1 while preserving the local summary; differences exit 0.
 Bare `flea`, `flea help`, `flea -h`, and `flea --help` show the grouped command
 overview on stdout and exit successfully. Each command supports `--help` and
 `-h` without requiring a site or starting work. Keep the overview spacious;
