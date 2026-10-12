@@ -4,7 +4,7 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
-## Unreleased
+## 0.13.0 - 2026-10-12
 
 - `flea status` now shows a readable local summary first, then automatically
   checks the current branch's saved deployment with terminal progress. Code,
