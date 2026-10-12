@@ -9,6 +9,24 @@ Start with `flea new breakfast-qa`, enter that folder, and run `flea dev`.
 These are manual acceptance checks, not a claim that live delivery, deployment,
 or every browser has already been tested.
 
+## Linux ARM64 CLI support verification, October 12, 2026
+
+Native Linux ARM64 checks passed with Go 1.26.9: full tests and race suite with
+real Contact/server bundles required, vet and `scripts/build.sh`. The real CLI
+passed fixture-backed install/reinstall with matching hashes, default/starter
+creation with initial commits, canonical starter asset comparisons, status and
+dev homepage/team/contact checks. Test dev processes were stopped. An isolated
+HTTPS updater fixture using the real native CLI and production version checker
+passed verified replacement and already-current checks; it used a temporary Go
+test overlay and did not change production trust settings.
+
+Installer regressions cover all three release platforms, bad checksums and a
+missing ARM64 manifest entry. Staging regressions require the ARM64 artifact,
+verify all three hashes and reject an existing staged version. No new public
+release was published in this implementation task. Live 0.11.0 still excludes
+Linux ARM64; public install/update acceptance is pending a new release. Existing
+manual answers and release evidence below remain unchanged.
+
 ## Public 0.11.0 release verification, October 12, 2026
 
 Clean framework commit `9759a51`, tag `v0.11.0`, Go 1.27.1 on Mac ARM64. Native

@@ -6,6 +6,13 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
+## Pending Linux ARM64 release
+
+- Linux ARM64 CLI native jobs and public staging now accompany Mac ARM64 and
+  Linux AMD64. Publish a new immutable version after native checks, then verify
+  public install/reinstall/update on ARM64 before advertising availability.
+  The existing 0.11.0 downloads and hashes stay immutable.
+
 ## Current release status (October 12, 2026)
 
 - Version 0.11.0 is published from framework `9759a51`, tag `v0.11.0`; website
@@ -105,9 +112,9 @@ and real client workloads still need their own capacity checks.
   account or license key. Do not describe FleaCMS as open source.
 - Primary installation is one copy-and-paste shell command from fleacms.com,
   ideally without sudo. Homebrew and native installer packages are deferred.
-- Required developer platforms: Apple Silicon macOS and x86-64 Linux.
-  Add Intel Mac and ARM64 Linux only if building and verifying them takes little
-  extra work; otherwise omit them from advertised V1 support.
+- CLI release targets: Apple Silicon macOS and AMD64/ARM64 Linux. Advertise
+  ARM64 Linux only after publishing and verifying its new download. Intel Mac
+  remains deferred.
 - Support single-server Ubuntu deployments. Multi-developer permissions,
   clustering, high availability and separate per-site runtimes are deferred.
 - Add `flea update` for the local CLI and its bundled server executables.
@@ -380,7 +387,7 @@ Ask one question at a time; these need not delay independent work.
 ## Deferred beyond V1
 
 - Homebrew tap and native installer packages; their existing scaffolding can remain.
-- Intel Mac/ARM64 Linux support if verification is more than a small addition.
+- Intel Mac support.
 - Cropping/focal points, responsive derivatives, new image formats, video collection
   fields, transcoding/provider integrations and retention/pruning UI.
 - Per-edit history, general field schemas/forms and expanded rich-text features.
