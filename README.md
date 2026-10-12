@@ -249,6 +249,13 @@ transitions. The default font is Inter from Google Fonts, with warm off-white
 backgrounds and forest-green accents controlled by theme tokens. Replace
 `site/images/mark.svg` with your own logo.
 
+The documentation loads a local Prism.js 1.30.0 bundle from `site/js/prism.js`
+with core, markup, Bash and JSON components from the upstream `v1.30.0` tag.
+Its MIT license is kept in `site/js/prism.LICENSE.txt`. Label documentation code
+blocks with `language-markup`, `language-bash` or `language-json` on the `code`
+element. Token colors live in `site/css/docs-code.css`; inline code keeps the
+normal site styling. No frontend build step is needed.
+
 ### Icons
 
 Reference Lucide icons directly in HTML:

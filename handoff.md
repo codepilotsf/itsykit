@@ -1,6 +1,28 @@
 # fleacms.com website handoff
 
-## Current release: 0.10.0 published October 5, 2026
+## Current release: 0.11.0 published October 12, 2026
+
+Framework tag `v0.11.0` (`9759a51`). Website `26ed807`, activation
+`20261012-164409-6fcf3b6569f135a51848d882`; homepage/docs/latest.txt show 0.11.0.
+`flea new` creates a clean `Initial site` commit on main and prints remote
+connection/push commands. Downloads remain Mac ARM64 and Linux AMD64 only.
+
+Native Mac full tests, vet, race checks, bundled build and ad-hoc signature checks
+passed. Both Linux server bundles were rebuilt. Linux AMD64 was cross-compiled
+off production and smoke-tested there unprivileged. Public download hashes,
+fresh install, reinstall, update from 0.10.0 and already-current checks passed
+on both platforms, including default/starter initial commits, status and dev
+routes. Test dev processes are stopped. The tag pipeline is pending for absent
+native runners; native AMD64 build/full-suite, clean-Mac acceptance and
+notarization remain open.
+
+The shared server remains **0.9.0-rc.1 / protocol 23**. All six hosted sites are
+healthy, content/themes are preserved, recovery is clear and memory/swap policy
+is unchanged. No normal user CLI installation was replaced. Build copies are
+isolated from the unfinished framework and website edits. See RELEASES.md for
+hashes and full evidence.
+
+## Previous release: 0.10.0 published October 5, 2026
 
 Framework tag `v0.10.0` (`d6a7f7c`). Website `b95eabb` is deployed as
 `20261005-203837-d9261af00e49e2d96f2fd52f`; the homepage, docs and `latest.txt`
