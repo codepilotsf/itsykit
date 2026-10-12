@@ -83,8 +83,17 @@ flea status
 This validates the site without rewriting files. Review your changes, then commit
 the templates and extracted content together.
 
-New sites have a Git repository on `main`, unless created with `--skip-git` or
-without Git installed. Flea does not make an initial commit.
+New sites have an `Initial site` commit on `main`, unless created with
+`--skip-git`, without Git installed, or with a Git error reported during creation.
+Flea respects your Git identity, hooks and signing settings. To connect a blank
+remote project, run:
+
+```sh
+git remote add origin <repository-url>
+git push -u origin main
+```
+
+No remote is configured automatically. There is no existing `origin` to rename.
 
 ## Project structure
 

@@ -94,7 +94,9 @@ separate from the site/ template boundary: logical template names remain site-re
 while extraction journal edit paths begin with site/. No old-directory fallback or
 automatic migration. Protocol 23 prevents old servers receiving this structure.
 
-`flea new` initializes Git on main without staging files or creating a commit.
+`flea new` initializes Git on main and commits the generated files as
+`Initial site`, respecting normal identity, hooks and signing. Commit failure
+keeps the site with recovery instructions; no remote is configured automatically.
 Default creation is minimal: layout, navigation, index, styles/logo, error pages,
 admin/email support, guidance and blank configuration. `--starter`/`-s` selects
 the complete example site. Keep minimal overrides in templates/minimal/; they

@@ -718,8 +718,11 @@ flea rollback
   Native HTML popover navigation supplies the mobile menu without JavaScript.
   `flea reset` confirms before replacing local files/settings with the minimal
   site, retaining .git and a private sibling backup. It never changes remote sites.
-- Initializes Git on main without making a commit. --skip-git skips initialization;
-  missing Git does not prevent site creation. Includes a starter .gitignore.
+- Initializes Git on main and creates an `Initial site` commit using normal Git
+  identity, hooks and signing. `--skip-git` skips all Git operations. Missing Git
+  or a failed commit preserves the created site with instructions to finish setup.
+  Includes a starter .gitignore. No remote or hosted project is created; successful
+  commit output explains how to add origin and push main.
 - Creates default `.flea.config.json`, editable starter copy, a layout with inline
   header/footer, error pages, and a welcome page with its SVG mark. Navigation links
   Team and Contact; /test remains an unlinked example. Contact uses an introduction
