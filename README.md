@@ -251,8 +251,9 @@ backgrounds and forest-green accents controlled by theme tokens. Replace
 
 The documentation loads a local Prism.js 1.30.0 bundle from `site/js/prism.js`
 with core, markup, Bash and JSON components from the upstream `v1.30.0` tag.
+`site/js/prism-go.js` adds the C-like and Go components from the same tag.
 Its MIT license is kept in `site/js/prism.LICENSE.txt`. Label documentation code
-blocks with `language-markup`, `language-bash` or `language-json` on the `code`
+blocks with `language-markup`, `language-bash`, `language-json` or `language-go` on the `code`
 element. Token colors live in `site/css/docs-code.css`; inline code keeps the
 normal site styling. No frontend build step is needed.
 
