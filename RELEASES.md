@@ -12,10 +12,50 @@ HTTPS and verify their checksums before advancing `site/releases/latest.txt`.
 `site/install.sh` and `flea update` read that pointer. Test actual downloads,
 installation, reinstall and update before advertising the command.
 
-Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
-(`linux-amd64`). Do not list additional platforms without native checks.
+Supported downloads: Apple Silicon macOS (`darwin-arm64`), x86-64 Linux
+(`linux-amd64`) and ARM64 Linux (`linux-arm64`). Do not list additional platforms without native checks.
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
+
+## 0.12.0 published October 12, 2026
+
+First public Linux ARM64 CLI. Source/tag `a227ff4` / `v0.12.0`; Go 1.27.1,
+clean tagged builds (`vcs.modified=false`). Mac ARM64 and Linux ARM64 full tests,
+real-bundle race checks, vet and bundled builds passed natively. Linux AMD64 was
+cross-compiled off production and verified there as nobody; native AMD64
+build/full-suite acceptance remains open. CI pipeline 357 is pending absent
+native runners; final verification was manual. Mac signatures are ad-hoc,
+not notarized; clean-machine acceptance remains open.
+
+All three CLIs contain one canonical verified set of newly built Linux server
+executables and matching Contact children. The tag was synchronized before the
+final builds so Go version metadata agrees across build hosts. Server hashes:
+AMD64 `b7447fb1485b6a04d3805eb74402682ae4d44777060f249bd58583d3019c197f`,
+ARM64 `40a83e9b69f8106bcb00a1646147157f6d68f42878b515b7ebd310547a7fc59d`.
+Protocol 23 remains unchanged.
+
+The complete version directory was checksum-verified and installed under the
+deployment lock, validated before restarting the shared service, and verified
+through anonymous HTTPS downloads. Only then website `6ebdb00`, activation
+`20261012-174635-ec70336ae4e81090c4bc0c21`, advanced latest.txt and added ARM64
+download links. It preserves the committed docs syntax highlighting and ships
+the clearer missing-platform installer error. Old versions/hashes are immutable.
+
+Public fresh install/reinstall, installed hashes/version and already-current
+checks passed on all three native platforms. Mac/AMD64 updated from public
+0.11.0; ARM64 updated a local 0.11.0 fixture because no prior public ARM64
+binary exists. Published CLIs passed default/starter initial commits, status
+and dev homepage/team/contact checks. Test dev processes were stopped.
+
+All six hosted sites are healthy; content/theme hashes match before/after,
+recovery is clear and memory/swap policy unchanged. Shared server remains
+0.9.0-rc.1 / protocol 23, restarted only for catalogue/site publication. Normal
+user installations were not replaced. Private website backup and isolated build
+copies/artifact archives are retained outside website Git.
+
+- Mac ARM64: `e7d4858a5118ce141a27fce4a87cdf0418dffc06551977c48acce72be050dc41`
+- Linux AMD64: `12f5bc368f9611e070224368ce299c09eff3d8ddd36df1efd03c2fb6baf3fc5a`
+- Linux ARM64: `e623545617796816a055e81a43cf7aa401543bb2fc5d963791c4cd8448d4e9f5`
 
 ## 0.11.0 published October 12, 2026
 

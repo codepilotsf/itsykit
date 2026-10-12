@@ -22,7 +22,7 @@ flea dev
 ```
 
 Install the public test release with `curl -fsSL https://fleacms.com/install.sh | bash`.
-Downloads cover Apple Silicon macOS and x86-64 Linux. See
+Downloads cover Apple Silicon macOS and AMD64/ARM64 Linux. See
 https://fleacms.com/docs#installation for PATH setup and current testing limits.
 This generated folder already is a site, so you can skip directly to `flea dev`.
 `flea new` creates a clean layout and editable homepage. Use `flea new --starter

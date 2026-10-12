@@ -1,6 +1,28 @@
 # fleacms.com website handoff
 
-## Current release: 0.11.0 published October 12, 2026
+## Current release: 0.12.0 published October 12, 2026
+
+Source/tag `a227ff4` / `v0.12.0`, Go 1.27.1. First public Linux ARM64 CLI,
+alongside Mac ARM64 and Linux AMD64. Website `6ebdb00`, activation
+`20261012-174635-ec70336ae4e81090c4bc0c21`; homepage/docs/latest.txt show 0.12.0.
+Installer errors now identify missing versions/platforms; the same curl command
+works on aarch64. Docs highlighting is preserved.
+
+Native Mac/ARM64 Linux full tests, race checks, vet and builds passed. All CLIs
+bundle identical verified Linux server executables. Public installer/reinstaller,
+checksum/version, updater and already-current checks passed on all three native
+platforms, including default/starter initial commits, status and dev routes.
+ARM64 updated a local 0.11.0 fixture; Mac/AMD64 updated public 0.11.0. Native
+AMD64 build/full-suite, native CI runner setup (pipeline 357 pending), clean-Mac
+acceptance and notarization remain open. Test dev processes are stopped.
+
+Shared server remains **0.9.0-rc.1 / protocol 23**. Six sites are healthy, live
+content/themes are preserved, recovery clear and memory/swap policy unchanged.
+Normal user CLIs were not replaced. Old version URLs/hashes are unchanged.
+RELEASES.md records hashes and provenance; backups/build copies remain private
+outside website Git.
+
+## Previous release: 0.11.0 published October 12, 2026
 
 Framework tag `v0.11.0` (`9759a51`). Website `26ed807`, activation
 `20261012-164409-6fcf3b6569f135a51848d882`; homepage/docs/latest.txt show 0.11.0.
