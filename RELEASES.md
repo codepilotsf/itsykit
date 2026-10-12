@@ -17,6 +17,53 @@ Supported downloads: Apple Silicon macOS (`darwin-arm64`), x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.13.0 published October 12, 2026
+
+MR !4 is merged. Source/tag `bd668a1` / `v0.13.0`; Go 1.27.1, clean tagged
+builds (`vcs.modified=false`). `flea status` now shows local validation, site
+counts and Git state first, then automatically checks this branch's saved remote
+with terminal progress. Website reachability, deployed code, editable content and
+theme are separate. Scoped pull baselines establish change direction; status
+never pulls or changes deployment settings/baselines.
+
+Native ARM64 Linux and Mac full tests, real-bundle race checks, vet and bundled
+builds passed. Linux AMD64 was cross-compiled off production and smoke-tested
+natively as nobody, including the exact server's version/protocol. Native AMD64
+full-suite/build, clean-Mac acceptance and notarization remain open. Tag pipeline
+358 is pending without native runners; verification was manual. The Mac executable
+passed ad-hoc signature checks.
+
+Every final CLI was checked to contain both canonical Linux server executables
+and their matching checksums, comparing uncompressed bytes because gzip output
+varies by platform. Server hashes:
+AMD64 `02e55e82ee6f49d9a46e7f7454f4f6880dfc25b9ac253a21cf842323eba00b84`,
+ARM64 `15841a2c222d0ff65eb787e7bc028bf5c1938cf8f35a2b42338fe47fb039c84e`.
+Protocol 23 and Contact behavior are unchanged.
+
+The complete immutable store directory was checksum-checked under the deployment
+lock, validated and loaded by restarting the existing service. All anonymous HTTPS
+downloads matched before the public channel advanced; the old 0.12.0 manifest
+remained unchanged. Website `1f8d4bf`, activation
+`20261012-182752-488ee26bcaf1fb17ddf715ec`, then published latest.txt, the homepage,
+current download links and status documentation. No binaries entered website Git.
+
+Actual public install/reinstall, installed hashes/version, 0.12.0-to-0.13.0 update
+and already-current checks passed on all three native platforms. Published CLIs
+passed default/starter initial commits, status and dev routes. The exact final
+ARM64 CLI also passed an animated-terminal status check against the configured
+website, including local-first output, remote comparison and spinner cleanup.
+Test dev processes were stopped. Native password/sudo prompts on a live non-root
+remote target were not exercised.
+
+All hosted domains are healthy; content, theme and routing hashes match before/
+after. Recovery is clear and memory/swap policy unchanged. Shared server stays
+0.9.0-rc.1 / protocol 23; normal user installations were not changed. Backups,
+private build copies and retained artifacts are outside website Git.
+
+- Mac ARM64: `683be74c63f09a308bcfff4be11bb3a82cc5a08527611af7ce43bbd50b538052`
+- Linux AMD64: `34da6f5ad433adbe2e4b28ed45bd19fa18e7dd461816bc633ecf65a678cb2076`
+- Linux ARM64: `84be037ce925e6ff67640ab9abfcac2c7654097152340631ec396ccbb3b3be07`
+
 ## 0.12.0 published October 12, 2026
 
 First public Linux ARM64 CLI. Source/tag `a227ff4` / `v0.12.0`; Go 1.27.1,

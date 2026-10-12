@@ -1,6 +1,32 @@
 # fleacms.com website handoff
 
-## Current release: 0.12.0 published October 12, 2026
+## Current release: 0.13.0 published October 12, 2026
+
+MR !4 merged; framework source/tag `bd668a1` / `v0.13.0`, Go 1.27.1. Status now
+prints local information first, then automatically compares the current branch's
+configured deployment with terminal progress. Code, content and theme are distinct;
+change direction needs a scoped pull baseline. No remote flag or status mutation.
+
+Website `1f8d4bf`, activation `20261012-182752-488ee26bcaf1fb17ddf715ec`, publishes
+homepage/docs/latest.txt 0.13.0 after all three immutable HTTPS downloads were
+verified. Native Mac/ARM64 Linux full checks and all three platforms' public
+install/reinstall/update, initial-commit, status and dev checks passed. The final
+ARM64 CLI's animated remote status check passed. No test dev processes remain.
+
+Shared server remains **0.9.0-rc.1 / protocol 23**. All hosted domains are healthy,
+content/themes/routing hashes are preserved, recovery clear and memory/swap policy
+unchanged. Existing user CLIs and published old artifacts are unchanged. Native
+AMD64 full-suite/build, native CI runner setup (pipeline 358 pending), clean-Mac,
+notarization and live non-root password/sudo status verification remain open.
+
+Private records: framework worktree `/home/sean/Projects/flea-release-013`, Mac
+build `/Users/sean/flea-release-013.w6iFK0`, native AMD64 isolated checks
+`/var/tmp/flea-013-native.soNcFH1s`, artifact/download archive `/tmp/flea-013-public`.
+Website backup `/tmp/flea-013-website-before.flea-backup`; before/after state hashes
+`/tmp/flea-013-before-state.json` and `/tmp/flea-013-after-state.json`. RELEASES.md
+records final hashes and provenance. Keep private source/backups outside site/.
+
+## Previous release: 0.12.0 published October 12, 2026
 
 Source/tag `a227ff4` / `v0.12.0`, Go 1.27.1. First public Linux ARM64 CLI,
 alongside Mac ARM64 and Linux AMD64. Website `6ebdb00`, activation
