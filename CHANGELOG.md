@@ -4,6 +4,13 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## Unreleased
+
+- `flea new` now creates an `Initial site` commit on main and prints commands
+  to connect and push to a remote repository. Git identity, hooks and signing
+  settings are respected; failed commits preserve the site with retry instructions.
+  `--skip-git` still skips Git setup. No remote or hosted project is created.
+
 ## 0.10.0 - 2026-10-05
 
 - Rename `flea server sites` to `flea server list` without an alias. `flea server

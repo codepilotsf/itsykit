@@ -121,9 +121,9 @@ The preview server is local to your machine. Use `-port 0` to choose an availabl
 port automatically. `status` works offline; missing icons produce warnings while
 otherwise valid sites still pass.
 
-`flea new my-site` creates a Git repository on `main`, ready for your first
-commit. Use `flea new my-site --skip-git` if the site belongs in an existing
-repository. Git isn't required for local previews, but it is required to deploy.
+`flea new my-site` creates a Git repository on `main` with an `Initial site`
+commit, ready to push. Use `flea new my-site --skip-git` if the site belongs in
+an existing repository. Git isn't required for local previews, but it is required to deploy.
 
 Start with [project structure](#project-structure) and [templates](#templates)
 below. When you're ready to publish, see [deploy a site](#deploy-a-site) and
@@ -1408,12 +1408,24 @@ Contributors need Go, Bash, gzip and shasum; installed users do not need them.
 
 `new` accepts a simple name containing letters, digits, underscores, and hyphens, starting with a letter or digit. It refuses existing destinations, including empty directories and symlinks. An interrupted creation may leave a partial new directory for inspection. `status` validates configuration, routes, templates, and current content without listening on a port. Exit codes are 0 for success, 1 for project or runtime failures, and 2 for invalid CLI usage.
 
-`flea new my-site` also initializes Git on `main`, without staging or committing
-anything. The starter includes a `.gitignore` for macOS metadata, temporary editor
-files, and local environment secrets. To use a parent repository instead, run
+`flea new my-site` also initializes Git on `main`, stages the generated files
+and creates an `Initial site` commit using your normal Git identity, hooks and
+signing settings. If the commit fails, the site remains usable and Flea prints
+the Git diagnostic and commands to retry. The starter includes a `.gitignore`
+for macOS metadata, temporary editor files, and local environment secrets. To use a parent repository instead, run
 `flea new my-site --skip-git` (the flag also works before the name).
 If Git is not installed, the site is still created with instructions for setting
 up Git before deployment.
+
+To connect a blank GitLab or other remote project, run inside the new site:
+
+```sh
+git remote add origin <repository-url>
+git push -u origin main
+```
+
+No remote is configured automatically. A new site has no existing `origin` to
+rename and no tags to push.
 
 ## Checks
 
