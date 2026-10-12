@@ -17,6 +17,44 @@ Required platforms: Apple Silicon macOS (`darwin-arm64`) and x86-64 Linux
 The Mac executable is ad-hoc signed, not notarized. This is an early test release;
 clean-machine testing remains pending.
 
+## 0.11.0 published October 12, 2026
+
+Framework `9759a51`, tag `v0.11.0`, built with Go 1.27.1 from a clean snapshot
+on Mac ARM64 (`vcs.modified=false`). Adds an `Initial site` commit for `flea new`
+and prints remote connection/push commands. Git identity, hooks and signing are
+respected; failed commits preserve the site. Linux ARM64 CLI support is excluded.
+Both Linux server architectures and their matching Contact children were rebuilt
+and bundled. Protocol 23 and the Contact behavior are unchanged.
+
+Native Mac full tests, vet, race checks with real bundles, bundled build and
+ad-hoc signature verification passed. Linux AMD64 was cross-compiled off the
+production host and verified there as nobody. It was not built or fully tested
+on a native AMD64 runner. The tag pipeline remains pending for missing native
+runner tags; release verification was performed manually. Clean-machine Mac
+acceptance and notarization remain open.
+
+The new immutable store directory was uploaded beside the store, checksum-checked,
+installed under the deployment lock and validated before restarting the service.
+The immediate readiness check raced startup; a subsequent check and all public
+site checks passed without rollback. The public channel stayed at 0.10.0 until
+anonymous HTTPS downloads matched both new hashes and the old manifest remained
+available. Website `26ed807`, activation
+`20261012-164409-6fcf3b6569f135a51848d882`, then advanced homepage/docs/latest.txt.
+The installer is unchanged.
+
+Public fresh install, reinstall, 0.10.0-to-0.11.0 update and already-current checks
+passed natively on Mac ARM64 and unprivileged Linux AMD64. Installed hashes matched
+below. Default/starter creation produced clean initial commits on main; status
+and dev homepage/team/contact checks passed. Test dev processes were stopped.
+All six active sites are healthy and content/theme hashes matched before/after.
+No recovery journals remain; existing memory/swap policy is unchanged. Shared
+server stays 0.9.0-rc.1 / protocol 23; it was restarted but not upgraded. Normal
+user installations were not changed. Website backup is retained privately outside
+this repository. Build/artifact records are retained in isolated release paths.
+
+- Mac ARM64: `b4290260582449a599d429eada9fdbd98780588ee6572cbd6a7a09cc0bf66015`
+- Linux AMD64: `e3c2303d9eec074a8029f49b39927776617a9e2141ead43284eed363871ffbbf`
+
 ## 0.10.0 published October 5, 2026
 
 Framework tag `v0.10.0` (`d6a7f7c`), built with Go 1.27.1 on Mac ARM64 from the
