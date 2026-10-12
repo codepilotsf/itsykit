@@ -1,0 +1,46 @@
+/* Prism token colors; keep block layout and inline code in the site styles. */
+@layer styles {
+  .docs-content pre > code {
+    font-size: inherit;
+    color: var(--black);
+    white-space: inherit;
+    overflow-wrap: normal;
+    tab-size: 2;
+  }
+
+  .docs-content pre .token.comment,
+  .docs-content pre .token.prolog,
+  .docs-content pre .token.doctype,
+  .docs-content pre .token.cdata {
+    color: #536258;
+  }
+
+  .docs-content pre .token.punctuation {
+    color: #536258;
+  }
+
+  .docs-content pre .token.tag,
+  .docs-content pre .token.keyword,
+  .docs-content pre .token.boolean,
+  .docs-content pre .token.property {
+    color: #176b36;
+  }
+
+  .docs-content pre .token.attr-name,
+  .docs-content pre .token.function,
+  .docs-content pre .token.builtin,
+  .docs-content pre .token.number {
+    color: #795018;
+  }
+
+  .docs-content pre .token.string,
+  .docs-content pre .token.attr-value {
+    color: #104c28;
+  }
+
+  .docs-content pre .token.operator,
+  .docs-content pre .token.variable,
+  .docs-content pre .token.entity {
+    color: #4c5686;
+  }
+}
