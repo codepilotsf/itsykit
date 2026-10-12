@@ -41,7 +41,7 @@ flea_install() (
   fetch --max-filesize 8192 --output "$stage/SHA256SUMS" "$base/$version/SHA256SUMS" || fail 'Could not retrieve release checksums.'
   [[ $(wc -c < "$stage/SHA256SUMS") -le 8192 ]] || fail 'Release checksum list is too large.'
   expected=$(awk -v name="$file" '$2 == name && NF == 2 {print $1}' "$stage/SHA256SUMS")
-  [[ "$expected" =~ ^[0-9a-f]{64}$ ]] || fail "FleaCMS $version has no verified download for $system/$arch. See https://fleacms.com/docs for available platforms."
+  [[ "$expected" =~ ^[0-9a-f]{64}$ ]] || fail 'This release does not include a verified download for your platform.'
   printf 'Downloading FleaCMS %s…\n' "$version"
   fetch --max-filesize 134217728 --output "$stage/flea" "$base/$version/$file" || fail 'Download failed. Your existing CLI was not changed.'
   [[ $(wc -c < "$stage/flea") -le 134217728 ]] || fail 'Download is too large.'

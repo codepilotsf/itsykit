@@ -9,23 +9,6 @@ Start with `flea new breakfast-qa`, enter that folder, and run `flea dev`.
 These are manual acceptance checks, not a claim that live delivery, deployment,
 or every browser has already been tested.
 
-## Linux ARM64 installer verification, October 12, 2026
-
-Native Linux ARM64 checks passed: full Go tests, vet, bundled build and the full
-race suite with real Contact/server bundles required. The real ARM64 CLI passed
-installer install/reinstall through local download fixtures, hash verification,
-fresh clean-site creation, starter asset comparison and `flea status`. Installer
-regressions cover Mac ARM64, Linux AMD64/ARM64, checksum failure and a missing
-ARM64 manifest entry. Release-staging regressions check all three hashes and
-reject missing ARM64 artifacts and replacement of an existing staged release.
-
-This host lacks shasum; local build/staging checks used a temporary shasum command
-adapter to the system sha256sum. Release runners still require real shasum as
-documented. No public ARM64 download was published or tested; live 0.10.0 still
-omits it. The only attached GitLab runner inspected has the hatchbox tag, not
-the native release tags. Native tagged runners must be configured before using
-the release pipeline. Existing manual answers below remain unchanged.
-
 ## Automated retest, September 28, 2026
 
 Original manual answers below are preserved. Diagnostic regression tests verify

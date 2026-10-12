@@ -60,7 +60,7 @@ rollback control the public update pointer. Published old binaries remain availa
    service health and all hosted sites. If restart fails, keep the old channel and
    restore the reviewed host configuration; retain all versioned bytes for recovery.
 6. Only then deploy the small website change advancing latest.txt and its download
-   links. Run fresh install/update checks on every advertised native platform.
+   links. Run fresh install/update checks on both advertised native platforms.
 
 On this host, use the existing 320 MiB Go target for both service and admin
 processes and verify swap. Separating downloads reduces asset RAM and upload size;

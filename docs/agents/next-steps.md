@@ -6,13 +6,6 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
-## Pending Linux ARM64 release
-
-- Native Linux ARM64 CLI jobs and public staging now accompany Mac ARM64 and
-  Linux AMD64. Publish a new immutable release after all three native jobs pass,
-  then verify public ARM64 Linux install/reinstall/update. The live 0.10.0
-  checksum list has no ARM64 Linux CLI; changing CI does not change that release.
-
 ## Current release status (October 5, 2026)
 
 - Version 0.10.0 is published. Framework `d6a7f7c`, tag `v0.10.0`; website

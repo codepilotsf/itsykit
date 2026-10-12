@@ -41,12 +41,8 @@ The installer detects macOS/Linux and processor, downloads over HTTPS, checks
 SHA-256 and executable version, and installs without sudo to `~/.local/bin/flea`.
 If needed it prints a PATH export to add to your shell profile; it never edits
 the profile. `FLEA_INSTALL_DIR` may specify another absolute user-owned directory.
-Release jobs now build and test Apple Silicon macOS and both x86-64 and ARM64
-Linux natively. Public staging requires all three CLIs and includes their hashes.
-The published 0.10.0 release has no Linux ARM64 CLI, so an ARM64 Linux install
-still fails until a newly verified release is published. Missing-download errors
-identify the selected release and platform. Other platforms must pass native
-verification before being included in published metadata.
+Required V1 platforms are Apple Silicon macOS and x86-64 Linux. Other platforms
+must pass native verification before being included in published metadata.
 
 The 0.8.0 public installer passed fresh installation and updates from 0.7.1 on
 an existing Mac and Ubuntu host, with installed checksums matching the published

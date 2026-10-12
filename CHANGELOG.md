@@ -6,9 +6,6 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
-- Include the Linux ARM64 CLI in native release testing and public staging,
-  alongside Linux AMD64 and Apple Silicon macOS. Installer errors now identify
-  the release and platform when its verified download is missing.
 - `flea new` now creates an `Initial site` commit on main and prints commands
   to connect and push to a remote repository. Git identity, hooks and signing
   settings are respected; failed commits preserve the site with retry instructions.
