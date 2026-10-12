@@ -86,8 +86,9 @@ dev server through private local control; never interrupt pull/reset or bypass
 the development lock. See the runtime guide.
 `--lan`/`-l` explicitly enables full trusted-network development over HTTP;
 preserve the shared Host/peer gate and ordinary auth/CSRF.
-`flea new` defaults to a clean layout/index. `--starter`/`-s` adds demo pages and a
-six-person fictional team. `flea reset` confirms before resetting all local files
+`flea new` creates an initial Git commit on main unless `--skip-git` is used;
+see the runtime guide for failure recovery and remote setup. It defaults to a
+clean layout/index. `--starter`/`-s` adds demo pages and a six-person fictional team. `flea reset` confirms before resetting all local files
 except `.git`, with a private sibling recovery copy; it never deploys.
 Starter navigation links Team and Contact, with editable page copy and footer.
 Keep form controls developer-managed; see the templates guide for starter scope.

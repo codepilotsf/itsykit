@@ -385,7 +385,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			case "--skip-git", "-skip-git":
 				skipGit = true
 			case "-h", "--help":
-				fmt.Fprintln(out, "Usage: flea new [--starter|-s] <site-name> [--skip-git]\n\nCreates a clean site and starts a Git repository on main.\nUse --starter or -s for example pages and team content.\nUse --skip-git to leave Git setup to you.")
+				fmt.Fprintln(out, "Usage: flea new [--starter|-s] <site-name> [--skip-git]\n\nCreates a clean site with an initial Git commit on main.\nUse --starter or -s for example pages and team content.\nUse --skip-git to leave Git setup to you.")
 				fmt.Fprintln(out)
 				return 0
 			default:
@@ -406,19 +406,35 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			if err != nil {
 				fmt.Fprintln(out, "\nGit isn't installed. You can develop your site now.\nInstall Git before deploying, then run git init -b main in your site folder.")
 			} else {
-				cmd := exec.CommandContext(ctx, gitPath, "init", "--quiet", "-b", "main")
-				cmd.Dir = name
-				// Do not let inherited Git location overrides initialize another repo.
-				for _, entry := range os.Environ() {
-					key, _, _ := strings.Cut(entry, "=")
-					if key != "GIT_DIR" && key != "GIT_WORK_TREE" && key != "GIT_COMMON_DIR" && key != "GIT_INDEX_FILE" {
-						cmd.Env = append(cmd.Env, entry)
+				runGit := func(args ...string) ([]byte, error) {
+					cmd := exec.CommandContext(ctx, gitPath, args...)
+					cmd.Dir = name
+					cmd.Stdin = os.Stdin
+					// Do not let inherited Git location overrides touch another repo.
+					for _, entry := range os.Environ() {
+						key, _, _ := strings.Cut(entry, "=")
+						if key != "GIT_DIR" && key != "GIT_WORK_TREE" && key != "GIT_COMMON_DIR" && key != "GIT_INDEX_FILE" {
+							cmd.Env = append(cmd.Env, entry)
+						}
 					}
+					return cmd.CombinedOutput()
 				}
-				if err := cmd.Run(); err != nil {
+				if _, err := runGit("init", "--quiet", "-b", "main"); err != nil {
 					return fail(fmt.Errorf("Your site was created, but Git setup failed.\n\nOpen the %s folder and run:\n  git init -b main", name))
 				}
-				fmt.Fprintln(out, "\nGit is ready on the main branch. No commit has been made yet.")
+				gitOutput, gitErr := runGit("add", "--", ".")
+				if gitErr == nil {
+					gitOutput, gitErr = runGit("commit", "--quiet", "-m", "Initial site")
+				}
+				if gitErr != nil {
+					fmt.Fprintln(out, "\nYour site is ready, but its initial Git commit could not be created.")
+					if detail := strings.TrimSpace(string(gitOutput)); detail != "" {
+						fmt.Fprintln(out, "\n"+detail)
+					}
+					fmt.Fprintf(out, "\nResolve the Git issue above, then run inside %s:\n  git add .\n  git commit -m \"Initial site\"\n", name)
+				} else {
+					fmt.Fprintln(out, "\nGit is ready on main with an initial commit.\nTo connect a remote repository, run inside your site:\n  git remote add origin <repository-url>\n  git push -u origin main")
+				}
 			}
 		}
 		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\n", name)
