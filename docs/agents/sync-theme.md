@@ -24,7 +24,7 @@ rollback restores the selected release's CSS while keeping current live snips.
 Content saves retain the immutable source CSS, and EditingVersion includes it.
 The removed `--with-theme`, `--theme-only` and `--snips-only` flags have no aliases.
 
-Protocol 24 rejects removed theme host config and sync-plan fields. Before a live
+Protocol 25 rejects removed theme host config and sync-plan fields. Before a live
 upgrade, back up remote customizations using the previous runtime and explicitly
 capture needed styles in Git. Host configuration/toolbar updates require reviewed
 maintenance; there is no automatic migration, reset or deletion of retained themes.
@@ -46,3 +46,10 @@ Content differences count active snip values, metadata fields, collections and
 media-library entries; ignore developer labels, ownership and retained archives.
 Status reads baselines without creating directories and never saves them, pulls,
 resolves conflicts or publishes. Matching values need no baseline.
+
+## Blog
+
+Read [Blog](../blog.md) for the optional built-in blog, JSON and template contract.
+Posts share the snip/media snapshot, atomic save and preservation/synchronization
+paths. Drafts remain outside public routes and template data. The blog admin uses
+existing login, exact Origin, CSRF, upload bounds and content-version checks.

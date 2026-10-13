@@ -328,6 +328,9 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 	if err = p.validateApps(); err != nil {
 		return nil, err
 	}
+	if err = p.loadBlog(); err != nil {
+		return nil, err
+	}
 	for route, t := range p.Pages {
 		if _, err = p.render(t, route); err != nil {
 			return nil, fmt.Errorf("%s: %w", routes[route], err)
@@ -379,7 +382,7 @@ func (p *Project) buildTemplate(file string, layout bool) (*template.Template, e
 	if err := checkCSRFContexts(source); err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
 	}
-	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"csrfField": csrfField, "snipField": p.snipField, "multiPhoto": multiPhoto, "multiRows": p.multiRows, "multiValue": multiValue, "multiBoundary": multiBoundary, "multiItemBoundary": multiItemBoundary, "lookup": lookup, "collection": collection, "richFlea": func(id string, owner bool) template.HTML {
+	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"csrfField": csrfField, "blogBody": blogBody, "snipField": p.snipField, "multiPhoto": multiPhoto, "multiRows": p.multiRows, "multiValue": multiValue, "multiBoundary": multiBoundary, "multiItemBoundary": multiItemBoundary, "lookup": lookup, "collection": collection, "richFlea": func(id string, owner bool) template.HTML {
 		if owner {
 			return template.HTML("<!--snip-start:"+id+"-->") + p.rich[id] + template.HTML("<!--snip-end:"+id+"-->")
 		}
@@ -423,11 +426,18 @@ func (p *Project) renderRequest(t *template.Template, route string, admin map[st
 		snips[k] = v
 	}
 	description := ""
+	blog := p.blogData(route)
+	if current, ok := blog["post"].(map[string]any); ok {
+		title = current["title"].(string)
+		description = current["excerpt"].(string)
+	}
 	if page := p.Content.Pages[route]; page != nil {
 		if page.Title != "" {
 			title = page.Title
 		}
-		description = page.Description
+		if page.Description != "" {
+			description = page.Description
+		}
 	}
 	app := make(map[string]any, len(p.App)+1)
 	for key, value := range p.App {
@@ -435,7 +445,14 @@ func (p *Project) renderRequest(t *template.Template, route string, admin map[st
 	}
 	app["current_admin"] = nil
 	if owner && admin != nil {
-		app["current_admin"] = admin
+		copy := map[string]any{}
+		for k, v := range admin {
+			copy[k] = v
+		}
+		if _, enabled := p.Apps["blog"]; enabled {
+			copy["blog_enabled"] = true
+		}
+		app["current_admin"] = copy
 	}
 	data := map[string]any{"app": app, "page": map[string]any{"title": title, "description": description, "path": route}, "snip": snips, "data": snips}
 	photos := map[string]any{}
@@ -443,6 +460,7 @@ func (p *Project) renderRequest(t *template.Template, route string, admin map[st
 		photos[id] = map[string]any{"src": "/media/" + photo.File, "alt": photo.Alt, "width": photo.Width, "height": photo.Height, "name": photo.Name}
 	}
 	data["media"] = photos
+	data["blog"] = map[string]any{"data": blog}
 	videos := map[string]any{}
 	for id, v := range p.Content.Videos {
 		poster := ""
@@ -460,6 +478,11 @@ func (p *Project) renderRequest(t *template.Template, route string, admin map[st
 			return nil, fmt.Errorf("app name conflicts with a template namespace")
 		}
 		data[inputs.appName] = inputs.appData
+		var out appRenderBuffer
+		err := t.Execute(&out, data)
+		return out.Bytes(), err
+	}
+	if cfg, ok := p.Apps["blog"]; ok && (route == cfg.Mount || strings.HasPrefix(route, cfg.Mount+"/")) {
 		var out appRenderBuffer
 		err := t.Execute(&out, data)
 		return out.Bytes(), err

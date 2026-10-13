@@ -62,6 +62,9 @@ func contentValues(s *snips.Store) map[string]string {
 		return values
 	}
 	put := func(key string, value any) { data, _ := json.Marshal(value); values[key] = string(data) }
+	for _, p := range s.Blog {
+		put("blog:"+p.ID, p)
+	}
 	entries, _ := s.Index()
 	for id, e := range entries {
 		e.Label = ""

@@ -12,13 +12,13 @@ Before updating older site sources, remove their obsolete Theme toolbar button
 while preserving custom layouts. Existing hosted toolbar partials have not been
 rewritten by the shared executable rollout. Preview noindex and Hub branch
 workflow verification are separate planned tasks. Public 0.14.0 binary publishing,
-native Mac/AMD64 release checks and source integration remain separate work.
+native Mac/AMD64 release checks remain separate work.
 
 ## Current release status (October 13, 2026)
 
 - Private shared-server rollout 0.14.0 / protocol 24 completed October 13 from
   framework `beb87ab`; the local Linux ARM64 CLI is also 0.14.0. The source branch
-  is pushed and draft MR 5 remains unmerged. Public downloads/channel stay 0.13.0;
+  is integrated into main through MR 5. Public downloads/channel stay 0.13.0;
   no release tag or artifacts were published. The owner approved one-time removal
   of 11 obsolete theme mappings across seven sites after verifying every saved
   theme matched source CSS. Root-only backups retain the original config,
@@ -436,3 +436,12 @@ Ask one question at a time; these need not delay independent work.
 
 Maintain this as the remaining work plan. Remove completed task detail as it moves
 to the changelog; retain acceptance evidence in the checklist or linked QA records.
+
+## Blog task
+
+Minimal Blog implementation is on `feat/minimal-blog` in its isolated worktree.
+Local implementation and checks are complete; see
+[Blog verification](blog-verification.md). The 0.15.0 commit, push and private server rollout are authorized; results will be
+recorded after verification. Live rollout, native
+Mac/AMD64 acceptance and public release are separate work. Optional Blog source
+adoption must preserve each site's custom layouts.

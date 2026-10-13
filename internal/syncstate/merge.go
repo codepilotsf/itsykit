@@ -132,6 +132,52 @@ func MergeSnips(base, local, remote *snips.Store, resolve Resolve) (*snips.Store
 			out.Media[id] = p
 		}
 	}
+	// Posts conflict as whole records; omitted IDs never delete live posts.
+	postMap := func(s *snips.Store) map[string]snips.BlogPost {
+		m := map[string]snips.BlogPost{}
+		for _, p := range s.Blog {
+			m[p.ID] = p
+		}
+		return m
+	}
+	bp, lp, rp := postMap(base), postMap(local), postMap(remote)
+	ids := make([]string, 0, len(lp))
+	for id := range lp {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+	for _, id := range ids {
+		encode := func(m map[string]snips.BlogPost) string {
+			p, ok := m[id]
+			if !ok {
+				return "null"
+			}
+			b, _ := json.Marshal(p)
+			return string(b)
+		}
+		v, e := choose("blog post "+id, encode(bp), encode(lp), encode(rp), resolve)
+		if e != nil {
+			return nil, e
+		}
+		if v != "null" {
+			var p snips.BlogPost
+			if e = json.Unmarshal([]byte(v), &p); e != nil {
+				return nil, e
+			}
+			rp[id] = p
+		}
+	}
+	out.Blog = nil
+	for _, p := range remote.Blog {
+		out.Blog = append(out.Blog, rp[p.ID])
+		delete(rp, p.ID)
+	}
+	for _, id := range ids {
+		if p, ok := rp[id]; ok {
+			out.Blog = append(out.Blog, p)
+			delete(rp, id)
+		}
+	}
 	index := func(s *snips.Store) (map[string]snips.Entry, error) {
 		m, e := s.Index()
 		if e != nil {
@@ -252,6 +298,9 @@ func MergeSnips(base, local, remote *snips.Store, resolve Resolve) (*snips.Store
 		if err != nil {
 			return nil, err
 		}
+	}
+	if err := out.ValidateBlog(); err != nil {
+		return nil, err
 	}
 	return out, nil
 }

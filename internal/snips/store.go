@@ -30,6 +30,7 @@ type MultiItem struct {
 	Fields map[string]string `json:"fields"`
 }
 type Store struct {
+	Blog    []BlogPost             `json:"blog,omitempty"`
 	Videos  map[string]video.Video `json:"videos,omitempty"`
 	Media   map[string]media.Photo `json:"media,omitempty"`
 	Pages   map[string]*Page       `json:"pages"`
@@ -117,6 +118,9 @@ func uniqueKeys(d *json.Decoder) error {
 	return err
 }
 func (s *Store) Index() (map[string]Entry, error) {
+	if err := s.ValidateBlog(); err != nil {
+		return nil, err
+	}
 	if len(s.ImageAssets()) > media.MaxPhotos || len(s.VideoAssets()) > video.MaxVideos {
 		return nil, fmt.Errorf("media snip limits exceeded")
 	}
@@ -207,6 +211,7 @@ func Merge(seed, remote *Store, refs map[string]string) (*Store, error) {
 		return nil, err
 	}
 	out := NewStore()
+	out.Blog = PreserveBlog(seed.Blog, remote.Blog)
 	out.Videos = map[string]video.Video{}
 	for id, v := range seed.Videos {
 		out.Videos[id] = v
@@ -266,6 +271,9 @@ func Merge(seed, remote *Store, refs map[string]string) (*Store, error) {
 		}
 		out.Page(route).Snips[id] = e
 		delete(out.Archive, id)
+	}
+	if err := out.ValidateBlog(); err != nil {
+		return nil, err
 	}
 	return out, nil
 }

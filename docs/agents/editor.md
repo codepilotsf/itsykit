@@ -246,3 +246,10 @@ relative paths. The new-tab option defaults off and stores only _blank with
 noopener noreferrer. The production sanitizer permits this exact new-tab policy.
 Reusable CSS-only switch visuals belong in templates/site/css/ui.css, targeting native
 checkboxes with role="switch"; preserve keyboard, focus and reduced-motion behavior.
+
+## Blog
+
+Read [Blog](../blog.md) for the optional built-in blog, JSON and template contract.
+Posts share the snip/media snapshot, atomic save and preservation/synchronization
+paths. Drafts remain outside public routes and template data. The blog admin uses
+existing login, exact Origin, CSRF, upload bounds and content-version checks.

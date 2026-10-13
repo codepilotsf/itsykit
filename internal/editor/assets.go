@@ -16,6 +16,9 @@ import (
 	"flea/templates"
 )
 
+//go:embed inline/blog.js
+var blogJS []byte
+
 //go:embed inline/owner.css
 var editorCSS []byte
 
@@ -73,7 +76,12 @@ var editorAssets = func() map[string][]byte {
 	}
 	js = append(js, []byte(`
 })().catch(error=>{const host=document.getElementById('flea-owner-root');if(host){const status=host.shadowRoot?.querySelector('#status')||host;status.textContent=error.message;status.setAttribute('role','alert');}console.error(error);});`)...)
-	return map[string][]byte{"editor.js": js, "editor.css": css, "toolbar.html": []byte(inlineUI + collectionIconTemplates())}
+	blog := append([]byte(nil), inlinePurify...)
+	blog = append(blog, '\n', ';', '\n')
+	blog = append(blog, inlineSquire...)
+	blog = append(blog, '\n', ';', '\n')
+	blog = append(blog, blogJS...)
+	return map[string][]byte{"blog.js": blog, "editor.js": js, "editor.css": css, "toolbar.html": []byte(inlineUI + collectionIconTemplates())}
 }()
 
 func serveEditorAsset(w http.ResponseWriter, r *http.Request) bool {

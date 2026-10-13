@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/admin/assets/editor.css" />
     <section inert aria-label="Site administration">
       <nav><label class="switch editing-switch"><input id="edit" type="checkbox" role="switch" checked>Edit</label><span id="status" role="status"></span><span id="identity">{app.current_admin.email}</span>
+        {#if app.current_admin.blog_enabled}<a href="/admin/blog">Blog posts</a>{/if}
         <button id="logout">Sign out</button></nav>
       <div class="edit-row"><nav id="format" aria-label="Text formatting">
         <button id="details" disabled>Page details</button>

@@ -885,3 +885,12 @@ FleaCMS is meaningfully usable when a developer can:
 11. Receive a valid automatically managed HTTPS certificate.
 12. Deploy a second release and roll back safely.
 13. Host more than one domain/site from the same FleaCMS server.
+
+## Blog (implemented)
+
+Optional `apps.blog` enables a mounted listing and published post routes plus
+private post-list/edit admin screens. Posts live in `flea/snips.json` with title,
+slug, excerpt, sanitized rich body, status, publication date and optional library
+cover. Drafts require explicit Publish; published saves update immediately.
+See [Blog](../blog.md) for the supported format, tokens, limits and sync behavior.
+Comments, taxonomy, search, scheduling and revision history remain deferred.

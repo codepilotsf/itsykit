@@ -108,6 +108,23 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 		}
 		files["site/admin/"+name+".html"] = string(data)
 	}
+	// Keep reload tests offline: their toolbar references the canonical icon cache.
+	// Missing icons would let LoadEditing perform network I/O under the content lock.
+	icons, err := templates.Files.ReadDir("flea/icons")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, icon := range icons {
+		if icon.IsDir() {
+			continue
+		}
+		name := "flea/icons/" + icon.Name()
+		body, err := templates.Files.ReadFile(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		files[name] = string(body)
+	}
 	for name, body := range files {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {

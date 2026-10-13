@@ -236,3 +236,10 @@ the target release's CSS while retaining current snips; backup/restore includes
 CSS as source. Servers with a removed `themes` mapping must be reviewed before
 upgrade: preserve remote customizations explicitly in Git using the old runtime
 first. No migration, compatibility mapping or automatic theme deletion is added.
+
+## Blog
+
+Read [Blog](../blog.md) for the optional built-in blog, JSON and template contract.
+Posts share the snip/media snapshot, atomic save and preservation/synchronization
+paths. Drafts remain outside public routes and template data. The blog admin uses
+existing login, exact Origin, CSRF, upload bounds and content-version checks.

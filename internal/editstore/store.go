@@ -93,7 +93,7 @@ func (s *Store) Read() (editor.Document, error) {
 	if err != nil {
 		return editor.Document{}, err
 	}
-	return editor.Document{Store: p.Content, Routes: p.Routes(), Version: p.EditingVersion()}, nil
+	return editor.Document{BlogMount: p.Apps["blog"].Mount, Store: p.Content, Routes: p.Routes(), Version: p.EditingVersion()}, nil
 }
 func (s *Store) Save(u editor.Update) error {
 	unlock, err := s.lock()
@@ -111,7 +111,11 @@ func (s *Store) Save(u editor.Update) error {
 	if u.Version == "" || u.Version != p.EditingVersion() {
 		return fmt.Errorf("content changed since opening this form")
 	}
-	if u.Page != nil {
+	if u.Blog != nil {
+		if err := s.applyBlog(p, *u.Blog); err != nil {
+			return err
+		}
+	} else if u.Page != nil {
 		if err := s.applyMedia(p, *u.Page); err != nil {
 			return err
 		}
@@ -172,6 +176,17 @@ func (s *Store) Save(u editor.Update) error {
 		return err
 	}
 	s.Publish(next)
+	if u.Blog != nil && u.BlogResult != nil {
+		for _, post := range next.Content.Blog {
+			if post.ID == u.Blog.Post.ID {
+				*u.BlogResult = editor.BlogResult{Version: next.EditingVersion(), Post: post}
+				if photo, ok := next.Content.Media[post.Cover]; ok {
+					u.BlogResult.Cover = &photo
+				}
+				break
+			}
+		}
+	}
 	if u.Page != nil && u.Result != nil {
 		page := next.Content.Page(u.Page.Route)
 		result := editor.PageResult{Page: editor.PageEdit{Version: next.EditingVersion(), Route: u.Page.Route, Title: page.Title, Description: page.Description, Changes: []editor.ContentEdit{}, Multisnips: map[string][]snips.MultiItem{}}, Media: map[string]snips.Entry{}}

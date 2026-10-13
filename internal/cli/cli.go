@@ -580,7 +580,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				logger.Print("Admin sign-in needs email setup. Run flea email.")
 			}
 		}
-		if len(p.Apps) > 0 && sender == nil {
+		if _, contactEnabled := p.Apps["contact"]; contactEnabled && sender == nil {
 			logger.Print("Contact forms need email setup. Run flea email, then restart dev.")
 		}
 		if preview != nil {

@@ -16,7 +16,7 @@ const csrfAction = `[[NW csrfField $ NW]]`
 // Check the expanded source, including partials, before handing it to Go's
 // contextual escaper. Returning trusted markup is allowed only as HTML content.
 func checkCSRFContexts(source string) error {
-	if !strings.Contains(source, csrfAction) {
+	if !strings.Contains(source, csrfAction) && !strings.Contains(source, blogBodyAction) {
 		return nil
 	}
 	z := html.NewTokenizer(strings.NewReader(source))
@@ -24,8 +24,8 @@ func checkCSRFContexts(source string) error {
 	for {
 		kind := z.Next()
 		raw := string(z.Raw())
-		if strings.Contains(raw, csrfAction) && (kind != html.TextToken || len(blocked) != 0) {
-			return fmt.Errorf("{csrf} requires ordinary HTML element content, not an attribute or raw-text context")
+		if (strings.Contains(raw, csrfAction) || strings.Contains(raw, blogBodyAction)) && (kind != html.TextToken || len(blocked) != 0) {
+			return fmt.Errorf("rich blog body and {csrf} require ordinary HTML element content, not an attribute or raw-text context")
 		}
 		switch kind {
 		case html.ErrorToken:

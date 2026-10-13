@@ -13,17 +13,17 @@ Template names and public URLs stay relative to site/, not the project root.
 Extraction journals use physical site/ paths. All *.layout.html files are private.
 Root `.flea.config.json` is the only admitted dotfile. Deployment destinations
 are nested in deploy.branches; archive packing removes deploy while retaining
-runtime settings. Configuration reads stay bounded and confined. Protocol 24
+runtime settings. Configuration reads stay bounded and confined. Protocol 25
 requires this structure, with no alternate old-layout loader.
 
 Mail templates are private runtime files in `mailers/`. The shared inclusion
 policy retains them for watching, deployment and backups; the email renderer
-loads them separately from web pages and snip extraction. Protocol 24 requires
+loads them separately from web pages and snip extraction. Protocol 25 requires
 this location, with no old-directory fallback.
 
 FleaCMS has a developer CLI and persistent website server sharing the site loader
-and renderer. The bundled Contact mini app is a separate child executable, not
-a general application framework. There is no database, background job queue or
+and renderer. The bundled Contact mini app is a separate child executable. Blog is a built-in
+content application using the existing snapshot/editor, not a child process. There is no database, background job queue or
 public deployment administration API.
 
 `apps.contact` enables a validated mount, fixed recipient and optional sender
@@ -177,7 +177,7 @@ bounded file reads rather than allocating each file in full.
 A `Project` is immutable after publication. Public config values come from `app`
 (app.site_name for the display name), never admin/mail settings. An omitted name
 gets a read-only folder default. Interactive dev saves it with confined,
-RawMessage-preserving writes; deployment requires a committed name. Protocol 24
+RawMessage-preserving writes; deployment requires a committed name. Protocol 25
 requires the app namespace without a site alias. Its exported maps exist for internal
 inspection, not concurrent editing. HTTP handlers select from validated maps;
 they never turn request paths into filesystem reads. Template output is buffered
@@ -286,7 +286,7 @@ sites before replacement; failed readiness restores the saved old executable.
 
 `sitefiles.Included` is a runtime inclusion policy, not a public-URL policy.
 Configuration and content belong in an archive but remain private over HTTP.
-Site configuration uses only `.flea.config.json`; protocol 24 rejects older
+Site configuration uses only `.flea.config.json`; protocol 25 rejects older
 server contracts before upload, including the inline-save/formatting contract.
 There is no extensionless-name fallback.
 Do not combine this predicate with the server's URL checks.
@@ -319,7 +319,7 @@ theme overlay loader or theme mutation endpoint. Normal deploy publishes release
 CSS; backup includes it as source and rollback restores the selected release's
 CSS while retaining current snips. EditingVersion includes the source CSS byte
 snapshot so stale content drafts fail after source style changes.
-Protocol 24 prevents older clients/servers from disagreeing about CSS preservation;
+Protocol 25 prevents older clients/servers from disagreeing about CSS preservation;
 removed theme configuration and sync-plan fields are rejected, not migrated.
 
 ### Local extraction
@@ -481,7 +481,7 @@ origin and CSRF validation remain exact.
 Both environments use a private `flea/runtime/sessions.json`: below the project locally,
 below `/var/lib/flea/sites/<name>/` in production. Production's `flea/` is service-owned
 0700, beside content/releases, not inside either. Code and parent directories remain
-administrator-owned. Deployment protocol 24 requires these runtime permissions.
+administrator-owned. Deployment protocol 25 requires these runtime permissions.
 Host derives this stable location from the administrator-configured managed content
 path; aliases share storage, distinct sites must not. No request chooses a path.
 Candidate host validation is read-only; actual startup prunes expired/removed owners.
@@ -570,3 +570,18 @@ bash scripts/build.sh
 paths, exercises edits/extraction/error recovery, and shuts down. Tests also cover
 local HTTP/TLS/ACME, alias content consistency, confined file operations, Git and
 SSH workflows, and failed deployment recovery. They need loopback bind permission.
+
+## Blog content application
+
+Read [Blog](../blog.md). `snips.Store.Blog` is the optional strict JSON post array,
+sharing one durable snapshot with media and snips. `site/blog.go` validates private
+mount templates and constructs published route maps and sanitized public views.
+Drafts never enter public template data or route maps. The exact blog body token
+returns sanitized HTML only in ordinary element content. No JSON is template source.
+`editor/blog.go` owns authenticated forms and bounded uploads; `editstore/blog.go`
+checks enabled configuration, version, action and photo references under the existing
+content/deployment lock. Immutable photo bytes precede candidate validation, durable
+JSON and publication. Failures may retain unreferenced files, never prune them.
+Normal merges preserve remote posts and seed new IDs; explicit sync compares whole
+posts and retains omitted IDs. Backups and pull use the existing content/media paths.
+Protocol 25 requires this new optional content and mounted routing contract.

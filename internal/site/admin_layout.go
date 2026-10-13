@@ -21,7 +21,7 @@ func (s *Server) AdminSettings() (AdminAccess, error) {
 // They are excluded from public routes and can only be selected by editor state.
 func (p *Project) buildAdminLayout() error {
 	p.adminTemplates = map[string]*template.Template{}
-	for _, name := range []string{"index", "code", "setup", "error"} {
+	for _, name := range []string{"index", "code", "setup", "error", "blog", "blog-edit"} {
 		file := "admin/" + name + ".html"
 		if _, ok := p.files[file]; !ok {
 			continue
@@ -46,7 +46,7 @@ func (s *Server) RenderAdmin(mode string, data map[string]any) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	names := map[string]string{"login": "index", "verify": "code", "setup": "setup", "error": "error"}
+	names := map[string]string{"login": "index", "verify": "code", "setup": "setup", "error": "error", "blog": "blog", "blog-edit": "blog-edit"}
 	name, ok := names[mode]
 	if !ok {
 		return nil, fmt.Errorf("unknown admin page")
