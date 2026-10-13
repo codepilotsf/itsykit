@@ -17,6 +17,21 @@ acceptance remain open.
 
 ## Current release status (October 13, 2026)
 
+- Public 0.16.0 is published from `1c85aae` / `v0.16.0`; website `a49e002`,
+  activation `20261013-221944-d1f6169314346e36fd5ab5c7`. Linux ARM64 and M5 Mac
+  normal CLIs are installed from the verified public bytes. Includes detected
+  hostnames/Tailscale peers in LAN mode, automatic default dev-port selection
+  and server-update progress. Host/port, peer, Origin, CSRF and session checks
+  remain intact. Native Mac/ARM64 Linux full tests, vet, race and bundled builds,
+  relevant named-host/preview browser race checks and public install/update
+  checks passed. Actual M5-to-asahi access and wrong Host/port rejection passed.
+  All 12 HTTPS domains are healthy, content/media/CSS and the latest unrelated
+  deployments are preserved. Server stays 0.15.1 / protocol 25; recovery is clear.
+  Native AMD64 build/full-suite, clean-Mac/notarization and a pre-existing
+  navigation browser timing check under race remain open. See
+  [release evidence](release-016-verification.md). Draft MR 8 records integration;
+  no source branches were merged into main.
+
 - Public 0.15.1 is published from source/tag `d5958ac` / `v0.15.1`; website
   `d6cd9c9`, activation `20261013-213030-9a92d56ccb61b7b62b20a800`.
   The installer/update channel and download links agree. Native Mac/ARM64 Linux

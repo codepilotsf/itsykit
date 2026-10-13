@@ -1,32 +1,36 @@
 # Installation and updates
 
-Version 0.15.1 is the current public test release for Apple Silicon macOS and
+Version 0.16.0 is the current public test release for Apple Silicon macOS and
 AMD64/ARM64 Linux, published October 13, 2026. The installer and `flea update`
 select it from `https://fleacms.com/releases/latest.txt`.
 
-## Updating to 0.15.1
+## Updating to 0.16.0
 
 Run `flea update` to update the local CLI and its bundled servers. This includes
-optional Blog and the Blog/Contact setup skills. Existing project files remain
-unchanged; adopt Blog or the new skills explicitly as described below.
+optional Blog and the Blog/Contact setup skills. LAN dev now accepts detected
+computer names/local aliases and Tailscale IPv4 peers while retaining exact
+Host/port, Origin, CSRF and peer checks. Default dev explains occupied ports and
+tries consecutive ports from 3000; explicit ports stay fixed. Server updates and
+recovery show a terminal spinner after confirmation, or plain redirected output.
+Existing project files remain unchanged; adopt Blog or the new skills explicitly as described below.
 
 CSS is developer-managed from 0.14.0 onward. Browser Theme editing, CSS overlays,
 `--with-theme`, `--theme-only` and `--snips-only` are removed. Normal deployment
 publishes committed CSS and preserves live editable content. Pull retrieves live
 content and referenced media; `--with-snips` remains the explicit content sync.
 
-Remote server updates are separate. Version 0.15.1 requires protocol 25. Before
+Remote server updates are separate. The 0.16.0 CLI requires server protocol 25. Before
 upgrading a protocol-23 server, preserve saved theme customizations in source and
 arrange reviewed removal of obsolete host theme mappings; no automatic migration
 is provided. Remove the obsolete Theme control from existing toolbar templates,
-preserving custom layouts. The shared fleacms.com server is already on 0.15.1.
+preserving custom layouts. The shared fleacms.com server remains compatible at 0.15.1 / protocol 25.
 
 Native Mac ARM64 and Linux ARM64 full tests, vet, race and bundled builds passed.
-Public install/reinstall, 0.13.0-to-0.15.1 update, already-current and fresh-site
+Public install/reinstall, 0.15.1-to-0.16.0 update, already-current and fresh-site
 checks passed on all three advertised platforms. Linux AMD64 was cross-compiled
 and checked natively as an unprivileged user; its native build/full suite remains
 open, as do clean-Mac acceptance and notarization. See
-[public release verification](agents/release-0151-verification.md).
+[public release verification](agents/release-016-verification.md).
 
 ## 0.15.1 agent skills rollout
 
@@ -44,7 +48,7 @@ The shared server and local Linux ARM64 CLI were updated to 0.15.1 on October
 All eleven HTTPS domains and preserved content/media/styles were verified.
 See [rollout evidence](agents/site-app-skills-verification.md). During that private
 rollout, public downloads remained 0.13.0. The subsequent public 0.15.1 release
-is recorded above.
+is recorded in [its verification](agents/release-0151-verification.md).
 
 ## 0.14.0 server and local CLI rollout
 
