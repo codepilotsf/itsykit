@@ -1,5 +1,107 @@
 # fleacms.com website handoff
 
+## 0.16.0 published and installed October 13, 2026
+
+Framework/tag `1c85aae` / `v0.16.0`, clean Go 1.27.1 artifacts. Includes detected
+hostnames/local aliases and Tailscale IPv4 LAN peers with exact Host/port checks,
+automatic default dev-port selection, and server-update progress. Website source
+`a49e002`, activation `20261013-221944-d1f6169314346e36fd5ab5c7`. Public homepage,
+docs, download links and latest.txt now agree on 0.16.0.
+
+Native Mac and Linux ARM64 full runtime tests, vet, race and bundled builds
+passed. Relevant named-host editing and mail-preview Chrome checks passed under
+race instrumentation. A test-only preview handler race was fixed. The existing
+owner-navigation browser check reports `Missing page transition name` in repeated
+race runs; repeated ordinary runs pass. No navigation implementation/assertion
+was changed. Do not claim all browser tests under race passed. Native AMD64
+build/full-suite, clean-Mac/notarization and native CI acceptance remain open.
+
+AMD64 was cross-compiled on the Mac and smoke-tested natively as nobody. All
+CLIs embed identical Linux servers. Public hashes, fresh installs, reinstalls,
+0.15.1-to-0.16.0 updates, already-current checks and fresh-site/dev smoke passed
+on all three advertised platforms. Native Mac signature checks passed. Normal
+Linux `/home/sean/.local/bin/flea` and M5 `/Users/sean/.local/bin/flea` were updated
+through the public updater and both report 0.16.0 with matching public hashes.
+
+The immutable directory was verified and installed under the deployment lock,
+validated with the existing 320 MiB admin target, then the service restarted to
+load the catalogue. Public bytes and the old 0.15.1 manifest passed before channel
+advancement. During the longer build window, Gestalt Haus was separately deployed
+as `6601d165`, activation `20261013-220136-62ba8cfc530ca453040636ab`; this newer
+code/content/CSS was preserved. Config last changed at 22:01:41 UTC, before
+catalogue restart at 22:15:55 UTC. A refreshed pre-channel snapshot matched
+content/media/CSS and unrelated deployments after the website update.
+
+All 12 HTTPS domains are healthy. Final website status reports code/content
+matching source. Recovery is clear and the publication-window error journal is
+empty; memory/swap policy and retained downloads are unchanged. Server executable
+remains 0.15.1 / protocol 25. No source branches were merged or real email sent.
+Actual M5-to-`asahi:3003` dev homepage/sign-in/reload returned 200; unrelated Host
+and wrong port returned 403. No firewall settings or existing dev servers changed.
+Restart site dev with the installed CLI to load the new code.
+
+- Mac ARM64: `c95ba159de8674538ebf03499958332ff66ada9d9cb36b63394af4696e6b3ee3`
+- Linux AMD64: `edae40e02d8e6174610d46277958313790eee26e786f86b8527b2fd7b0324b2c`
+- Linux ARM64: `9a88c0e21b0fe890f81c72c8b71d514a1e126f211465d227a1e41e4189a7f53c`
+
+Framework [draft MR 8](https://gitlab.codepilot.com/sean-schertell/flea/-/merge_requests/8)
+and website [draft MR 4](https://gitlab.codepilot.com/sean-schertell/flea-website/-/merge_requests/4)
+are linked to T3. Full provenance/limits are in framework
+`docs/agents/release-016-verification.md`. Private evidence/website backup:
+`/tmp/flea-016-release`. Retained artifacts:
+`/home/sean/fleacms-releases/0.16.0`; remote staging:
+`/var/lib/flea/downloads/.flea-016.VWjWihow`. Prior installed binaries remain at
+`/tmp/flea-016-release/linux-cli.before` and `/tmp/flea-016-installed-before/flea`
+on the Mac. Task-owned previews stopped; existing manual QA answers are preserved.
+
+## 0.15.1 published October 13, 2026
+
+Framework source/tag `d5958ac` / `v0.15.1`; all three clean tagged artifacts use
+Go 1.27.1 (`vcs.modified=false`). Includes optional Blog, Blog/Contact setup
+skills and the removal of browser Theme editing/CSS synchronization. The public
+installer, updater, homepage/docs and download links now select 0.15.1.
+Website source `d6cd9c9`, activation
+`20261013-213030-9a92d56ccb61b7b62b20a800`, deployed through an isolated clean
+main clone. This task merged no source branches.
+
+Native Mac ARM64 and Linux ARM64 full tests, required real-bundle race checks,
+vet and bundled builds passed. Final CLIs embed identical Linux server bundles.
+Linux AMD64 was cross-compiled on the Mac and tested natively as nobody; its
+native build/full-suite remains unverified. Clean/starter initial commits,
+status, dev routes and new skills passed. Generated Blog templates/skills matched
+canonical starter bytes. Mac ad-hoc signature checks passed; clean-Mac acceptance
+and notarization remain open.
+
+The immutable download directory was uploaded beside the store, hash/permission
+checked, moved without overwrite under the deployment lock, validated, then the
+service restarted to load its catalogue. Anonymous HTTPS hashes on all three
+platforms and the retained 0.13.0 manifest passed before advancing latest.txt.
+Public fresh installs, reinstalls, 0.13.0-to-0.15.1 updates and already-current
+checks passed on all three native platforms, with installed hashes matching.
+Downloaded binaries passed fresh-site/dev checks; test dev servers stopped.
+Ordinary installed CLIs were left unchanged so owners can run `flea update`.
+
+Server executable remains the already-installed 0.15.1 / protocol 25. All eleven
+HTTPS domains return 200; content/media/CSS and unrelated site roots/commits are
+preserved. Host config fingerprints matched across catalogue publication; only
+the website's normal deployment changed its routing/commit receipt afterward.
+Service is active, recovery is clear and the deployment-window error journal is
+empty. Memory/swap policy is unchanged and no old downloads were removed.
+Final website `flea status` reports deployed code/content matching source.
+No real email or new interactive production editing was tested.
+
+- Mac ARM64: `784ca438a304faf344f1a2a6bbb4e2fd5685ced77411b5fc5c313a581b94c9f4`
+- Linux AMD64: `6c31975387b3712967066cd78533ef0aa6bdd92f27fba53860bb7a6ba36451f3`
+- Linux ARM64: `ee9d4ede230d14f0d3db74983148c58d526d3a576021a6ac0b37625d9b4e66a4`
+
+Evidence/private website backup: `/tmp/flea-0151-release`. Local retained artifacts:
+`/home/sean/fleacms-releases/0.15.1`. Remote retained staging:
+`/var/lib/flea/downloads/.flea-0151.FVF6MDwf`; Mac public test files:
+`/tmp/flea-0151-public`; native AMD64 test files:
+`/var/tmp/flea-0151-native.T0IR9yVs`. Full provenance is recorded in framework
+`docs/agents/release-0151-verification.md`. Native AMD64 full-suite/build,
+clean-Mac/notarization and native CI runner acceptance remain open.
+
 ## Blog and Contact skills documentation deployment - October 13, 2026
 
 Website source `5380c92` on `docs/app-skills`, stacked on `docs/blog-setup`.
