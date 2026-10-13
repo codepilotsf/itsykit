@@ -1,5 +1,37 @@
 # Publishing FleaCMS downloads
 
+## Blog and Contact skills documentation deployment - October 13, 2026
+
+Website source `5380c92` on `docs/app-skills`, stacked on `docs/blog-setup`.
+[Draft MR 3](https://gitlab.codepilot.com/sean-schertell/flea-website/-/merge_requests/3)
+remains open. The exact snapshot was normally deployed through a clean isolated
+main checkout to the existing fleacms.com mapping; no source merge occurred.
+Activation: `20261013-201235-eb349a3b66e33aaf2fadb520`.
+
+Live https://fleacms.com/docs#agents documents `add-blog`, `add-contact-form`,
+request phrases, setup conventions, template values and existing-site adoption.
+The website's own agent guidance includes both skills. Source-built framework
+`1feae24`, draft MR 7, supplies Flea 0.15.1 / protocol 25. The shared server and
+local Linux ARM64 CLI were updated through the supported update-server workflow
+and a verified atomic local installation. Public downloads remain 0.13.0;
+no artifacts, tags or channel changes were published.
+
+Verification: full native ARM64 framework tests with real bundles, vet and
+standard bundled build passed; skill validation and clean/starter packaging
+checks passed. Website `flea status` validates and reports live code/content
+matching source. Browser checks at 1280px and 375px confirm literal tokens,
+valid Blog/Contact links and no page/section overflow. All eleven HTTPS domains
+return 200. Skill URLs return 404. Content/media/CSS fingerprints and site/domain
+counts were preserved. Service is active, recovery is clear and the deployment
+window has no service error entries. No real mail or new editor QA was performed;
+native Mac/AMD64 release acceptance and public publication remain open.
+
+All seven live-site backups and old server executable remain under private host
+`/var/backups/flea-app-skills-0151-20261013`; website backup, previous local CLI and
+before/after evidence are in `/tmp/flea-app-skills-rollout`. Existing memory/swap
+policy was preserved; the established 320 MiB target applied to admin commands.
+No task-owned preview remains. Receipt-only commits do not change the site snapshot.
+
 ## Blog documentation deployment — October 13, 2026
 
 Website source `54815a7` on `docs/blog-setup`, based on current main `7e55082`.

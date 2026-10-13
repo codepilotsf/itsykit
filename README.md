@@ -397,7 +397,14 @@ CSRF meta tag, and the `{render /admin/toolbar}` include with the toolbar's
 version/revision fields. These connect your layout to the editor. The server
 supplies the signed-in identity; never configure `app.current_admin` yourself.
 
-### Agent-assisted imports
+### Agent-assisted work
+
+Focused setup skills are available at `flea/skills/add-blog/SKILL.md` and
+`flea/skills/add-contact-form/SKILL.md`. Ask your agent to "add a blog" or "add a
+contact form"; `AGENTS.md` routes it to the supported setup and template values.
+Blog requires Flea 0.15.0 or newer. These skills are bundled with newly generated
+sites starting in 0.15.1; existing projects can copy them from a fresh site and
+add the matching routes to their own `AGENTS.md`, preserving custom instructions.
 
 To import an existing brochure site, give your coding agent the source URL or
 export and `flea/skills/import-brochure/SKILL.md`. The bundled instructions cover
