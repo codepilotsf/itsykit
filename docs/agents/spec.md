@@ -2,6 +2,11 @@
 
 ## Product and build specification
 
+Default `flea dev` starts at port 3000 and tries consecutive ports when occupied,
+with clear console messages. Explicit ports remain fixed; port 0 is OS-selected.
+Same-site replacement precedes binding; actual listener ports drive URLs and
+LAN/email-preview access checks.
+
 Deployment progress uses installed server TLS state: first-time HTTPS enablement
 shows setup guidance, routine deployments show a concise health/HTTPS check.
 This changes messaging only, not readiness checks or certificate renewal.

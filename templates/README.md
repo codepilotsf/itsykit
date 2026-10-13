@@ -51,7 +51,10 @@ For real local delivery, set `"dev": {"email_preview": false}`, run `flea email`
 and restart dev. Production ignores preview mode and always needs real email
 configuration. Restart dev after changing preview mode or its sender details.
 
-Open [http://localhost:3000](http://localhost:3000). Leave the server running while
+Open the Website URL printed in the console. Dev starts at port 3000 and
+explains occupied ports before trying 3001, 3002 and so on. An explicit
+`--port` stays fixed; `--port 0` lets the operating system choose a port.
+Leave the server running while
 you work; saved changes reload the browser. Starting dev again gracefully replaces
 the same site's existing dev server, including LAN mode or port changes. Pull and
 reset remain protected while running. Stop older dev binaries manually once.

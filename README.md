@@ -81,7 +81,11 @@ Set `"dev": {"email_preview": false}` and restart dev to test real delivery;
 configure it explicitly with `flea email`. Production always uses real delivery
 and ignores this toggle. See [email previews](docs/email-templates.md) for details.
 
-Open http://localhost:3000, edit `site/index.html`, and save. Your browser reloads
+Open the Website URL printed in the console, edit `site/index.html`, and save.
+Dev starts at port 3000. If another process occupies it, Flea explains the
+conflict and tries 3001, 3002 and so on until it binds an available port.
+Use `flea dev --port 4000` to require a specific port, or `--port 0` to let the
+operating system choose one. Your browser reloads
 automatically. Change the welcome text in `flea/snips.json`, or give the site
 your own colors and fonts in `site/css/theme.css`. Press Ctrl-C to stop the server.
 Admin sign-in pages also refresh when their templates or layout change in dev.
@@ -112,7 +116,7 @@ Run these from your site's folder:
 
 | Command | What it does |
 | --- | --- |
-| `flea dev` | Preview your site at http://localhost:3000 with browser reloads. |
+| `flea dev` | Preview your site with browser reloads, starting at port 3000. |
 | `flea dev -port 8080` | Preview on a different port. |
 | `flea status` | Show local validation and Git state, then compare the current branch with its saved deployment. |
 | `flea reset` | Reset the local site to the clean default after confirmation, keeping a private backup. |
