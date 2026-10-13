@@ -11,25 +11,37 @@ for completed changes, and [README.md](../../README.md) for current usage.
 Before updating older site sources, remove their obsolete Theme toolbar button
 while preserving custom layouts. Existing hosted toolbar partials have not been
 rewritten by the shared executable rollout. Preview noindex and Hub branch
-workflow verification are separate planned tasks. Public 0.14.0 binary publishing,
-native Mac/AMD64 release checks remain separate work.
+workflow verification are separate planned tasks. Theme removal is included in
+public 0.15.1. Native AMD64 build/full-suite, clean-Mac and notarization
+acceptance remain open.
 
 ## Current release status (October 13, 2026)
+
+- Public 0.15.1 is published from source/tag `d5958ac` / `v0.15.1`; website
+  `d6cd9c9`, activation `20261013-213030-9a92d56ccb61b7b62b20a800`.
+  The installer/update channel and download links agree. Native Mac/ARM64 Linux
+  full tests, race, vet and bundled builds passed. Public install/reinstall,
+  update from 0.13.0, already-current and fresh-site/dev checks passed on all
+  three platforms. AMD64 was cross-compiled and smoke-tested unprivileged;
+  native AMD64 build/full-suite, clean-Mac and notarization remain open.
+  Server remains 0.15.1 / protocol 25; all eleven HTTPS domains are healthy,
+  content/media/CSS and unrelated deployments are preserved, recovery is clear.
+  No source merges occurred. See [release evidence](release-0151-verification.md).
 
 - Private Blog rollout 0.15.0 / protocol 25 completed from `e690ab7`; the matching
   local Linux ARM64 CLI is installed. Seven backups and the old executable remain
   at `/var/backups/flea-blog-015-20261013`. All eleven HTTPS homepages are healthy,
   configuration/content/media/CSS fingerprints match, and recovery is clear.
   [MR 6](https://gitlab.codepilot.com/sean-schertell/flea/-/merge_requests/6) is
-  draft/open; no merge, tag or public artifacts were published. Public channel
-  stays 0.13.0. See [Blog verification](blog-verification.md). Existing sites need
+  draft/open; that private rollout did not merge, tag or publish public artifacts.
+  Its public channel was 0.13.0; the subsequent 0.15.1 publication is recorded above. See [Blog verification](blog-verification.md). Existing sites need
   explicit Blog template/config adoption; custom layouts were not changed.
 
 
 - Private shared-server rollout 0.14.0 / protocol 24 completed October 13 from
   framework `beb87ab`; the local Linux ARM64 CLI is also 0.14.0. The source branch
-  is integrated into main through MR 5. Public downloads/channel stay 0.13.0;
-  no release tag or artifacts were published. The owner approved one-time removal
+  is integrated into main through MR 5. During that private rollout, public downloads
+  stayed on 0.13.0 and no release tag or artifacts were published. The owner approved one-time removal
   of 11 obsolete theme mappings across seven sites after verifying every saved
   theme matched source CSS. Root-only backups retain the original config,
   executable and seven site backups in
@@ -452,8 +464,7 @@ to the changelog; retain acceptance evidence in the checklist or linked QA recor
 Minimal Blog implementation is on `feat/minimal-blog` in its isolated worktree.
 Local implementation and checks are complete; see
 [Blog verification](blog-verification.md). The 0.15.0 commit, push and private server rollout are complete; results are
-recorded in the verification document. Native
-Mac/AMD64 acceptance and public release remain separate work. Optional Blog source
-adoption must preserve each site's custom layouts. The subsequent source-built
-0.15.1 skill update is verified in [agent-skills rollout](site-app-skills-verification.md);
-public publication and native Mac/AMD64 acceptance remain open.
+recorded in the verification document. Blog and the subsequent setup skills are
+now available in public 0.15.1; see [release evidence](release-0151-verification.md).
+Optional Blog source adoption must preserve each site's custom layouts. Native
+AMD64 build/full-suite, clean-Mac and notarization acceptance remain open.

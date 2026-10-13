@@ -1,10 +1,32 @@
 # Installation and updates
 
-Version 0.13.0 is the current test release for Apple Silicon macOS and AMD64/ARM64
-Linux. Published October 12, 2026; the public installer selects it from
-`https://fleacms.com/releases/latest.txt`. The public channel is separate from source-built local CLI and shared-server
-rollouts; see the current rollout record below. Updating from the public channel
-currently installs 0.13.0.
+Version 0.15.1 is the current public test release for Apple Silicon macOS and
+AMD64/ARM64 Linux, published October 13, 2026. The installer and `flea update`
+select it from `https://fleacms.com/releases/latest.txt`.
+
+## Updating to 0.15.1
+
+Run `flea update` to update the local CLI and its bundled servers. This includes
+optional Blog and the Blog/Contact setup skills. Existing project files remain
+unchanged; adopt Blog or the new skills explicitly as described below.
+
+CSS is developer-managed from 0.14.0 onward. Browser Theme editing, CSS overlays,
+`--with-theme`, `--theme-only` and `--snips-only` are removed. Normal deployment
+publishes committed CSS and preserves live editable content. Pull retrieves live
+content and referenced media; `--with-snips` remains the explicit content sync.
+
+Remote server updates are separate. Version 0.15.1 requires protocol 25. Before
+upgrading a protocol-23 server, preserve saved theme customizations in source and
+arrange reviewed removal of obsolete host theme mappings; no automatic migration
+is provided. Remove the obsolete Theme control from existing toolbar templates,
+preserving custom layouts. The shared fleacms.com server is already on 0.15.1.
+
+Native Mac ARM64 and Linux ARM64 full tests, vet, race and bundled builds passed.
+Public install/reinstall, 0.13.0-to-0.15.1 update, already-current and fresh-site
+checks passed on all three advertised platforms. Linux AMD64 was cross-compiled
+and checked natively as an unprivileged user; its native build/full suite remains
+open, as do clean-Mac acceptance and notarization. See
+[public release verification](agents/release-0151-verification.md).
 
 ## 0.15.1 agent skills rollout
 
@@ -20,8 +42,9 @@ committed agent guidance and never public runtime assets.
 The shared server and local Linux ARM64 CLI were updated to 0.15.1 on October
 13, 2026. Full tests, vet, bundled build and fresh-site skill checks passed.
 All eleven HTTPS domains and preserved content/media/styles were verified.
-See [rollout evidence](agents/site-app-skills-verification.md). Public downloads
-remain 0.13.0; no public artifacts or tags are part of this rollout.
+See [rollout evidence](agents/site-app-skills-verification.md). During that private
+rollout, public downloads remained 0.13.0. The subsequent public 0.15.1 release
+is recorded above.
 
 ## 0.14.0 server and local CLI rollout
 
@@ -30,7 +53,8 @@ remain 0.13.0; no public artifacts or tags are part of this rollout.
 committed CSS. Snip editing and synchronization remain supported. Protocol 24
 requires reviewed removal of obsolete host theme mappings before upgrading an
 existing protocol-23 server; preserve any remote customizations in source first.
-The public update channel remains 0.13.0 until a separately verified publication.
+The public update channel stayed on 0.13.0 during that private rollout; the
+subsequent public 0.15.1 release includes this change.
 The shared server and local Linux ARM64 CLI were updated to 0.14.0 on October
 13, 2026. All seven sites' saved CSS matched source before the approved one-time
 host config cleanup; content/styles and all eleven public HTTPS hostnames passed
