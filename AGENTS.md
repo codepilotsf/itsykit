@@ -42,7 +42,12 @@ srcset/picture/source elements for a media snip. Local JPEG/PNG and optimized
 H.264 MP4 seeds are imported by dev. Do not invent IDs. Admins click media in
 Edit mode and use the same page Save/Cancel. No Photos/Videos library buttons.
 
-## Available skill
+## Available skills
+
+For requests like "add a blog" or "let's create a blog", read
+`flea/skills/add-blog/SKILL.md`. For "add a contact form" or an email-enabled
+contact page, read `flea/skills/add-contact-form/SKILL.md`. These focused additions
+use the existing site's design and do not require a full-site consultation.
 
 - **import-brochure**: import an existing small brochure website into this site,
   preserving its content and navigation with basic Prewind styling. Read
