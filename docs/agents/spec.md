@@ -5,6 +5,10 @@
 Deployment progress uses installed server TLS state: first-time HTTPS enablement
 shows setup guidance, routine deployments show a concise health/HTTPS check.
 This changes messaging only, not readiness checks or certificate renewal.
+Confirmed `flea update-server` and recovery operations show terminal progress,
+with plain text when redirected. Animation yields to native SSH/sudo diagnostics
+and stops before completion/error output; upgrade checks and confirmation remain
+unchanged.
 
 Implemented in 0.7.0: optional administrator-owned `downloads` host mappings serve
 checksum-validated versioned Flea CLI downloads from pinned disk handles, outside

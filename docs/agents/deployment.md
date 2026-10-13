@@ -15,6 +15,10 @@ downloads, checksum/platform/version checks and same-directory replacement.
 It shares `.flea-install.lock` with the installer. Preserve the old executable on
 failed validation. `flea update-server` explicitly updates the remote executable;
 never add an `upgrade` alias or trigger remote updates from local updates.
+After confirmation, update/recovery shows a simple terminal spinner through
+upload and execution; redirected output uses plain progress text. Clear animation
+before diagnostics, interactive sudo prompts and final output, including failures
+and cancellation. Preserve confirmation, native SSH and upgrade safeguards.
 
 Read docs/recovery.md for commands, data boundaries and limits.
 Rollback selects reachable per-site receipts, never directory ordering or the

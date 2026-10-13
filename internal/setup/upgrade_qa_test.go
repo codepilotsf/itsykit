@@ -42,7 +42,7 @@ func TestQAUpgradeRecoveryDoesNotRequireWorkingInstalledBinary(t *testing.T) {
 		}
 		return nil
 	}
-	if e := upgradeServer(context.Background(), root, true, strings.NewReader("y\n"), io.Discard, io.Discard, run); e != nil {
+	if e := upgradeServer(context.Background(), root, true, strings.NewReader("y\n"), io.Discard, io.Discard, false, run); e != nil {
 		t.Fatal(e)
 	}
 	if !recovered {

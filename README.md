@@ -1357,6 +1357,9 @@ content directories (flea-owned 0750) and create each managed site's private
 `flea/` directory (flea-owned 0700) before starting the new server. Reload systemd and restart
 after replacing the unit. For executable-only updates on a current installation,
 use `flea update-server`; it does not migrate service units or configuration.
+After confirmation, a terminal spinner shows that the update is running; redirected
+output uses a plain progress line. Animation stops before SSH diagnostics or
+interactive sudo prompts, and successful updates print a completion message.
 
 ### List or remove sites on a server
 

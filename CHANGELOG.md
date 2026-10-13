@@ -8,6 +8,8 @@ During 0.x development, interfaces may change without backward compatibility.
 
 - Support this computer's hostname and local alias in LAN dev, including Tailscale
   IPv4 peers, while preserving the exact Host/port and authentication checks.
+- Show a simple terminal spinner during confirmed `flea update-server` operations
+  and recovery, with plain progress text for redirected output.
 
 ## 0.15.1 - 2026-10-13
 

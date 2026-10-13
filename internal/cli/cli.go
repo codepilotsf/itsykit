@@ -130,7 +130,11 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if flags.NArg() != 0 {
 			return 2
 		}
-		if err := setup.Upgrade(ctx, ".", *recover, os.Stdin, out, errOut); err != nil {
+		terminal := false
+		if file, ok := out.(*os.File); ok {
+			terminal = devTerminal(ctx, file)
+		}
+		if err := setup.Upgrade(ctx, ".", *recover, os.Stdin, out, errOut, terminal); err != nil {
 			return fail(err)
 		}
 		return 0
