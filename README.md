@@ -90,14 +90,17 @@ mode when there are no unsaved changes. Drafts and open dialogs
 pause reloads so they are not lost. Cancel a draft to accept pending source changes.
 
 To test from a phone or another computer on the same trusted network, run
-`flea dev --lan` (or `flea dev -l`). Open one of the printed Network URLs on that
-device. Sign-in, editing, uploads, forms, reloads and dev diagnostics work
+`flea dev --lan` (or `flea dev -l`). Open a printed Network or Hostname URL on that device, such as
+`http://asahi:3000` or `http://asahi.local:3000` when that name resolves to this
+computer. Sign-in, editing, uploads, forms, reloads and dev diagnostics work
 there too. Each device signs in separately. Email previews still open on the
 computer running Flea; enter that code on your other device. To share a private
 preview, replace its `127.0.0.1` host with a printed network IP, keeping the port
 and random path. Never share preview links with anyone you do not trust.
 
-LAN mode uses unencrypted HTTP and detected private IPv4 addresses. Use it only
+LAN mode uses unencrypted HTTP, detected private/Tailscale IPv4 addresses and
+this computer's hostname/local alias. Its exact Host/port allowlist and actual
+private, loopback or RFC 6598 (`100.64.0.0/10`) peer checks remain required. Use it only
 on a trusted network, never forward its port, and restart after changing networks.
 VPN addresses may also appear. Allow the chosen port through your computer's
 firewall if needed; guest Wi-Fi may block device-to-device connections.

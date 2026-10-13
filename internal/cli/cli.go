@@ -532,9 +532,13 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			sender = mailer.NewResend(mailSettings)
 		}
 		bindHost := "127.0.0.1"
-		var lanAddresses []string
+		var lanAddresses, lanHostnames []string
 		if lan {
 			lanAddresses, err = devLANAddresses()
+			if err != nil {
+				return fail(err)
+			}
+			lanHostnames, err = devLANHostnames()
 			if err != nil {
 				return fail(err)
 			}
@@ -594,7 +598,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			})
 		}
 		if lan {
-			httpHandler = devaccess.WrapLAN(httpHandler, lanAddresses, listener.Addr().(*net.TCPAddr).Port)
+			httpHandler = devaccess.WrapLAN(httpHandler, lanAddresses, lanHostnames, listener.Addr().(*net.TCPAddr).Port)
 		}
 		server := &http.Server{Handler: httpHandler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 30 * time.Second}
 		watchCtx, cancel := context.WithCancel(ctx)
@@ -609,6 +613,9 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			for _, address := range lanAddresses {
 				base := fmt.Sprintf("http://%s:%d", address, listener.Addr().(*net.TCPAddr).Port)
 				fmt.Fprintf(out, "\nNetwork  %s\nSign in  %s/admin\n", base, base)
+			}
+			for _, name := range lanHostnames {
+				fmt.Fprintf(out, "\nHostname http://%s:%d\n", name, listener.Addr().(*net.TCPAddr).Port)
 			}
 			fmt.Fprintln(out, "\nLAN mode uses unencrypted HTTP. Use only on a trusted network; do not forward this port.")
 			if preview != nil {

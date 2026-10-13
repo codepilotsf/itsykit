@@ -55,8 +55,8 @@ Stale sockets may be removed only after acquiring the site lock; reject other
 file types. Older binaries without this endpoint must be stopped manually once.
 The dev server defaults to loopback and prints localhost URLs with the actual bound
 port. `--lan`/`-l` binds IPv4 interfaces and prints detected RFC1918 addresses.
-The outer devaccess middleware validates exact listener Host/port and actual
-private/loopback peers, then marks the request context. Forwarded headers never
+The outer devaccess middleware accepts any Host and validates actual
+private, shared-address-space (100.64.0.0/10) or loopback IPv4 peers, then marks the request context. Forwarded headers never
 authorize access. Only marked dev requests may use LAN admin, contact, diagnostics
 and private capability previews. Keep exact Origin, CSRF, host-bound sessions and
 production HTTPS checks. Warn that LAN HTTP requires a trusted network; restart

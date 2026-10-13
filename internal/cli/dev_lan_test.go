@@ -62,11 +62,11 @@ func TestLANDevWorkflow(t *testing.T) {
 	admin := devAdmin(root, "LAN test", public, nil, mail)
 	stopApps := public.StartApps(context.Background(), mail, &contact.Budget{})
 	defer stopApps()
-	h := devaccess.WrapLAN(admin, []string{"192.168.1.5"}, 3000)
+	h := devaccess.WrapLAN(admin, []string{"192.168.1.5"}, []string{"asahi", "asahi.local"}, 3000)
 	request := func(handler http.Handler, method, path string, values url.Values, cookie *http.Cookie, origin string) *httptest.ResponseRecorder {
 		t.Helper()
-		r := httptest.NewRequest(method, "http://192.168.1.5:3000"+path, strings.NewReader(values.Encode()))
-		r.RemoteAddr = "192.168.1.9:54321"
+		r := httptest.NewRequest(method, "http://asahi:3000"+path, strings.NewReader(values.Encode()))
+		r.RemoteAddr = "100.79.67.33:54321"
 		r.Header.Set("Origin", origin)
 		r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		r.Header.Set("X-CSRF-Token", values.Get("csrf"))
@@ -77,7 +77,7 @@ func TestLANDevWorkflow(t *testing.T) {
 		handler.ServeHTTP(w, r)
 		return w
 	}
-	const origin = "http://192.168.1.5:3000"
+	const origin = "http://asahi:3000"
 	req := func(method, path string, values url.Values, cookie *http.Cookie) *httptest.ResponseRecorder {
 		return request(h, method, path, values, cookie, origin)
 	}
@@ -97,11 +97,11 @@ func TestLANDevWorkflow(t *testing.T) {
 	if w := request(public, "POST", "/contact", nil, nil, origin); w.Code != 403 {
 		t.Fatal("contact LAN enabled by default", w.Code)
 	}
-	productionAdmin := devaccess.WrapLAN(editor.New(editor.Options{Emails: []string{"owner@example.test"}}), []string{"192.168.1.5"}, 3000)
+	productionAdmin := devaccess.WrapLAN(editor.New(editor.Options{Emails: []string{"owner@example.test"}}), []string{"192.168.1.5"}, []string{"asahi", "asahi.local"}, 3000)
 	if w := request(productionAdmin, "GET", "/admin", nil, nil, origin); w.Code != 403 || !strings.Contains(w.Body.String(), "HTTPS") {
 		t.Fatal("LAN context bypassed production HTTPS")
 	}
-	productionForm := devaccess.WrapLAN(site.NewProductionServer(p, nil), []string{"192.168.1.5"}, 3000)
+	productionForm := devaccess.WrapLAN(site.NewProductionServer(p, nil), []string{"192.168.1.5"}, []string{"asahi", "asahi.local"}, 3000)
 	if w := request(productionForm, "POST", "/contact", nil, nil, origin); w.Code != 403 {
 		t.Fatal("LAN context bypassed production contact HTTPS")
 	}
@@ -202,7 +202,7 @@ func TestLANDevWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	r := httptest.NewRequest("POST", origin+"/admin/page", bytes.NewReader(upload.Bytes()))
-	r.RemoteAddr = "192.168.1.9:54321"
+	r.RemoteAddr = "100.79.67.33:54321"
 	r.Header.Set("Origin", origin)
 	r.Header.Set("Content-Type", parts.FormDataContentType())
 	r.Header.Set("X-CSRF-Token", csrf)

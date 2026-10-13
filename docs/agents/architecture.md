@@ -394,8 +394,9 @@ the first request see the new owner. Nonterminal startup never reads prompt inpu
 The editor enforces loopback host checks before showing local instructions,
 unless devaccess has authorized an explicit LAN request. `flea dev --lan`/`-l`
 binds IPv4 interfaces and snapshots detected private IPv4 addresses at startup.
-The outer middleware admits only exact approved Hosts with the listener port and
-actual private/loopback peers, then adds an unexported context marker. Editor,
+The outer middleware checks exact listener Host/port against detected interface
+addresses and OS hostname/local aliases, along with actual private, shared-address-space
+(100.64.0.0/10) or loopback IPv4 peers, then adds an unexported context marker. Editor,
 authenticated public rendering, contact, diagnostics and previews share this
 decision; no HTTP header can enable it. Production never installs this middleware
 and still requires HTTPS. LAN mode changes reachability, not authentication,

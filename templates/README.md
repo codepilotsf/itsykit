@@ -57,7 +57,8 @@ the same site's existing dev server, including LAN mode or port changes. Pull an
 reset remain protected while running. Stop older dev binaries manually once.
 
 For another device on the same trusted network, use `flea dev --lan` (or `-l`)
-and open a printed Network URL. Sign-in, editing, media, forms and reloads
+and open a printed Network or Hostname URL. Named URLs work when they resolve to
+the dev machine; Tailscale IPv4 connections are supported. Sign-in, editing, media, forms and reloads
 work there too. Email previews open on the computer running Flea; enter that code
 on the other device. LAN mode uses unencrypted HTTP on private IPv4 networks.
 Do not forward the port. Allow it through your firewall if needed and restart dev

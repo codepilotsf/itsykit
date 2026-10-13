@@ -106,7 +106,7 @@ func TestDevOriginGate(t *testing.T) {
 			t.Fatal("unapproved host accepted")
 		}
 	}
-	r.RemoteAddr = "192.168.1.3:1234"
+	r.RemoteAddr = "100.79.67.33:1234"
 	if _, _, err := g.Token(r); err == nil {
 		t.Fatal("unapproved peer accepted")
 	}
@@ -116,9 +116,9 @@ func TestDevOriginGate(t *testing.T) {
 		if _, _, err := g.Token(r); err != nil {
 			t.Error(err)
 		}
-	}), []string{"192.168.1.2"}, 3000)
-	r = httptest.NewRequest("GET", "http://192.168.1.2:3000/", nil)
-	r.RemoteAddr = "192.168.1.3:1234"
+	}), []string{"192.168.1.2"}, []string{"asahi", "asahi.local"}, 3000)
+	r = httptest.NewRequest("GET", "http://asahi:3000/", nil)
+	r.RemoteAddr = "100.79.67.33:1234"
 	h.ServeHTTP(httptest.NewRecorder(), r)
 	if !called {
 		t.Fatal("approved LAN blocked")

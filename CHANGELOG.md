@@ -4,6 +4,11 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## Unreleased
+
+- Support this computer's hostname and local alias in LAN dev, including Tailscale
+  IPv4 peers, while preserving the exact Host/port and authentication checks.
+
 ## 0.15.1 - 2026-10-13
 
 - Bundle focused `add-blog` and `add-contact-form` agent skills in new sites,

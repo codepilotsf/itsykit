@@ -120,13 +120,14 @@ func TestLANPreviewRequiresCapabilityAndApprovedRequest(t *testing.T) {
 	if err := p.Send(context.Background(), mailer.Message{To: "owner@example.test", Text: "Private LAN preview"}); err != nil {
 		t.Fatal(err)
 	}
-	h := devaccess.WrapLAN(p, []string{"192.168.1.5"}, 3000)
+	h := devaccess.WrapLAN(p, []string{"192.168.1.5"}, []string{"asahi", "asahi.local"}, 3000)
 	lanURL := strings.Replace(*address, "127.0.0.1", "192.168.1.5", 1)
 	for _, tc := range []struct {
 		name, url, origin, peer string
 		handler                 http.Handler
 		want                    int
 	}{
+		{"hostname", strings.Replace(lanURL, "192.168.1.5", "asahi", 1), "http://asahi:3000", "100.79.67.33:4321", h, 200},
 		{"LAN", lanURL, "", "192.168.1.9:4321", h, 200},
 		{"same origin", lanURL, "http://192.168.1.5:3000", "192.168.1.9:4321", h, 200},
 		{"default", lanURL, "", "192.168.1.9:4321", p, 404},

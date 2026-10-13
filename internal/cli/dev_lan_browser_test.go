@@ -134,7 +134,7 @@ func TestLANBrowserEditing(t *testing.T) {
 			_, _ = w.Write(body)
 		}
 	})
-	server := &http.Server{Handler: devaccess.WrapLAN(handler, addresses, port), ReadHeaderTimeout: 5 * time.Second}
+	server := &http.Server{Handler: devaccess.WrapLAN(handler, addresses, []string{"asahi", "asahi.local"}, port), ReadHeaderTimeout: 5 * time.Second}
 	defer server.Close()
 	go server.Serve(listener)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
