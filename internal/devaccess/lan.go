@@ -18,8 +18,9 @@ func LAN(r *http.Request) bool {
 	return allowed
 }
 
-// WrapLAN admits only private IPv4 peers and the listener's explicitly selected
-// addresses and hostname aliases, at the selected port. Loopback remains usable. Forwarded headers are never consulted.
+// WrapLAN admits private, shared-address-space and loopback IPv4 peers at
+// explicitly selected addresses and hostname aliases, at the listener port.
+// Forwarded headers are never consulted.
 func WrapLAN(next http.Handler, addresses, names []string, port int) http.Handler {
 	hosts := make(map[string]bool)
 	allowHost := func(host string) {

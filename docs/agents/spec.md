@@ -63,7 +63,8 @@ real local delivery uses the explicit email wizard. Secrets stay in ignored .env
 while approved owners remain developer-owned configuration.
 
 `flea dev --lan`/`-l` explicitly enables full development over trusted-network
-HTTP, using detected private IPv4 URLs. Loopback remains the default. The listener admits detected IPv4 addresses and this computer's hostname/local alias at its selected port;
+HTTP, using detected private/Tailscale IPv4 URLs and OS hostname/local aliases.
+Loopback remains the default. The listener admits these exact Hosts at its selected port;
 private, shared-address-space (100.64.0.0/10) or loopback IPv4 peer checks gate
 LAN requests; sessions, Origin, CSRF and
 production HTTPS requirements remain intact. Previews open on the dev computer

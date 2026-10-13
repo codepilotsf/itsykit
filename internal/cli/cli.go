@@ -491,7 +491,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		}
 		port := flags.Int("port", 3000, "fixed HTTP port (0 selects an available port)")
 		var lan bool
-		flags.BoolVar(&lan, "lan", false, "enable full development access on a trusted private IPv4 network (HTTP)")
+		flags.BoolVar(&lan, "lan", false, "enable full development access on a trusted private/Tailscale IPv4 network (HTTP)")
 		flags.BoolVar(&lan, "l", false, "same as --lan")
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
