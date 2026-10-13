@@ -1,5 +1,53 @@
 # Publishing FleaCMS downloads
 
+## 0.15.1 published October 13, 2026
+
+Framework source/tag `d5958ac` / `v0.15.1`; all three clean tagged artifacts use
+Go 1.27.1 (`vcs.modified=false`). Includes optional Blog, Blog/Contact setup
+skills and the removal of browser Theme editing/CSS synchronization. The public
+installer, updater, homepage/docs and download links now select 0.15.1.
+Website source `d6cd9c9`, activation
+`20261013-213030-9a92d56ccb61b7b62b20a800`, deployed through an isolated clean
+main clone. This task merged no source branches.
+
+Native Mac ARM64 and Linux ARM64 full tests, required real-bundle race checks,
+vet and bundled builds passed. Final CLIs embed identical Linux server bundles.
+Linux AMD64 was cross-compiled on the Mac and tested natively as nobody; its
+native build/full-suite remains unverified. Clean/starter initial commits,
+status, dev routes and new skills passed. Generated Blog templates/skills matched
+canonical starter bytes. Mac ad-hoc signature checks passed; clean-Mac acceptance
+and notarization remain open.
+
+The immutable download directory was uploaded beside the store, hash/permission
+checked, moved without overwrite under the deployment lock, validated, then the
+service restarted to load its catalogue. Anonymous HTTPS hashes on all three
+platforms and the retained 0.13.0 manifest passed before advancing latest.txt.
+Public fresh installs, reinstalls, 0.13.0-to-0.15.1 updates and already-current
+checks passed on all three native platforms, with installed hashes matching.
+Downloaded binaries passed fresh-site/dev checks; test dev servers stopped.
+Ordinary installed CLIs were left unchanged so owners can run `flea update`.
+
+Server executable remains the already-installed 0.15.1 / protocol 25. All eleven
+HTTPS domains return 200; content/media/CSS and unrelated site roots/commits are
+preserved. Host config fingerprints matched across catalogue publication; only
+the website's normal deployment changed its routing/commit receipt afterward.
+Service is active, recovery is clear and the deployment-window error journal is
+empty. Memory/swap policy is unchanged and no old downloads were removed.
+Final website `flea status` reports deployed code/content matching source.
+No real email or new interactive production editing was tested.
+
+- Mac ARM64: `784ca438a304faf344f1a2a6bbb4e2fd5685ced77411b5fc5c313a581b94c9f4`
+- Linux AMD64: `6c31975387b3712967066cd78533ef0aa6bdd92f27fba53860bb7a6ba36451f3`
+- Linux ARM64: `ee9d4ede230d14f0d3db74983148c58d526d3a576021a6ac0b37625d9b4e66a4`
+
+Evidence/private website backup: `/tmp/flea-0151-release`. Local retained artifacts:
+`/home/sean/fleacms-releases/0.15.1`. Remote retained staging:
+`/var/lib/flea/downloads/.flea-0151.FVF6MDwf`; Mac public test files:
+`/tmp/flea-0151-public`; native AMD64 test files:
+`/var/tmp/flea-0151-native.T0IR9yVs`. Full provenance is recorded in framework
+`docs/agents/release-0151-verification.md`. Native AMD64 full-suite/build,
+clean-Mac/notarization and native CI runner acceptance remain open.
+
 ## Blog and Contact skills documentation deployment - October 13, 2026
 
 Website source `5380c92` on `docs/app-skills`, stacked on `docs/blog-setup`.
