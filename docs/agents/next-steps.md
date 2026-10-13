@@ -452,6 +452,8 @@ to the changelog; retain acceptance evidence in the checklist or linked QA recor
 Minimal Blog implementation is on `feat/minimal-blog` in its isolated worktree.
 Local implementation and checks are complete; see
 [Blog verification](blog-verification.md). The 0.15.0 commit, push and private server rollout are complete; results are
-recorded in the verification document. Live rollout, native
-Mac/AMD64 acceptance and public release are separate work. Optional Blog source
-adoption must preserve each site's custom layouts.
+recorded in the verification document. Native
+Mac/AMD64 acceptance and public release remain separate work. Optional Blog source
+adoption must preserve each site's custom layouts. The subsequent source-built
+0.15.1 skill update is verified in [agent-skills rollout](site-app-skills-verification.md);
+public publication and native Mac/AMD64 acceptance remain open.

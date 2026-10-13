@@ -17,7 +17,10 @@ from a fresh matching-version site into `flea/skills/` and add their routing to
 that project's `AGENTS.md`, preserving its custom instructions. Skills are
 committed agent guidance and never public runtime assets.
 
-The 0.15.1 source-built local/server rollout is being verified. Public downloads
+The shared server and local Linux ARM64 CLI were updated to 0.15.1 on October
+13, 2026. Full tests, vet, bundled build and fresh-site skill checks passed.
+All eleven HTTPS domains and preserved content/media/styles were verified.
+See [rollout evidence](agents/site-app-skills-verification.md). Public downloads
 remain 0.13.0; no public artifacts or tags are part of this rollout.
 
 ## 0.14.0 server and local CLI rollout
