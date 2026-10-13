@@ -20,7 +20,7 @@ folder default and saves the answer. Saved names must be nonempty strings.
 Read-only/noninteractive loads use the folder default without writing; deployment
 requires a committed name so temporary release directories never change it.
 Use this exact filename everywhere; no extensionless configuration fallback.
-Deployment protocol 24 requires the JSON-suffixed configuration filename and
+Deployment protocol 25 requires the JSON-suffixed configuration filename and
 inline editing with the updated rich-content sanitization policy.
 Owner-editable snips live in flea/snips.json: pages map canonical routes to title,
 description, and snips; shared.snips holds reusable regions; archive holds removed
@@ -31,7 +31,7 @@ Generate {snip ID} without quotes. Quoted markers are rejected; HTML comments
 are ordinary comments and never render content or count as references, except
 the leading flea page-settings comment described below.
 Reject old flea attributes, directives, content paths and recovery journals;
-never silently ignore or migrate them. Protocol 24 enforces the snip format.
+never silently ignore or migrate them. Protocol 25 enforces the snip format.
 Do not add layout-changing borders to editable content. Show dashed editable
 boundaries using shadow-root overlays, stronger on hover/focus. Suppress the
 native editable wrapper outline and restore developer styling when editing ends.
@@ -92,7 +92,7 @@ media and icon files in release snapshots. The config is the sole dotfile except
 Private runtime and skills never enter archives. Keep the project-root read boundary
 separate from the site/ template boundary: logical template names remain site-relative,
 while extraction journal edit paths begin with site/. No old-directory fallback or
-automatic migration. Protocol 24 prevents old servers receiving this structure.
+automatic migration. Protocol 25 prevents old servers receiving this structure.
 
 `flea new` initializes Git on main and commits the generated files as
 `Initial site`, respecting normal identity, hooks and signing. Commit failure
@@ -165,3 +165,10 @@ settings and icon caches in version control by default.
   renders the escaped text field of a named snip. Preserve
   contextual escaping through Go's html/template; never reinterpret JSON as
   template code. Script and style elements do not support interpolation.
+
+## Blog
+
+Read [Blog](../blog.md) for the optional built-in blog, JSON and template contract.
+Posts share the snip/media snapshot, atomic save and preservation/synchronization
+paths. Drafts remain outside public routes and template data. The blog admin uses
+existing login, exact Origin, CSRF, upload bounds and content-version checks.

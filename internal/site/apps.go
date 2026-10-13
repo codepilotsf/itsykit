@@ -25,8 +25,15 @@ func (p *Project) validateApps() error {
 		assets = append(assets, route)
 	}
 	for name, cfg := range p.Apps {
-		if name != "contact" {
+		if name != "contact" && name != "blog" {
 			return fmt.Errorf("app %q is not included in this build", name)
+		}
+		if name == "blog" {
+			if cfg.Email != (contact.Email{}) {
+				return fmt.Errorf("blog does not accept email settings")
+			}
+			mounts = append(mounts, appapi.Mount{Name: name, Path: cfg.Mount})
+			continue
 		}
 		if err := cfg.Email.Validate(); err != nil {
 			return err
@@ -64,6 +71,9 @@ func (s *Server) StartApps(ctx context.Context, sender mailer.Sender, budget *co
 	}
 	s.apps.running = map[string]*runningApp{}
 	for name, cfg := range p.Apps {
+		if name == "blog" {
+			continue
+		}
 		delivery := &contact.Delivery{Email: cfg.Email, Sender: sender, Budget: budget, Render: s.RenderEmail}
 		manager, err := appmanager.Start(ctx, delivery, s.logger)
 		if err != nil && s.logger != nil {
@@ -86,6 +96,9 @@ func (s *Server) StartApps(ctx context.Context, sender mailer.Sender, budget *co
 
 func (s *Server) appFor(p *Project, route string) (appapi.Mount, *runningApp, bool) {
 	for name, cfg := range p.Apps {
+		if name == "blog" {
+			continue
+		}
 		if route == cfg.Mount || strings.HasPrefix(route, cfg.Mount+"/") {
 			s.apps.RLock()
 			running := s.apps.running[name]

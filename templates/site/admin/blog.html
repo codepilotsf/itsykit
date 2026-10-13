@@ -1,0 +1,13 @@
+<!-- flea
+layout: /admin.layout.html
+-->
+<section class="container py-xl admin-panel">
+ <div class="flex items-center gap-md"><h1 class="text-xl m-0">Blog posts</h1><a href="/admin/blog/edit" class="ml-auto ui-brand-1 text-white">New post</a></div>
+ <p class="text-dark">Drafts stay private. Publish a post when it is ready.</p>
+ <ul class="blog-post-list">
+ {#each admin.posts as post}
+  <li><a href="/admin/blog/edit?id={post.id}">{post.title}</a><span class="text-sm text-dark">{post.status}</span></li>
+ {:else}<li>No posts yet. Create your first post.</li>
+ {/each}
+ </ul>
+</section>

@@ -1,0 +1,9 @@
+<article class="container py-xl blog-public">
+ <a href="{blog.data.url}">Back to blog</a>
+ <h1>{blog.data.post.title}</h1>
+ <p class="text-sm text-dark"><time datetime="{blog.data.post.published_at}">{blog.data.post.published_label}</time></p>
+ {#if blog.data.post.cover}
+ <img src="{blog.data.post.cover.src}" alt="{blog.data.post.cover.alt}" width="{blog.data.post.cover.width}" height="{blog.data.post.cover.height}" class="blog-cover rounded-lg" />
+ {/if}
+ <div class="blog-body">{blog.data.post.body}</div>
+</article>

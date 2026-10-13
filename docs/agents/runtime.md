@@ -95,7 +95,8 @@ implements the child transport; internal/appbundle packages target-specific
 executables. Keep credentials in inherited pipes and an already-bound listener
 handoff. Never pass provider environment to children. Preserve parent-liveness
 cleanup, bounded restarts and per-site process isolation; this is not an OS sandbox.
-Only Contact is configurable today; custom/remote registration remains planned.
+Contact is the only bundled child service. Optional Blog uses the built-in
+content snapshot/editor; custom/remote service registration remains planned.
 Never forward browser cookies or Authorization as service credentials. Keep
 upstream redirects and POST retries disabled, response/deadline/concurrency
 bounds enforced, and app values request-local. Anonymous form cookies are signed,
@@ -119,7 +120,8 @@ Flash is bounded (256 entries/site, five-minute expiry), visitor/host/app/route
 bound, and consumed only after a successful GET render. HEAD, assets, failed
 renders and other pages cannot consume it. Changed app settings require restart;
 never silently use an old recipient for a changed registration. Deployment
-configures email for app-only sites too. Protocol 24 requires the managed runtime.
+configures email for Contact-only sites too. Blog itself requires no mail; its
+admin login still uses the normal mail and HTTPS requirements. Protocol 25 requires the managed runtime.
 Test cross-site recipients, credentials, flashes and aliases without live email.
 
 `index.html` maps to `/`. `about.html` and `about/index.html`
@@ -172,3 +174,10 @@ Dev request logs use `GET /test` for 200 and `404 GET /missing` for non-200
 responses, including assets and HEAD. Suppress successful internal reload polls.
 Log escaped paths without query strings, using the same concurrency-safe logger
 as reload diagnostics. Capture the actual HTTP status, including partial content.
+
+## Blog
+
+Read [Blog](../blog.md) for the optional built-in blog, JSON and template contract.
+Posts share the snip/media snapshot, atomic save and preservation/synchronization
+paths. Drafts remain outside public routes and template data. The blog admin uses
+existing login, exact Origin, CSRF, upload bounds and content-version checks.

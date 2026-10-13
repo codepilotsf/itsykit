@@ -1,0 +1,11 @@
+<section class="container py-xl blog-public">
+ <h1>Blog</h1>
+ {#each blog.data.posts as post}
+ <article class="py-md border-b border-light">
+  <p class="text-sm text-dark"><time datetime="{post.published_at}">{post.published_label}</time></p>
+  <h2><a href="{post.url}">{post.title}</a></h2>
+  <p>{post.excerpt}</p>
+ </article>
+ {:else}<p>No posts yet. Check back soon.</p>
+ {/each}
+</section>

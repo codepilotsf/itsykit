@@ -17,13 +17,16 @@ import (
 )
 
 type Document struct {
-	Store   *snips.Store
-	Routes  []string
-	Version string
+	Store     *snips.Store
+	Routes    []string
+	Version   string
+	BlogMount string
 }
 type Update struct {
 	Version, Route, ID, Content, Title, Description string
 	Page                                            *PageEdit
+	Blog                                            *BlogEdit
+	BlogResult                                      *BlogResult
 	// Result is filled from the committed snapshot while the save lock is held.
 	Result *PageResult
 }
@@ -136,7 +139,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "POST" {
-		pageUpload := r.URL.Path == "/admin/page" && strings.HasPrefix(strings.ToLower(r.Header.Get("Content-Type")), "multipart/form-data")
+		pageUpload := (r.URL.Path == "/admin/page" || r.URL.Path == "/admin/blog/save") && strings.HasPrefix(strings.ToLower(r.Header.Get("Content-Type")), "multipart/form-data")
 		scheme := "https"
 		if h.options.Local {
 			scheme = "http"
@@ -214,7 +217,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case "/admin/verify":
 			h.verifyCode(w, r)
 			return
-		case "/admin/logout", "/admin/activity", "/admin/page":
+		case "/admin/logout", "/admin/activity", "/admin/page", "/admin/blog/save":
 			if !logged || !equal(s.csrf, r.FormValue("csrf")) {
 				http.Error(w, "Your session expired. Please sign in again.", 403)
 				return
@@ -241,6 +244,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusNoContent)
 				return
 			}
+			if r.URL.Path == "/admin/blog/save" {
+				h.saveBlog(w, r)
+				return
+			}
 			if r.URL.Path == "/admin/page" {
 				h.savePage(w, r)
 				return
@@ -249,6 +256,17 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 			return
 		}
+	}
+	if r.URL.Path == "/admin/blog" || r.URL.Path == "/admin/blog/edit" {
+		if !logged {
+			http.Redirect(w, r, "/admin", 303)
+			return
+		}
+		if !h.renew(w, r) {
+			return
+		}
+		h.showBlog(w, r, s)
+		return
 	}
 	if r.URL.Path == "/admin/editor-context" && logged {
 		h.readEditorContext(w, r, s)

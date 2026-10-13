@@ -15,7 +15,7 @@ func TestAppRegistration(t *testing.T) {
 		{"null", `"apps":null`, false},
 		{"missing recipient", `"apps":{"contact":{"mount":"/contact"}}`, false},
 		{"unknown option", `"apps":{"contact":{"mount":"/contact","url":"http://127.0.0.1:9999","email":{"to":"owner@example.test"}}}`, false},
-		{"unbundled app", `"apps":{"blog":{"mount":"/contact","email":{"to":"owner@example.test"}}}`, false},
+		{"blog email settings", `"apps":{"blog":{"mount":"/contact","email":{"to":"owner@example.test"}}}`, false},
 		{"core route", `"apps":{"contact":{"mount":"/admin","email":{"to":"owner@example.test"}}}`, false},
 		{"no pages", `"apps":{"contact":{"mount":"/missing","email":{"to":"owner@example.test"}}}`, false},
 		{"sender injection", `"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.test","from":"evil\r\n@example.test"}}}`, false},

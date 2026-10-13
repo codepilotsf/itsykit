@@ -5,7 +5,8 @@ Build pages with HTML, style them with CSS, and let site admins edit their own c
 ## Getting started
 
 The included Contact mini app uses a normal HTML form and `{csrf}`. Enable it
-only on sites that need it, as described below. Other mini apps remain planned.
+only on sites that need it, as described below. Blog is an optional built-in content application, described below. Custom
+service apps remain planned.
 
 For a new project, install FleaCMS first, then run:
 
@@ -483,3 +484,14 @@ options, such as `flea deploy --help`.
 
 General field schemas, content revision history, video transcoding, and
 unrestricted raw HTML rendering are not currently supported.
+
+## Optional Blog
+
+Merge `"blog": {"mount": "/blog"}` into the configuration’s `apps` object.
+The private `site/blog/_index.html` and `_post.html` templates supply the listing
+and posts. Sign in, then open `/admin/blog` for drafts, rich text, cover selection
+and explicit Publish/Unpublish. Posts use the top-level `blog` array in
+`flea/snips.json`. Normal deploy preserves live posts; pull before publishing
+source edits with `--with-snips`. Draft text is private; uploaded photos are public.
+See https://gitlab.codepilot.com/sean-schertell/flea/-/blob/main/docs/blog.md for
+the JSON/token contract.

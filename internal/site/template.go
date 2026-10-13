@@ -137,6 +137,9 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 					return fail(i, fmt.Errorf("unclosed <%s> element", match[1]))
 				}
 				end := i + len(match[0]) + close[1]
+				if strings.Contains(source[i:end], "{blog.data.post.body}") {
+					return fail(i, fmt.Errorf("blog body requires ordinary HTML element content"))
+				}
 				out.WriteString(source[i:end])
 				i = end
 				continue
@@ -173,6 +176,8 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 		token := strings.TrimSpace(source[i+1 : end])
 		var rendered string
 		switch {
+		case token == "blog.data.post.body":
+			rendered = blogBodyAction
 		case token == "csrf":
 			rendered = csrfAction
 		case token == "icon" || strings.HasPrefix(token, "icon ") || strings.HasPrefix(token, "icon\t") || strings.HasPrefix(token, "icon\n"):

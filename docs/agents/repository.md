@@ -60,3 +60,12 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 Source CSS is loaded from the immutable release. `internal/site/managed.go`
 provides confined fixed-path file helpers. Theme editor/overlay/sync code has
 been removed; snip synchronization remains in setup/admin/syncstate.
+
+## Blog
+
+`internal/snips/blog.go` validates post records; `internal/site/blog.go` owns
+published routes/views; `internal/editor/blog.go` owns private forms and uploads;
+`internal/editstore/blog.go` saves under the shared content lock.
+`internal/syncstate` compares/merges whole posts. Canonical private blog/admin
+templates live under `templates/site/blog/` and `templates/site/admin/`.
+See [Blog](../blog.md) for the authoring contract.

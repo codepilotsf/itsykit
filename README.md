@@ -219,7 +219,7 @@ in `.flea.config.json` and are stripped from release archives and backups.
 This structure is required; there is no old-directory fallback or automatic
 migration. Existing projects need an explicit, collision-checked reorganization.
 Keep template-relative paths and public URLs unchanged. Update the server before
-deploying: protocol 24 requires the new structure.
+deploying: protocol 25 requires the new structure.
 
 ## Templates
 
@@ -638,7 +638,7 @@ browser's session. Removing an admin revokes their sessions. Session files stay
 private; status reports site and deployment information.
 
 The production service can write the site's private `flea/` directory, not its
-release directory or configuration. Deployment protocol 24 requires the updated
+release directory or configuration. Deployment protocol 25 requires the updated
 server and these permissions; there is no compatibility fallback for older servers.
 
 ### Editing content
@@ -753,7 +753,7 @@ FLEA_EMAIL_FROM="login@your-verified-domain.com"
 ```
 
 Production admin access requires HTTPS. An admin-enabled HTTP-only deployment is
-refused. Protocol 24 requires both the updated server binary and systemd unit, a
+refused. Protocol 25 requires both the updated server binary and systemd unit, a
 service-owned `/etc/flea/deploy.lock`, and writable managed content/runtime directories.
 Fresh setup installs these. Existing servers need an administrator-reviewed upgrade;
 do not use setup's destructive reset to upgrade a server with sites. Existing
@@ -761,6 +761,14 @@ content directories must be owned by `flea:flea` (0750); release directories
 and host config remain root-owned. Each site's `flea/` runtime directory must be
 owned by `flea:flea` (0700). Redeployment prepares content and runtime directories.
 Back up your server before changing installation permissions.
+
+## Blog
+
+Enable `apps.blog` with `{"mount":"/blog"}` for a minimal blog with an admin post
+list and rich-text editor at `/admin/blog`. New posts are drafts; Publish/Unpublish
+is explicit, and saving a published post updates it immediately. Optional covers
+reuse the photo library. Posts use the `blog` array in `flea/snips.json` and ordinary
+HTML templates. See [Blog](docs/blog.md) for setup, JSON, tokens and synchronization.
 
 ## Contact app
 
@@ -802,8 +810,9 @@ JSON responses, flash, limits and process behavior, and
 This replaces top-level `contact` configuration and `/_flea/contact`, without
 aliases or automatic migration. Update existing forms/config explicitly, add
 `{csrf}`, and move the thank-you page beneath the chosen mount. Deployment
-protocol 24 requires the matching server. Nothing is deployed by a local build.
-External services, generic app installation and blog routes remain planned.
+protocol 25 requires the matching server. Nothing is deployed by a local build.
+External services and generic app installation remain planned. Blog is a built-in
+content application, described above.
 
 ## Styling with Prewind
 
@@ -985,7 +994,7 @@ advances the baseline last; disk failures report any partial local update.
 
 Theme editing, remote CSS overlays, `--with-theme`, `--theme-only` and
 `--snips-only` have been removed. No aliases or automatic conversion are provided.
-Protocol 24 rejects server configurations with the removed `themes` mapping.
+Protocol 25 rejects server configurations with the removed `themes` mapping.
 Before a live upgrade, use the previous runtime to back up any saved remote CSS
 and explicitly preserve needed customizations in Git. Review server configuration
 and toolbar updates separately; do not reset a server or delete retained files.
@@ -1334,7 +1343,7 @@ sudo systemctl restart flea
 ```
 
 Existing installations are not upgraded by rerunning setup. Deployment requires
-the current server executable (deployment protocol 24, unquoted snip syntax).
+the current server executable (deployment protocol 25, unquoted snip syntax).
 For an older installation,
 update the executable and systemd unit deliberately, preserve server.json and all
 sites, and create `/var/lib/flea/certs` owned by `flea:flea` with mode
@@ -1473,7 +1482,7 @@ directions and a sample-page review before the full build, unless you explicitly
 delegate those choices. Small maintenance edits do not require a new design review.
 
 Editable regions, short IDs, sanitized HTML, page metadata, content-preserving
-deployment, and archived orphan pruning are implemented. Deployment protocol 24
+deployment, and archived orphan pruning are implemented. Deployment protocol 25
 requires an updated server binary; older servers are refused before upload.
 Local extraction preserves unreferenced content until deployment. There is no
 Markdown renderer or schema migration engine. Inline rich-text editing and

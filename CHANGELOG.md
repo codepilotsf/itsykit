@@ -4,6 +4,14 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.15.0 - 2026-10-13
+
+- Add optional Blog with a private admin list/editor, explicit Publish/Unpublish,
+  rich text and library/uploaded covers. Public templates receive published
+  posts only. Content preservation, explicit synchronization and backups reuse
+  the existing content snapshot.
+- Deployment protocol 25 adds the blog content and mounted routing contract.
+
 ## 0.14.0 - 2026-10-13
 
 - Remove the remote Theme editor, CSS overlays and theme synchronization. Keep

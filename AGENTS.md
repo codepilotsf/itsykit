@@ -69,8 +69,10 @@ Generated sites use `site/` for public templates/assets, `mailers/` for private
 email templates, `flea/` for content/data/media/icons/skills, and
 `.flea.config.json` for configuration. Runtime state is private in
 `flea/runtime/`. Globals use `app.*`; there is no `site.*` alias.
-Mini apps use the Flea App Protocol and explicit `{csrf}` form controls. Only
-bundled Contact is enabled today; see the runtime/template guides and its README.
+Bundled Contact uses the Flea App Protocol and explicit `{csrf}` visitor forms.
+Optional Blog uses the built-in content/editor snapshot; read [Blog](docs/blog.md)
+before changing posts, routes, rich bodies or synchronization. See the
+runtime/template guides for both applications.
 Do not change admin form contracts or infer support for arbitrary app installation.
 Generated-site guidance lives in `templates/AGENTS.md` and the bundled skills in
 `templates/flea/skills/` (`import-brochure` and `fleacms-site`); keep it consistent

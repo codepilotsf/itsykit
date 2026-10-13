@@ -1,0 +1,44 @@
+<!-- flea
+layout: /admin.layout.html
+-->
+<section class="container py-lg admin-panel">
+ <a href="/admin/blog">Back to posts</a>
+ <h1 class="text-xl">Edit post</h1>
+ <noscript><p>The blog editor needs JavaScript. Enable it and reload before editing.</p></noscript>
+ <form method="post" action="/admin/blog/save" id="blog-editor" data-status="{admin.post.status}">
+  <input type="hidden" name="csrf" value="{admin.csrf}" />
+  <input type="hidden" name="version" value="{admin.version}" />
+  <input type="hidden" name="id" value="{admin.post.id}" />
+  <p id="blog-state" class="text-dark">Status: {admin.post.status}</p>
+  <label class="form-field">Title<input name="title" value="{admin.post.title}" maxlength="200" required /></label>
+  <label class="form-field">URL slug<input name="slug" value="{admin.post.slug}" maxlength="100" pattern="[a-z0-9]+(-[a-z0-9]+)*" required aria-describedby="slug-help" /></label>
+  <p id="slug-help" class="text-sm text-dark">Lowercase words separated by hyphens, such as welcome-to-our-blog. Changing this changes the public URL.</p>
+  <label class="form-field">Excerpt<textarea name="excerpt" maxlength="500" rows="3">{admin.post.excerpt}</textarea></label>
+  <label class="form-field">Publication date<input name="published_at" value="{admin.post.published_at}" aria-describedby="date-help" /></label>
+  <p id="date-help" class="text-sm text-dark">Leave empty to use the date you first publish. Otherwise use a date such as 2026-10-13T14:00:00Z. Future dates publish immediately.</p>
+  <label class="form-field" id="blog-body-label">Body<textarea name="body" rows="12">{admin.post.body}</textarea></label>
+  <fieldset class="blog-cover-field"><legend>Cover photo (optional)</legend>
+   <label class="form-field">Current selection<select name="cover"><option value="">No photo</option>
+    {#each admin.photos as photo}<option value="{photo.id}" data-src="{photo.src}" data-alt="{photo.alt}">{photo.name} {photo.alt}</option>{/each}
+   </select></label>
+   <input type="hidden" name="saved_cover" value="{admin.post.cover}" />
+   <button type="button" id="choose-cover">Choose from library</button>
+   <div id="cover-preview-slot"></div>
+   <label class="form-field">Upload a JPEG or PNG<input name="cover_file" type="file" accept="image/jpeg,image/png" /></label>
+   <label class="form-field">New photo description<input name="cover_alt" maxlength="1000" aria-describedby="cover-help" /></label>
+   <p id="cover-help" class="text-sm text-dark">Up to 8 MiB. Describe the image for people using screen readers, or leave blank for decoration. Saved photos and their descriptions are public website assets.</p>
+  </fieldset>
+  <div class="flex items-center gap-sm flex-wrap py-md" id="blog-actions">
+   <button name="action" value="save" class="ui-brand-1 text-white">Save</button>
+   <button name="action" value="publish">Publish</button>
+   <button name="action" value="unpublish">Unpublish</button>
+   <a href="/admin/blog" id="blog-cancel">Cancel</a>
+  </div>
+  <p id="blog-message" role="status" aria-live="polite"></p>
+ </form>
+ <dialog id="cover-library" class="blog-library"><h2>Choose a cover photo</h2><div class="blog-photo-grid">
+  <button type="button" data-photo="">No photo</button>
+  {#each admin.photos as photo}<button type="button" data-photo="{photo.id}" aria-label="{photo.alt}"><img src="{photo.src}" alt="{photo.alt}" loading="lazy" /><span>{photo.name}</span></button>{/each}
+ </div><button type="button" id="close-library">Close</button></dialog>
+</section>
+<script src="/admin/assets/blog.js" defer></script>

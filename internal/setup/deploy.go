@@ -108,7 +108,8 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			return fmt.Errorf("Set app.site_name in .flea.config.json, or run flea dev to choose a site name, then commit it before deploying.")
 		}
 		localProject = p
-		needsMail = len(p.Admin.Emails) > 0 || len(p.Apps) > 0
+		_, contactEnabled := p.Apps["contact"]
+		needsMail = len(p.Admin.Emails) > 0 || contactEnabled
 		if needsMail && !opts.HTTPS {
 			return fmt.Errorf("Admin login requires HTTPS, and so do contact forms. Enable it with flea deploy -configure before deploying this site.")
 		}

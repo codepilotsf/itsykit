@@ -181,3 +181,12 @@ are appropriate for review; keep temporary captures outside the public site.
 Styles are developer-managed in `site/css/theme.css` using Prewind. Ordinary
 `flea deploy` publishes committed CSS. There is no browser Theme editor or CSS
 synchronization; `flea pull` retrieves snips and media only.
+
+### Optional Blog
+
+Enable `apps.blog.mount` and customize the private `_index.html` and `_post.html`
+templates below its mount. Author the top-level `blog` array in `flea/snips.json`;
+retain other content and stable IDs. Public views are `blog.data.posts` and
+`blog.data.post`; `{blog.data.post.body}` is sanitized rich element content only.
+New admin posts are drafts; published saves apply immediately. Pull live content
+before publishing source updates with `--with-snips`. Photos are public assets.

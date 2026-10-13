@@ -107,3 +107,14 @@ backward compatibility or changing deployment/access settings.
 Styles are developer-managed in `site/css/theme.css` using Prewind. Ordinary
 `flea deploy` publishes committed CSS. There is no browser Theme editor or CSS
 synchronization; `flea pull` retrieves snips and media only.
+
+## Optional Blog
+
+`apps.blog.mount` enables private `_index.html` and `_post.html` templates below
+the mount directory. Posts are the `blog` array in `flea/snips.json`, sharing
+content/media deployment semantics. Keep stable ten-character alphanumeric IDs.
+Use `blog.data.posts` and `blog.data.post` published-only views; only the exact
+`{blog.data.post.body}` token renders sanitized HTML, in ordinary element content.
+Drafts have no public route. The private `/admin/blog` supports explicit Publish
+and Unpublish; published saves apply immediately. Preserve live posts with normal
+deploy; pull before `--with-snips` source updates. Omitted IDs never delete posts.
