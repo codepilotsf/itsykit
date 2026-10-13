@@ -16,7 +16,9 @@ mail opens in the browser without Resend credentials. Preview mode and sender
 details require a dev restart after changes; production ignores the toggle.
 Do not write preview messages or sign-in codes into site files.
 `flea dev --lan`/`-l` enables full HTTP development on a trusted private IPv4
-network. Default dev remains loopback-only. Email previews open on the host
+network or shared address space (100.64.0.0/10, including Tailscale). Hostnames
+must match a detected interface address, computer name or local alias at the
+selected port. Default dev remains loopback-only. Email previews open on the host
 computer; enter the code on the other device. Never forward the development port.
 
 Public pages, partials, layouts and assets belong in site/. Use main.layout.html

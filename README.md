@@ -81,7 +81,11 @@ Set `"dev": {"email_preview": false}` and restart dev to test real delivery;
 configure it explicitly with `flea email`. Production always uses real delivery
 and ignores this toggle. See [email previews](docs/email-templates.md) for details.
 
-Open http://localhost:3000, edit `site/index.html`, and save. Your browser reloads
+Open the Website URL printed in the console, edit `site/index.html`, and save.
+Dev starts at port 3000. If another process occupies it, Flea explains the
+conflict and tries 3001, 3002 and so on until it binds an available port.
+Use `flea dev --port 4000` to require a specific port, or `--port 0` to let the
+operating system choose one. Your browser reloads
 automatically. Change the welcome text in `flea/snips.json`, or give the site
 your own colors and fonts in `site/css/theme.css`. Press Ctrl-C to stop the server.
 Admin sign-in pages also refresh when their templates or layout change in dev.
@@ -90,14 +94,17 @@ mode when there are no unsaved changes. Drafts and open dialogs
 pause reloads so they are not lost. Cancel a draft to accept pending source changes.
 
 To test from a phone or another computer on the same trusted network, run
-`flea dev --lan` (or `flea dev -l`). Open one of the printed Network URLs on that
-device. Sign-in, editing, uploads, forms, reloads and dev diagnostics work
+`flea dev --lan` (or `flea dev -l`). Open a printed Network or Hostname URL on that device, such as
+`http://asahi:3000` or `http://asahi.local:3000` when that name resolves to this
+computer. Sign-in, editing, uploads, forms, reloads and dev diagnostics work
 there too. Each device signs in separately. Email previews still open on the
 computer running Flea; enter that code on your other device. To share a private
 preview, replace its `127.0.0.1` host with a printed network IP, keeping the port
 and random path. Never share preview links with anyone you do not trust.
 
-LAN mode uses unencrypted HTTP and detected private IPv4 addresses. Use it only
+LAN mode uses unencrypted HTTP, detected private/Tailscale IPv4 addresses and
+this computer's hostname/local alias. Its exact Host/port allowlist and actual
+private, loopback or RFC 6598 (`100.64.0.0/10`) peer checks remain required. Use it only
 on a trusted network, never forward its port, and restart after changing networks.
 VPN addresses may also appear. Allow the chosen port through your computer's
 firewall if needed; guest Wi-Fi may block device-to-device connections.
@@ -109,7 +116,7 @@ Run these from your site's folder:
 
 | Command | What it does |
 | --- | --- |
-| `flea dev` | Preview your site at http://localhost:3000 with browser reloads. |
+| `flea dev` | Preview your site with browser reloads, starting at port 3000. |
 | `flea dev -port 8080` | Preview on a different port. |
 | `flea status` | Show local validation and Git state, then compare the current branch with its saved deployment. |
 | `flea reset` | Reset the local site to the clean default after confirmation, keeping a private backup. |
@@ -1354,6 +1361,9 @@ content directories (flea-owned 0750) and create each managed site's private
 `flea/` directory (flea-owned 0700) before starting the new server. Reload systemd and restart
 after replacing the unit. For executable-only updates on a current installation,
 use `flea update-server`; it does not migrate service units or configuration.
+After confirmation, a terminal spinner shows that the update is running; redirected
+output uses a plain progress line. Animation stops before SSH diagnostics or
+interactive sudo prompts, and successful updates print a completion message.
 
 ### List or remove sites on a server
 

@@ -120,13 +120,14 @@ func TestLANPreviewRequiresCapabilityAndApprovedRequest(t *testing.T) {
 	if err := p.Send(context.Background(), mailer.Message{To: "owner@example.test", Text: "Private LAN preview"}); err != nil {
 		t.Fatal(err)
 	}
-	h := devaccess.WrapLAN(p, []string{"192.168.1.5"}, 3000)
+	h := devaccess.WrapLAN(p, []string{"192.168.1.5"}, []string{"asahi", "asahi.local"}, 3000)
 	lanURL := strings.Replace(*address, "127.0.0.1", "192.168.1.5", 1)
 	for _, tc := range []struct {
 		name, url, origin, peer string
 		handler                 http.Handler
 		want                    int
 	}{
+		{"hostname", strings.Replace(lanURL, "192.168.1.5", "asahi", 1), "http://asahi:3000", "100.79.67.33:4321", h, 200},
 		{"LAN", lanURL, "", "192.168.1.9:4321", h, 200},
 		{"same origin", lanURL, "http://192.168.1.5:3000", "192.168.1.9:4321", h, 200},
 		{"default", lanURL, "", "192.168.1.9:4321", p, 404},
@@ -217,14 +218,15 @@ func TestPreviewBrowser(t *testing.T) {
 	if browser == "" {
 		t.Skip("set FLEA_TEST_BROWSER")
 	}
-	var handler http.Handler
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { handler.ServeHTTP(w, r) }))
-	defer s.Close()
-	p, err := New(s.URL, "Juniper Studio", "hello@juniper.example", nil)
+	s := httptest.NewUnstartedServer(nil)
+	p, err := New("http://"+s.Listener.Addr().String(), "Juniper Studio", "hello@juniper.example", nil)
 	if err != nil {
+		s.Close()
 		t.Fatal(err)
 	}
-	handler = p
+	s.Config.Handler = p
+	s.Start()
+	defer s.Close()
 	address := ""
 	p.open = func(_ context.Context, s string) error { address = s; return nil }
 	err = p.Send(context.Background(), mailer.Message{To: "sean@example.test", Subject: "Your sign-in code for Juniper Studio", Text: "Your sign-in code is 482916", HTML: `<html><body style="margin:0;padding:48px 32px;font:16px/1.7 system-ui;color:#26332d"><p style="margin:0 0 16px;font-size:12px;letter-spacing:.14em;color:#66776c">JUNIPER STUDIO</p><h1 style="font-size:25px;font-weight:600">Welcome back.</h1><p>Use this code to sign in to your website.</p><p style="font-size:38px;letter-spacing:.2em;font-weight:600">482916</p><p style="color:#66776c;font-size:14px">This code expires in 10 minutes.</p><script>parent.document.title="UNSAFE"</script></body></html>`})

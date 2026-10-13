@@ -134,12 +134,12 @@ func TestLANBrowserEditing(t *testing.T) {
 			_, _ = w.Write(body)
 		}
 	})
-	server := &http.Server{Handler: devaccess.WrapLAN(handler, addresses, port), ReadHeaderTimeout: 5 * time.Second}
+	server := &http.Server{Handler: devaccess.WrapLAN(handler, addresses, []string{"asahi", "asahi.local"}, port), ReadHeaderTimeout: 5 * time.Second}
 	defer server.Close()
 	go server.Serve(listener)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, browser, "--headless", "--disable-gpu", "--no-proxy-server", "--host-resolver-rules=MAP unpkg.com ~NOTFOUND, MAP fonts.googleapis.com ~NOTFOUND, MAP fonts.gstatic.com ~NOTFOUND", "--disable-background-mode", "--disable-background-networking", "--disable-component-update", "--no-first-run", "--no-default-browser-check", "--user-data-dir="+t.TempDir(), fmt.Sprintf("http://%s:%d/_test/run", addresses[0], port))
+	cmd := exec.CommandContext(ctx, browser, "--headless", "--disable-gpu", "--no-proxy-server", fmt.Sprintf("--host-resolver-rules=MAP asahi %s, MAP unpkg.com ~NOTFOUND, MAP fonts.googleapis.com ~NOTFOUND, MAP fonts.gstatic.com ~NOTFOUND", addresses[0]), "--disable-background-mode", "--disable-background-networking", "--disable-component-update", "--no-first-run", "--no-default-browser-check", "--user-data-dir="+t.TempDir(), fmt.Sprintf("http://asahi:%d/_test/run", port))
 	cmd.WaitDelay = 2 * time.Second
 	var output bytes.Buffer
 	cmd.Stdout = &output

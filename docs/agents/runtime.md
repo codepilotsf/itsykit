@@ -54,13 +54,20 @@ Never interrupt pull/reset, delete their locks, or proceed if shutdown times out
 Stale sockets may be removed only after acquiring the site lock; reject other
 file types. Older binaries without this endpoint must be stopped manually once.
 The dev server defaults to loopback and prints localhost URLs with the actual bound
-port. `--lan`/`-l` binds IPv4 interfaces and prints detected RFC1918 addresses.
-The outer devaccess middleware validates exact listener Host/port and actual
-private/loopback peers, then marks the request context. Forwarded headers never
+port. Without an explicit `--port`, bind 3000 directly and retry consecutive
+ports only for address-in-use errors, explaining each occupied port and the
+selected replacement. Explicit ports are fixed; `--port 0` remains OS-selected.
+Never probe then bind, retry permission/other failures, or bypass same-site
+replacement and the dev/pull/reset lock. Derive URLs, email previews and LAN
+Host/Origin checks from the actual listener port.
+`--lan`/`-l` binds IPv4 interfaces and prints detected private/Tailscale addresses
+and OS hostname/local aliases. The outer devaccess middleware validates these
+exact Hosts at the listener port and actual private, RFC 6598 shared-address-space
+(100.64.0.0/10) or loopback IPv4 peers, then marks the request context. Forwarded headers never
 authorize access. Only marked dev requests may use LAN admin, contact, diagnostics
 and private capability previews. Keep exact Origin, CSRF, host-bound sessions and
 production HTTPS checks. Warn that LAN HTTP requires a trusted network; restart
-after network changes. Fail clearly when no private IPv4 address is available.
+after network changes. Fail clearly when no private or Tailscale IPv4 address is available.
 The persistent host defaults to public HTTP
 port 80, with opt-in automatic HTTPS on port 443 per domain.
 

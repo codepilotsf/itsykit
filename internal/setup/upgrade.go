@@ -14,11 +14,29 @@ import (
 	"time"
 )
 
-func Upgrade(ctx context.Context, root string, recover bool, in io.Reader, out, errOut io.Writer) error {
-	return upgradeServer(ctx, root, recover, in, out, errOut, execute)
+func Upgrade(ctx context.Context, root string, recover bool, in io.Reader, out, errOut io.Writer, terminal bool) error {
+	return upgradeServer(ctx, root, recover, in, out, errOut, terminal, execute)
 }
-func upgradeServer(ctx context.Context, root string, recover bool, in io.Reader, out, errOut io.Writer, run runner) error {
-	return withRemoteAdminProtocol(ctx, root, in, out, errOut, run, false, func(r remoteAdmin) error {
+func upgradeServer(ctx context.Context, root string, recover bool, in io.Reader, out, errOut io.Writer, terminal bool, run runner) error {
+	var progress *commandProgress
+	stop := func() {
+		if progress != nil {
+			progress.stop()
+		}
+	}
+	defer stop()
+	wrapped := func(ctx context.Context, c command) error {
+		for _, arg := range c.args {
+			if arg == "-tt" {
+				stop()
+				break
+			}
+		}
+		return run(ctx, c)
+	}
+	output := progressOutput{Writer: out, stop: stop}
+	diagnostic := progressOutput{Writer: errOut, stop: stop}
+	err := withRemoteAdminProtocol(ctx, root, in, output, diagnostic, wrapped, false, func(r remoteAdmin) error {
 		var result bytes.Buffer
 		if err := r.ssh(ctx, probe, false, &result); err != nil {
 			return err
@@ -57,6 +75,7 @@ func upgradeServer(ctx context.Context, root string, recover bool, in io.Reader,
 		if strings.ToLower(answer) != "y" && strings.ToLower(answer) != "yes" {
 			return fmt.Errorf("cancelled; nothing changed")
 		}
+		progress = newCommandProgress(out, terminal, "Updating server...")
 		result.Reset()
 		if err = r.ssh(ctx, "umask 077; mktemp /tmp/flea-upgrade.XXXXXXXXXX", false, &result); err != nil {
 			return err
@@ -83,6 +102,15 @@ func upgradeServer(ctx context.Context, root string, recover bool, in io.Reader,
 		if !r.root {
 			command = "sudo -- " + command
 		}
-		return r.ssh(ctx, command, !r.root, out)
+		return r.ssh(ctx, command, !r.root, progressOutput{Writer: out, stop: stop})
 	})
+	stop()
+	if err == nil {
+		if recover {
+			fmt.Fprintln(out, "Server update recovery complete.")
+		} else {
+			fmt.Fprintln(out, "Server update complete.")
+		}
+	}
+	return err
 }

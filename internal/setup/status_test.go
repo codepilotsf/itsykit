@@ -204,7 +204,7 @@ func TestWebsiteCheck(t *testing.T) {
 }
 func TestStatusSpinner(t *testing.T) {
 	var out bytes.Buffer
-	p := newStatusProgress(&out, true)
+	p := newCommandProgress(&out, true, "Checking remote...")
 	time.Sleep(150 * time.Millisecond)
 	p.stop()
 	p.stop()

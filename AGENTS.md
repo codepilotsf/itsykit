@@ -84,11 +84,14 @@ in private browser previews; production ignores this setting. Keep the first-run
 prompts limited to site name and optional admin email, asked once on first run.
 User-facing copy says "admin"; code and DOM identifiers keep "owner". See the
 runtime guide.
-Dev defaults to loopback. A new dev invocation gracefully replaces the same site's existing
+Dev defaults to loopback and tries consecutive ports from 3000 when occupied,
+with clear console output. Explicit `--port` stays fixed; 0 selects an OS-assigned port.
+A new dev invocation gracefully replaces the same site's existing
 dev server through private local control; never interrupt pull/reset or bypass
 the development lock. See the runtime guide.
 `--lan`/`-l` explicitly enables full trusted-network development over HTTP;
-preserve the shared Host/peer gate and ordinary auth/CSRF.
+preserve the shared exact Host/port and private/Tailscale peer gate, including
+detected hostname/local aliases, and ordinary auth/CSRF.
 `flea new` creates an initial Git commit on main unless `--skip-git` is used;
 see the runtime guide for failure recovery and remote setup. It defaults to a
 clean layout/index. `--starter`/`-s` adds demo pages and a six-person fictional team. `flea reset` confirms before resetting all local files

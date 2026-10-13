@@ -130,7 +130,11 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if flags.NArg() != 0 {
 			return 2
 		}
-		if err := setup.Upgrade(ctx, ".", *recover, os.Stdin, out, errOut); err != nil {
+		terminal := false
+		if file, ok := out.(*os.File); ok {
+			terminal = devTerminal(ctx, file)
+		}
+		if err := setup.Upgrade(ctx, ".", *recover, os.Stdin, out, errOut, terminal); err != nil {
 			return fail(err)
 		}
 		return 0
@@ -478,16 +482,16 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet("dev", flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintln(flags.Output(), "Usage: flea dev [options]\n\nStart the local development server from your site folder.\nAsks for a site name once, then offers optional admin setup.\nNew sites preview email in your browser without sending.\nChanges reload automatically.\n\nOptions")
+			fmt.Fprintln(flags.Output(), "Usage: flea dev [options]\n\nStart the local development server from your site folder.\nAsks for a site name once, then offers optional admin setup.\nNew sites preview email in your browser without sending.\nChanges reload automatically.\nStarts at port 3000 and tries the next port if it is occupied.\n\nOptions")
 			flags.PrintDefaults()
 			fmt.Fprintln(flags.Output())
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			flags.SetOutput(out)
 		}
-		port := flags.Int("port", 3000, "local HTTP port (0 selects an available port)")
+		port := flags.Int("port", 3000, "fixed HTTP port (0 selects an available port)")
 		var lan bool
-		flags.BoolVar(&lan, "lan", false, "enable full development access on a trusted private IPv4 network (HTTP)")
+		flags.BoolVar(&lan, "lan", false, "enable full development access on a trusted private/Tailscale IPv4 network (HTTP)")
 		flags.BoolVar(&lan, "l", false, "same as --lan")
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
@@ -499,6 +503,12 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			fmt.Fprint(errOut, usage)
 			return 2
 		}
+		automaticPort := true
+		flags.Visit(func(f *flag.Flag) {
+			if f.Name == "port" {
+				automaticPort = false
+			}
+		})
 		ctx, unlock, err := beginDevelopment(ctx, ".", out)
 		if err != nil {
 			return fail(err)
@@ -532,15 +542,19 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			sender = mailer.NewResend(mailSettings)
 		}
 		bindHost := "127.0.0.1"
-		var lanAddresses []string
+		var lanAddresses, lanHostnames []string
 		if lan {
 			lanAddresses, err = devLANAddresses()
 			if err != nil {
 				return fail(err)
 			}
+			lanHostnames, err = devLANHostnames()
+			if err != nil {
+				return fail(err)
+			}
 			bindHost = "0.0.0.0"
 		}
-		listener, err := net.Listen("tcp4", net.JoinHostPort(bindHost, fmt.Sprint(*port)))
+		listener, err := listenDev(ctx, bindHost, *port, automaticPort, out, (&net.ListenConfig{}).Listen)
 		if err != nil {
 			return fail(err)
 		}
@@ -594,7 +608,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			})
 		}
 		if lan {
-			httpHandler = devaccess.WrapLAN(httpHandler, lanAddresses, listener.Addr().(*net.TCPAddr).Port)
+			httpHandler = devaccess.WrapLAN(httpHandler, lanAddresses, lanHostnames, listener.Addr().(*net.TCPAddr).Port)
 		}
 		server := &http.Server{Handler: httpHandler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 30 * time.Second}
 		watchCtx, cancel := context.WithCancel(ctx)
@@ -609,6 +623,9 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			for _, address := range lanAddresses {
 				base := fmt.Sprintf("http://%s:%d", address, listener.Addr().(*net.TCPAddr).Port)
 				fmt.Fprintf(out, "\nNetwork  %s\nSign in  %s/admin\n", base, base)
+			}
+			for _, name := range lanHostnames {
+				fmt.Fprintf(out, "\nHostname http://%s:%d\n", name, listener.Addr().(*net.TCPAddr).Port)
 			}
 			fmt.Fprintln(out, "\nLAN mode uses unencrypted HTTP. Use only on a trusted network; do not forward this port.")
 			if preview != nil {

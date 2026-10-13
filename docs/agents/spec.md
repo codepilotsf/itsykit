@@ -2,9 +2,18 @@
 
 ## Product and build specification
 
+Default `flea dev` starts at port 3000 and tries consecutive ports when occupied,
+with clear console messages. Explicit ports remain fixed; port 0 is OS-selected.
+Same-site replacement precedes binding; actual listener ports drive URLs and
+LAN/email-preview access checks.
+
 Deployment progress uses installed server TLS state: first-time HTTPS enablement
 shows setup guidance, routine deployments show a concise health/HTTPS check.
 This changes messaging only, not readiness checks or certificate renewal.
+Confirmed `flea update-server` and recovery operations show terminal progress,
+with plain text when redirected. Animation yields to native SSH/sudo diagnostics
+and stops before completion/error output; upgrade checks and confirmation remain
+unchanged.
 
 Implemented in 0.7.0: optional administrator-owned `downloads` host mappings serve
 checksum-validated versioned Flea CLI downloads from pinned disk handles, outside
@@ -54,10 +63,12 @@ real local delivery uses the explicit email wizard. Secrets stay in ignored .env
 while approved owners remain developer-owned configuration.
 
 `flea dev --lan`/`-l` explicitly enables full development over trusted-network
-HTTP, using detected private IPv4 URLs. Loopback remains the default. Exact
-Host/port and actual-peer checks gate LAN requests; sessions, Origin, CSRF and
+HTTP, using detected private/Tailscale IPv4 URLs and OS hostname/local aliases.
+Loopback remains the default. The listener admits these exact Hosts at its selected port;
+private, shared-address-space (100.64.0.0/10) or loopback IPv4 peer checks gate
+LAN requests; sessions, Origin, CSRF and
 production HTTPS requirements remain intact. Previews open on the dev computer
-and existing private capability URLs also work on approved network addresses.
+and existing private capability URLs also work on network addresses and hostnames.
 
 Editable state: `flea pull` retrieves live snips, metadata and referenced media
 into local files. Plain deployment preserves live content; `--with-snips`

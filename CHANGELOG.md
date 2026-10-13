@@ -4,6 +4,15 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.16.0 - 2026-10-13
+
+- Support this computer's hostname and local alias in LAN dev, including Tailscale
+  IPv4 peers, while preserving the exact Host/port and authentication checks.
+- Show a simple terminal spinner during confirmed `flea update-server` operations
+  and recovery, with plain progress text for redirected output.
+- Let default `flea dev` use the next available port when 3000 is occupied,
+  with clear console messages and the selected URL. Explicit ports remain fixed.
+
 ## 0.15.1 - 2026-10-13
 
 - Bundle focused `add-blog` and `add-contact-form` agent skills in new sites,

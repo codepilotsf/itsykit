@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"sync"
 	"time"
 
 	"flea/internal/admin"
@@ -69,10 +68,10 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 	}
 	settings.Branch = state.Branch
 	fmt.Fprintln(out)
-	progress := newStatusProgress(out, terminal)
+	progress := newCommandProgress(out, terminal, "Checking remote...")
 	defer progress.stop()
 	// Stop animation before native SSH/sudo diagnostics or password prompts.
-	diagnostic := statusDiagnostic{Writer: errOut, stop: progress.stop}
+	diagnostic := progressOutput{Writer: errOut, stop: progress.stop}
 	wrapped := func(ctx context.Context, c command) error {
 		for _, arg := range c.args {
 			if arg == "-tt" {
@@ -250,44 +249,3 @@ func countChanges(raw string) int {
 	}
 	return count
 }
-
-type statusProgress struct {
-	once          sync.Once
-	done, stopped chan struct{}
-}
-
-func newStatusProgress(out io.Writer, terminal bool) *statusProgress {
-	p := &statusProgress{done: make(chan struct{}), stopped: make(chan struct{})}
-	if !terminal {
-		fmt.Fprintln(out, "Checking remote...")
-		close(p.stopped)
-		return p
-	}
-	fmt.Fprint(out, "Checking remote... |")
-	go func() {
-		defer close(p.stopped)
-		ticker := time.NewTicker(120 * time.Millisecond)
-		defer ticker.Stop()
-		frames := []byte{'/', '-', '\\', '|'}
-		i := 0
-		for {
-			select {
-			case <-p.done:
-				fmt.Fprint(out, "\r\x1b[2K")
-				return
-			case <-ticker.C:
-				fmt.Fprintf(out, "\rChecking remote... %c", frames[i%len(frames)])
-				i++
-			}
-		}
-	}()
-	return p
-}
-func (p *statusProgress) stop() { p.once.Do(func() { close(p.done); <-p.stopped }) }
-
-type statusDiagnostic struct {
-	io.Writer
-	stop func()
-}
-
-func (w statusDiagnostic) Write(b []byte) (int, error) { w.stop(); return w.Writer.Write(b) }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -62,7 +63,7 @@ func TestLANExecutableFlags(t *testing.T) {
 					lines <- scanner.Text()
 				}
 			}()
-			var website, network string
+			var website, network, hostname string
 			ready := false
 			for !ready {
 				select {
@@ -75,6 +76,9 @@ func TestLANExecutableFlags(t *testing.T) {
 					}
 					if strings.HasPrefix(line, "Network  ") && network == "" {
 						network = strings.TrimPrefix(line, "Network  ")
+					}
+					if strings.HasPrefix(line, "Hostname ") && hostname == "" {
+						hostname = strings.TrimPrefix(line, "Hostname ")
 					}
 					ready = strings.Contains(line, "Press Ctrl-C")
 				case <-ctx.Done():
@@ -114,6 +118,23 @@ func TestLANExecutableFlags(t *testing.T) {
 			get(network, "/")
 			get(network, "/admin")
 			get(network, "/_flea/reload")
+			if hostname == "" {
+				t.Fatal("missing hostname URL")
+			}
+			alias, err := url.Parse(hostname)
+			if err != nil {
+				t.Fatal(err)
+			}
+			aliasRequest, _ := http.NewRequest("GET", network+"/admin", nil)
+			aliasRequest.Host = alias.Host
+			aliasResponse, err := client.Do(aliasRequest)
+			if err != nil {
+				t.Fatal(err)
+			}
+			aliasResponse.Body.Close()
+			if aliasResponse.StatusCode != 200 {
+				t.Fatal("advertised hostname blocked", aliasResponse.Status)
+			}
 			r, _ := http.NewRequest("GET", network+"/", nil)
 			r.Host = "evil.test:3000"
 			response, err := client.Do(r)

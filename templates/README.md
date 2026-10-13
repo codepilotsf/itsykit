@@ -51,13 +51,17 @@ For real local delivery, set `"dev": {"email_preview": false}`, run `flea email`
 and restart dev. Production ignores preview mode and always needs real email
 configuration. Restart dev after changing preview mode or its sender details.
 
-Open [http://localhost:3000](http://localhost:3000). Leave the server running while
+Open the Website URL printed in the console. Dev starts at port 3000 and
+explains occupied ports before trying 3001, 3002 and so on. An explicit
+`--port` stays fixed; `--port 0` lets the operating system choose a port.
+Leave the server running while
 you work; saved changes reload the browser. Starting dev again gracefully replaces
 the same site's existing dev server, including LAN mode or port changes. Pull and
 reset remain protected while running. Stop older dev binaries manually once.
 
 For another device on the same trusted network, use `flea dev --lan` (or `-l`)
-and open a printed Network URL. Sign-in, editing, media, forms and reloads
+and open a printed Network or Hostname URL. Named URLs work when they resolve to
+the dev machine; Tailscale IPv4 connections are supported. Sign-in, editing, media, forms and reloads
 work there too. Email previews open on the computer running Flea; enter that code
 on the other device. LAN mode uses unencrypted HTTP on private IPv4 networks.
 Do not forward the port. Allow it through your firewall if needed and restart dev

@@ -13,7 +13,7 @@ func TestLANBoundary(t *testing.T) {
 		}
 		w.WriteHeader(http.StatusNoContent)
 	})
-	h := WrapLAN(next, []string{"192.168.1.5", "10.0.0.5", "203.0.113.2"}, 3000)
+	h := WrapLAN(next, []string{"192.168.1.5", "10.0.0.5", "203.0.113.2"}, []string{"asahi", "asahi.local"}, 3000)
 	for _, tc := range []struct {
 		host, peer string
 		want       int
@@ -22,6 +22,14 @@ func TestLANBoundary(t *testing.T) {
 		{"10.0.0.5:3000", "10.0.0.9:4567", 204},
 		{"localhost:3000", "127.0.0.1:4567", 204},
 		{"127.0.0.1:3000", "127.0.0.1:4567", 204},
+		{"asahi:3000", "192.168.1.9:4567", 204},
+		{"ASAHI.local:3000", "192.168.1.9:4567", 204},
+		{"asahi:3000", "100.64.0.1:4567", 204},
+		{"asahi:3000", "100.127.255.254:4567", 204},
+		{"asahi:3000", "100.63.255.255:4567", 403},
+		{"asahi:3000", "100.128.0.1:4567", 403},
+		{"asahi:3001", "192.168.1.9:4567", 403},
+		{"asahi", "192.168.1.9:4567", 403},
 		{"evil.test:3000", "192.168.1.9:4567", 403},
 		{"192.168.1.6:3000", "192.168.1.9:4567", 403},
 		{"192.168.1.5:3001", "192.168.1.9:4567", 403},
@@ -48,8 +56,8 @@ func TestLANBoundary(t *testing.T) {
 }
 
 func TestLANDefaultHTTPPort(t *testing.T) {
-	h := WrapLAN(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) }), []string{"192.168.1.5"}, 80)
-	for _, host := range []string{"192.168.1.5", "192.168.1.5:80", "localhost", "127.0.0.1"} {
+	h := WrapLAN(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(204) }), []string{"192.168.1.5"}, []string{"asahi", "asahi.local"}, 80)
+	for _, host := range []string{"192.168.1.5", "192.168.1.5:80", "localhost", "127.0.0.1", "asahi", "asahi.local"} {
 		r := httptest.NewRequest("GET", "http://"+host+"/", nil)
 		r.RemoteAddr = "192.168.1.9:4567"
 		w := httptest.NewRecorder()
