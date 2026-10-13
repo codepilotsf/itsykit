@@ -1,9 +1,15 @@
 ---
 name: fleacms-site
-description: Build or redesign a website in a FleaCMS project, especially for one real local business (bar, restaurant, shop, venue). Use when asked to research a business and build or redo its site, and for any substantial FleaCMS authoring task. Covers deciding the site's job, research-first vibe discovery, real assets (including SVG logos taken from the actual signage), content truth rules, genre-driven design, and the safe editing + dev/verify workflow for this repo.
+description: Build or redesign a website in a FleaCMS project, especially for one real local business (bar, restaurant, shop, venue). Use when asked to research a business and build or redo its site, and for substantial site-wide FleaCMS authoring. Focused Blog or Contact setup uses the add-blog or add-contact-form skills. Covers deciding the site's job, research-first vibe discovery, real assets (including SVG logos taken from the actual signage), content truth rules, genre-driven design, and the safe editing + dev/verify workflow for this repo.
 ---
 
 # Build a site in FleaCMS
+
+For a focused Blog or Contact addition, read
+[add-blog](../add-blog/SKILL.md) or
+[add-contact-form](../add-contact-form/SKILL.md) instead of starting the full-site
+consultation below. Use those skills for the corresponding feature within a
+larger site build as well.
 
 ## Why this exists
 

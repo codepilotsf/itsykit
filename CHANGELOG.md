@@ -4,6 +4,11 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.15.1 - 2026-10-13
+
+- Bundle focused `add-blog` and `add-contact-form` agent skills in new sites,
+  with request routing, setup steps, template values and content/form conventions.
+
 ## 0.15.0 - 2026-10-13
 
 - Add optional Blog with a private admin list/editor, explicit Publish/Unpublish,

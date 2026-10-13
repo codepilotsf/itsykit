@@ -2,8 +2,26 @@
 
 Version 0.13.0 is the current test release for Apple Silicon macOS and AMD64/ARM64
 Linux. Published October 12, 2026; the public installer selects it from
-`https://fleacms.com/releases/latest.txt`. The shared server remains 0.9.0-rc.1 /
-protocol 23; this release needs no remote server upgrade.
+`https://fleacms.com/releases/latest.txt`. The public channel is separate from source-built local CLI and shared-server
+rollouts; see the current rollout record below. Updating from the public channel
+currently installs 0.13.0.
+
+## 0.15.1 agent skills rollout
+
+0.15.1 bundles `add-blog` and `add-contact-form` guidance in new sites. Generated
+`AGENTS.md` routes requests like "add a blog" and "add a contact form" to setup,
+template-value and content/form instructions. Blog itself requires 0.15.0 or
+newer with protocol 25; this guidance update leaves the protocol unchanged.
+Updating a CLI does not modify existing projects: copy the two skill directories
+from a fresh matching-version site into `flea/skills/` and add their routing to
+that project's `AGENTS.md`, preserving its custom instructions. Skills are
+committed agent guidance and never public runtime assets.
+
+The shared server and local Linux ARM64 CLI were updated to 0.15.1 on October
+13, 2026. Full tests, vet, bundled build and fresh-site skill checks passed.
+All eleven HTTPS domains and preserved content/media/styles were verified.
+See [rollout evidence](agents/site-app-skills-verification.md). Public downloads
+remain 0.13.0; no public artifacts or tags are part of this rollout.
 
 ## 0.14.0 server and local CLI rollout
 

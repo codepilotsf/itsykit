@@ -8,8 +8,11 @@ A generated site uses `site/` for public templates/assets, root `mailers/` for
 private email templates, and `flea/` for content, media, data, icons and skills.
 `flea/runtime/` holds sessions and extraction recovery records and is Git-ignored.
 `flea/skills/` is committed agent guidance, excluded from serving and archives.
-Bundled import/redesign and site-building skills use two design directions and a
-sample-page review before a substantial full build, unless the user explicitly
+Generated `AGENTS.md` routes focused Blog and Contact requests to the bundled
+`add-blog` and `add-contact-form` skills. Keep configuration, JSON/form fields and
+template values consistent with the actual app contracts. These additions do not
+require a full-site design consultation. Bundled import/redesign and site-building
+skills use two design directions and a sample-page review before a substantial full build, unless the user explicitly
 delegates those decisions. Keep generated README/AGENTS summaries aligned.
 `.flea.config.json` at the project root stores public globals in the required `app` object.
 Branch destinations live under `deploy.branches` in that same file. Preserve other

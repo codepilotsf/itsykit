@@ -1474,9 +1474,12 @@ see [disk-backed download hosting](docs/agents/download-hosting.md). This option
 setting does not change ordinary site assets or the 256 MiB site archive limit.
 
 New sites include AGENTS.md and portable skills in `flea/skills/`
-(`import-brochure` and `fleacms-site`). These are developer instructions, not a
-runtime dependency or an automatically installed agent integration. They are
-excluded from serving and deployment.
+(`add-blog`, `add-contact-form`, `import-brochure` and `fleacms-site`). These are
+developer instructions, not a runtime dependency or an automatically installed agent integration. They are
+excluded from serving and deployment. Generated `AGENTS.md` routes requests such
+as "add a blog" and "add a contact form" to focused skills documenting setup,
+post/form fields and supported template values. Agents read these instructions;
+there is no runtime keyword listener or required plugin.
 For substantial imports and redesigns, they guide an agent through two design
 directions and a sample-page review before the full build, unless you explicitly
 delegate those choices. Small maintenance edits do not require a new design review.
