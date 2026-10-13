@@ -87,6 +87,20 @@ in the browser, not only in screenshots.
 
 ## Available skills
 
+Match the user's intent and read the relevant skill before editing. Requests such
+as "add a blog" or "let's create a blog" use **add-blog**; "add a contact form"
+or "create a contact page" with email submission use **add-contact-form**.
+For a focused addition to an existing site, use these setup skills directly;
+there is no need to restart the full-site research/design consultation.
+
+- **add-blog**: enable Blog, connect templates/navigation, author posts and use
+  the supported `blog.data.*` values and admin publishing flow. Read
+  `flea/skills/add-blog/SKILL.md`.
+
+- **add-contact-form**: enable Contact, create its form and thank-you page, use
+  exact field names, `{csrf}`, `contact.*` feedback and private mail templates.
+  Read `flea/skills/add-contact-form/SKILL.md`.
+
 - **import-brochure**: import or redesign an existing small brochure/portfolio
   website into this site, preserving its content and navigation, with local assets
   and editable snips. Work it interactively: offer two directions (mood boards or

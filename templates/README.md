@@ -396,16 +396,20 @@ supplies the signed-in identity; never configure `app.current_admin` yourself.
 
 ### Agent-assisted work
 
-Two portable skills ship in `flea/skills/` for coding agents:
+Portable skills ship in `flea/skills/` for coding agents:
 
+- **add-blog**: requests like "add a blog" or "let's create a blog"; setup,
+  post JSON, Blog template values and admin publishing.
+- **add-contact-form**: requests like "add a contact form"; setup, exact fields,
+  CSRF, feedback values and private mail templates.
 - **import-brochure**: import or redesign an existing brochure/portfolio site,
   preserving its content and navigation. Interactive: choose a direction (two mood
   boards or references) and approve a sample page before the full build.
 - **fleacms-site**: build or redesign a site, especially for one real local
   business, doing the research and capturing the real vibe and assets first.
 
-Point your agent at the relevant `SKILL.md`. `AGENTS.md` links to both. They stay
-in Git but are excluded from serving and deployment; no particular agent plugin is
+Point your agent at the relevant `SKILL.md`. `AGENTS.md` routes these requests to
+the matching skill. They stay in Git but are excluded from serving and deployment; no particular agent plugin is
 required.
 
 ## Deployment
