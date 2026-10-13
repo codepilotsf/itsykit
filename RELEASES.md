@@ -1,5 +1,34 @@
 # Publishing FleaCMS downloads
 
+## Blog documentation deployment — October 13, 2026
+
+Website source `54815a7` on `docs/blog-setup`, based on current main `7e55082`.
+[Draft MR 2](https://gitlab.codepilot.com/sean-schertell/flea-website/-/merge_requests/2)
+remains open. Deployed an isolated main checkout of the exact committed snapshot
+to the existing fleacms.com destination; original working checkout/branch was
+preserved and no source merge was performed.
+
+Activation: `20261013-194213-97642e56ad639a7acdb3ac8a`. Blog setup is public at
+https://fleacms.com/docs#blog and linked from the homepage and docs contents.
+The guide covers config/template adoption, editing, agent JSON, tokens and sync.
+It labels the 0.15.0 / protocol 25 requirement and the public 0.13.0 channel
+accurately. No release artifacts or channel files changed.
+
+Validation: `flea status`, rendered anchors/literal tokens, highlighted JSON and
+HTML examples, desktop/mobile browser checks and live HTTPS verification passed.
+At 375px there is no horizontal page overflow. Live JSON examples parse as shown.
+After deploy, `flea status` reports code and content matching the committed source.
+All eleven HTTPS homepages are healthy, recovery is clear, and website saved
+content/media/CSS plus all unrelated-site fingerprints are preserved. Runtime
+remains 0.15.0 / protocol 25. No real email was sent.
+
+Private backup: `/tmp/flea-website-blog-rollout/website-before.flea-backup`.
+Before/after fingerprints are in that private directory. The deployment used the
+existing 320 MiB admin-process memory target; no service-policy change occurred.
+No preview process remains. These are website documentation checks, not new
+native binary-release acceptance results.
+
+
 Public downloads live outside this website in the server's administrator-owned
 `/var/lib/flea/downloads/fleacms/<version>/` store. URLs remain
 `https://fleacms.com/releases/<version>/`. Never replace published bytes or hashes.
