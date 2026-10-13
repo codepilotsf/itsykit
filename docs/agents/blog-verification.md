@@ -63,9 +63,43 @@ absent. Chromium used the existing cached browser and library-path prerequisites
 ## Limits
 
 The implementation verification did not publish artifacts or change live sites.
-The subsequently authorized private rollout is recorded separately below. Native Mac/AMD64, real mail, live Ubuntu/systemd and Hub
-approval/promotion were not verified. Preview noindex and older site Theme toolbar
+The subsequently authorized private rollout is recorded separately below. Native
+Mac/AMD64 full build/test acceptance, real mail and Hub approval/promotion were not
+verified. Preview noindex and older site Theme toolbar
 adoption remain separate tasks. Existing sites need explicit Blog template/source
 adoption while preserving custom layouts. Draft text is private; photo files are
 public assets. Comments, taxonomy, scheduling, revisions and inline body photos
 remain deferred.
+
+## Authorized private rollout
+
+0.15.0 / protocol 25 rolled out on October 13, 2026 through the standard
+`flea update-server` command. Source implementation commit: `e690ab7`, pushed on
+`feat/minimal-blog`; [draft MR 6](https://gitlab.codepilot.com/sean-schertell/flea/-/merge_requests/6)
+remains open. The final artifacts were rebuilt from that clean committed source.
+
+Before the update, seven site backups and the previous executable were retained
+at `/var/backups/flea-blog-015-20261013`, with private backup permissions. Existing
+swap and the 320 MiB Go memory target were preserved. A fresh task-local SSH
+wrapper applied that target to the upgrade process, following the runbook.
+No host configuration cleanup or service-policy change was necessary.
+
+The verified installed and running Linux AMD64 executable both have SHA-256
+`91ae3b0a5bf7adab09bf075a2a2a347b89a760ed1a5b8a23dd646c84992a6437`.
+The service is active, all eleven HTTPS homepages returned 200, and deployment
+and upgrade recovery journals are clear. Full configuration, managed content,
+retained media and source CSS fingerprints match before/after across seven sites;
+existing routing, TLS, download and commit mappings are preserved. No existing
+site source, layout or Blog setting was rewritten.
+
+The matching installed Linux ARM64 CLI at `/home/sean/.local/bin/flea` reports
+0.15.0 and has SHA-256
+`de3ef5b9b4253b995b6ec581df7af416026178d06d188f19c20390a3ad0e3ea6`.
+Replacement used the shared portable installer lock, a checked same-directory
+candidate and atomic rename; the previous CLI is backed up outside Git.
+
+Public latest.txt remains 0.13.0. No release tag, public binary artifact, website
+release-channel update or merge was performed. Blog is available in the runtime
+and new starter files; enabling it on an existing site requires explicit source
+and configuration adoption. Live admin editing and real email were not exercised
+in this executable-only rollout.

@@ -16,6 +16,16 @@ native Mac/AMD64 release checks remain separate work.
 
 ## Current release status (October 13, 2026)
 
+- Private Blog rollout 0.15.0 / protocol 25 completed from `e690ab7`; the matching
+  local Linux ARM64 CLI is installed. Seven backups and the old executable remain
+  at `/var/backups/flea-blog-015-20261013`. All eleven HTTPS homepages are healthy,
+  configuration/content/media/CSS fingerprints match, and recovery is clear.
+  [MR 6](https://gitlab.codepilot.com/sean-schertell/flea/-/merge_requests/6) is
+  draft/open; no merge, tag or public artifacts were published. Public channel
+  stays 0.13.0. See [Blog verification](blog-verification.md). Existing sites need
+  explicit Blog template/config adoption; custom layouts were not changed.
+
+
 - Private shared-server rollout 0.14.0 / protocol 24 completed October 13 from
   framework `beb87ab`; the local Linux ARM64 CLI is also 0.14.0. The source branch
   is integrated into main through MR 5. Public downloads/channel stay 0.13.0;
@@ -441,7 +451,7 @@ to the changelog; retain acceptance evidence in the checklist or linked QA recor
 
 Minimal Blog implementation is on `feat/minimal-blog` in its isolated worktree.
 Local implementation and checks are complete; see
-[Blog verification](blog-verification.md). The 0.15.0 commit, push and private server rollout are authorized; results will be
-recorded after verification. Live rollout, native
+[Blog verification](blog-verification.md). The 0.15.0 commit, push and private server rollout are complete; results are
+recorded in the verification document. Live rollout, native
 Mac/AMD64 acceptance and public release are separate work. Optional Blog source
 adoption must preserve each site's custom layouts.
