@@ -6,7 +6,31 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
-## Current release status (October 12, 2026)
+## Theme removal follow-up
+
+Before updating older site sources, remove their obsolete Theme toolbar button
+while preserving custom layouts. Existing hosted toolbar partials have not been
+rewritten by the shared executable rollout. Preview noindex and Hub branch
+workflow verification are separate planned tasks. Public 0.14.0 binary publishing,
+native Mac/AMD64 release checks and source integration remain separate work.
+
+## Current release status (October 13, 2026)
+
+- Private shared-server rollout 0.14.0 / protocol 24 completed October 13 from
+  framework `beb87ab`; the local Linux ARM64 CLI is also 0.14.0. The source branch
+  is pushed and draft MR 5 remains unmerged. Public downloads/channel stay 0.13.0;
+  no release tag or artifacts were published. The owner approved one-time removal
+  of 11 obsolete theme mappings across seven sites after verifying every saved
+  theme matched source CSS. Root-only backups retain the original config,
+  executable and seven site backups in
+  `/var/backups/flea-theme-removal-014-20261013`. The standard `flea update-server`
+  path completed, active binary hash matches the verified bundle, all eleven
+  HTTPS hostnames respond successfully, content/CSS hashes and routing/TLS/release/
+  download/commit mappings are preserved, and recovery journals are clear.
+  Full tests/vet/race, bundled build, selected Chrome editor/media/reload/LAN
+  checks and fresh-site checks passed on native Linux ARM64. Staging tests used
+  a task-local SHA-256 adapter for absent shasum. Live email and interactive
+  production admin editing were not exercised in this rollout.
 
 - Version 0.13.0 is published: framework `bd668a1`, tag `v0.13.0`; website
   `1f8d4bf`, activation `20261012-182752-488ee26bcaf1fb17ddf715ec`. Status now

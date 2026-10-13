@@ -5,11 +5,11 @@
   <template shadowrootmode="open">
     <link rel="stylesheet" href="/admin/assets/editor.css" />
     <section inert aria-label="Site administration">
-      <nav><label class="switch editing-switch"><input id="edit" type="checkbox" role="switch" checked>Edit</label><button id="theme" aria-expanded="false" aria-controls="theme-panel">Theme</button><span id="status" role="status"></span><span id="identity">{app.current_admin.email}</span>
+      <nav><label class="switch editing-switch"><input id="edit" type="checkbox" role="switch" checked>Edit</label><span id="status" role="status"></span><span id="identity">{app.current_admin.email}</span>
         <button id="logout">Sign out</button></nav>
       <div class="edit-row"><nav id="format" aria-label="Text formatting">
         <button id="details" disabled>Page details</button>
-        <span class="theme-select format-select"><select id="heading" aria-label="Text format" disabled><option value="P">Normal text</option><option value="H1">Heading 1</option><option value="H2">Heading 2</option><option value="H3">Heading 3</option><option value="H4">Heading 4</option></select></span>
+        <span class="format-select"><select id="heading" aria-label="Text format" disabled><option value="P">Normal text</option><option value="H1">Heading 1</option><option value="H2">Heading 2</option><option value="H3">Heading 3</option><option value="H4">Heading 4</option></select></span>
         <button data-mark="B" aria-label="Bold" disabled><b>B</b></button><button data-mark="I" aria-label="Italic" disabled><i>I</i></button><button data-mark="U" aria-label="Underline" disabled><u>U</u></button><button data-mark="S" aria-label="Strikethrough" disabled><s>S</s></button>
         <button id="link" data-icon="link" aria-label="Add link" disabled>{icon link size="18"}</button>
         <button data-list="UL" data-icon="list" aria-label="Bullet list" disabled>{icon list size="18"}</button><button data-list="OL" data-icon="list-ordered" aria-label="Numbered list" disabled>{icon list-ordered size="18"}</button>

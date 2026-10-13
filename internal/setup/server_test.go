@@ -21,7 +21,7 @@ func inventoryRunner(t *testing.T, listJSON string, extra func(c command) (bool,
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=23\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=24\n")
 			return nil
 		case strings.Contains(text, "-list-sites"):
 			fmt.Fprint(c.out, listJSON)
@@ -87,7 +87,7 @@ func TestServerListEmptyAndOlderProtocol(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=22\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=23\n")
 			return nil
 		}
 		ran = true
@@ -128,7 +128,7 @@ func TestServerListPromptsForTarget(t *testing.T) {
 			if !strings.Contains(text, "-- root@fleacms.com ") {
 				t.Fatalf("prompted target not used: %q", text)
 			}
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=23\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=24\n")
 			return nil
 		case strings.Contains(text, "-list-sites"):
 			fmt.Fprint(c.out, "[]")
@@ -169,7 +169,7 @@ func TestServerRemoveWorkflow(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=23\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=24\n")
 			return nil
 		case strings.Contains(text, "-site-info"):
 			if !strings.Contains(text, "-site-info 'demo'") {
@@ -314,7 +314,7 @@ func TestServerRemoveCancellation(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=23\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=24\n")
 			return nil
 		case strings.Contains(text, "-site-info"):
 			fmt.Fprint(c.out, testSiteJSON)
@@ -373,7 +373,7 @@ func TestServerRemoveNonRootUsesSudo(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=1000\nFLEA_DEPLOY=23\n")
+			fmt.Fprint(c.out, "FLEA_UID=1000\nFLEA_DEPLOY=24\n")
 			return nil
 		case strings.Contains(text, "mktemp"):
 			fmt.Fprintln(c.out, stage)

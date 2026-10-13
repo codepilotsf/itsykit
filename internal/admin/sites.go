@@ -52,7 +52,6 @@ type siteState struct {
 	Release   string            `json:"release,omitempty"`
 	Domains   []string          `json:"domains"`
 	Content   map[string]string `json:"content,omitempty"`
-	Themes    map[string]string `json:"themes,omitempty"`
 	Downloads map[string]string `json:"downloads,omitempty"`
 	Redirects map[string]string `json:"redirects,omitempty"`
 	TLS       []string          `json:"tls,omitempty"`
@@ -189,7 +188,6 @@ func removeSiteEntries(c *host.Config, g siteGroup) error {
 	for _, d := range g.domains {
 		delete(c.Sites, d)
 		delete(c.Content, d)
-		delete(c.Themes, d)
 		delete(c.Downloads, d)
 	}
 	for from, to := range c.Redirects {
@@ -285,12 +283,6 @@ func stateFor(c host.Config, g siteGroup) siteState {
 				st.Content = map[string]string{}
 			}
 			st.Content[d] = v
-		}
-		if v := c.Themes[d]; v != "" {
-			if st.Themes == nil {
-				st.Themes = map[string]string{}
-			}
-			st.Themes[d] = v
 		}
 		if v := c.Downloads[d]; v != "" {
 			if st.Downloads == nil {

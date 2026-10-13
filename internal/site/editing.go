@@ -20,8 +20,8 @@ func (p *Project) EditingVersion() string {
 		App     map[string]any
 		Data    map[string]map[string]any
 		Root    string
-		Theme   *string
-	}{p.Content, p.files, p.App, p.Snips, p.Root, p.ThemeCSS()})
+		CSS     []byte
+	}{p.Content, p.files, p.App, p.Snips, p.Root, p.AssetData["/css/theme.css"]})
 	hash := sha256.Sum256(data)
 	return hex.EncodeToString(hash[:])
 }

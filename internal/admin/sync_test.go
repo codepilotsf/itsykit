@@ -6,8 +6,6 @@ import (
 	"flea/internal/site"
 	"flea/internal/snips"
 	"flea/internal/syncstate"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -16,7 +14,7 @@ func TestSyncVersionAndOwnerPreservation(t *testing.T) {
 	m, o := fixture(t)
 	o.Branch = "main"
 	o.Commit = strings.Repeat("a", 40)
-	o.Archive = richArchive(t, true)
+	o.Archive = richArchive(t, true, ":root {--brand-1: #111111;}")
 	if _, e := m.Apply(context.Background(), o); e != nil {
 		t.Fatal(e)
 	}
@@ -53,17 +51,14 @@ func TestSyncVersionAndOwnerPreservation(t *testing.T) {
 		t.Fatal("lost concurrent edit")
 	}
 	css := ":root {--brand-1: #123456;}"
-	o.Sync = &syncstate.Plan{Expected: fresh.Version(), WithTheme: true, Theme: &css}
-	if _, e = m.Apply(context.Background(), o); e != nil {
-		t.Fatal(e)
-	}
+	o.Archive = richArchive(t, true, css)
 	o.Sync = nil
 	if _, e = m.Apply(context.Background(), o); e != nil {
 		t.Fatal(e)
 	}
 	fresh, e = m.Snapshot(o.Name, o.Branch)
-	if e != nil || fresh.Theme == nil || *fresh.Theme != css {
-		t.Fatal(fresh.Theme, e)
+	if e != nil {
+		t.Fatal(e)
 	}
 	if fresh.Snips.Page("/").Snips["a7Km2pQ9xB"].Content != "Owner edit" {
 		t.Fatal("normal deploy replaced owner content")
@@ -72,13 +67,27 @@ func TestSyncVersionAndOwnerPreservation(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if _, e = os.Stat(c.Themes["example.test"]); e != nil {
+	p, e := site.Load(c.Sites["example.test"])
+	if e != nil {
 		t.Fatal(e)
 	}
-	if filepath.Dir(c.Themes["example.test"]) != filepath.Dir(c.Content["example.test"]) {
-		t.Fatal("theme outside content directory")
+	if string(p.AssetData["/css/theme.css"]) != css {
+		t.Fatal("committed CSS was not published")
 	}
-	if _, e = site.Load(c.Sites["example.test"]); e != nil {
+	// A source release can also remove CSS; no prior overlay should reappear.
+	o.Archive = richArchive(t, true)
+	if _, e = m.Apply(context.Background(), o); e != nil {
 		t.Fatal(e)
+	}
+	c, _, e = host.Load(m.ConfigPath, nil)
+	if e != nil {
+		t.Fatal(e)
+	}
+	p, e = site.Load(c.Sites["example.test"])
+	if e != nil {
+		t.Fatal(e)
+	}
+	if _, exists := p.Assets["/css/theme.css"]; exists {
+		t.Fatal("removed source CSS was retained")
 	}
 }

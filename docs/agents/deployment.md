@@ -128,7 +128,7 @@ and releases exceeding 256 MiB or 10,000 entries.
 
 Deployment administration runs through SSH/sudo via the installed server binary,
 never HTTP. The browser editor has content-only permissions, not deployment powers.
-Protocol 23 requires persistent-session runtime directories, the bundled Contact
+Protocol 24 requires persistent-session runtime directories, the bundled Contact
 child/runtime and current site/config syntax. Old top-level contact settings are
 rejected, not migrated. Build each matching Contact executable before its parent.
 Verify child launch/cleanup under the real systemd unit separately; local tests
@@ -210,7 +210,7 @@ The server computes an expected-state digest over exactly the routing and
 ancillary entries removal would change. Review prints it; removal recomputes it
 under the existing deployment/content lock and refuses if the site changed since
 review. The operation blocks on a pending deployment or executable recovery and
-removes only the target's `sites`, `content`, `themes`, `downloads`, owned
+removes only the target's `sites`, `content`, `downloads`, owned
 redirects, TLS allowlist entries and site/branch/commit bookkeeping. The digest
 covers branch and commit, so a commit-only change since review also fails closed.
 Other sites' routing and ancillary entries are preserved. Removing the site that
@@ -227,3 +227,12 @@ activation restarts the shared service, other sites are briefly unavailable. An
 interrupted removal is recovered with `sudo flea-server -recover`, exactly like
 an interrupted deployment. Removing the last site is supported and probes generic
 server readiness. Removal never prunes retained content or media.
+
+## Source CSS contract
+
+Protocol 24 publishes committed `site/css/theme.css` with the code release on
+normal deploy. No live theme overlay or CSS sync plan exists. Rollback selects
+the target release's CSS while retaining current snips; backup/restore includes
+CSS as source. Servers with a removed `themes` mapping must be reviewed before
+upgrade: preserve remote customizations explicitly in Git using the old runtime
+first. No migration, compatibility mapping or automatic theme deletion is added.

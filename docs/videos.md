@@ -69,11 +69,11 @@ working copy or a backup; retain the hash filenames.
 Ordinary deployment preserves live video metadata/files and seeds new IDs.
 `--with-snips` includes reviewed local metadata changes with conflict checks.
 
-`flea pull` / `--snips-only` includes videos and referenced bytes in the same
+`flea pull` includes videos and referenced bytes in the same
 reviewed state snapshot as photos. Stop dev first. Pull can start from committed
 metadata without local video bytes, but requires full file validation before it
 saves content or advances the sync baseline.
-`--theme-only` does not download videos. Deploy and pull never silently remove
+Deploy and pull never silently remove
 retained video files.
 
 Production stores uploads in the site's managed content/media/ directory,

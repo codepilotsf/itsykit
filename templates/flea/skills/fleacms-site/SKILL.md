@@ -177,3 +177,7 @@ are appropriate for review; keep temporary captures outside the public site.
 - Ask the owner things you could research, or dump many questions at once.
 - Edit the same file in parallel or race bulk rewrites against extraction.
 - Rasterize to "check" and leave artifacts behind.
+
+Styles are developer-managed in `site/css/theme.css` using Prewind. Ordinary
+`flea deploy` publishes committed CSS. There is no browser Theme editor or CSS
+synchronization; `flea pull` retrieves snips and media only.

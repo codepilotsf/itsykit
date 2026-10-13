@@ -4,6 +4,20 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## 0.14.0 - 2026-10-13
+
+- Remove the remote Theme editor, CSS overlays and theme synchronization. Keep
+  `site/css/theme.css`, Prewind, theme tokens and custom CSS as developer-managed
+  source. Normal deploy publishes committed CSS; rollback restores release CSS
+  while keeping live snips, and backup/restore includes source styles.
+- Remove `--with-theme`, `--theme-only` and `--snips-only` without aliases. Pull
+  retrieves live snips/metadata and referenced media; snip editing and explicit
+  `--with-snips` publication retain their validation and conflict checks.
+- Bump the version to 0.14.0 and deployment protocol to 24. Removed
+  host theme mappings are rejected. Existing remote theme customization needs
+  explicit preservation and reviewed maintenance before a live upgrade; no
+  migration or automatic file deletion is included.
+
 ## 0.13.0 - 2026-10-12
 
 - `flea status` now shows a readable local summary first, then automatically

@@ -44,9 +44,6 @@ var inlineOwner []byte
 //go:embed inline/collections.js
 var inlineCollections []byte
 
-//go:embed inline/theme.js
-var inlineTheme []byte
-
 //go:embed inline/media.js
 var inlineMedia []byte
 

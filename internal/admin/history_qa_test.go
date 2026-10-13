@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"flea/internal/host"
+	"flea/internal/site"
 	"flea/internal/snips"
-	"flea/internal/syncstate"
 )
 
 func TestQARollbackPreservesLiveStateAndOtherSites(t *testing.T) {
@@ -32,13 +32,9 @@ func TestQARollbackPreservesLiveStateAndOtherSites(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	state, e := m.Snapshot(o.Name, o.Branch)
-	if e != nil {
-		t.Fatal(e)
-	}
 	css := ":root {--brand-1: #123456;}"
 	o.Commit = strings.Repeat("b", 40)
-	o.Sync = &syncstate.Plan{Expected: state.Version(), WithTheme: true, Theme: &css}
+	o.Archive = richArchive(t, true, css)
 	second, e := m.Apply(ctx, o)
 	if e != nil {
 		t.Fatal(e)
@@ -77,12 +73,19 @@ func TestQARollbackPreservesLiveStateAndOtherSites(t *testing.T) {
 	if after.Commits[o.Name] != strings.Repeat("a", 40) {
 		t.Fatal("wrong commit")
 	}
-	state, e = m.Snapshot(o.Name, o.Branch)
+	state, e := m.Snapshot(o.Name, o.Branch)
 	if e != nil {
 		t.Fatal(e)
 	}
-	if state.Theme == nil || *state.Theme != css || state.Snips.Page("/").Title != "Owner title" || state.Snips.Page("/").Snips["a7Km2pQ9xB"].Content != "Owner edit after deploy" {
+	if state.Snips.Page("/").Title != "Owner title" || state.Snips.Page("/").Snips["a7Km2pQ9xB"].Content != "Owner edit after deploy" {
 		t.Fatal("live edits lost", state)
+	}
+	p, e := site.Load(after.Sites["example.test"])
+	if e != nil {
+		t.Fatal(e)
+	}
+	if _, exists := p.Assets["/css/theme.css"]; exists {
+		t.Fatal("rollback retained later release CSS")
 	}
 	records, e := m.History(o.Name, o.Branch)
 	if e != nil || len(records) != 3 || records[0].Previous != second {

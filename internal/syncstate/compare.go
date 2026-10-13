@@ -95,15 +95,3 @@ func contentValues(s *snips.Store) map[string]string {
 	}
 	return values
 }
-
-// CompareValue keeps a missing theme distinct from an empty theme.
-func CompareValue(known bool, base, local, remote *string) Comparison {
-	value := func(s *string) map[string]string {
-		m := map[string]string{}
-		if s != nil {
-			m["value"] = "present:" + *s
-		}
-		return m
-	}
-	return compare(known, value(base), value(local), value(remote))
-}

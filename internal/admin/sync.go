@@ -13,7 +13,7 @@ import (
 )
 
 // Snapshot is a privileged SSH-only export. It never includes config, sessions,
-// credentials or arbitrary paths. The lock gives content/theme one revision.
+// credentials or arbitrary paths. The lock gives content one revision.
 func (m Manager) Snapshot(name, branch string) (syncstate.Snapshot, error) {
 	unlock, e := m.lock()
 	if e != nil {
@@ -52,25 +52,15 @@ func (m Manager) snapshot(c host.Config, name, branch string) (syncstate.Snapsho
 				return s, e
 			}
 		}
-		var css *string
-		if path := c.Themes[domain]; path != "" {
-			b, e := site.ReadManagedFile(filepath.Dir(path), filepath.Base(path))
-			if e != nil {
-				return s, e
-			}
-			v := string(b)
-			css = &v
-		}
 		mediaRoot := ""
 		if c.Content[domain] != "" {
 			mediaRoot = site.ManagedMediaRoot(c.Content[domain])
 		}
-		p, e := site.LoadWithMedia(root, content, css, mediaRoot)
+		p, e := site.LoadWithMedia(root, content, mediaRoot)
 		if e != nil {
 			return s, e
 		}
 		s.Snips = p.Content
-		s.Theme = p.ThemeCSS()
 		return s, nil
 	}
 	return s, nil

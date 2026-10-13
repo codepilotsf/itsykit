@@ -132,9 +132,6 @@ func fetchState(ctx context.Context, s DeploySettings, ssh func(context.Context,
 	if _, e = snips.Decode(b); e != nil {
 		return remote, e
 	}
-	if remote.Theme != nil && len(*remote.Theme) > 128<<10 {
-		return remote, fmt.Errorf("theme too large")
-	}
 	return remote, nil
 }
 
@@ -171,8 +168,8 @@ func streamAdmin(ctx context.Context, command string, ssh func(context.Context, 
 	return nil
 }
 
-func makePlan(base syncstate.Baseline, local *site.Project, remote syncstate.Snapshot, withSnips, withTheme bool, resolve syncstate.Resolve) (*syncstate.Plan, error) {
-	plan := &syncstate.Plan{Expected: remote.Version(), WithTheme: withTheme}
+func makePlan(base syncstate.Baseline, local *site.Project, remote syncstate.Snapshot, withSnips bool, resolve syncstate.Resolve) (*syncstate.Plan, error) {
+	plan := &syncstate.Plan{Expected: remote.Version()}
 	var e error
 	if withSnips {
 		if !remote.Exists {
@@ -184,32 +181,13 @@ func makePlan(base syncstate.Baseline, local *site.Project, remote syncstate.Sna
 			}
 		}
 	}
-	if withTheme {
-		if local.ThemeCSS() == nil && remote.Theme != nil {
-			return nil, fmt.Errorf("local theme.css is missing; theme removal is not supported")
-		}
-		if !remote.Exists {
-			plan.Theme = local.ThemeCSS()
-		} else {
-			if !base.HasTheme {
-				return nil, fmt.Errorf("run flea pull before publishing the live theme")
-			}
-			plan.Theme, e = syncstate.MergeTheme(base.Theme, local.ThemeCSS(), remote.Theme, resolve)
-			if e != nil {
-				return nil, e
-			}
-		}
-	}
 	return plan, nil
 }
 
-func Pull(ctx context.Context, root string, snipsOnly, themeOnly bool, in io.Reader, out, errOut io.Writer) error {
-	return pull(ctx, root, snipsOnly, themeOnly, in, out, errOut, execute)
+func Pull(ctx context.Context, root string, in io.Reader, out, errOut io.Writer) error {
+	return pull(ctx, root, in, out, errOut, execute)
 }
-func pull(ctx context.Context, root string, snipsOnly, themeOnly bool, in io.Reader, out, errOut io.Writer, run runner) error {
-	if snipsOnly && themeOnly {
-		return fmt.Errorf("choose either --snips-only or --theme-only")
-	}
+func pull(ctx context.Context, root string, in io.Reader, out, errOut io.Writer, run runner) error {
 	root, e := filepath.Abs(root)
 	if e != nil {
 		return e
@@ -236,27 +214,16 @@ func pull(ctx context.Context, root string, snipsOnly, themeOnly bool, in io.Rea
 		return e
 	}
 	// Pull never overwrites uncommitted content, and never commits on your behalf.
-	paths := []string{}
-	if !themeOnly {
-		paths = append(paths, "flea/snips.json")
-		paths = append(paths, "flea/media/")
-	}
-	if !snipsOnly {
-		paths = append(paths, "site/css/theme.css")
-	}
+	paths := []string{"flea/snips.json", "flea/media/"}
 	args := append([]string{"status", "--porcelain=v1", "--untracked-files=all", "--"}, paths...)
 	status, e := git(ctx, root, args...)
 	if e != nil {
 		return e
 	}
 	if status != "" {
-		return fmt.Errorf("commit your local snip/theme changes before pulling")
+		return fmt.Errorf("commit your local snip changes before pulling")
 	}
-	load := site.Load
-	if !themeOnly {
-		load = site.LoadSyncSource
-	}
-	p, e := load(root)
+	p, e := site.LoadSyncSource(root)
 	if e != nil {
 		return e
 	}
@@ -308,52 +275,28 @@ func pull(ctx context.Context, root string, snipsOnly, themeOnly bool, in io.Rea
 	if !remote.Exists {
 		return fmt.Errorf("this branch has not been deployed yet")
 	}
-	photoSource := ""
-	if !themeOnly {
-		photoSource, e = fetchPhotos(ctx, s, remote, ssh, isRoot, temp)
-		if e != nil {
-			return e
-		}
+	photoSource, e := fetchPhotos(ctx, s, remote, ssh, isRoot, temp)
+	if e != nil {
+		return e
 	}
 	nextContent := p.Content
-	nextTheme := p.ThemeCSS()
-	if !themeOnly {
-		comparison := base.Snips
-		if comparison == nil {
-			comparison = snips.NewStore()
-		}
-		merged, e := syncstate.MergeSnips(comparison, p.Content, remote.Snips, resolveSync(ctx, in, out))
-		if e != nil {
-			return e
-		}
-		refs, e := p.SnipReferences()
-		if e != nil {
-			return e
-		}
-		nextContent, e = snips.Merge(p.Content, merged, refs)
-		if e != nil {
-			return e
-		}
-		base.Snips = remote.Snips
+	comparison := base.Snips
+	if comparison == nil {
+		comparison = snips.NewStore()
 	}
-	if !snipsOnly {
-		if !base.HasTheme {
-			nextTheme, e = syncstate.MergeTheme(nil, p.ThemeCSS(), remote.Theme, resolveSync(ctx, in, out))
-			if e != nil {
-				return e
-			}
-		} else {
-			nextTheme, e = syncstate.MergeTheme(base.Theme, p.ThemeCSS(), remote.Theme, resolveSync(ctx, in, out))
-			if e != nil {
-				return e
-			}
-		}
-		base.Theme = remote.Theme
-		base.HasTheme = true
+	merged, e := syncstate.MergeSnips(comparison, p.Content, remote.Snips, resolveSync(ctx, in, out))
+	if e != nil {
+		return e
 	}
-	if nextTheme == nil && p.ThemeCSS() != nil {
-		nextTheme = p.ThemeCSS()
+	refs, e := p.SnipReferences()
+	if e != nil {
+		return e
 	}
+	nextContent, e = snips.Merge(p.Content, merged, refs)
+	if e != nil {
+		return e
+	}
+	base.Snips = remote.Snips
 	// Check again after network/prompt time. Never publish a baseline before files.
 	latest, e := currentGit(ctx, root, false)
 	if e != nil {
@@ -366,27 +309,18 @@ func pull(ctx context.Context, root string, snipsOnly, themeOnly bool, in io.Rea
 	if latest.Branch != g.Branch || latest.Commit != g.Commit || status != "" {
 		return fmt.Errorf("local files or branch changed during pull; retry")
 	}
-	if !themeOnly {
-		if e = installPhotos(root, photoSource, nextContent); e != nil {
-			return e
-		}
-	}
-	if _, e = site.LoadWithState(root, nextContent, nextTheme); e != nil {
+	if e = installPhotos(root, photoSource, nextContent); e != nil {
 		return e
 	}
-	if !themeOnly {
-		if e = site.SaveContent(root, nextContent); e != nil {
-			return e
-		}
+	if _, e = site.LoadWithSnips(root, nextContent); e != nil {
+		return e
 	}
-	if !snipsOnly && nextTheme != nil {
-		if e = site.WriteManagedFile(root, "site/css/theme.css", []byte(*nextTheme)); e != nil {
-			return fmt.Errorf("snips may have been pulled, but theme could not be saved; baseline unchanged: %w", e)
-		}
+	if e = site.SaveContent(root, nextContent); e != nil {
+		return e
 	}
 	if e = saveBaseline(ctx, root, s, base); e != nil {
 		return fmt.Errorf("files pulled, but baseline could not be saved: %w", e)
 	}
-	fmt.Fprintln(out, "Pulled live settings. Review and commit the local changes.")
+	fmt.Fprintln(out, "Pulled live snips and media. Review and commit the local changes.")
 	return nil
 }

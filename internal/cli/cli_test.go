@@ -324,3 +324,12 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	t.Log("Executable smoke passed: scaffold, validation, HTTP, private paths, flea/config/asset/template reloads, invalid state, recovery, shutdown")
 }
+
+func TestRemovedThemeAndPullScopeFlagsAreRejected(t *testing.T) {
+	for _, args := range [][]string{{"deploy", "--with-theme"}, {"pull", "--theme-only"}, {"pull", "--snips-only"}} {
+		var out, errOut bytes.Buffer
+		if code := Run(context.Background(), args, &out, &errOut); code != 2 {
+			t.Fatalf("%v returned %d: %s", args, code, errOut.String())
+		}
+	}
+}

@@ -13,7 +13,6 @@ import (
 	"flea/internal/host"
 	"flea/internal/site"
 	"flea/internal/snips"
-	"flea/internal/syncstate"
 )
 
 func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {
@@ -21,17 +20,9 @@ func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {
 	ctx := context.Background()
 	o.Branch = "main"
 	o.Commit = strings.Repeat("a", 40)
-	o.Archive = richArchive(t, true)
-	if _, e := m.Apply(ctx, o); e != nil {
-		t.Fatal(e)
-	}
-	live, e := m.Snapshot(o.Name, o.Branch)
-	if e != nil {
-		t.Fatal(e)
-	}
 	css := ":root {--brand-1: #123456;}"
-	o.Sync = &syncstate.Plan{Expected: live.Version(), WithTheme: true, Theme: &css}
-	if _, e = m.Apply(ctx, o); e != nil {
+	o.Archive = richArchive(t, true, css)
+	if _, e := m.Apply(ctx, o); e != nil {
 		t.Fatal(e)
 	}
 	c, _, e := host.Load(m.ConfigPath, nil)
@@ -58,7 +49,7 @@ func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if p.Content.Page("/").Snips["a7Km2pQ9xB"].Content != "Saved owner text" || p.ThemeCSS() == nil || *p.ThemeCSS() != css {
+	if p.Content.Page("/").Snips["a7Km2pQ9xB"].Content != "Saved owner text" || string(p.AssetData["/css/theme.css"]) != css {
 		t.Fatal("backup used stale release seeds")
 	}
 	file := filepath.Join(t.TempDir(), "site.flea-backup")
@@ -76,7 +67,7 @@ func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {
 	if _, e = m.Restore(ctx, o.Name, o.Branch, file, reviewed.Version()); e == nil {
 		t.Fatal("accepted stale restore")
 	}
-	live, e = m.Snapshot(o.Name, o.Branch)
+	live, e := m.Snapshot(o.Name, o.Branch)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -113,7 +104,16 @@ func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if restored.Snips.Page("/").Snips["a7Km2pQ9xB"].Content != "Saved owner text" || restored.Theme == nil || *restored.Theme != css {
-		t.Fatal("restore did not restore backup overlays")
+	if restored.Snips.Page("/").Snips["a7Km2pQ9xB"].Content != "Saved owner text" {
+		t.Fatal("restore did not restore backup snips")
 	}
+	restoredConfig, _, e := host.Load(m.ConfigPath, nil)
+	if e != nil {
+		t.Fatal(e)
+	}
+	restoredSite, e := site.Load(restoredConfig.Sites["example.test"])
+	if e != nil || string(restoredSite.AssetData["/css/theme.css"]) != css {
+		t.Fatal("backup CSS not restored", e)
+	}
+
 }

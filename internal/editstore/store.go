@@ -14,11 +14,9 @@ import (
 	"flea/internal/site"
 	"flea/internal/snips"
 	"flea/internal/state"
-	"flea/internal/theme"
 )
 
 type Store struct {
-	ThemePath                     string
 	Root, ContentPath, ConfigPath string
 	Emails                        []string
 	Publish                       func(*site.Project)
@@ -50,13 +48,13 @@ func (s *Store) lock() (func(), error) {
 			return nil, fmt.Errorf("server upgrade recovery pending")
 		}
 		data, err := os.ReadFile(s.ConfigPath)
-		var c struct{ Sites, Content, Themes map[string]string }
+		var c struct{ Sites, Content map[string]string }
 		if err == nil {
 			err = json.Unmarshal(data, &c)
 		}
 		active := false
 		for domain, root := range c.Sites {
-			if filepath.Clean(root) == filepath.Clean(s.Root) && filepath.Clean(c.Content[domain]) == filepath.Clean(s.ContentPath) && c.Themes[domain] == s.ThemePath {
+			if filepath.Clean(root) == filepath.Clean(s.Root) && filepath.Clean(c.Content[domain]) == filepath.Clean(s.ContentPath) {
 				active = true
 			}
 		}
@@ -76,16 +74,7 @@ func (s *Store) load() (*site.Project, error) {
 			return nil, err
 		}
 	}
-	var css *string
-	if s.ThemePath != "" {
-		b, e := site.ReadManagedFile(filepath.Dir(s.ThemePath), filepath.Base(s.ThemePath))
-		if e != nil {
-			return nil, e
-		}
-		v := string(b)
-		css = &v
-	}
-	p, err := site.LoadWithMedia(s.Root, content, css, s.mediaRoot())
+	p, err := site.LoadWithMedia(s.Root, content, s.mediaRoot())
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +93,7 @@ func (s *Store) Read() (editor.Document, error) {
 	if err != nil {
 		return editor.Document{}, err
 	}
-	return editor.Document{Store: p.Content, Theme: p.ThemeCSS(), Routes: p.Routes(), Version: p.EditingVersion()}, nil
+	return editor.Document{Store: p.Content, Routes: p.Routes(), Version: p.EditingVersion()}, nil
 }
 func (s *Store) Save(u editor.Update) error {
 	unlock, err := s.lock()
@@ -121,33 +110,6 @@ func (s *Store) Save(u editor.Update) error {
 	}
 	if u.Version == "" || u.Version != p.EditingVersion() {
 		return fmt.Errorf("content changed since opening this form")
-	}
-	if u.Theme != nil || len(u.Scales) > 0 {
-		css := p.ThemeCSS()
-		if css == nil {
-			return fmt.Errorf("no theme.css")
-		}
-		nextCSS, e := theme.ApplyScales(*css, u.Theme, u.Scales)
-		if e != nil {
-			return e
-		}
-		next, e := site.LoadWithMedia(s.Root, p.Content, &nextCSS, s.mediaRoot())
-		if e != nil {
-			return e
-		}
-		if s.ConfigPath == "" {
-			e = site.WriteManagedFile(s.Root, "site/css/theme.css", []byte(nextCSS))
-		} else {
-			if s.ThemePath == "" {
-				return fmt.Errorf("no managed theme; redeploy first")
-			}
-			e = site.WriteManagedFile(filepath.Dir(s.ThemePath), filepath.Base(s.ThemePath), []byte(nextCSS))
-		}
-		if e != nil {
-			return e
-		}
-		s.Publish(next)
-		return nil
 	}
 	if u.Page != nil {
 		if err := s.applyMedia(p, *u.Page); err != nil {
@@ -197,7 +159,7 @@ func (s *Store) Save(u editor.Update) error {
 		page.Description = u.Description
 	}
 	// Validate the full candidate before making it durable or visible to readers.
-	next, err := site.LoadWithMedia(s.Root, p.Content, p.ThemeCSS(), s.mediaRoot())
+	next, err := site.LoadWithMedia(s.Root, p.Content, s.mediaRoot())
 	if err != nil {
 		return err
 	}

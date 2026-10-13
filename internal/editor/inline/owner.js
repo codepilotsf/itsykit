@@ -283,18 +283,12 @@
     command(e=>{e.setSelection(linkRange);e.removeLink();e.makeLink(url,newTab?{target:'_blank',rel:'noopener noreferrer'}:{});});
   };
   $('#cancel').onclick=()=>{if(!saving && (!dirty || confirm('Discard your unsaved changes?'))){stop();start();}};
-  $('#theme').onclick=()=>{
-    if(saving || expired)return;
-    if(editing){if(dirty && !confirm('Discard page changes and open Theme? Choose Cancel to save them first.'))return;stop();}
-    host.dispatchEvent(new Event('theme-open'));
-  };
-  host.addEventListener('theme-closed',()=>{if(preferredEditing)start();});
   $('#save').onclick=async()=>{
     if(!dirty || saving || expired)return;
     const changes=new Map();for(const r of regions)if(!r.id.includes('/') && content(r)!==r.baseline)changes.set(r.id,{id:r.id,content:content(r)});
     const edit={version:page.version,route:page.route,title:draft.title,description:draft.description,changes:[...changes.values()],multisnips:multiDraft()};
     const body=host.mediaSnips?.dirty()||host.collectionUI?.hasUploads()?host.mediaSnips.body(edit):new URLSearchParams({csrf:host.dataset.csrf,edit:JSON.stringify(edit)});
-    saving=true;$('#edit').disabled=$('#save').disabled=$('#cancel').disabled=$('#logout').disabled=$('#details').disabled=$('#theme').disabled=true;
+    saving=true;$('#edit').disabled=$('#save').disabled=$('#cancel').disabled=$('#logout').disabled=$('#details').disabled=true;
     for(const r of regions)r.node.setAttribute('contenteditable','false');controls();$('#status').textContent='Saving…';
     try {
       const response=await fetch('/admin/page',{method:'POST',credentials:'same-origin',redirect:'error',headers:{'X-CSRF-Token':host.dataset.csrf},signal:AbortSignal.timeout(body instanceof FormData?180000:15000),body});
@@ -330,13 +324,13 @@
       Object.assign(page,saved.page);host.dataset.version=page.version;host.dataset.page=JSON.stringify(page);
       draft={title:page.title,description:page.description};
       saving=false;dirty=false;saveError='';
-      $('#edit').disabled=$('#theme').disabled=$('#logout').disabled=false;
+      $('#edit').disabled=$('#logout').disabled=false;
       for(const r of regions)r.node.setAttribute('contenteditable','true');
       beginMultisnips();changed();
     } catch(error) {
       saveError=error instanceof TypeError || error.name==='TimeoutError'?'Save could not be confirmed. Your draft is still here. Check the connection and copy it before reloading.':error.message;
       $('#status').textContent=saveError;
-      saving=false;$('#edit').disabled=$('#save').disabled=$('#theme').disabled=expired;$('#cancel').disabled=$('#logout').disabled=$('#details').disabled=false;
+      saving=false;$('#edit').disabled=$('#save').disabled=expired;$('#cancel').disabled=$('#logout').disabled=$('#details').disabled=false;
       for(const r of regions)r.node.setAttribute('contenteditable',r.editor?'true':'plaintext-only');controls();
     }
   };

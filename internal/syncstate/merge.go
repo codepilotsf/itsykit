@@ -17,7 +17,6 @@ import (
 type Snapshot struct {
 	Exists   bool         `json:"exists"`
 	Snips    *snips.Store `json:"snips"`
-	Theme    *string      `json:"theme"`
 	Revision string       `json:"revision"`
 }
 
@@ -31,15 +30,11 @@ func (s Snapshot) Version() string {
 type Baseline struct {
 	Destination string       `json:"destination"`
 	Snips       *snips.Store `json:"snips,omitempty"`
-	Theme       *string      `json:"theme,omitempty"`
-	HasTheme    bool         `json:"has_theme"`
 }
 
 type Plan struct {
-	Expected  string       `json:"expected"`
-	Snips     *snips.Store `json:"snips,omitempty"`
-	Theme     *string      `json:"theme,omitempty"`
-	WithTheme bool         `json:"with_theme"`
+	Expected string       `json:"expected"`
+	Snips    *snips.Store `json:"snips,omitempty"`
 }
 
 type Conflict struct{ Key, Local, Remote string }
@@ -259,17 +254,4 @@ func MergeSnips(base, local, remote *snips.Store, resolve Resolve) (*snips.Store
 		}
 	}
 	return out, nil
-}
-
-// Themes merge as a complete source file, preserving imports and arbitrary
-// developer CSS. Concurrent differing edits require an explicit choice.
-func MergeTheme(base, local, remote *string, resolve Resolve) (*string, error) {
-	encode := func(v *string) string { b, _ := json.Marshal(v); return string(b) }
-	value, err := choose("css/theme.css", encode(base), encode(local), encode(remote), resolve)
-	if err != nil {
-		return nil, err
-	}
-	var out *string
-	err = json.Unmarshal([]byte(value), &out)
-	return out, err
 }

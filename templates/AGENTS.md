@@ -103,3 +103,7 @@ in the browser, not only in screenshots.
 Agent guidance stays in Git, but is excluded from public serving and deployment.
 Do not put credentials in guidance or templates. Ask before adding dependencies,
 backward compatibility or changing deployment/access settings.
+
+Styles are developer-managed in `site/css/theme.css` using Prewind. Ordinary
+`flea deploy` publishes committed CSS. There is no browser Theme editor or CSS
+synchronization; `flea pull` retrieves snips and media only.

@@ -5,9 +5,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
-	"encoding/json"
 	"flea/internal/snips"
-	"flea/internal/theme"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -36,7 +34,7 @@ func TestPublicPreviewBrowser(t *testing.T) {
   if(!matchMedia('(prefers-reduced-motion: reduce)').matches){const exiting=ui.querySelector('.collection-outlines-exit');assert(exiting?.inert&&!exiting.querySelector('button'),'outline exit must be inert and control-free');assert(exiting.getAnimations().some(a=>a.effect.getTiming().duration===160),'missing outline fade out');}
   assert(ui.querySelector('.editing-switch').textContent.trim()==='Edit'&&!ui.querySelector('nav strong,.divider'),'toolbar labels');
   assert(getComputedStyle(ui.querySelector('#edit')).backgroundColor==='rgb(71, 85, 105)','off switch must be dark');
-  assert(getComputedStyle(ui.querySelector('#theme')).height==='30px'&&getComputedStyle(ui.querySelector('#logout')).borderRadius==='999px','compact pill buttons');
+  assert(getComputedStyle(ui.querySelector('#logout')).height==='30px'&&getComputedStyle(ui.querySelector('#logout')).borderRadius==='999px','compact pill buttons');
   const before=article.innerHTML, leafBefore=leaf.innerHTML;
   article.style.outline='3px solid purple';
   const originalOutline=article.style.outline;
@@ -53,7 +51,7 @@ func TestPublicPreviewBrowser(t *testing.T) {
   assert(getComputedStyle(ui.querySelector('.edit-row')).transitionDuration==='0s','reduced motion still animates row');
   assert(getComputedStyle(ui.querySelector('#edit')).backgroundColor==='rgb(22, 163, 74)','on switch must be green');
   assert(!ui.querySelector('#status').textContent&&!ui.querySelector('#notice').textContent,'idle hints remain');
-  assert(!ui.querySelector('#theme').hidden && !ui.querySelector('#cancel').hidden && !ui.querySelector('#logout').hidden,'edit mode topbar');
+  assert(!ui.querySelector('#theme') && !ui.querySelector('#cancel').hidden && !ui.querySelector('#logout').hidden,'edit mode topbar');
   await new Promise(resolve=>setTimeout(resolve,50));
   const outlineStyle=getComputedStyle(ui.querySelector('.editable-outline'));assert(outlineStyle.borderTopColor==='rgb(22, 163, 74)'&&outlineStyle.borderTopWidth==='2px'&&outlineStyle.borderRadius==='6px','editable outline styling');
   assert(!ui.querySelector('#format').hidden && ui.querySelector('[data-mark]').disabled,'inactive formatting');
@@ -135,83 +133,6 @@ func TestPublicPreviewBrowser(t *testing.T) {
   assert(leaf.textContent==='Second canonical','Cancel restored pre-save content');
   ui.querySelector('#edit').click();
   assert(leaf.textContent==='Second canonical','leaving edit restored pre-save content');
-  const oldBrand=document.documentElement.style.getPropertyValue('--brand-1');
-  window.fetch=async(url,options)=>options?.method==='POST'?{status:409}:{ok:true,json:async()=>({version:'theme-version',fields:THEME_FIELDS,scales:THEME_SCALES})};
-  ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));
-  article.style.removeProperty('outline');
-  assert(parseFloat(document.documentElement.style.getPropertyValue('--flea-toolbar-height'))>0,'public toolbar height token missing');
-  assert(!ui.querySelector('#theme-panel').hidden && ui.querySelector('#theme-save').disabled,'theme initial state');
-  await new Promise(resolve=>setTimeout(resolve,300));
-  assert(ui.querySelector('#format').inert&&ui.querySelector('.edit-row').getBoundingClientRect().height===0,'Theme retained edit row');
-  assert(Math.abs(ui.querySelector('#theme-panel').getBoundingClientRect().top-root.getBoundingClientRect().bottom)<1,'Theme did not track collapsed toolbar');
-  const closeButton=ui.querySelector('#theme-cancel').getBoundingClientRect(),closeIcon=ui.querySelector('#theme-cancel svg').getBoundingClientRect();assert(Math.abs(closeButton.left+closeButton.width/2-closeIcon.left-closeIcon.width/2)<1&&Math.abs(closeButton.top+closeButton.height/2-closeIcon.top-closeIcon.height/2)<1,'theme close icon not centered');
-  assert(ui.querySelectorAll('#theme-fields>details[open]').length===0,'theme sections should start closed');
-  assert(ui.querySelector('#edit').disabled && !ui.querySelector('#theme').hidden && !ui.querySelector('#theme-cancel').hidden && !ui.querySelector('#logout').hidden,'theme mode topbar');
-  assert(ui.querySelector('#theme-save').closest('#theme-panel footer') && ui.querySelector('#theme-cancel').closest('#theme-panel header'),'theme actions not in panel');
-  assert(ui.querySelector('#theme-title').textContent==='Theme' && !ui.textContent.includes('A little personality'),'theme labels');
-  const typography=[...ui.querySelectorAll('#theme-fields details')].find(d=>d.querySelector('summary').textContent==='Typography');
-  typography.querySelector('summary').click();assert(typography.open,'accordion opening');
-  const pageColors=[...ui.querySelectorAll('#theme-fields details')].find(d=>d.querySelector('summary').textContent==='Page colors');
-  const fontColor=pageColors.querySelector('[aria-label="Font Color"]');
-  const background=pageColors.querySelector('[aria-label="Background Color"]');assert(background.value==='var(--lighter)','background default');
-  background.value='var(--brand-1-light)';background.dispatchEvent(new Event('input'));assert(document.documentElement.style.getPropertyValue('--bg-color')==='var(--brand-1-light)','background preview');
-  assert(fontColor.tagName==='SELECT' && fontColor.value==='var(--black)','font color default');
-  assert([...fontColor.querySelectorAll('optgroup')].map(g=>g.label).join(',')==='Neutral colors,Brand colors','font color ordering');
-  assert(![...fontColor.options].some(o=>o.value==='var(--error)') && !typography.querySelector('[aria-label="Font Color color picker"]'),'semantic/font color picker present');
-  fontColor.value='var(--brand-1)';fontColor.dispatchEvent(new Event('input'));
-  assert(document.documentElement.style.getPropertyValue('--font-color')==='var(--brand-1)','font color preview');
-  assert(typography.querySelector('[aria-label="Body Font"]').tagName==='INPUT','font not a text field');
-  assert(ui.querySelectorAll('#theme-fields>details[open]').length===1,'multiple sections open');
-  const help=typography.querySelector('[aria-label="About Body Font"]');help.click();assert(help.getAttribute('aria-expanded')==='true','help bubble missing');
-  const font=typography.querySelector('[aria-label="Body Font"]');font.focus();assert(getComputedStyle(font).outlineOffset==='-3px','focus ring can be clipped');
-  const originalAppend=document.head.append;let fontPreview;
-  document.head.append=function(node){if(node.tagName==='LINK'&&node.href.startsWith('https://fonts.googleapis.com/css2?')){fontPreview=node;return;}return originalAppend.call(this,node);};
-  font.value='"Lora", serif';font.dispatchEvent(new Event('input'));await new Promise(resolve=>setTimeout(resolve,450));
-  assert(fontPreview?.href.includes('family=Lora'),'Google font preview missing');
-  document.head.append=originalAppend;
-  typography.querySelector('summary').click();assert(!typography.open,'accordion closing');
-  const base=ui.querySelector('[aria-label="Text large screen base size (px)"]');
-  assert(base && !ui.querySelector('[aria-label="Text Base"]'),'scale controls missing');
-  const oldText=document.documentElement.style.getPropertyValue('--text-base');
-  const small=ui.querySelector('[aria-label="Text small screen base size (px)"]');small.value=10;small.dispatchEvent(new Event('input'));
-  base.value=100;base.dispatchEvent(new Event('input'));
-  const expected=document.createElement('div');expected.style.setProperty('--text-base',EXPECTED_CLAMP);
-  assert(document.documentElement.style.getPropertyValue('--text-base')===expected.style.getPropertyValue('--text-base'),'Go/browser negative-intercept mismatch');
-  assert(!ui.querySelector('#theme-save').disabled,'scale change cannot save');
-  for(const fixture of SCALE_FIXTURES){
-    for(const [key,value] of Object.entries(fixture.settings)){
-      const suffix=key.endsWith('Base')?(fixture.kind==='text'?'base size (px)':'small spacing (px)'):key.endsWith('Ratio')?'scale ratio':'width (px)';
-      const input=ui.querySelector('[aria-label="'+(fixture.kind==='text'?'Text':'Spacing')+' '+(key.endsWith('Viewport')?'viewport '+(key.startsWith('min')?'min':'max')+' (px)':(key.startsWith('min')?'small':'large')+' screen '+suffix)+'"]');
-      input.value=value;input.dispatchEvent(new Event('input'));
-    }
-    for(const [name,value] of Object.entries(fixture.values))assert(document.documentElement.style.getPropertyValue(name)===value,'scale parity '+name+': '+document.documentElement.style.getPropertyValue(name)+' expected '+value);
-  }
-  const color=ui.querySelector('#theme-fields input[aria-label="Brand 1"]');color.value='#123456';color.dispatchEvent(new Event('input'));
-  assert(document.documentElement.style.getPropertyValue('--brand-1')==='#123456' && !ui.querySelector('#theme-save').disabled,'private theme preview');
-  ui.querySelector('#theme-save').click();await new Promise(resolve=>setTimeout(resolve,30));
-  assert(ui.querySelector('#theme-message').textContent.includes('preview is still here'),'theme failure lost preview');
-  assert(ui.querySelector('#edit').disabled,'failed theme save enabled conflicting edit mode');
-  window.confirm=()=>false;ui.querySelector('#edit').click();assert(!ui.querySelector('#theme-panel').hidden,'mode switch lost draft');
-  window.confirm=()=>false;document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));assert(!ui.querySelector('#theme-panel').hidden,'Escape discarded dirty preview');
-  window.confirm=()=>true;document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));assert(document.documentElement.style.getPropertyValue('--brand-1')===oldBrand,'theme cancel not restored');
-  assert(document.documentElement.style.getPropertyValue('--text-base')===oldText,'scale cancel not restored');
-  assert(document.documentElement.style.getPropertyValue('--font-color')==='','font color cancel not restored');
-  assert(!ui.querySelector('#edit').checked&&!article.isContentEditable,'Theme did not restore browsing preference');
-  ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));
-  window.matchMedia=query=>query==='(prefers-reduced-motion: reduce)'?{matches:false}:originalMatchMedia(query);
-  ui.querySelector('#theme-cancel').click();const closingPanel=ui.querySelector('#theme-panel');assert(!closingPanel.hidden&&closingPanel.inert,'theme hidden before exit animation');assert(closingPanel.getAnimations().some(a=>a.effect.getTiming().duration===220),'theme exit animation missing');
-  ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));assert(!closingPanel.hidden&&!closingPanel.inert,'reopening retained stale closing state');
-  ui.querySelector('#theme-cancel').click();closingPanel.getAnimations().forEach(a=>a.finish());await new Promise(resolve=>setTimeout(resolve,30));assert(closingPanel.hidden,'theme exit did not finish');window.matchMedia=originalMatchMedia;
-  ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));
-  ui.querySelector('#theme-cancel').click();
-  ui.querySelector('#edit').click();ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));
-  assert(ui.querySelector('#format').inert,'Theme opened from Edit retained interactive row');
-  ui.querySelector('#theme-cancel').click();
-  assert(ui.querySelector('#edit').checked&&!ui.querySelector('#format').inert,'Theme failed to restore Edit row');
-  ui.querySelector('#theme').click();await new Promise(resolve=>setTimeout(resolve,30));
-  const textGroup=[...ui.querySelectorAll('#theme-fields details')].find(d=>d.querySelector('summary').textContent==='Text sizes');
-  [...ui.querySelectorAll('#theme-fields>details[open]')].forEach(d=>d.querySelector('summary').click());
-  textGroup.querySelector('summary').click();textGroup.scrollIntoView({block:'start'});
   result.textContent='PASS';
  } catch(error) { result.textContent='FAIL: '+error.message; }
  document.body.append(result);
@@ -220,32 +141,6 @@ func TestPublicPreviewBrowser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fields, err := theme.Fields(string(themeCSS))
-	if err != nil {
-		t.Fatal(err)
-	}
-	fieldJSON, err := json.Marshal(fields)
-	if err != nil {
-		t.Fatal(err)
-	}
-	checks = strings.ReplaceAll(checks, "THEME_FIELDS", string(fieldJSON))
-	scaleJSON, _ := json.Marshal(theme.Scales(string(themeCSS)))
-	checks = strings.ReplaceAll(checks, "THEME_SCALES", string(scaleJSON))
-	clampJSON, _ := json.Marshal(theme.Clamp(theme.Scale{MinViewport: 320, MaxViewport: 1600, MinBase: 10, MaxBase: 100, MinRatio: 1.25, MaxRatio: 1.414}, 0))
-	checks = strings.ReplaceAll(checks, "EXPECTED_CLAMP", string(clampJSON))
-	var fixtures []any
-	for _, kind := range []string{"text", "space"} {
-		for _, s := range []theme.Scale{
-			{MinViewport: 320, MaxViewport: 1600, MinBase: 10, MaxBase: 100, MinRatio: 1.25, MaxRatio: 1.414},
-			{MinViewport: 320, MaxViewport: 1600, MinBase: 100, MaxBase: 10, MinRatio: 1.5, MaxRatio: 1.667},
-			{MinViewport: 360, MaxViewport: 1440, MinBase: 16, MaxBase: 20, MinRatio: 1.2, MaxRatio: 1.333},
-		} {
-			values, _ := theme.Generate(kind, s)
-			fixtures = append(fixtures, map[string]any{"kind": kind, "settings": s, "values": values})
-		}
-	}
-	fixtureJSON, _ := json.Marshal(fixtures)
-	checks = strings.ReplaceAll(checks, "SCALE_FIXTURES", string(fixtureJSON))
 	// Reuse exactly the production injection and CSP through an authenticated session.
 	h, mail := fixture(t)
 	cookie := login(t, h, mail)

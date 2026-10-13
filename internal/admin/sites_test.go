@@ -131,8 +131,8 @@ func TestRemoveSiteRejectsStaleStateAndPreservesOthers(t *testing.T) {
 	if len(c.Redirects) != 0 {
 		t.Fatalf("target redirect remains: %+v", c.Redirects)
 	}
-	if c.Content["a.test"] != "" || c.Themes["a.test"] != "" {
-		t.Fatal("target content/theme mapping remains")
+	if c.Content["a.test"] != "" {
+		t.Fatal("target content mapping remains")
 	}
 	for _, d := range c.TLS.Domains {
 		if d == "a.test" || d == "www.a.test" {
@@ -407,7 +407,6 @@ func TestRemoveSiteEntriesRemovesOnlyTargetOwnedEntries(t *testing.T) {
 	c := host.Config{
 		Sites:        map[string]string{"a.test": "/data/sites/a/releases/1", "www.a.test": "/data/sites/a/releases/1", "b.test": "/data/sites/b/releases/1"},
 		Content:      map[string]string{"a.test": "/data/sites/a/content/1.json", "b.test": "/data/sites/b/content/1.json"},
-		Themes:       map[string]string{"a.test": "/data/sites/a/content/1.json.theme.css", "b.test": "/data/sites/b/content/1.json.theme.css"},
 		Downloads:    map[string]string{"a.test": "/store/a", "b.test": "/store/b"},
 		Redirects:    map[string]string{"www.a.test": "a.test", "www.b.test": "b.test"},
 		SiteBranches: map[string]string{"a": "main", "b": "main"},
@@ -427,8 +426,8 @@ func TestRemoveSiteEntriesRemovesOnlyTargetOwnedEntries(t *testing.T) {
 	if _, ok := c.Content["a.test"]; ok {
 		t.Fatal("target content remains")
 	}
-	if c.Content["b.test"] == "" || c.Themes["b.test"] == "" {
-		t.Fatal("unrelated content/theme lost")
+	if c.Content["b.test"] == "" {
+		t.Fatal("unrelated content lost")
 	}
 	if _, ok := c.Downloads["a.test"]; ok {
 		t.Fatal("target download mapping remains")

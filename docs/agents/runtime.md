@@ -119,7 +119,7 @@ Flash is bounded (256 entries/site, five-minute expiry), visitor/host/app/route
 bound, and consumed only after a successful GET render. HEAD, assets, failed
 renders and other pages cannot consume it. Changed app settings require restart;
 never silently use an old recipient for a changed registration. Deployment
-configures email for app-only sites too. Protocol 23 requires the managed runtime.
+configures email for app-only sites too. Protocol 24 requires the managed runtime.
 Test cross-site recipients, credentials, flashes and aliases without live email.
 
 `index.html` maps to `/`. `about.html` and `about/index.html`

@@ -56,7 +56,7 @@ the same site's existing dev server, including LAN mode or port changes. Pull an
 reset remain protected while running. Stop older dev binaries manually once.
 
 For another device on the same trusted network, use `flea dev --lan` (or `-l`)
-and open a printed Network URL. Sign-in, editing, media, Theme, forms and reloads
+and open a printed Network URL. Sign-in, editing, media, forms and reloads
 work there too. Email previews open on the computer running Flea; enter that code
 on the other device. LAN mode uses unencrypted HTTP on private IPv4 networks.
 Do not forward the port. Allow it through your firewall if needed and restart dev
@@ -300,14 +300,11 @@ idle window is 30 days; set `admin.session_idle_days` to 1–365 to change it.
 Sign out revokes the current browser session. Remove an address from `admin.emails`
 to revoke that admin's access. Do not edit or copy runtime session files.
 
-### Theme editing
+### Styling
 
-Admins choose **Theme** to adjust supported colors, fonts, and spacing. Changes
-preview in their browser until saved; Cancel restores the original appearance.
-Google Font family names can load a preview; system fonts need no download.
-
-The panel edits supported variables already present in `site/css/theme.css`.
-Use the stylesheet itself for developer changes beyond those controls.
+Edit `site/css/theme.css` for colors, fonts and fluid sizing. Prewind and theme
+tokens remain available. Styles are developer-managed files: ordinary deployment
+publishes committed CSS, and rollback restores the selected release's CSS.
 
 ### Photos
 
@@ -328,7 +325,7 @@ Admins click the item's photo to choose a library image or upload a JPEG/PNG.
 Done previews the choice; Save changes publishes new uploads to the library.
 Cancel discards the draft without uploading. Empty photos show a
 neutral portrait and an Add photo control during Edit. Normal deployment retains
-live photos; `flea pull --snips-only` retrieves their metadata and files together.
+live photos; `flea pull` retrieves their metadata and files together.
 
 ### Videos
 
@@ -343,7 +340,7 @@ Photos/Videos buttons. Metadata lives in `flea/snips.json`; MP4 files in
 Deployment stages referenced local files and preserves live replacements.
 
 Pulls and backups include video files. On a fresh clone, restore missing video
-files before validation, using `flea pull --snips-only` when a live destination is
+files before validation, using `flea pull` when a live destination is
 configured. Storage is limited to 64 MiB including retained replacements, with no
 automatic deletion. Video fields in multisnips are not supported.
 
@@ -436,26 +433,24 @@ Email-enabled sites prompt for server-side Resend settings when needed.
 
 ### Sync admin changes
 
-Normal deployment preserves live editable content and theme changes, seeding new
-IDs from your local site. To bring live edits back into your project, stop dev and
-run:
+Normal deployment preserves live editable content, seeding new IDs from your
+local site. It publishes committed CSS, including `site/css/theme.css`.
+To bring live snip/metadata and media edits back, stop dev and run:
 
 ```sh
 flea pull
 ```
 
-Use `--snips-only` or `--theme-only` to select one. Review and commit the result.
-Pull never retrieves configuration, secrets, or sessions.
-
-To intentionally publish local content or theme edits:
+Review and commit the result. Pull never retrieves styles, source templates,
+configuration, secrets or sessions. To intentionally publish local snip edits:
 
 ```sh
 flea deploy --with-snips
-flea deploy --with-theme
 ```
 
-You can combine both flags. Existing live sites require a pull baseline first.
-Conflicts ask you to choose explicitly between live and local changes.
+Existing live sites require a pull baseline first. Conflicts require an explicit
+choice between live and local changes; unattended conflicts stop. There are no
+Theme controls or theme synchronization flags.
 
 ## Backups and recovery
 

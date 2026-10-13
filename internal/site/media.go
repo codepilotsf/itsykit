@@ -2,6 +2,7 @@ package site
 
 import (
 	"flea/internal/media"
+	"flea/internal/snips"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -95,4 +96,8 @@ func ReadPhoto(root, name string) ([]byte, error) {
 	}
 	defer r.Close()
 	return readFileBounded(r, name, media.MaxFile)
+}
+
+func LoadWithMedia(root string, content *snips.Store, mediaRoot string) (*Project, error) {
+	return loadProject(root, content, mediaRoot, false)
 }

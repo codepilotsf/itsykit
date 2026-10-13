@@ -41,16 +41,14 @@ func TestOwnerReloadBrowser(t *testing.T) {
   };
   const savedRegion=document.getElementById('region');savedRegion.textContent='Saved';savedRegion.dispatchEvent(new Event('input'));ui.querySelector('#save').click();
   await wait(1000);assert(savedRegion.isConnected&&ui.querySelector('#save').disabled&&host.dataset.revision==='2','own save triggered reload or failed to acknowledge revision');
-  window.fetch=async url=>url==='/_flea/reload'?{ok:true,text:async()=>'3'}:{ok:true,json:async()=>({version:'v',fields:[],scales:{}})};
+  window.fetch=async url=>url==='/_flea/reload'?{ok:true,text:async()=>'3'}:{ok:true,json:async()=>({page:{version:'v'}})};
   window.confirm=()=>true;
   assert(ui.querySelector('#edit').checked,'editing defaults on');
   const region=document.getElementById('region');region.textContent='Draft';region.dispatchEvent(new Event('input'));
   await wait(1000);
   assert(region.textContent==='Draft' && ui.querySelector('#status').textContent.includes('Source changed'),'draft not protected');
-  ui.querySelector('#cancel').click();ui.querySelector('#theme').click();
-  await wait(1000);assert(!ui.querySelector('#theme-panel').hidden,'theme preview not protected');
-  ui.querySelector('#theme-cancel').click();
   sessionStorage.setItem('reload-ready','yes');
+  ui.querySelector('#cancel').click();
  }catch(e){result.textContent='FAIL: '+e.message;document.body.append(result);await report(result.textContent);}
 },100);`
 	h, mail := fixture(t)

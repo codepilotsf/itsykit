@@ -77,7 +77,7 @@ func TestQAPullHydratesIgnoredVideoInFreshClone(t *testing.T) {
 		}
 		return nil
 	}
-	if e = pull(context.Background(), root, true, false, strings.NewReader(""), io.Discard, io.Discard, run); e != nil {
+	if e = pull(context.Background(), root, strings.NewReader(""), io.Discard, io.Discard, run); e != nil {
 		t.Fatal(e)
 	}
 	p, e := site.Load(root)

@@ -88,7 +88,7 @@ func TestLANBrowserEditing(t *testing.T) {
   await wait(()=>host.dataset.version!==previousVersion&&!ui.querySelector('#edit').disabled&&ui.querySelector('#save').disabled&&ui.querySelector('#cancel').disabled);
   assert((await (await fetch('/',{credentials:'omit'})).text()).includes('Saved in a LAN browser'),'save did not publish');
   assert(field.isConnected,'save unexpectedly replaced the page');
-  ui.querySelector('#theme').click();await wait(()=>ui.querySelector('#theme-panel')?.hidden===false&&ui.querySelector('#theme-fields')?.children.length>0);
+  assert(!ui.querySelector('#theme')&&!ui.querySelector('#theme-panel'),'removed Theme UI is present');
   await fetch('/_test/result',{method:'POST',body:'PASS'});
  }catch(e){await fetch('/_test/result',{method:'POST',body:String(e.stack||e)})}
 })();`
