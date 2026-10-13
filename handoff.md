@@ -1,5 +1,59 @@
 # fleacms.com website handoff
 
+## 0.16.0 published and installed October 13, 2026
+
+Framework/tag `1c85aae` / `v0.16.0`, clean Go 1.27.1 artifacts. Includes detected
+hostnames/local aliases and Tailscale IPv4 LAN peers with exact Host/port checks,
+automatic default dev-port selection, and server-update progress. Website source
+`a49e002`, activation `20261013-221944-d1f6169314346e36fd5ab5c7`. Public homepage,
+docs, download links and latest.txt now agree on 0.16.0.
+
+Native Mac and Linux ARM64 full runtime tests, vet, race and bundled builds
+passed. Relevant named-host editing and mail-preview Chrome checks passed under
+race instrumentation. A test-only preview handler race was fixed. The existing
+owner-navigation browser check reports `Missing page transition name` in repeated
+race runs; repeated ordinary runs pass. No navigation implementation/assertion
+was changed. Do not claim all browser tests under race passed. Native AMD64
+build/full-suite, clean-Mac/notarization and native CI acceptance remain open.
+
+AMD64 was cross-compiled on the Mac and smoke-tested natively as nobody. All
+CLIs embed identical Linux servers. Public hashes, fresh installs, reinstalls,
+0.15.1-to-0.16.0 updates, already-current checks and fresh-site/dev smoke passed
+on all three advertised platforms. Native Mac signature checks passed. Normal
+Linux `/home/sean/.local/bin/flea` and M5 `/Users/sean/.local/bin/flea` were updated
+through the public updater and both report 0.16.0 with matching public hashes.
+
+The immutable directory was verified and installed under the deployment lock,
+validated with the existing 320 MiB admin target, then the service restarted to
+load the catalogue. Public bytes and the old 0.15.1 manifest passed before channel
+advancement. During the longer build window, Gestalt Haus was separately deployed
+as `6601d165`, activation `20261013-220136-62ba8cfc530ca453040636ab`; this newer
+code/content/CSS was preserved. Config last changed at 22:01:41 UTC, before
+catalogue restart at 22:15:55 UTC. A refreshed pre-channel snapshot matched
+content/media/CSS and unrelated deployments after the website update.
+
+All 12 HTTPS domains are healthy. Final website status reports code/content
+matching source. Recovery is clear and the publication-window error journal is
+empty; memory/swap policy and retained downloads are unchanged. Server executable
+remains 0.15.1 / protocol 25. No source branches were merged or real email sent.
+Actual M5-to-`asahi:3003` dev homepage/sign-in/reload returned 200; unrelated Host
+and wrong port returned 403. No firewall settings or existing dev servers changed.
+Restart site dev with the installed CLI to load the new code.
+
+- Mac ARM64: `c95ba159de8674538ebf03499958332ff66ada9d9cb36b63394af4696e6b3ee3`
+- Linux AMD64: `edae40e02d8e6174610d46277958313790eee26e786f86b8527b2fd7b0324b2c`
+- Linux ARM64: `9a88c0e21b0fe890f81c72c8b71d514a1e126f211465d227a1e41e4189a7f53c`
+
+Framework [draft MR 8](https://gitlab.codepilot.com/sean-schertell/flea/-/merge_requests/8)
+and website [draft MR 4](https://gitlab.codepilot.com/sean-schertell/flea-website/-/merge_requests/4)
+are linked to T3. Full provenance/limits are in framework
+`docs/agents/release-016-verification.md`. Private evidence/website backup:
+`/tmp/flea-016-release`. Retained artifacts:
+`/home/sean/fleacms-releases/0.16.0`; remote staging:
+`/var/lib/flea/downloads/.flea-016.VWjWihow`. Prior installed binaries remain at
+`/tmp/flea-016-release/linux-cli.before` and `/tmp/flea-016-installed-before/flea`
+on the Mac. Task-owned previews stopped; existing manual QA answers are preserved.
+
 ## 0.15.1 published October 13, 2026
 
 Framework source/tag `d5958ac` / `v0.15.1`; all three clean tagged artifacts use
