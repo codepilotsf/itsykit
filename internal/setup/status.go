@@ -170,15 +170,13 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 	}
 	content := syncstate.CompareContent(baseline.Snips, p.Content, remote.Snips)
 	fmt.Fprintf(out, "  Content      %s\n", content.String())
-	theme := syncstate.CompareValue(baseline.HasTheme, baseline.Theme, p.ThemeCSS(), remote.Theme)
-	fmt.Fprintf(out, "  Theme        %s\n", theme.String())
 	switch {
-	case content.Different > 0 || theme.Different > 0:
-		fmt.Fprintln(out, "\nNext: run flea pull to review content and theme differences.")
+	case content.Different > 0:
+		fmt.Fprintln(out, "\nNext: run flea pull to review content differences.")
 	case changes > 0 || state.Commit != record.Commit:
 		fmt.Fprintln(out, "\nNext: review your local changes, then run flea deploy to publish code.")
 	default:
-		fmt.Fprintln(out, "\nCode, content and theme match.")
+		fmt.Fprintln(out, "\nCode and content match. Styles are part of the code release.")
 	}
 	if websiteErr != nil {
 		return fmt.Errorf("the public website could not be reached; check its DNS, TLS and server availability")

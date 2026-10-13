@@ -45,16 +45,3 @@ func TestCompareActiveValuesAndMetadata(t *testing.T) {
 		t.Fatal("labels or archives counted", got)
 	}
 }
-func TestCompareMissingTheme(t *testing.T) {
-	empty := ""
-	changed := "css"
-	if got := CompareValue(true, nil, nil, &empty); got.Remote != 1 {
-		t.Fatal(got)
-	}
-	if got := CompareValue(true, &empty, &changed, &empty); got.Local != 1 {
-		t.Fatal(got)
-	}
-	if got := CompareValue(false, nil, nil, &empty); got.Different != 1 || got.Known {
-		t.Fatal(got)
-	}
-}

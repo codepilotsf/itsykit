@@ -73,8 +73,7 @@ outside immutable code releases. Validated photos stream from pinned file handle
 not permanent Go-heap buffers. Never modify hash-named files in place: detected
 changes make the asset unavailable until a valid snapshot is loaded.
 
-Normal deployment preserves live photos and seeds new ones. `flea pull` and
-`flea pull --snips-only` retrieve photo metadata and referenced files together.
+Normal deployment preserves live photos and seeds new ones. `flea pull` retrieves photo metadata and referenced files together.
 `--with-snips` includes reviewed local photo changes, with explicit conflicts.
 Backups include live photo bytes, and restore validates them before activation.
 

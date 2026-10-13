@@ -56,3 +56,7 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `internal/site/server.go`: HTTP serving, reload watching, and URL validation.
 - `internal/site/site_test.go`: rendering, routing, isolation, and reload tests.
 - `bin/flea`: local build output; rebuilding is necessary for CLI changes to take effect.
+
+Source CSS is loaded from the immutable release. `internal/site/managed.go`
+provides confined fixed-path file helpers. Theme editor/overlay/sync code has
+been removed; snip synchronization remains in setup/admin/syncstate.

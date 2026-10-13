@@ -129,3 +129,30 @@ func testReadinessAndShutdown(t *testing.T, bind string) {
 		t.Fatal("server did not stop")
 	}
 }
+
+func TestRemovedThemeMappingIsRejectedWithoutRewritingConfig(t *testing.T) {
+	file := testConfig(t, "127.0.0.1:8080")
+	original, err := os.ReadFile(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var config map[string]any
+	if err = json.Unmarshal(original, &config); err != nil {
+		t.Fatal(err)
+	}
+	config["themes"] = map[string]string{"example.test": "/private/saved-theme.css"}
+	data, err := json.Marshal(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = os.WriteFile(file, data, 0644); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err = Load(file, nil); err == nil || !strings.Contains(err.Error(), "themes") {
+		t.Fatal("removed theme mapping accepted", err)
+	}
+	after, err := os.ReadFile(file)
+	if err != nil || string(after) != string(data) {
+		t.Fatal("rejected config was modified", err)
+	}
+}

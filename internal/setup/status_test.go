@@ -74,7 +74,7 @@ func TestStatusRemoteReadOnlyAndLocalFirst(t *testing.T) {
 		}
 		text := strings.Join(c.args, " ")
 		if strings.Contains(text, "-export-state") {
-			return true, json.NewEncoder(c.out).Encode(syncstate.Snapshot{Exists: true, Snips: p.Content, Theme: p.ThemeCSS(), Revision: revision})
+			return true, json.NewEncoder(c.out).Encode(syncstate.Snapshot{Exists: true, Snips: p.Content, Revision: revision})
 		}
 		if strings.Contains(text, "-history") {
 			return true, json.NewEncoder(c.out).Encode([]admin.ReleaseRecord{{ID: filepath.Base(revision), Branch: s.Branch, Commit: commit}})
@@ -89,7 +89,7 @@ func TestStatusRemoteReadOnlyAndLocalFirst(t *testing.T) {
 		}
 		return nil
 	})
-	if err != nil || checks != 1 || !strings.Contains(out.String(), "Code, content and theme match.") || strings.Contains(out.String(), "\x1b") {
+	if err != nil || checks != 1 || !strings.Contains(out.String(), "Code and content match. Styles are part of the code release.") || strings.Contains(out.String(), "\x1b") {
 		t.Fatal(err, out.String())
 	}
 	if after := testGit(t, p.Root, "status", "--porcelain"); after != before {
@@ -226,9 +226,8 @@ func TestStatusDifferencesWithAndWithoutBaseline(t *testing.T) {
 			p, s := statusFixture(t, true)
 			remote := snips.NewStore()
 			remote.Page("/").Title = "Live title"
-			css := "live css"
 			if known {
-				if err := saveBaseline(context.Background(), p.Root, s, syncstate.Baseline{Snips: p.Content, HasTheme: true, Theme: p.ThemeCSS()}); err != nil {
+				if err := saveBaseline(context.Background(), p.Root, s, syncstate.Baseline{Snips: p.Content}); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -237,7 +236,7 @@ func TestStatusDifferencesWithAndWithoutBaseline(t *testing.T) {
 			run := inventoryRunner(t, "["+testSiteJSON+"]", func(c command) (bool, error) {
 				text := strings.Join(c.args, " ")
 				if strings.Contains(text, "-export-state") {
-					return true, json.NewEncoder(c.out).Encode(syncstate.Snapshot{Exists: true, Snips: remote, Theme: &css, Revision: revision})
+					return true, json.NewEncoder(c.out).Encode(syncstate.Snapshot{Exists: true, Snips: remote, Revision: revision})
 				}
 				if strings.Contains(text, "-history") {
 					return true, json.NewEncoder(c.out).Encode([]admin.ReleaseRecord{{ID: filepath.Base(revision), Branch: s.Branch, Commit: commit}})
@@ -250,7 +249,7 @@ func TestStatusDifferencesWithAndWithoutBaseline(t *testing.T) {
 			if known {
 				want = "0 local, 1 remote, 0 conflicting changes"
 			}
-			if err == nil || strings.Count(out.String(), want) != 2 || !strings.Contains(out.String(), "Connection   Unavailable") || !strings.Contains(out.String(), "flea pull") {
+			if err == nil || strings.Count(out.String(), want) != 1 || !strings.Contains(out.String(), "Connection   Unavailable") || !strings.Contains(out.String(), "flea pull") {
 				t.Fatal(err, out.String())
 			}
 		})

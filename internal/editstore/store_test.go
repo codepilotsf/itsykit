@@ -226,3 +226,41 @@ func TestRejectUnknownTargetsAndChangedAccess(t *testing.T) {
 		t.Fatal("continued after access changed")
 	}
 }
+
+func TestSnipSavePreservesSourceCSSAndRejectsChangedStyles(t *testing.T) {
+	for _, remote := range []bool{false, true} {
+		t.Run(map[bool]string{false: "local", true: "remote"}[remote], func(t *testing.T) {
+			s, public := fixture(t, remote)
+			cssPath := filepath.Join(s.Root, "site", "css", "theme.css")
+			if err := os.MkdirAll(filepath.Dir(cssPath), 0755); err != nil {
+				t.Fatal(err)
+			}
+			css := ":root { --brand-1: #123456; }"
+			if err := os.WriteFile(cssPath, []byte(css), 0644); err != nil {
+				t.Fatal(err)
+			}
+			doc, err := s.Read()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := s.Save(editor.Update{Version: doc.Version, ID: "abcdefghij", Content: "Updated text"}); err != nil {
+				t.Fatal(err)
+			}
+			w := httptest.NewRecorder()
+			public.ServeHTTP(w, httptest.NewRequest("GET", "/css/theme.css", nil))
+			if w.Code != 200 || w.Body.String() != css {
+				t.Fatal("content save changed source styling", w.Code, w.Body.String())
+			}
+			doc, err = s.Read()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(cssPath, []byte(":root { --brand-1: #654321; }"), 0644); err != nil {
+				t.Fatal(err)
+			}
+			if err := s.Save(editor.Update{Version: doc.Version, ID: "abcdefghij", Content: "Stale draft"}); err == nil {
+				t.Fatal("accepted content draft after source CSS changed")
+			}
+		})
+	}
+}

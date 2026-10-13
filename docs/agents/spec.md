@@ -36,11 +36,11 @@ shared page Save/Cancel applies all changes together. Photo fields offer existin
 library images in a thumbnail picker and JPEG/PNG uploads, with a selected-photo
 preview and contextual alt text. Private previews publish only with page Save.
 Editable `mailers/` templates and local
-email preview are implemented; see docs/email-templates.md. Protocol 23 requires
+email preview are implemented; see docs/email-templates.md. Protocol 24 requires
 these runtime features. Adaptive streaming and automatic retention remain planned.
 
 Dev reloads authenticated public pages when safe, restoring edit mode and scroll.
-Unsaved drafts, open dialogs, saves and Theme panels block automatic reload.
+Unsaved drafts, open dialogs, saves block automatic reload.
 Production owner pages do not poll for development reloads.
 Page Save applies server-confirmed content in place without a full reload and
 updates the version and Cancel baseline for subsequent edits.
@@ -59,33 +59,20 @@ Host/port and actual-peer checks gate LAN requests; sessions, Origin, CSRF and
 production HTTPS requirements remain intact. Previews open on the dev computer
 and existing private capability URLs also work on approved network addresses.
 
-Editable state: `flea pull` retrieves live snips and theme CSS into local files,
-with `--snips-only` / `--theme-only` selectors. Plain deployment preserves live
-state; `--with-snips` / `--with-theme` publish intentional local changes using
-scoped pull baselines and explicit conflict resolution. No config/session/secret
-sync. Protocol 23 checks reviewed state under the activation lock. See README
-for first-pull conflicts, whole-file theme merging, and local write-failure limits.
+Editable state: `flea pull` retrieves live snips, metadata and referenced media
+into local files. Plain deployment preserves live content; `--with-snips`
+publishes intentional local changes using scoped pull baselines and explicit
+conflict resolution. No config/session/secret or CSS sync. Protocol 24 checks
+reviewed state under the activation lock.
 
-Every owner can open Theme beside Editing. A right panel edits supported existing
-variables in css/theme.css, with browser-private preview and Save/Cancel.
-Page Cancel/Save stay on the second toolbar row and retain Editing after use.
-The switch label is Edit, with dark-off/green-on styling. Editable overlays use
-2px dashed green boundaries with 6px corners. Theme and Sign out are
-compact pills; the owner bar has no wordmark, account separator or idle hints.
-Theme disables the Editing switch and hides page actions. Its header X and Escape
-close with confirmation for dirty previews; Save stays in a fixed panel footer.
-Closing restores the preferred editing mode. Entry/exit motion respects reduced motion.
-Complete Prewind text/spacing scales use paired endpoint sizes, ratios and screen
-widths instead of individual clamp inputs. Settings remain in CSS comments; Go
-generates saved declarations without Node. Custom scales need explicit replacement.
-Imports and arbitrary CSS remain developer-owned. Live theme snapshots sit
-outside releases, and normal deployment retains them.
-Theme font-family fields accept text and generate fixed-host Google Fonts imports
-on save, preserving developer imports. Private preview loads the font; Cancel
-removes its stylesheet. No credentials or server network access are needed. Brand, neutral
-and semantic color sections come first; only one sibling section opens at a time.
-Font Color selects existing neutral or brand tokens, neutrals first. Semantic
-colors are excluded, and the starter uses var(--black).
+Styles are developer-managed in `site/css/theme.css`, using Prewind, theme tokens
+and ordinary CSS. No remote Theme editor, CSS overlay or theme synchronization.
+Normal deploy publishes committed CSS, backups include source styles, and rollback
+restores the selected release's CSS while keeping current snip content.
+Page Cancel/Save remain on the second row and keep Editing on. The switch label
+is Edit, with dark-off/green-on styling. Editable overlays use 2px dashed green
+boundaries with 6px corners; Sign out stays a compact pill. Keep visible focus,
+source-change protection and reduced-motion behavior.
 
 `flea email` configures Resend with an asterisk-masked API key, separate sender name and
 verified-domain address, a non-sending connection check, and a private .env save.
@@ -128,7 +115,7 @@ on authenticated activity. Active editing renews at most once a minute; idle tab
 do not. Sessions survive browser closure, restart and deploy. Logout and owner
 removal revoke sessions. Store hashed tokens and host/CSRF/expiry metadata only,
 with private permissions, bounded reads, locking and atomic saves. Never ship
-session state in Git or release archives. Deployment protocol 23 requires the
+session state in Git or release archives. Deployment protocol 24 requires the
 private writable runtime directory; OTPs remain memory-only.
 
 **Status:** first implementation specification  
@@ -441,7 +428,7 @@ Aliases pointing to the same release must select the same content snapshot;
 conflicting paths are rejected and valid aliases share a loaded serving snapshot.
 After successful activation, unreferenced entries move to an archive map, retaining
 last remote content. References are lexical, including false/empty branches and
-unused partials. Failed activation leaves previous content untouched. Protocol 23
+unused partials. Failed activation leaves previous content untouched. Protocol 24
 is required. No automatic archive deletion or rollback command exists yet.
 
 ### Values, conditions, and loops
@@ -584,8 +571,7 @@ right-aligned Edit and Sign out buttons. Edit starts editing the current page an
 replaces Edit with Cancel and Save changes. Sign out remains visible after a
 vertical divider. Save is disabled until actual
 changes exist. Page details and formatting slide out in a second bar during Edit,
-collapsing outside Edit and while Theme is open. Theme slides from the right below
-the measured toolbar height. Both respect reduced motion. Formatting requires a focused editable region:
+collapsing outside Edit and respecting reduced motion. Formatting requires a focused editable region:
 normal text, H1–H4, bold, italic, underline, strikethrough, links,
 bullet/numbered lists, and left/center/right alignment. Page details holds title
 and description. Save applies the page's changes together; Cancel discards them,
@@ -752,7 +738,7 @@ flea rollback
   confirmation, and commit message. Respect Git hooks and signing. Declining or
   failure stops deployment. Sites within larger repositories commit manually.
 
-- Requires deployment protocol 23 before upload, offering first-time setup when absent. Validates the
+- Requires deployment protocol 24 before upload, offering first-time setup when absent. Validates the
   packaged site, uploads over SSH/SCP, stages, and atomically switches host config.
 - Restarts and verifies revision/hostname; restores the prior config on failure.
 - Uses native SSH and the saved current-branch mapping in .flea.config.json. The first
@@ -782,7 +768,7 @@ flea rollback
 
 `flea status`
 
-- Prints local validity, site counts and Git state first, then automatically checks the current branch's saved remote over SSH. Separately reports website reachability, deployed commit, content and theme differences. Direction requires a scoped pull baseline. No remote flag; no mapping finishes locally.
+- Prints local validity, site counts and Git state first, then automatically checks the current branch's saved remote over SSH. Separately reports website reachability, deployed commit, content differences; CSS is part of code. Direction requires a scoped pull baseline. No remote flag; no mapping finishes locally.
 
 `flea logs`
 

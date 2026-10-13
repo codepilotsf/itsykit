@@ -230,16 +230,10 @@ func TestLANDevWorkflow(t *testing.T) {
 	if w := req("GET", "/team", nil, nil); !strings.Contains(w.Body.String(), "LAN team member") {
 		t.Fatal("collection not published")
 	}
-	w = req("GET", "/admin/theme", url.Values{"csrf": {csrf}}, session)
-	var theme struct {
-		Version string `json:"version"`
-	}
-	if err := json.Unmarshal(w.Body.Bytes(), &theme); err != nil || w.Code != 200 {
-		t.Fatal("theme read", w.Code, err)
-	}
-	data, _ = json.Marshal(map[string]any{"version": theme.Version, "changes": map[string]string{"--brand-1": "#123456"}})
-	if w := req("POST", "/admin/theme", url.Values{"csrf": {csrf}, "edit": {string(data)}}, session); w.Code != 204 {
-		t.Fatal("theme save", w.Code, w.Body.String())
+	for _, method := range []string{"GET", "POST"} {
+		if w := req(method, "/admin/theme", url.Values{"csrf": {csrf}}, session); w.Code != 404 {
+			t.Fatal("removed Theme endpoint", method, w.Code)
+		}
 	}
 	if w := req("POST", "/admin/activity", url.Values{"csrf": {csrf}}, session); w.Code != 204 {
 		t.Fatal("activity", w.Code)

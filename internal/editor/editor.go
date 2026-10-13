@@ -14,18 +14,14 @@ import (
 	"flea/internal/mailer"
 	"flea/internal/media"
 	"flea/internal/snips"
-	"flea/internal/theme"
 )
 
 type Document struct {
-	Theme   *string
 	Store   *snips.Store
 	Routes  []string
 	Version string
 }
 type Update struct {
-	Scales                                          map[string]theme.ScaleEdit
-	Theme                                           map[string]string
 	Version, Route, ID, Content, Title, Description string
 	Page                                            *PageEdit
 	// Result is filled from the committed snapshot while the save lock is held.
@@ -218,7 +214,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case "/admin/verify":
 			h.verifyCode(w, r)
 			return
-		case "/admin/logout", "/admin/activity", "/admin/page", "/admin/theme":
+		case "/admin/logout", "/admin/activity", "/admin/page":
 			if !logged || !equal(s.csrf, r.FormValue("csrf")) {
 				http.Error(w, "Your session expired. Please sign in again.", 403)
 				return
@@ -249,10 +245,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				h.savePage(w, r)
 				return
 			}
-			if r.URL.Path == "/admin/theme" {
-				h.saveTheme(w, r)
-				return
-			}
 		default:
 			http.NotFound(w, r)
 			return
@@ -260,10 +252,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.URL.Path == "/admin/editor-context" && logged {
 		h.readEditorContext(w, r, s)
-		return
-	}
-	if r.URL.Path == "/admin/theme" && logged {
-		h.readTheme(w, r)
 		return
 	}
 	if r.URL.Path != "/admin" && r.URL.Path != "/admin/" {

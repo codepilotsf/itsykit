@@ -5,6 +5,16 @@ Linux. Published October 12, 2026; the public installer selects it from
 `https://fleacms.com/releases/latest.txt`. The shared server remains 0.9.0-rc.1 /
 protocol 23; this release needs no remote server upgrade.
 
+## 0.14.0 server and local CLI rollout
+
+0.14.0 removes browser Theme editing and CSS synchronization while retaining
+`site/css/theme.css`, Prewind and source styling. Normal deployment publishes
+committed CSS. Snip editing and synchronization remain supported. Protocol 24
+requires reviewed removal of obsolete host theme mappings before upgrading an
+existing protocol-23 server; preserve any remote customizations in source first.
+The public update channel remains 0.13.0 until a separately verified publication.
+A local source-built CLI/server rollout does not publish downloads or tags.
+
 ## Upgrading to 0.13.0
 
 Run `flea update` for the improved `flea status`. Local validation, page/asset/

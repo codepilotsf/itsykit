@@ -21,7 +21,6 @@ import (
 // DeploySettings contains no secrets. Native SSH configuration owns credentials.
 type DeploySettings struct {
 	WithSnips   bool     `json:"-"`
-	WithTheme   bool     `json:"-"`
 	Target      string   `json:"target"`
 	Domain      string   `json:"domain"`
 	Name        string   `json:"name"`
@@ -53,8 +52,8 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		return fmt.Errorf("branch changed since selecting the deployment destination")
 	}
 	fmt.Fprintf(out, "\nDeploying %s branch to %s.\nPress Ctrl-C to abort.\n\n", state.Branch, s.Domain)
-	if !httpsOnly && !s.WithSnips && !s.WithTheme {
-		fmt.Fprintln(out, "Existing live snips and theme will be kept. New snips use their committed content.")
+	if !httpsOnly && !s.WithSnips {
+		fmt.Fprintln(out, "Existing live snips will be kept. Styles come from this commit. New snips use their committed content.")
 	}
 	target, err := targetName(s.Target)
 	if err != nil {
@@ -221,7 +220,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 	if !strings.Contains(output.String(), release.Protocol+"\n") {
 		return fmt.Errorf("This server has an older or incomplete FleaCMS installation.\nPlease update the server before deploying.")
 	}
-	if s.WithSnips || s.WithTheme {
+	if s.WithSnips {
 		if httpsOnly {
 			return fmt.Errorf("content options require flea deploy")
 		}
@@ -234,7 +233,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		if e != nil {
 			return e
 		}
-		plan, e := makePlan(base, localProject, remote, s.WithSnips, s.WithTheme, resolveSync(ctx, in, out))
+		plan, e := makePlan(base, localProject, remote, s.WithSnips, resolveSync(ctx, in, out))
 		if e != nil {
 			return e
 		}

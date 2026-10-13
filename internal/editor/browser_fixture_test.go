@@ -75,7 +75,7 @@ func browserDecorate(w http.ResponseWriter, r *http.Request, decorate func([]byt
 		policy := w.Header().Get("Content-Security-Policy")
 		shellMarkup := bytes.Clone(out.Bytes())
 		out.Reset()
-		for _, script := range [][]byte{inlinePurify, inlineSquire, inlineOwner, inlineCollections, inlineTheme, inlineMedia} {
+		for _, script := range [][]byte{inlinePurify, inlineSquire, inlineOwner, inlineCollections, inlineMedia} {
 			hash := sha256.Sum256(script)
 			policy += " 'sha256-" + base64.StdEncoding.EncodeToString(hash[:]) + "'"
 			out.WriteString("<script>")

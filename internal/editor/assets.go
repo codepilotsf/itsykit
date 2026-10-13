@@ -67,7 +67,7 @@ var editorAssets = func() map[string][]byte {
  const template=document.createElement('template');template.innerHTML=await markup.text();host.shadowRoot.append(template.content);
  host.dataset.csrf=csrf;host.dataset.email=data.email;host.dataset.shared=JSON.stringify(data.shared);host.dataset.page=JSON.stringify(data.page);host.dataset.photos=JSON.stringify(data.photos);host.dataset.media=JSON.stringify(data.media);host.dataset.photoPlaceholder=data.photoPlaceholder;
 `)...)
-	for _, script := range [][]byte{inlineOwner, inlineCollections, inlineTheme, inlineMedia} {
+	for _, script := range [][]byte{inlineOwner, inlineCollections, inlineMedia} {
 		js = append(js, '\n', ';', '\n')
 		js = append(js, script...)
 	}

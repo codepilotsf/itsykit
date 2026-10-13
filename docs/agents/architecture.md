@@ -13,12 +13,12 @@ Template names and public URLs stay relative to site/, not the project root.
 Extraction journals use physical site/ paths. All *.layout.html files are private.
 Root `.flea.config.json` is the only admitted dotfile. Deployment destinations
 are nested in deploy.branches; archive packing removes deploy while retaining
-runtime settings. Configuration reads stay bounded and confined. Protocol 23
+runtime settings. Configuration reads stay bounded and confined. Protocol 24
 requires this structure, with no alternate old-layout loader.
 
 Mail templates are private runtime files in `mailers/`. The shared inclusion
 policy retains them for watching, deployment and backups; the email renderer
-loads them separately from web pages and snip extraction. Protocol 23 requires
+loads them separately from web pages and snip extraction. Protocol 24 requires
 this location, with no old-directory fallback.
 
 FleaCMS has a developer CLI and persistent website server sharing the site loader
@@ -177,7 +177,7 @@ bounded file reads rather than allocating each file in full.
 A `Project` is immutable after publication. Public config values come from `app`
 (app.site_name for the display name), never admin/mail settings. An omitted name
 gets a read-only folder default. Interactive dev saves it with confined,
-RawMessage-preserving writes; deployment requires a committed name. Protocol 23
+RawMessage-preserving writes; deployment requires a committed name. Protocol 24
 requires the app namespace without a site alias. Its exported maps exist for internal
 inspection, not concurrent editing. HTTP handlers select from validated maps;
 they never turn request paths into filesystem reads. Template output is buffered
@@ -286,7 +286,7 @@ sites before replacement; failed readiness restores the saved old executable.
 
 `sitefiles.Included` is a runtime inclusion policy, not a public-URL policy.
 Configuration and content belong in an archive but remain private over HTTP.
-Site configuration uses only `.flea.config.json`; protocol 23 rejects older
+Site configuration uses only `.flea.config.json`; protocol 24 rejects older
 server contracts before upload, including the inline-save/formatting contract.
 There is no extensionless-name fallback.
 Do not combine this predicate with the server's URL checks.
@@ -313,21 +313,14 @@ metadata, never site runtime files. Pull locks out dev, validates candidates and
 checks local Git state again after network/prompts. It saves its baseline last;
 disk errors may leave reported partial local file writes, never a false baseline.
 
-Theme CSS is managed beside each content snapshot, selected by host.Themes.
-Aliases must share the same content/theme pair. `LoadWithState` overlays immutable
-CSS asset bytes without making code releases writable. Theme saves use the existing
-editstore lock/version/publication sequence and source-preserving `internal/theme`
-value validation. Code, content and theme switch together through the activation
-journal. Browser theme editing never writes host configuration or release files.
-Scale edits carry numeric endpoint settings, not client-generated CSS. Go validates
-and generates the declarations and settings comments under the same save lock.
-Browser calculations provide private previews only; parity tests cover the two
-implementations. No Node process or extra configuration file is involved.
-Font-family saves additionally regenerate a marked Google Fonts import block.
-Names are validated and URL-encoded into a fixed HTTPS endpoint; no arbitrary
-URL, server fetch or credentials are accepted. Existing developer imports remain
-unchanged. Private preview uses a removable stylesheet link and Cancel restores
-the original inline variables.
+Styling belongs to the immutable code release. `site/css/theme.css` and Prewind
+remain ordinary developer-managed CSS. The host has no live `themes` mapping,
+theme overlay loader or theme mutation endpoint. Normal deploy publishes release
+CSS; backup includes it as source and rollback restores the selected release's
+CSS while retaining current snips. EditingVersion includes the source CSS byte
+snapshot so stale content drafts fail after source style changes.
+Protocol 24 prevents older clients/servers from disagreeing about CSS preservation;
+removed theme configuration and sync-plan fields are rejected, not migrated.
 
 ### Local extraction
 
@@ -444,7 +437,7 @@ the content version against the rendered mount before allowing editing.
 Visitors, assets and errors retain ordinary rendering. Owner responses are private,
 no-store; their CSP permits the exact editor asset URL, not other site or inline scripts.
 Dev supplies the rendered revision to the external owner controller, which polls without cookies and reloads only
-when drafts, dialogs, saves and Theme previews are not at risk. Edit mode and
+when drafts, dialogs, saves are not at risk. Edit mode and
 scroll survive clean reloads in tab-local storage. Production omits this revision.
 The controller identifies complete wrappers by the server's directive-boundary
 comments, not source attributes. It changes only those wrappers in memory and restores them
@@ -488,7 +481,7 @@ origin and CSRF validation remain exact.
 Both environments use a private `flea/runtime/sessions.json`: below the project locally,
 below `/var/lib/flea/sites/<name>/` in production. Production's `flea/` is service-owned
 0700, beside content/releases, not inside either. Code and parent directories remain
-administrator-owned. Deployment protocol 23 requires these runtime permissions.
+administrator-owned. Deployment protocol 24 requires these runtime permissions.
 Host derives this stable location from the administrator-configured managed content
 path; aliases share storage, distinct sites must not. No request chooses a path.
 Candidate host validation is read-only; actual startup prunes expired/removed owners.

@@ -15,7 +15,7 @@ import (
 	"flea/internal/snips"
 )
 
-func richArchive(t *testing.T, include bool) string {
+func richArchive(t *testing.T, include bool, css ...string) string {
 	t.Helper()
 	root := t.TempDir()
 	if err := os.Mkdir(filepath.Join(root, "flea"), 0755); err != nil {
@@ -40,6 +40,14 @@ func richArchive(t *testing.T, include bool) string {
 	}
 	if err := os.WriteFile(filepath.Join(root, "site", "index.html"), []byte(page), 0644); err != nil {
 		t.Fatal(err)
+	}
+	if len(css) > 0 {
+		if err := os.MkdirAll(filepath.Join(root, "site", "css"), 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(root, "site", "css", "theme.css"), []byte(css[0]), 0644); err != nil {
+			t.Fatal(err)
+		}
 	}
 	archive := filepath.Join(t.TempDir(), "site.tar.gz")
 	f, err := os.Create(archive)

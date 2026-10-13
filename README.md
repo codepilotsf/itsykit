@@ -86,12 +86,12 @@ automatically. Change the welcome text in `flea/snips.json`, or give the site
 your own colors and fonts in `site/css/theme.css`. Press Ctrl-C to stop the server.
 Admin sign-in pages also refresh when their templates or layout change in dev.
 Signed-in pages reload too, including newly extracted snips, and retain edit
-mode when there are no unsaved changes. Drafts, open dialogs and Theme previews
+mode when there are no unsaved changes. Drafts and open dialogs
 pause reloads so they are not lost. Cancel a draft to accept pending source changes.
 
 To test from a phone or another computer on the same trusted network, run
 `flea dev --lan` (or `flea dev -l`). Open one of the printed Network URLs on that
-device. Sign-in, editing, uploads, Theme, forms, reloads and dev diagnostics work
+device. Sign-in, editing, uploads, forms, reloads and dev diagnostics work
 there too. Each device signs in separately. Email previews still open on the
 computer running Flea; enter that code on your other device. To share a private
 preview, replace its `127.0.0.1` host with a printed network IP, keeping the port
@@ -122,11 +122,11 @@ The preview server is local to your machine. Use `-port 0` to choose an availabl
 port automatically. `flea status` prints local validation, page/asset/editable-area
 counts and Git state first. If the current branch has a saved destination, it then
 checks the remote over native SSH automatically. There is no remote flag. It shows
-website reachability, deployed commit, editable content and theme separately.
+website reachability, deployed commit, editable content separately; styles travel with code.
 A terminal shows a spinner while checking; redirected output uses a plain progress
 line. Remote checks have a one-minute deadline and use the usual SSH/sudo credentials.
 
-Content and theme changes are classified as local, remote or conflicting only
+Content changes are classified as local, remote or conflicting only
 when a previous `flea pull` recorded a baseline for that exact destination and
 scope. Otherwise, status reports differences with unknown direction. Content
 comparison includes active editable areas, page metadata, collections and media
@@ -153,9 +153,8 @@ Deployment
   Connection   Reachable
   Code         Matches latest local commit
   Content      0 local, 3 remote, 0 conflicting changes
-  Theme        Matches local
 
-Next: run flea pull to review content and theme differences.
+Next: run flea pull to review content differences.
 ```
 
 `flea new my-site` creates a Git repository on `main` with an `Initial site`
@@ -220,13 +219,12 @@ in `.flea.config.json` and are stripped from release archives and backups.
 This structure is required; there is no old-directory fallback or automatic
 migration. Existing projects need an explicit, collision-checked reorganization.
 Keep template-relative paths and public URLs unchanged. Update the server before
-deploying: protocol 23 requires the new structure.
+deploying: protocol 24 requires the new structure.
 
 ## Templates
 
 The signed-in formatting row slides out beneath the top bar in Edit and collapses
-when Edit is off or Theme is open. Theme slides in from the right and fills the
-space below the toolbar. Reduced-motion preferences disable these transitions. Text formatting
+when Edit is off. Reduced-motion preferences disable these transitions. Text formatting
 also requires an editable region to be focused. Pasting a complete six-digit
 sign-in code submits it automatically. Typing and partial pastes still allow Enter
 or the Sign in button.
@@ -507,40 +505,12 @@ Repeatable, page-local content is documented in [Multisnips](docs/multisnips.md)
 For developer-editable sign-in/contact messages and offline previews, see
 [Email templates](docs/email-templates.md).
 
-### Theme editing
+### Developer-managed styling
 
-Every approved admin can choose **Theme**, beside Editing in the topbar. A right-hand
-panel groups the existing variables in `css/theme.css`: colors, typography,
-sizes, spacing, layout, forms, corners, borders, and shadows. Controls share the
-topbar's sizing and interaction styles, independently of the website theme.
-Theme temporarily suspends page editing and replaces the second-row page actions
-with controls inside the panel: a header X and a fixed-footer Save button. Escape
-also closes Theme; unsaved changes require confirmation. Closing Theme restores
-your editing preference.
-Save stays visible while the settings scroll. The panel fades/slides in and out,
-with immediate transitions when reduced motion is enabled.
-Font Color offers neutral colors followed by brand colors, without semantic
-colors. The starter defaults to Black; selections stay linked to theme tokens.
-Page colors groups Font Color and Background Color together. Background Color
-defaults to Lighter and controls the starter page background through --bg-color.
-
-Changes preview only in that browser until **Save**. Closing restores the
-previous appearance. Switching between text editing and Theme asks before
-discarding unsaved changes. Failed or stale saves keep the preview available.
-The editor updates supported existing custom properties in one `:root` block;
-it preserves imports, selectors, and unrelated CSS. Text and spacing scales use
-paired small-screen/large-screen base sizes and ratios, with screen widths under
-an expandable section. Changes immediately preview the complete scale. Save
-regenerates the CSS in Go and updates its settings comment in `theme.css`; no
-Node or npm is needed. Custom scales require explicit replacement before using
-the generator. Other complex values retain value fields. Font fields accept
-font-family text values. Google Fonts load automatically in your preview; Save
-updates a managed import in theme.css and Cancel removes the preview stylesheet.
-Existing developer imports are preserved. System fonts need no imports. Flea
-requests the regular face; browsers may synthesize bold and italic. No API key
-or Node installation is needed. Info buttons explain settings, and only one Theme
-section opens at a time.
-Unsupported CSS values remain developer-managed rather than being rewritten.
+Edit `site/css/theme.css` for colors, fonts and fluid sizing. Keep Prewind and
+site-wide CSS conventions; no frontend build step is needed. Browser editing
+changes content, not styles. Normal deployment publishes committed CSS and
+rollback restores the selected release's styles.
 
 Sign in at `/admin`, then browse your site normally. Choose Edit in the admin
 bar to change the current page. Page details edits its title and description,
@@ -668,7 +638,7 @@ browser's session. Removing an admin revokes their sessions. Session files stay
 private; status reports site and deployment information.
 
 The production service can write the site's private `flea/` directory, not its
-release directory or configuration. Deployment protocol 23 requires the updated
+release directory or configuration. Deployment protocol 24 requires the updated
 server and these permissions; there is no compatibility fallback for older servers.
 
 ### Editing content
@@ -783,7 +753,7 @@ FLEA_EMAIL_FROM="login@your-verified-domain.com"
 ```
 
 Production admin access requires HTTPS. An admin-enabled HTTP-only deployment is
-refused. Protocol 23 requires both the updated server binary and systemd unit, a
+refused. Protocol 24 requires both the updated server binary and systemd unit, a
 service-owned `/etc/flea/deploy.lock`, and writable managed content/runtime directories.
 Fresh setup installs these. Existing servers need an administrator-reviewed upgrade;
 do not use setup's destructive reset to upgrade a server with sites. Existing
@@ -832,7 +802,7 @@ JSON responses, flash, limits and process behavior, and
 This replaces top-level `contact` configuration and `/_flea/contact`, without
 aliases or automatic migration. Update existing forms/config explicitly, add
 `{csrf}`, and move the thank-you page beneath the chosen mount. Deployment
-protocol 23 requires the matching server. Nothing is deployed by a local build.
+protocol 24 requires the matching server. Nothing is deployed by a local build.
 External services, generic app installation and blog routes remain planned.
 
 ## Styling with Prewind
@@ -979,54 +949,48 @@ are intended for small local sites, not large media libraries.
 
 ## Deploy a site
 
-### Snips and theme synchronization
+### Snip synchronization
 
-Commit `flea/snips.json` and `css/theme.css` with your site. They seed the first
-deployment. Subsequent plain `flea deploy` preserves existing live snips, page
-metadata, and theme CSS while publishing templates, assets, and configuration.
-New snip IDs receive their committed seed content; removed IDs are archived.
-Keep IDs stable when changing templates. Incompatible rich content in a new
-heading/paragraph wrapper fails validation instead of being stripped.
+Commit `flea/snips.json` with your site. It seeds the first deployment. Subsequent
+plain `flea deploy` preserves existing live snips and page metadata while publishing
+committed templates, assets, configuration and CSS, including `site/css/theme.css`.
+Keep snip IDs stable. Removed IDs are archived; incompatible rich content fails
+validation rather than being stripped.
 
-Before local content/design work, stop `flea dev`, then run:
+Before local content work, stop dev and run:
 
 ```sh
 flea pull
-# Or pull just one kind of editable state:
-flea pull --snips-only
-flea pull --theme-only
 ```
 
-Pull uses the current branch's saved destination. It preserves local-only snips,
-does not copy config, credentials, sessions, or templates, and does not commit.
-Commit pending edits to the selected files first. Review and commit the pulled
-changes afterward. Dev and pull cannot run simultaneously on the same project.
+Pull retrieves snips and referenced media from the current branch's destination.
+It never copies CSS, source templates, configuration, credentials or sessions,
+and never commits. Commit pending snip/media edits first; review and commit the
+result afterward. Dev and pull cannot run together on the same project.
 
-To intentionally publish local edits, commit them and use:
+To intentionally publish local snip/metadata changes:
 
 ```sh
 flea deploy --with-snips
-flea deploy --with-theme
-flea deploy --with-snips --with-theme
 ```
 
-An existing deployment requires a pull baseline for each selected scope. Baselines
-live privately in Git metadata under `flea-sync`, keyed by destination, branch,
-and local project. They are not committed or shipped. A fresh checkout must pull
-before publishing existing content. First deployments seed both without a baseline.
+Existing deployments require a pull baseline, stored privately in Git metadata
+under `flea-sync` and keyed by destination, branch and local project. Fresh
+checkouts must pull first; first deployments seed content without a baseline.
+Snips merge by ID, metadata by field and multisnips as whole arrays. Conflicts
+require an explicit choice of live, local or cancel; unattended conflicts stop.
+Activation checks the reviewed snapshot under the deployment lock. Pull again
+after publication to refresh the baseline. Pull validates before writing and
+advances the baseline last; disk failures report any partial local update.
 
-Snips merge by ID, with titles and descriptions compared separately. Theme CSS
-is compared as one file so imports and developer customizations remain intact.
-If both copies changed differently, the CLI shows the conflict and asks whether
-to keep live, use local, or cancel. The first pull also asks when differing copies
-have no shared baseline. There is no default winner; noninteractive conflicts fail.
-All choices are collected before publishing. Live state is rechecked under the
-deployment lock before activation; concurrent admin edits stop a stale plan.
-Pull again after publishing to refresh your baseline and local admin content.
-
-Pull validates before writing and advances its baseline last. If a disk write
-fails, it reports any partial local update; review the files before retrying.
-Neither command force-overwrites conflicts. Remote rollback remains planned.
+Theme editing, remote CSS overlays, `--with-theme`, `--theme-only` and
+`--snips-only` have been removed. No aliases or automatic conversion are provided.
+Protocol 24 rejects server configurations with the removed `themes` mapping.
+Before a live upgrade, use the previous runtime to back up any saved remote CSS
+and explicitly preserve needed customizations in Git. Review server configuration
+and toolbar updates separately; do not reset a server or delete retained files.
+Existing custom toolbars must remove their Theme control, as in the starter's
+`site/admin/_toolbar.html`. Snip editing remains available.
 
 You'll need Git, SSH access to a supported Ubuntu server, and a domain pointing
 at that server (or an IP address for an HTTP-only site). For HTTPS, allow inbound
@@ -1370,7 +1334,7 @@ sudo systemctl restart flea
 ```
 
 Existing installations are not upgraded by rerunning setup. Deployment requires
-the current server executable (deployment protocol 23, unquoted snip syntax).
+the current server executable (deployment protocol 24, unquoted snip syntax).
 For an older installation,
 update the executable and systemd unit deliberately, preserve server.json and all
 sites, and create `/var/lib/flea/certs` owned by `flea:flea` with mode
@@ -1509,14 +1473,14 @@ directions and a sample-page review before the full build, unless you explicitly
 delegate those choices. Small maintenance edits do not require a new design review.
 
 Editable regions, short IDs, sanitized HTML, page metadata, content-preserving
-deployment, and archived orphan pruning are implemented. Deployment protocol 23
+deployment, and archived orphan pruning are implemented. Deployment protocol 24
 requires an updated server binary; older servers are refused before upload.
 Local extraction preserves unreferenced content until deployment. There is no
 Markdown renderer or schema migration engine. Inline rich-text editing and
 explicit `flea pull` synchronization are supported. Keep backups before manual edits.
 
 This release provides local development, SSH setup/deployment, automatic HTTPS,
-email-code authentication, inline editing, multisnips, theme editing and a JPEG/PNG
+email-code authentication, inline editing, multisnips, developer-managed styles and a JPEG/PNG
 image/video snips. Rollback, site backups/restoration and executable-only server upgrades
 are supported; see [recovery](docs/recovery.md). Release pruning and remote logs
 commands, general-purpose forms, general field schemas, per-edit revision history

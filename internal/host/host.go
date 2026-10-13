@@ -31,7 +31,6 @@ const HealthPath = "/_flea/health"
 
 type Config struct {
 	Downloads    map[string]string `json:"downloads,omitempty"`
-	Themes       map[string]string `json:"themes,omitempty"`
 	Content      map[string]string `json:"content,omitempty"`
 	Listen       string            `json:"listen"`
 	Sites        map[string]string `json:"sites"`
@@ -95,7 +94,6 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 	byRoot := map[string]http.Handler{}
 	var appSites []*site.Server
 	contentPaths := map[string]string{}
-	themePaths := map[string]string{}
 	sessionOwners := map[string]string{}
 	contactBudget := &contact.Budget{}
 	type owner struct {
@@ -116,19 +114,6 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 		}
 		downloadRoots[key] = config.Downloads[host]
 		contentPath := config.Content[host]
-		themePath := config.Themes[host]
-		var themeCSS *string
-		if themePath != "" {
-			if !filepath.IsAbs(themePath) || contentPath == "" || themePath != contentPath+".theme.css" {
-				return config, nil, fmt.Errorf("theme must accompany its managed content snapshot")
-			}
-			b, e := site.ReadManagedFile(filepath.Dir(themePath), filepath.Base(themePath))
-			if e != nil {
-				return config, nil, e
-			}
-			v := string(b)
-			themeCSS = &v
-		}
 		if contentPath != "" {
 			if !filepath.IsAbs(contentPath) {
 				return config, nil, fmt.Errorf("content path must be absolute")
@@ -151,7 +136,7 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 			contentOwners = append(contentOwners, owner{key, info})
 		}
 		if handler, ok := byRoot[key]; ok {
-			if contentPaths[key] != contentPath || themePaths[key] != themePath {
+			if contentPaths[key] != contentPath {
 				return config, nil, fmt.Errorf("aliases for site %s must use the same content snapshot", root)
 			}
 			handlers[host] = handler
@@ -167,12 +152,11 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 				return config, nil, err
 			}
 		}
-		themePaths[key] = themePath
 		mediaRoot := ""
 		if contentPath != "" {
 			mediaRoot = site.ManagedMediaRoot(contentPath)
 		}
-		project, err := site.LoadWithMedia(root, content, themeCSS, mediaRoot)
+		project, err := site.LoadWithMedia(root, content, mediaRoot)
 		if err != nil {
 			return config, nil, fmt.Errorf("site %s: %w", host, err)
 		}
@@ -188,7 +172,7 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 			if contentPath == "" {
 				return config, nil, fmt.Errorf("site %s: admin requires a managed content snapshot; deploy this site first", host)
 			}
-			store := &editstore.Store{Root: root, ContentPath: contentPath, ThemePath: themePath, ConfigPath: configPath, Emails: project.Admin.Emails, Publish: public.Publish}
+			store := &editstore.Store{Root: root, ContentPath: contentPath, ConfigPath: configPath, Emails: project.Admin.Emails, Publish: public.Publish}
 			dashboard := editor.New(editor.Options{Emails: project.Admin.Emails, SessionPath: managedSessionPath(contentPath), SessionIdleDays: project.Admin.SessionIdleDays, Name: fmt.Sprint(project.App["site_name"]), Sender: sender, Backend: store, Logger: logger, Render: public.RenderAdmin, Public: public.ServeOwner, RenderEmail: public.RenderEmail})
 			handlers[host] = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if editor.IsPath(r.URL.Path) {

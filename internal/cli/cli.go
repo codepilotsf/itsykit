@@ -45,7 +45,7 @@ Build your site
   email            Set up email delivery
 
 Publish your site
-  pull             Bring live snips and theme into your local site
+  pull             Bring live snips and media into your local site
   setup            Install Flea on your server
   deploy           Publish the current Git branch
   rollback         Restore previous code, keeping live content
@@ -158,7 +158,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags.SetOutput(errOut)
 		list := flags.Bool("list", false, "list retained releases")
 		flags.Usage = func() {
-			fmt.Fprint(out, "Usage: flea rollback [--list] [release-id]\n\nRestore previous code for this branch. Keep live snips and theme.\nWithout an ID, use the preceding release. Confirmation is required.\n\n")
+			fmt.Fprint(out, "Usage: flea rollback [--list] [release-id]\n\nRestore previous code for this branch. Keep live snips. Styles come from the selected release.\nWithout an ID, use the preceding release. Confirmation is required.\n\n")
 		}
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
@@ -267,14 +267,12 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet("pull", flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintln(flags.Output(), "Usage: flea pull [--snips-only | --theme-only]\n\nPull live snips and theme into your local site. Stop dev first.\nReview and commit changes afterwards. Configuration and sessions stay local.")
+			fmt.Fprintln(flags.Output(), "Usage: flea pull\n\nPull live snips and media into your local site. Stop dev first.\nReview and commit changes afterwards. Configuration and sessions stay local.")
 			fmt.Fprintln(flags.Output())
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			flags.SetOutput(out)
 		}
-		snipsOnly := flags.Bool("snips-only", false, "pull only snips")
-		themeOnly := flags.Bool("theme-only", false, "pull only theme")
 		if e := flags.Parse(args[1:]); e != nil {
 			if e == flag.ErrHelp {
 				return 0
@@ -284,7 +282,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if flags.NArg() != 0 {
 			return fail(fmt.Errorf("unexpected pull arguments"))
 		}
-		if e := setup.Pull(ctx, ".", *snipsOnly, *themeOnly, os.Stdin, out, errOut); e != nil {
+		if e := setup.Pull(ctx, ".", os.Stdin, out, errOut); e != nil {
 			return fail(e)
 		}
 		return 0
@@ -309,7 +307,6 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags.BoolVar(&s.WWWRedirect, "www-redirect", true, "redirect WWW to the primary domain")
 		configure := flags.Bool("configure", false, "confirm and save changes to this branch's deployment settings")
 		withSnips := flags.Bool("with-snips", false, "also publish reviewed snip changes (pull first)")
-		withTheme := flags.Bool("with-theme", false, "also publish reviewed theme changes (pull first)")
 		expectedIPs := flags.String("expected-ips", "", "expected DNS destination IPs for NAT or proxy setups")
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
@@ -323,7 +320,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		}
 		provided := map[string]bool{}
 		flags.Visit(func(f *flag.Flag) {
-			if f.Name != "configure" && f.Name != "with-snips" && f.Name != "with-theme" {
+			if f.Name != "configure" && f.Name != "with-snips" {
 				provided[f.Name] = true
 			}
 		})
@@ -337,8 +334,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		s.WithSnips = *withSnips
-		s.WithTheme = *withTheme
-		if args[0] == "https" && (*withSnips || *withTheme) {
+		if args[0] == "https" && *withSnips {
 			return fail(fmt.Errorf("use these options with flea deploy"))
 		}
 		if err := setup.Deploy(ctx, ".", s, args[0] == "https", os.Stdin, out, errOut); err != nil {

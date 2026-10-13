@@ -6,6 +6,17 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
+## Theme removal follow-up
+
+Remaining acceptance for remote Theme removal is live/native rollout. See
+0.14.0 in CHANGELOG.md for the local implementation; Prewind and committed
+CSS remain intact.
+Before any rollout, inventory customized remote themes, preserve needed styles in
+Git and review host config/toolbar changes. Native/live upgrade acceptance remains
+pending; no deployment or publication is authorized. Preview noindex and Hub
+branch deployment verification are separate planned tasks. Preserve prior QA notes
+below as historical evidence, not acceptance of the new styling contract.
+
 ## Current release status (October 12, 2026)
 
 - Version 0.13.0 is published: framework `bd668a1`, tag `v0.13.0`; website

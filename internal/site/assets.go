@@ -56,7 +56,7 @@ func (p *Project) loadAsset(root *os.Root, route, name string) error {
 		return err
 	}
 	a := fileAsset{f, info}
-	// Theme editing/versioning consumes the CSS snapshot, including larger themes.
+	// Editing versions include developer-owned theme CSS, including larger files.
 	if info.Size() <= memoryAssetLimit || route == "/css/theme.css" {
 		data, err := io.ReadAll(io.LimitReader(f, (100<<20)+1))
 		if err != nil {

@@ -279,13 +279,6 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 				return "", fmt.Errorf("live content changed during deployment; pull and retry")
 			}
 		}
-		css := project.ThemeCSS()
-		if remote.Exists && remote.Theme != nil {
-			css = remote.Theme
-		}
-		if o.Sync != nil && o.Sync.WithTheme {
-			css = o.Sync.Theme
-		}
 		if (len(project.Admin.Emails) > 0 || len(project.Apps) > 0) && !o.HTTPS {
 			return "", fmt.Errorf("sites with admin access or contact forms require HTTPS")
 		}
@@ -296,28 +289,16 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 		if c.Content == nil {
 			c.Content = map[string]string{}
 		}
-		if c.Themes == nil {
-			c.Themes = map[string]string{}
-		}
-		themePath := ""
-		if css != nil {
-			themePath = contentPath + ".theme.css"
-			if err = atomicWrite(themePath, []byte(*css), 0644); err != nil {
-				return "", err
-			}
-		}
 		// All existing aliases for this site move together; unrelated sites survive.
 		for domain, root := range c.Sites {
 			if filepath.Dir(root) == parent {
 				c.Sites[domain] = dest
 				c.Content[domain] = contentPath
-				c.Themes[domain] = themePath
 			}
 		}
 		for _, domain := range o.Domains {
 			c.Sites[domain] = dest
 			c.Content[domain] = contentPath
-			c.Themes[domain] = themePath
 		}
 		if o.Branch != "" {
 			c.SiteBranches[o.Name] = o.Branch

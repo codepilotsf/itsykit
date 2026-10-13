@@ -33,10 +33,9 @@ Initialize Page Details from that same preference before paint. The toolbar stay
 inert until hydration even when Page Details looks enabled.
 navigation retains native beforeunload protection. Cancel restores the page and
 keeps editing on; Save applies the canonical server receipt in place. Cancel/Save sit at the
-right of the second row, disabled until changes exist. Theme stays in the first
-row, suspends content editing and restores the preferred mode on close.
+right of the second row, disabled until changes exist. Styles remain developer-managed CSS; there is no Theme control.
 Keep the first row compact: no product wordmark or account separator, dark-off/
-green-on switch, and 30px pill-shaped Theme/Sign out buttons. Keep the account
+green-on switch, and 30px pill-shaped Sign out button. Keep the account
 name close to Sign out. Omit idle instructional hints; retain unsaved/error
 status and the shared-content warning.
 Editable overlays use 2px dashed green (#16a34a) boundaries with 6px corners,
@@ -76,7 +75,7 @@ Dev owner pages carry the
 rendered snapshot revision and poll the existing reload endpoint without cookies.
 Reload clean pages automatically and restore edit mode/scroll via short-lived,
 tab-local sessionStorage. Never reload dirty drafts, saving/expired sessions,
-open dialogs or an open Theme panel. Dirty drafts show a source-change notice;
+open dialogs. Dirty drafts show a source-change notice;
 canceling allows the pending reload. Production has no reload marker or polling.
 Other site scripts and inline scripts remain blocked by the owner CSP.
 Anonymous pages keep their original scripts and reload behavior. Assets/errors are not
@@ -152,7 +151,7 @@ unconfigured; production keeps an owner-facing message without local shell steps
 
 `admin.emails` in .flea.config.json is a developer-owned list (max 20), empty by
 default. /admin supports email OTP; the public-page editor supports title/description
-rich content, designated images/videos, collections and supported theme values.
+rich content, designated images/videos, collections.
 Templates, schemas, archived entries and developer configuration remain private.
 Codes use crypto/rand, expire in 10 minutes and allow five attempts. Store hashed
 codes in bounded expiring maps. Sessions use admin.session_idle_days (omitted/zero
@@ -197,7 +196,7 @@ load .env into the production host. FLEA_EMAIL_NAME supplies the sender display
 name. Keep Sender and setup Checker interfaces separate from the Resend adapter.
 Admin addresses and sign-in mail settings update without a dev restart.
 
-Protocol 23 also requires the service unit and lock/content/runtime permissions, not
+Protocol 24 also requires the service unit and lock/content/runtime permissions, not
 just a binary swap. Do not reset a live installation as an upgrade. Setup creates
 the lock owned by flea, and activation grants write access only to each content
 and private runtime directory. Keep release/config parents root-owned. Browser edits and extraction
@@ -225,10 +224,10 @@ appear in a second bar. Unlinked-page discovery is deferred. Serve the selected
 local Lucide SVGs without adding npm or a frontend build step.
 Prototype dialogs use compact titles, a bold text-link-style Cancel button on
 the left, and the primary action on the right. Cancel discards dialog changes.
-Collapse the second bar outside Edit, including Theme mode. Slide it from beneath
+Collapse the second bar outside Edit. Slide it from beneath
 the top row over 220ms, with immediate changes for reduced motion. Restore its
 initial visibility from the Edit preference before paint, and make collapsed controls
-inert. Publish the changing toolbar height during motion for Theme and navigation.
+inert. Publish the changing toolbar height during motion for navigation.
 Within Edit, formatting requires an active text region. No content
 outlines, including on keyboard focus. Modal motion and page-content view transitions
 are subtle and respect reduced motion.

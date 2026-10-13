@@ -34,7 +34,7 @@ This is the framework repository; `templates/` is the canonical starter.
   and snapshot lifetime rules in the runtime guide.
 - Preserve session, exact Origin, CSRF, CSP, host isolation and content-version
   checks. No login bypass or weakened security to make tests pass.
-- Normal deployment preserves live editable content and theme. Explicit sync,
+- Normal deployment preserves live editable content and publishes committed CSS. Explicit sync,
   recovery and uploads must retain their validation, locking and publication order.
   Never prune retained content or media automatically.
 - Keep secrets, sessions and private runtime state out of Git, public assets,
@@ -56,11 +56,11 @@ dependencies, trust boundaries, loading, transactions or publication.
 | Find code ownership and entry points | [Repository map](docs/agents/repository.md) |
 | Site structure, config, templates, extraction, snips, starter/import conventions | [Templates and content](docs/agents/templates.md) |
 | Images, videos, collections, multipart saves and media transport | [Media and collections](docs/agents/media-collections.md); applicable [photos](docs/photos.md), [videos](docs/videos.md), [multisnips](docs/multisnips.md) |
-| Pull, explicit deploy sync, managed CSS, Theme UI | [Synchronization and theme](docs/agents/sync-theme.md) |
+| Pull and explicit snip sync; source CSS | [Synchronization and styling](docs/agents/sync-theme.md) |
 | HTML/CSS, Prewind, icons, starter styling | [Styling and icons](docs/agents/styling.md); `../prewind/README.md` |
 | CLI help/dev, file watching, routing, diagnostics, contact, email rendering | [Runtime](docs/agents/runtime.md); [email templates](docs/email-templates.md) when relevant |
 | SSH/setup, deploy, host/TLS, archives, rollback, backup, restore, server site administration, upgrade | [Deployment](docs/agents/deployment.md); [recovery](docs/recovery.md) |
-| Owner toolbar, authentication, sessions, onboarding, mail configuration, editor prototype | [Editor](docs/agents/editor.md); media/theme guides for those modes |
+| Owner toolbar, authentication, sessions, onboarding, mail configuration, editor prototype | [Editor](docs/agents/editor.md); media guide for those modes |
 | Versions, packaging and releases | [RELEASING.md](docs/agents/releasing.md) and version rules below |
 
 ## Site and UI essentials
@@ -98,7 +98,7 @@ protocol, process and email boundaries. Custom/remote app registration is planne
 Keep access pages simple and visually consistent using the shared `admin-access`
 layout; visual polish must not change authentication or code-autofill behavior.
 Starter styling uses Inter, warm neutral surfaces and forest-green primary actions,
-all driven by theme tokens. Existing live themes change only through explicit sync.
+all driven by theme tokens. Styles are developer-managed; normal deployment publishes committed CSS.
 
 Use Prewind's global-first conventions and supported utilities, not assumed
 Tailwind classes. Use `container` without `max-w-full`, theme tokens and fluid
@@ -107,10 +107,9 @@ spacing. Preserve vendored CSS/JS. Use `{icon name}` and the flat
 
 Owner edits happen on the page with explicit Save/Cancel. The Edit switch defaults on
 and persists per tab across pages. The second row slides beneath the top bar and
-collapses outside Edit, including Theme mode. Save/Cancel remain on the second toolbar row
+collapses outside Edit. Save/Cancel remain on the second toolbar row
 and keep editing on. Page Save updates in place from the committed server receipt,
-rebasing Cancel without reloading or replacing editable wrappers. Theme has its own fixed-footer Save and header X; Escape closes
-with dirty-preview confirmation. Use green 2px dashed shadow-root overlays with 6px
+rebasing Cancel without reloading or replacing editable wrappers. Use green 2px dashed shadow-root overlays with 6px
 corners, never layout-changing borders on content. Keep keyboard focus visible on controls.
 Collection photos use a thumbnail picker with private upload previews; keep
 dialog Done separate from publishing with page Save changes.

@@ -89,14 +89,6 @@ func (m Manager) Backup(name, branch string, out io.Writer) error {
 	if err = site.InstallVideos(filepath.Join(m.DataDir, "sites", name, "content", "media"), filepath.Join(stage, "flea", "media"), live.Snips); err != nil {
 		return err
 	}
-	if live.Theme != nil {
-		if err = os.MkdirAll(filepath.Join(stage, "site", "css"), 0755); err != nil {
-			return err
-		}
-		if err = site.WriteManagedFile(stage, "site/css/theme.css", []byte(*live.Theme)); err != nil {
-			return err
-		}
-	}
 	if _, err = site.Load(stage); err != nil {
 		return err
 	}
@@ -187,7 +179,7 @@ func (m Manager) Restore(ctx context.Context, name, branch, file, expected strin
 		return "", fmt.Errorf("live state changed; review restore again")
 	}
 	o := recoveryOptions(c, m.DataDir, name, branch, manifest.Commit, archive.Name())
-	o.Sync = &syncstate.Plan{Expected: expected, Snips: p.Content, WithTheme: true, Theme: p.ThemeCSS()}
+	o.Sync = &syncstate.Plan{Expected: expected, Snips: p.Content}
 	if err = o.Validate(); err != nil {
 		return "", err
 	}

@@ -117,7 +117,7 @@ func (m Manager) prepareContentPlan(c host.Config, name, id, dest string, projec
 	if err = atomicWrite(contentPath, candidateBytes, 0644); err != nil {
 		return "", nil, err
 	}
-	if _, err = site.LoadWithMedia(dest, activeContent, nil, site.ManagedMediaRoot(contentPath)); err != nil {
+	if _, err = site.LoadWithMedia(dest, activeContent, site.ManagedMediaRoot(contentPath)); err != nil {
 		return "", nil, fmt.Errorf("templates and preserved content: %w", err)
 	}
 	return contentPath, activeContent, nil
