@@ -55,6 +55,13 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(root, "embed.go")); !os.IsNotExist(err) {
 		t.Fatal("embedding code must not be scaffolded")
 	}
+	launcher, err := os.Stat(filepath.Join(root, ".agents/skills/impeccable/scripts/impeccable"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if launcher.Mode().Perm()&0111 == 0 {
+		t.Fatal("generated Impeccable launcher must be executable")
+	}
 }
 
 func TestHelpWithoutSite(t *testing.T) {

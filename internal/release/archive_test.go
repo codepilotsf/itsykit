@@ -12,7 +12,7 @@ import (
 
 func TestArchiveRoundTripAndScope(t *testing.T) {
 	root := t.TempDir()
-	for name, body := range map[string]string{"site/index.html": "hello", ".flea.config.json": `{"app":{"site_name":"test"},"admin":{"emails":["owner@example.test"]},"deploy":{"branches":{"main":{"target":"private-target"}}}}`, "flea/data/home.json": "{}", "flea/runtime/sessions.json": "private-session", ".git/config": "secret", "README.md": "local"} {
+	for name, body := range map[string]string{"site/index.html": "hello", ".flea.config.json": `{"app":{"site_name":"test"},"admin":{"emails":["owner@example.test"]},"deploy":{"branches":{"main":{"target":"private-target"}}}}`, "flea/data/home.json": "{}", "flea/runtime/sessions.json": "private-session", ".git/config": "secret", "README.md": "local", ".agents/skills/core/SKILL.md": "private agent instructions", ".agents/skills-source.md": "local source provenance"} {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)
@@ -58,7 +58,7 @@ func TestArchiveRoundTripAndScope(t *testing.T) {
 	if data, err := os.ReadFile(filepath.Join(dest, "mailers", "sign-in.email.html")); err != nil || string(data) != "{email.code}" {
 		t.Fatal("mailer missing from release", err)
 	}
-	for _, name := range []string{"flea/runtime", ".git/config", "README.md"} {
+	for _, name := range []string{"flea/runtime", ".git/config", "README.md", ".agents"} {
 		if _, err := os.Stat(filepath.Join(dest, name)); !os.IsNotExist(err) {
 			t.Fatal("included local file", name)
 		}

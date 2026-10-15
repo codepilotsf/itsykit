@@ -116,7 +116,9 @@ No remote is configured automatically. There is no existing `origin` to rename.
 | `flea/icons/` | Downloaded icon cache |
 | `flea/runtime/` | Private, Git-ignored sessions and recovery files |
 | `mailers/` | Private email templates |
-| `flea/skills/` | Portable instructions for coding agents |
+| `.agents/skills/` | Shared core, design, Prewind and Flea authoring skills |
+| `.agents/site-requirements.md` | Version-specific site requirements |
+| `flea/skills/` | Focused Blog, Contact and import guides |
 
 Public URLs omit `site/`. Configuration, mailers, runtime files, and agent skills
 are never served as public assets. Keep secrets out of configuration and Git.
@@ -400,7 +402,13 @@ supplies the signed-in identity; never configure `app.current_admin` yourself.
 
 ### Agent-assisted work
 
-Portable skills ship in `flea/skills/` for coding agents:
+Shared core, delivery, design, Prewind, Flea authoring and upstream Impeccable
+skills ship in `.agents/skills/`. Root `AGENTS.md` explicitly loads core and routes
+other work on demand. Conversation defaults yield to personal preferences;
+project requirements and permissions still apply. No personal instruction files
+or global tool settings are changed.
+
+Focused guides ship in `flea/skills/`:
 
 - **add-blog**: requests like "add a blog" or "let's create a blog"; setup,
   post JSON, Blog template values and admin publishing.
@@ -409,8 +417,10 @@ Portable skills ship in `flea/skills/` for coding agents:
 - **import-brochure**: import or redesign an existing brochure/portfolio site,
   preserving its content and navigation. Interactive: choose a direction (two mood
   boards or references) and approve a sample page before the full build.
-- **fleacms-site**: build or redesign a site, especially for one real local
-  business, doing the research and capturing the real vibe and assets first.
+The shared **fleacms-site** skill covers general authoring, real business
+content and verification, loading the same **prewind** and **design** skills used
+by other projects. Ongoing synchronization is not configured; installed source
+information is recorded in `.agents/skills-source.md`.
 
 Point your agent at the relevant `SKILL.md`. `AGENTS.md` routes these requests to
 the matching skill. They stay in Git but are excluded from serving and deployment; no particular agent plugin is

@@ -7,7 +7,13 @@ relative to the repository root unless stated otherwise.
 A generated site uses `site/` for public templates/assets, root `mailers/` for
 private email templates, and `flea/` for content, media, data, icons and skills.
 `flea/runtime/` holds sessions and extraction recovery records and is Git-ignored.
-`flea/skills/` is committed agent guidance, excluded from serving and archives.
+`.agents/skills/` holds shared core/design/Prewind and Flea authoring skills.
+Root `AGENTS.md` explicitly reads core; conversation defaults yield to personal
+preferences without changing project security or permissions. Version-specific
+site requirements stay in `.agents/site-requirements.md`. Focused Blog, Contact
+and import guides remain in `flea/skills/`. All agent guidance stays in Git and
+is excluded from serving and archives. The embedded `.agents/` tree is copied
+into both minimal and example sites; keep the Impeccable launcher executable.
 Generated `AGENTS.md` routes focused Blog and Contact requests to the bundled
 `add-blog` and `add-contact-form` skills. Keep configuration, JSON/form fields and
 template values consistent with the actual app contracts. These additions do not

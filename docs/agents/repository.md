@@ -4,9 +4,10 @@ Implementation requirements linked from [AGENTS.md](../../AGENTS.md).
 Read this when the task touches this subsystem. Paths in prose and code are
 relative to the repository root unless stated otherwise.
 
-New sites include portable agent guidance in AGENTS.md and the bundled skills in
-flea/skills/ (import-brochure and fleacms-site). Keep these in Git but exclude them
-from runtime loading, public assets and deployment via sitefiles. This does not
+New sites include a short AGENTS.md, shared/authoring skills in .agents/skills/,
+version-specific .agents/site-requirements.md, and focused Blog/Contact/import
+guides in flea/skills/. Keep these in Git but exclude them from runtime loading,
+public assets and deployment via sitefiles. This does not
 install or assume a particular agent plugin. Update skill conventions alongside
 template changes; test imports without publishing or using live credentials.
 

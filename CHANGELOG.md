@@ -4,6 +4,11 @@ User-facing changes are recorded here, newest first. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 During 0.x development, interfaces may change without backward compatibility.
 
+## Unreleased
+
+- Include modular core, design, Prewind and Flea website authoring skills in new
+  sites, with personal conversation overrides and short agent instruction routing.
+
 ## 0.16.0 - 2026-10-13
 
 - Support this computer's hostname and local alias in LAN dev, including Tailscale

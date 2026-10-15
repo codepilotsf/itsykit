@@ -8,6 +8,10 @@ independent signatures. Public-host and clean-machine verification remain pendin
 Project files have explicit boundaries: `site/` supplies templates and public
 assets; `mailers/` supplies private `*.email.html`/`*.email.txt` templates and
 `main.layout.html`; `flea/` holds content, media, data, icons and agent skills.
+Shared agent skills and site requirements live in `.agents/`, with focused
+authoring guides in `flea/skills/`; both are excluded from runtime snapshots and
+archives by `internal/sitefiles`. The CLI embeds `.agents/` only for local site
+creation and preserves the Impeccable launcher executable bit on extraction.
 Runtime files are under `flea/runtime/`, outside serving, watching and archives.
 Template names and public URLs stay relative to site/, not the project root.
 Extraction journals use physical site/ paths. All *.layout.html files are private.

@@ -770,7 +770,11 @@ func createSite(target string, starter bool) error {
 		if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 			return err
 		}
-		f, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+		mode := os.FileMode(0644)
+		if name == ".agents/skills/impeccable/scripts/impeccable" {
+			mode = 0755
+		}
+		f, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_EXCL, mode)
 		if err != nil {
 			return err
 		}

@@ -75,9 +75,11 @@ before changing posts, routes, rich bodies or synchronization. See the
 runtime/template guides for both applications.
 Do not change admin form contracts or infer support for arbitrary app installation.
 Generated-site guidance lives in `templates/AGENTS.md` and the bundled skills in
-`templates/flea/skills/` (`add-blog`, `add-contact-form`, `import-brochure` and
-`fleacms-site`); keep it consistent with starter syntax, committed, and excluded
-from serving/deployment.
+`templates/.agents/skills/` (core, delivery, design, Prewind, Flea authoring and
+upstream Impeccable), plus focused `templates/flea/skills/` guides (`add-blog`,
+`add-contact-form`, `import-brochure`). Keep them consistent with starter syntax,
+committed, and excluded from serving/deployment. Personal conversation preferences
+override the shared defaults; project requirements and permissions still apply.
 
 New sites enable `dev.email_preview`. Only `flea dev` opens actual outgoing mail
 in private browser previews; production ignores this setting. Keep the first-run
