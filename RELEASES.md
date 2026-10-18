@@ -1,5 +1,30 @@
 # Publishing FleaCMS downloads
 
+## 0.17.0 release October 18, 2026
+
+Framework source `fe15b8934165a90390c8bd4ff88cc5e9c9e0d753`, immutable tag
+`v0.17.0`, adds managed custom apps, app-owned sessions and modular starter
+skills. Deployment protocol is 26; app wire protocol is 2. The literal-brace fix
+from 0.16.1 is included without changing Impeccable.
+
+Final artifacts are archived privately in `/Users/sean/fleacms-releases/0.17.0`.
+Mac ARM64 and Linux ARM64 full tests, vet, race checks and canonical bundled
+builds passed. Linux AMD64 was cross-built on Mac and passed an unprivileged
+native CLI smoke check. The exact server and sample app passed TLS, sessions,
+restart persistence, CSRF/Origin rejection and shutdown under a transient
+systemd unit with production hardening and a separate network namespace.
+
+The version directory was published without overwriting older versions. All
+three anonymous HTTPS downloads match SHA256SUMS. The supported shared-server
+upgrade completed as 0.17.0 / protocol 26; all 18 HTTPS hostnames returned 200.
+Routing, editable-content hashes and deployed source hashes were unchanged.
+The existing memory target, swap and service policy remain in place.
+
+This website commit advances the channel and current documentation. Activation,
+public installer/update checks and installed CLI receipts are recorded below
+after execution. Native AMD64 full-suite/build, clean-Mac acceptance,
+notarization and real email remain unverified. The Mac binary is ad-hoc signed.
+
 ## 0.16.1 release October 18, 2026
 
 Framework source `57d8378df75c9981bb5fe1af173dbad81ac8afb4`, immutable tag
