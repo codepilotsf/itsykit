@@ -1,8 +1,14 @@
 # Contact
 
 Send a visitor's message to one email address using an ordinary HTML form.
-Contact uses Flea App Protocol v1. It has no database, inbox, uploads, automatic
+Contact uses the current Flea App Protocol (version 2). It has no database, inbox, uploads, automatic
 replies or delivery queue. Admin sign-in and editing remain in Flea core.
+
+This is the included app's operational contract. For the general app model, the
+exact request and response JSON, custom managed app packages, and app-owned
+sessions, see [Flea apps](../../docs/apps.md). Contact is bundled; other apps are
+managed local executables, and remote or registry-based registration is not
+supported.
 
 ## Enable it
 

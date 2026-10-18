@@ -3,7 +3,14 @@ package sitefiles
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 )
+
+// ExecutableMode is the immutable mode for a confined custom-app executable:
+// readable and executable by the service user (release trees are owned by the
+// deployment root, not the service account) and writable by no one. It is the
+// single policy shared by committed snapshots and release archives.
+const ExecutableMode os.FileMode = 0o555
 
 // RuntimeConfig removes local deployment destinations from a release or backup.
 // Everything else remains part of the site's configuration.

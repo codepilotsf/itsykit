@@ -52,11 +52,12 @@ func (m Manager) snapshot(c host.Config, name, branch string) (syncstate.Snapsho
 				return s, e
 			}
 		}
-		mediaRoot := ""
+		mediaRoot, runtimeRoot := "", ""
 		if c.Content[domain] != "" {
 			mediaRoot = site.ManagedMediaRoot(c.Content[domain])
+			runtimeRoot = site.ManagedRuntimeRoot(c.Content[domain])
 		}
-		p, e := site.LoadWithMedia(root, content, mediaRoot)
+		p, e := site.LoadWithMedia(root, content, mediaRoot, runtimeRoot)
 		if e != nil {
 			return s, e
 		}

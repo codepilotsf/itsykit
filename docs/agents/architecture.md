@@ -22,7 +22,7 @@ requires this structure, with no alternate old-layout loader.
 
 Mail templates are private runtime files in `mailers/`. The shared inclusion
 policy retains them for watching, deployment and backups; the email renderer
-loads them separately from web pages and snip extraction. Protocol 25 requires
+loads them separately from web pages and snip extraction. Protocol 26 requires
 this location, with no old-directory fallback.
 
 FleaCMS has a developer CLI and persistent website server sharing the site loader
@@ -31,16 +31,26 @@ content application using the existing snapshot/editor, not a child process. The
 public deployment administration API.
 
 `apps.contact` enables a validated mount, fixed recipient and optional sender
-override. `apps/contact` owns validation and JSON outcomes; `internal/appruntime`
-owns the child transport. `internal/appmanager` supervises it only during actual
-dev/host runs. Loading, status, validation and extraction never launch apps.
-Aliases share a site runtime. `internal/appbundle` embeds only its target's
-executable; build scripts compile the child before the parent. One verified
-private temporary executable is shared by all sites in the parent process.
-Listener fd 3, credential pipe fd 4 and parent-liveness fd 5 avoid port races,
-argv/environment secrets and orphaned children. Five attempts use bounded
-1/2/4/8-second backoff. Children receive a minimal environment, not provider
-credentials. Child processes are not OS sandboxes.
+override. Any other `apps.<name>` registers a **custom managed app**: a confined
+package under `flea/apps/<name>/` with a strict `app.json` manifest and one
+executable per `<goos>-<goarch>`. `internal/sitefiles` owns the shared package
+path, manifest and native-binary policy used by the loader, the release
+packer/extractor and the deployment preflight, so they cannot diverge.
+`internal/site/app_package.go` validates and confines the package at load,
+records the selected executable's size and SHA-256, and derives its private
+storage from the stable per-site runtime root, never the immutable release.
+`apps/contact` and a custom app own validation and JSON outcomes;
+`internal/appruntime` owns the child transport. `internal/appmanager`
+supervises both only during actual dev/host runs. Loading, status, validation and
+extraction never launch apps. Aliases share a site runtime. `internal/appbundle`
+embeds only its target's executable; build scripts compile the child before the
+parent. Contact shares one verified private temporary executable across sites;
+a custom app is re-opened confined, re-verified against the recorded identity,
+and copied to a private file before it is launched. Listener fd 3, credential
+pipe fd 4 and parent-liveness fd 5 avoid port races, argv/environment secrets and
+orphaned children. Five attempts use bounded 1/2/4/8-second backoff. Children
+receive a minimal environment, not provider credentials. Child processes are not
+OS sandboxes.
 
 `internal/contact.Delivery` is a private, site-bound email capability. Its separate
 bearer credential is not a general relay: an exact currently admitted submission
@@ -50,15 +60,20 @@ bound work. No submission storage exists. Provider quota is shared with login
 mail. App settings are startup-bound; a changed registration fails closed until
 restart. Other site pages remain usable.
 
-`internal/appapi` owns Flea App Protocol v1 types, mount validation, flat form
-decoding and bounded authenticated HTTP calls. It never imports site or editor.
-`internal/site/app_bridge.go` renders request-local envelopes, confined relative
-redirects and bounded flash. Contact GET/HEAD routes render without service reads;
-POST forwards JSON. The flash store has at most 256 entries/site, five-minute
-expiry, and visitor/host/app/destination binding. Only successful GET rendering
-consumes a claim. No credentials or messages enter logs, site files or archives.
-Custom-service registration, dynamic read-route declarations and storage remain
-planned; see [Contact's contract](../../apps/contact/README.md).
+`internal/appapi` owns the current Flea App Protocol (v2) types, mount
+validation, flat form decoding and bounded authenticated HTTP calls. It never
+imports site or editor. `internal/site/app_bridge.go` renders request-local
+envelopes, confined relative redirects and bounded flash; a custom app may read
+on GET so it can authenticate its session, while Contact's fixed GET/HEAD routes
+render without service reads and only its mount accepts POST. The flash store has
+at most 256 entries/site, five-minute expiry, and visitor/host/app/destination
+binding. Only successful GET rendering consumes a claim. No credentials or
+messages enter logs, site files or archives. `internal/site/session.go` bridges
+an app-owned opaque session token between Flea's host-only per-app cookie and the
+`X-Flea-Session` header; it never forwards a browser cookie or Authorization
+header, and an app session never grants admin access. Dynamic read-route
+declarations remain planned; see [Contact's contract](../../apps/contact/README.md)
+and [Flea apps](../apps.md).
 `internal/formguard` owns anonymous visitor CSRF independently of editor sessions.
 Each site Server retains a lazy signing key across snapshot reloads; no Project,
 disk file or per-visitor server map holds it. `{csrf}` calls a request-local
@@ -94,7 +109,7 @@ reset, deployment, or content synchronization. Backups may contain secrets.
 | Request handling and reload publication | `internal/site/server.go` |
 | Native directory notifications and debounced reloads | `internal/site/watch.go` |
 | Snip model, IDs, HTML sanitization, content merge | `internal/snips/` |
-| Shared runtime-file inclusion policy | `internal/sitefiles/` |
+| Shared runtime-file and custom-app package policy | `internal/sitefiles/` |
 | Hostname routing, configuration, listeners, ACME | `internal/host/` |
 | Local Git snapshot, prompts, SSH, installation and upload | `internal/setup/` |
 | Embedded Linux servers and bounded verified extraction | `internal/serverbundle/` |
@@ -290,7 +305,7 @@ sites before replacement; failed readiness restores the saved old executable.
 
 `sitefiles.Included` is a runtime inclusion policy, not a public-URL policy.
 Configuration and content belong in an archive but remain private over HTTP.
-Site configuration uses only `.flea.config.json`; protocol 25 rejects older
+Site configuration uses only `.flea.config.json`; protocol 26 rejects older
 server contracts before upload, including the inline-save/formatting contract.
 There is no extensionless-name fallback.
 Do not combine this predicate with the server's URL checks.
@@ -486,7 +501,7 @@ origin and CSRF validation remain exact.
 Both environments use a private `flea/runtime/sessions.json`: below the project locally,
 below `/var/lib/flea/sites/<name>/` in production. Production's `flea/` is service-owned
 0700, beside content/releases, not inside either. Code and parent directories remain
-administrator-owned. Deployment protocol 25 requires these runtime permissions.
+administrator-owned. Deployment protocol 26 requires these runtime permissions.
 Host derives this stable location from the administrator-configured managed content
 path; aliases share storage, distinct sites must not. No request chooses a path.
 Candidate host validation is read-only; actual startup prunes expired/removed owners.
@@ -589,4 +604,11 @@ content/deployment lock. Immutable photo bytes precede candidate validation, dur
 JSON and publication. Failures may retain unreferenced files, never prune them.
 Normal merges preserve remote posts and seed new IDs; explicit sync compares whole
 posts and retains omitted IDs. Backups and pull use the existing content/media paths.
-Protocol 25 requires this new optional content and mounted routing contract.
+Protocol 26 requires this new optional content and mounted routing contract
+together with the custom-app package contract.
+
+The developer-template compiler and rich/media/multisnip reference detection use
+`internal/site/template_lex.go` to distinguish commands/paths from literal brace
+groups. A validation-only view masks literal braces at original byte offsets;
+rendering always compiles the original source through Go contextual escaping.
+Sanitized editable content remains a separate, non-executable data boundary.

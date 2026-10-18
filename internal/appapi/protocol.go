@@ -3,6 +3,7 @@
 package appapi
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,7 @@ import (
 	"net/http"
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -17,10 +19,51 @@ import (
 	"flea/internal/formguard"
 )
 
-const Version = 1
+// Version is the current Flea App Protocol. It was 1 before the app-owned
+// session envelope and the managed launch contract were added; v1 services are
+// rejected explicitly rather than adapted.
+const Version = 2
 const FormLimit = 32 << 10
 const ResponseLimit = 1 << 20
 const HandshakeLimit = 4 << 10
+
+// App-owned session bridge. Flea reads its own per-site/per-app cookie and
+// forwards the opaque token as trusted transport metadata; it never forwards a
+// browser Cookie or Authorization header. Token length and lifetime are bounded.
+const (
+	SessionHeader   = "X-Flea-Session"
+	SessionTokenMin = 16
+	SessionTokenMax = 512
+	SessionMaxAge   = 30 * 24 * 60 * 60 // seconds
+)
+
+// SessionDirective is the validated instruction an app gives Flea for its
+// browser cookie. Present is false when the app omitted the key entirely.
+type SessionDirective struct {
+	Present bool
+	Clear   bool
+	Token   string
+	MaxAge  int
+}
+
+// ValidSessionToken bounds token length and restricts it to cookie-safe
+// printable ASCII so it can travel in a header and a Set-Cookie value unchanged.
+func ValidSessionToken(token string) bool {
+	if len(token) < SessionTokenMin || len(token) > SessionTokenMax {
+		return false
+	}
+	for i := 0; i < len(token); i++ {
+		c := token[i]
+		if c < 0x21 || c > 0x7e {
+			return false
+		}
+		switch c {
+		case ';', ',', '"', '\\', ' ':
+			return false
+		}
+	}
+	return true
+}
 
 type Identity struct {
 	Name     string `json:"name"`
@@ -34,7 +77,58 @@ type Envelope struct {
 	Error    string            `json:"error,omitempty"`
 	Flash    map[string]string `json:"flash,omitempty"`
 	Redirect string            `json:"redirect,omitempty"`
+	Session  json.RawMessage   `json:"session,omitempty"`
 }
+
+// SessionDirective validates the app's session instruction. Omission leaves the
+// cookie unchanged; an explicit null clears it; an object must contain exactly a
+// valid opaque token and a bounded integer max_age in seconds.
+func (e Envelope) SessionDirective() (SessionDirective, error) {
+	raw := bytes.TrimSpace(e.Session)
+	if len(raw) == 0 {
+		return SessionDirective{}, nil
+	}
+	if string(raw) == "null" {
+		return SessionDirective{Present: true, Clear: true}, nil
+	}
+	d := json.NewDecoder(bytes.NewReader(raw))
+	d.UseNumber()
+	if err := checkJSON(d, 0); err != nil {
+		return SessionDirective{}, fmt.Errorf("invalid session object")
+	}
+	if _, err := d.Token(); err != io.EOF {
+		return SessionDirective{}, fmt.Errorf("invalid session object")
+	}
+	// Field names are exact and case-sensitive: the documented contract is
+	// `token` and `max_age`, and no aliases are accepted.
+	var body map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &body); err != nil || len(body) != 2 {
+		return SessionDirective{}, fmt.Errorf("invalid session object")
+	}
+	tokenRaw, ok := body["token"]
+	if !ok {
+		return SessionDirective{}, fmt.Errorf("invalid session object")
+	}
+	ageRaw, ok := body["max_age"]
+	if !ok {
+		return SessionDirective{}, fmt.Errorf("invalid session object")
+	}
+	var token string
+	if len(tokenRaw) == 0 || tokenRaw[0] != '"' || json.Unmarshal(tokenRaw, &token) != nil || !ValidSessionToken(token) {
+		return SessionDirective{}, fmt.Errorf("invalid session token")
+	}
+	// max_age must be a bare JSON integer, never a quoted string.
+	if len(ageRaw) == 0 || !bareInteger.Match(ageRaw) {
+		return SessionDirective{}, fmt.Errorf("invalid session lifetime")
+	}
+	age, err := strconv.ParseInt(string(ageRaw), 10, 32)
+	if err != nil || age < 1 || age > SessionMaxAge {
+		return SessionDirective{}, fmt.Errorf("invalid session lifetime")
+	}
+	return SessionDirective{Present: true, Token: token, MaxAge: int(age)}, nil
+}
+
+var bareInteger = regexp.MustCompile(`^-?[0-9]+$`)
 
 // Values is a fresh top-level map. Nothing is merged into the shared Project.
 func (e Envelope) Values() map[string]any {
@@ -53,6 +147,10 @@ type Mount struct{ Name, Path string }
 
 var appName = regexp.MustCompile(`^[a-z][a-z0-9_]*$`)
 
+// ValidName reserves every built-in template namespace so an app name can never
+// shadow a core template value. The built-in Blog global is guarded separately:
+// apps.blog selects the bundled Blog app, so no custom package can take that
+// name, and blog is a valid app name for mount validation.
 func ValidName(name string) bool {
 	return len(name) <= 64 && appName.MatchString(name) && !strings.Contains(" app page snip data media videos admin csrf ", " "+name+" ")
 }
@@ -243,14 +341,22 @@ func decode(body []byte, target any) error {
 			return fmt.Errorf("missing handshake fields")
 		}
 	case *Envelope:
-		for _, key := range []string{"data", "invalid", "error", "flash", "redirect"} {
+		for _, key := range []string{"data", "invalid", "error", "flash", "redirect", "session"} {
 			allowed[key] = true
 		}
 	default:
 		return fmt.Errorf("unsupported protocol object")
 	}
 	for key, value := range raw {
-		if !allowed[key] || string(value) == "null" {
+		if !allowed[key] {
+			return fmt.Errorf("invalid protocol field")
+		}
+		// An explicit null is the documented way to clear an app session, so it
+		// is validated by SessionDirective rather than rejected here.
+		if key == "session" {
+			continue
+		}
+		if string(value) == "null" {
 			return fmt.Errorf("invalid protocol field")
 		}
 		if key == "invalid" || key == "flash" {

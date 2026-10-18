@@ -116,6 +116,8 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 		}
 		return "", sourceError(file, source, pos, err)
 	}
+	lexer := newBraceLexer(source)
+	lexer.aliases = aliases
 	for i := 0; i < len(source); {
 		if id, ok := mediaInsert[i]; ok {
 			out.WriteString(`[[NW if (lookup $ "__ownerPreview") NW]] data-snip-media="` + id + `"[[NW end NW]]`)
@@ -150,29 +152,16 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			i++
 			continue
 		}
-		end := i + 1
-		var quote byte
-		for ; end < len(source); end++ {
-			if quote != 0 {
-				if source[end] == quote {
-					quote = 0
-				}
-				continue
-			}
-			if source[end] == '"' || source[end] == '\'' {
-				quote = source[end]
-				continue
-			}
-			if source[end] == '}' {
-				break
-			}
-			if source[end] == '{' {
-				return fail(i, fmt.Errorf("unclosed template directive; expected } before the next directive"))
-			}
+		next, syntax, err := lexer.group(i)
+		if err != nil {
+			return fail(i, err)
 		}
-		if end == len(source) {
-			return fail(i, fmt.Errorf("unclosed template directive"))
+		if !syntax {
+			out.WriteString(source[i:next])
+			i = next
+			continue
 		}
+		end := next - 1
 		token := strings.TrimSpace(source[i+1 : end])
 		var rendered string
 		switch {

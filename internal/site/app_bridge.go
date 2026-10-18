@@ -12,10 +12,16 @@ import (
 )
 
 func (s *Server) serveInstalledApp(w http.ResponseWriter, r *http.Request, mount appapi.Mount) {
-	readonly := r.Method == "GET" || r.Method == "HEAD"
-	if r.URL.Path != mount.Path && !(readonly && r.URL.Path == mount.Path+"/thank-you") {
-		http.NotFound(w, r)
-		return
+	// Contact's read-only pages are fixed in Flea and never call the child, and
+	// only the mount itself accepts a POST. A custom managed app may read on GET
+	// so it can authenticate the session.
+	readonly := false
+	if mount.Name == "contact" {
+		readonly = r.Method == "GET" || r.Method == "HEAD"
+		if r.URL.Path != mount.Path && !(readonly && r.URL.Path == mount.Path+"/thank-you") {
+			http.NotFound(w, r)
+			return
+		}
 	}
 	s.serveApp(w, r, mount, nil, readonly, true)
 }
@@ -110,13 +116,16 @@ func (s *Server) serveApp(w http.ResponseWriter, r *http.Request, mount appapi.M
 		if client == nil {
 			err = appapi.ErrUnavailable
 		} else {
-			envelope, status, err = client.Request(r.Context(), mount, method, r.URL.Path, r.URL.RawQuery, fields)
+			envelope, status, err = client.RequestWithSession(r.Context(), mount, method, r.URL.Path, r.URL.RawQuery, fields, s.sessionToken(r, mount.Name))
 		}
 		if err != nil {
 			envelope = appapi.Envelope{Error: appapi.ErrUnavailable.Error()}
 			status = 503
 		}
 	}
+	// The app's session directive was validated before it reached here. Emit the
+	// cookie before any redirect or body so it commits with the correct status.
+	directive, _ := envelope.SessionDirective()
 	if status >= 400 && mount.Name == "contact" && fields != nil {
 		envelope.Data = contactapp.Redisplay(fields)
 	}
@@ -126,6 +135,7 @@ func (s *Server) serveApp(w http.ResponseWriter, r *http.Request, mount appapi.M
 			http.Error(w, "The app returned an invalid destination.", 503)
 			return
 		}
+		s.applySession(w, mount.Name, directive)
 		s.storeFlash(w, r, mount.Name, destination, envelope.Flash)
 		http.Redirect(w, r, destination, 303)
 		return
@@ -167,6 +177,7 @@ func (s *Server) serveApp(w http.ResponseWriter, r *http.Request, mount appapi.M
 	} else if !s.production {
 		body = withReload(body, revision)
 	}
+	s.applySession(w, mount.Name, directive)
 	commit(w)
 	finish(w, true)
 	finished = true

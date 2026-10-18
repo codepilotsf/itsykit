@@ -12,6 +12,13 @@ import (
 func ManagedMediaRoot(contentPath string) string {
 	return filepath.Join(filepath.Dir(contentPath), "media")
 }
+
+// ManagedRuntimeRoot is the stable per-site private runtime directory, a sibling
+// of the content snapshot and its admin sessions. Custom-app storage lives under
+// it so it survives immutable code releases; the release tree never holds it.
+func ManagedRuntimeRoot(contentPath string) string {
+	return filepath.Join(filepath.Dir(filepath.Dir(contentPath)), "flea", "runtime")
+}
 func (p *Project) loadMedia() error {
 	var total int64
 	seen := map[string]fileAsset{}
@@ -98,6 +105,9 @@ func ReadPhoto(root, name string) ([]byte, error) {
 	return readFileBounded(r, name, media.MaxFile)
 }
 
-func LoadWithMedia(root string, content *snips.Store, mediaRoot string) (*Project, error) {
-	return loadProject(root, content, mediaRoot, false)
+// LoadWithMedia loads a code snapshot with managed content and media. runtimeRoot
+// is the stable private runtime directory for custom-app storage; empty defaults
+// to the site tree (development).
+func LoadWithMedia(root string, content *snips.Store, mediaRoot, runtimeRoot string) (*Project, error) {
+	return loadProject(root, content, mediaRoot, runtimeRoot, false)
 }

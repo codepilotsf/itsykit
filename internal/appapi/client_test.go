@@ -2,6 +2,7 @@ package appapi
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -34,7 +35,7 @@ func TestTransportContract(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		if r.URL.Path == "/_flea/handshake" {
-			io.WriteString(w, `{"name":"contact","version":"0.1.0","protocol":1}`)
+			io.WriteString(w, `{"name":"contact","version":"0.1.0","protocol":2}`)
 			return
 		}
 		b, _ := io.ReadAll(r.Body)
@@ -78,7 +79,13 @@ func TestTransportContract(t *testing.T) {
 }
 
 func TestBadHandshakes(t *testing.T) {
-	for _, body := range []string{`{"name":"wrong","version":"1","protocol":1}`, `{"name":"contact","version":"1","protocol":2}`, `{"name":"contact","protocol":1}`, `{"Name":"contact","version":"1","protocol":1}`, strings.Repeat(" ", HandshakeLimit+1)} {
+	for _, body := range []string{
+		fmt.Sprintf(`{"name":"wrong","version":"1","protocol":%d}`, Version),
+		fmt.Sprintf(`{"name":"contact","version":"1","protocol":%d}`, Version+1),
+		fmt.Sprintf(`{"name":"contact","protocol":%d}`, Version),
+		fmt.Sprintf(`{"Name":"contact","version":"1","protocol":%d}`, Version),
+		strings.Repeat(" ", HandshakeLimit+1),
+	} {
 		c := testClient(t, func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			io.WriteString(w, body)
@@ -185,7 +192,7 @@ func TestEndpointPolicy(t *testing.T) {
 	}
 	s := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		io.WriteString(w, `{"name":"contact","version":"1","protocol":1}`)
+		io.WriteString(w, `{"name":"contact","version":"1","protocol":2}`)
 	}))
 	defer s.Close()
 	c, err := New(s.URL, "contact", secret)

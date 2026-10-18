@@ -370,6 +370,10 @@ page, where `contact.flash.notice` is available once. These are escaped values,
 not template source. Optional `email.from` overrides the configured sender;
 visitor email remains Reply-To. There is no old contact config/route alias.
 
+See https://fleacms.com/docs#custom-apps for the app model, the exact request and
+response JSON, custom managed app packages and app-owned sessions. Remote or
+registry-based app registration is not supported.
+
 ### Email templates
 
 Customize sign-in and contact messages in `mailers/*.email.html` and

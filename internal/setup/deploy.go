@@ -82,6 +82,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 	}
 	defer os.RemoveAll(temp)
 	archive := filepath.Join(temp, "site.tar.gz")
+	snapshot := ""
 	needsMail := false
 	var localProject *site.Project
 	planFile := ""
@@ -108,10 +109,22 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			return fmt.Errorf("Set app.site_name in .flea.config.json, or run flea dev to choose a site name, then commit it before deploying.")
 		}
 		localProject = p
-		_, contactEnabled := p.Apps["contact"]
-		needsMail = len(p.Admin.Emails) > 0 || contactEnabled
-		if needsMail && !opts.HTTPS {
-			return fmt.Errorf("Admin login requires HTTPS, and so do contact forms. Enable it with flea deploy -configure before deploying this site.")
+		// Admin login, Contact forms and every session-owning custom app require
+		// HTTPS. The built-in Blog without admin access is public read-only, so it
+		// keeps the previous HTTP allowance.
+		needsForms := len(p.Admin.Emails) > 0
+		needsMail = len(p.Admin.Emails) > 0
+		for name := range p.Apps {
+			if name == "blog" {
+				continue
+			}
+			needsForms = true
+			if name == "contact" {
+				needsMail = true
+			}
+		}
+		if needsForms && !opts.HTTPS {
+			return fmt.Errorf("This site requires HTTPS for admin login and app forms. Enable it with flea deploy -configure before deploying this site.")
 		}
 		for _, warning := range p.Warnings {
 			fmt.Fprintln(errOut, "Warning:", warning)
@@ -128,7 +141,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		if closeErr != nil {
 			return closeErr
 		}
-		snapshot := filepath.Join(temp, "snapshot")
+		snapshot = filepath.Join(temp, "snapshot")
 		if err = os.Mkdir(snapshot, 0700); err != nil {
 			return err
 		}
@@ -191,9 +204,18 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		}
 		return fmt.Errorf("Could not connect to or check %s.\n\nCheck your SSH username and key, then try again.\nTo change the saved username, run flea deploy -configure.", target)
 	}
-	_, isRoot, err := parseProbe(output.String())
+	arch, isRoot, err := parseProbe(output.String())
 	if err != nil {
 		return err
+	}
+	// Portable package preflight: the target server's architecture is known now,
+	// so a package that declares only the development platform is rejected
+	// before anything is uploaded. Check the immutable staged snapshot that is
+	// about to be uploaded, not the later mutable working tree.
+	if !httpsOnly {
+		if err = release.CheckAppPlatforms(snapshot, "linux", arch); err != nil {
+			return err
+		}
 	}
 	if strings.Contains(output.String(), "FLEA_MISSING=1\n") {
 		fmt.Fprint(out, "\nFleaCMS isn't installed on this server yet.\nSetup will install the server and start its service.\n\n")

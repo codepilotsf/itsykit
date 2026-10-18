@@ -1,8 +1,43 @@
 # Installation and updates
 
-Version 0.16.0 is the current public test release for Apple Silicon macOS and
-AMD64/ARM64 Linux, published October 13, 2026. The installer and `flea update`
-select it from `https://fleacms.com/releases/latest.txt`.
+## 0.16.1 literal-brace fix
+
+Published October 18, 2026. The public update channel, shared server and normal
+Mac/Linux CLI installations were verified at 0.16.1. Public installer/reinstaller,
+update and checksum checks passed for all three advertised platforms. Protocol
+remains 25. Existing dev processes need a new `flea dev` invocation to load the
+updated executable.
+
+The published 0.16.1 release preserves literal brace groups and raw JSON in ordinary
+HTML text and attributes, including unchanged Impeccable Live parameters.
+Recognizable malformed commands remain errors, and ordinary interpolation,
+contextual escaping and CSRF checks remain active. Encode exact Flea syntax
+with HTML entities when displaying it literally. See README.md for lexical rules.
+
+Install the published release with `flea update`. Server updates are separate:
+run `flea update-server` from a site with the intended saved SSH destination.
+The parser fix requires updating both the CLI used for dev and the production
+server. Deployment protocol remains 25; no content migration is introduced.
+See [0.16.1 verification](agents/release-0161-verification.md) for actual rollout
+status and remaining acceptance limits.
+
+### Development custom apps (unreleased 0.17.0-dev)
+
+The development tree adds custom managed apps, app-owned sessions and the
+`FLEA_DEPLOY=26` package contract. None of this is in the published 0.16.1
+binary: 0.16.1 ships Contact only and its server is protocol 25. A site that
+carries a `flea/apps/<name>/` package requires a matching development server at
+protocol 26, which refuses a protocol-25 server before upload and is itself
+refused by one. See [Flea apps](apps.md) for the model, package rules and
+sessions, and [next steps](agents/next-steps.md) for the remaining release gates.
+No deployment, tag or installed-binary change is implied.
+
+## Historical 0.16.0 release
+
+Version 0.16.0 was a public test release for Apple Silicon macOS and
+AMD64/ARM64 Linux, published October 13, 2026, and remains the base for 0.16.1.
+The installer and `flea update` now select 0.16.1 from
+`https://fleacms.com/releases/latest.txt`.
 
 ## Updating to 0.16.0
 

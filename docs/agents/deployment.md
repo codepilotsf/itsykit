@@ -125,18 +125,30 @@ Resolve missing icons in the temporary snapshot, never the working directory.
 The deploy section contains settings only, never credentials, and is stripped
 from the uploaded config. Runtime app/admin/apps settings are retained.
 Deploy packages committed site/ pages/assets/partials, .flea.config.json,
-mailers/, flea/snips.json, flea/media/, flea/data/, legacy flea/snips/, and flea/icons/. Validate
-the actual packaged snapshot locally and the extracted release remotely.
-Reject symlinks, hard links, special files, duplicate/traversing archive paths,
-and releases exceeding 256 MiB or 10,000 entries.
+mailers/, flea/snips.json, flea/media/, flea/data/, legacy flea/snips/, flea/icons/,
+and each custom app's `flea/apps/<name>/app.json` with exactly the executables it
+declares. Validate the actual packaged snapshot locally and the extracted release
+remotely. Reject symlinks, hard links, special files, duplicate/traversing
+archive paths, and releases exceeding 256 MiB or 10,000 entries. A malformed app
+manifest or an archive containing an unlisted package file fails extraction.
+App executables are extracted mode 0555 so the `flea` service user can read and
+execute them without owning the root-owned release tree; package directories stay
+administrator-owned. Custom-app storage is stable per-site runtime state outside
+the release, so it is never packaged and survives a release change; it is not
+backed up automatically.
 
 Deployment administration runs through SSH/sudo via the installed server binary,
 never HTTP. The browser editor has content-only permissions, not deployment powers.
-Protocol 24 requires persistent-session runtime directories, the bundled Contact
-child/runtime and current site/config syntax. Old top-level contact settings are
-rejected, not migrated. Build each matching Contact executable before its parent.
-Verify child launch/cleanup under the real systemd unit separately; local tests
-do not establish native Linux or email acceptance.
+Protocol 26 requires persistent-session runtime directories, the bundled Contact
+child/runtime, custom-app packages extracted at service-readable mode and current
+site/config syntax. Old top-level contact settings are rejected, not migrated.
+Before upload the CLI probes the server architecture and rejects a package that
+does not declare the server's `<goos>-<goarch>` executable, or whose declared
+target executable is not a native binary for that platform. The check runs
+against the immutable staged snapshot, not the mutable working tree. Build each
+matching Contact executable before its parent. Verify child launch/cleanup under
+the real systemd unit separately; local tests do not establish native Linux or
+email acceptance.
 Setup does not upgrade existing installations.
 If an authenticated server probe confirms that FleaCMS is absent, offer setup
 and continue deployment after a successful install and fresh server check. Reuse

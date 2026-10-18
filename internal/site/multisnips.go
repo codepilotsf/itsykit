@@ -55,7 +55,7 @@ var multiToken = regexp.MustCompile(`\{(?:#multisnip\s+([a-z][a-z0-9_]{0,39})|/m
 var multiField = regexp.MustCompile(`^\{snip\.([a-z][a-z0-9_]{0,39})\}$`)
 
 func multisnipBlocks(file, source string) ([]multiBlock, error) {
-	z := html.NewTokenizer(strings.NewReader(source))
+	z := html.NewTokenizer(strings.NewReader(directiveView(source)))
 	offset := 0
 	rawTag := ""
 	var ancestors []string
@@ -131,7 +131,7 @@ func multisnipBlocks(file, source string) ([]multiBlock, error) {
 
 func definition(body string) (MultiDefinition, error) {
 	def := MultiDefinition{Fields: map[string]bool{}, Photos: map[string]bool{}}
-	nodes, err := html.ParseFragment(strings.NewReader(body), &html.Node{Type: html.ElementNode, Data: "div", DataAtom: atom.Div})
+	nodes, err := html.ParseFragment(strings.NewReader(directiveView(body)), &html.Node{Type: html.ElementNode, Data: "div", DataAtom: atom.Div})
 	if err != nil {
 		return def, err
 	}

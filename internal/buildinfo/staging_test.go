@@ -11,6 +11,14 @@ import (
 )
 
 func TestPublicReleaseStaging(t *testing.T) {
+	// The development tree records a prerelease version, which the public
+	// update channel deliberately refuses. Exercise the staging pipeline with
+	// the stable form of the same version so the script's real behavior stays
+	// covered during development.
+	stable := Version
+	if i := strings.IndexAny(stable, "-+"); i >= 0 {
+		stable = stable[:i]
+	}
 	for _, missing := range []bool{false, true} {
 		t.Run(fmt.Sprintf("missing-arm64=%t", missing), func(t *testing.T) {
 			root := t.TempDir()
@@ -18,6 +26,9 @@ func TestPublicReleaseStaging(t *testing.T) {
 				body, err := os.ReadFile(filepath.Join("../..", name))
 				if err != nil {
 					t.Fatal(err)
+				}
+				if name == "internal/buildinfo/version.go" {
+					body = []byte(strings.Replace(string(body), `var Version = "`+Version+`"`, `var Version = "`+stable+`"`, 1))
 				}
 				target := filepath.Join(root, name)
 				if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
@@ -42,7 +53,7 @@ func TestPublicReleaseStaging(t *testing.T) {
 			run := func() ([]byte, error) {
 				cmd := exec.Command("bash", "scripts/stage-release.sh")
 				cmd.Dir = root
-				cmd.Env = append(os.Environ(), "CI_COMMIT_TAG=v"+Version)
+				cmd.Env = append(os.Environ(), "CI_COMMIT_TAG=v"+stable)
 				return cmd.CombinedOutput()
 			}
 			out, err := run()
@@ -58,7 +69,7 @@ func TestPublicReleaseStaging(t *testing.T) {
 			if err != nil {
 				t.Fatal(err, string(out))
 			}
-			release := filepath.Join(root, "dist/public/releases", Version)
+			release := filepath.Join(root, "dist/public/releases", stable)
 			manifest, err := os.ReadFile(filepath.Join(release, "SHA256SUMS"))
 			if err != nil {
 				t.Fatal(err)
@@ -77,7 +88,7 @@ func TestPublicReleaseStaging(t *testing.T) {
 				}
 			}
 			latest, err := os.ReadFile(filepath.Join(root, "dist/public/releases/latest.txt"))
-			if err != nil || string(latest) != Version+"\n" {
+			if err != nil || string(latest) != stable+"\n" {
 				t.Fatal("wrong update channel", err, string(latest))
 			}
 			installer, err := os.ReadFile(filepath.Join(root, "dist/public/install.sh"))

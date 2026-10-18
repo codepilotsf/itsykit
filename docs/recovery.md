@@ -44,8 +44,12 @@ It refuses existing output files and creates new files with private permissions.
 Keep backups outside the website directory and copy them to separate storage.
 Backups can contain admin addresses and content; handle them as private data.
 
-Credentials, certificates, deployment settings and sessions are excluded. A backup
-is not a whole-server disaster-recovery image. Record server/email setup separately.
+Credentials, certificates, deployment settings, sessions and custom-app storage
+are excluded. Custom-app storage lives in the stable per-site runtime directory
+(`/var/lib/flea/sites/<name>/flea/runtime/apps/<name>`), so a rollback or restore
+does not remove it, but it is never backed up automatically; back it up yourself.
+A backup is not a whole-server disaster-recovery image. Record server/email setup
+separately.
 
 Restore requires typing `RESTORE`. It replaces live code, site configuration and
 editable content with the backup, so first take a fresh backup if newer changes

@@ -18,19 +18,24 @@ import (
 // Project is a validated serving snapshot. After publishing it to a Server,
 // callers must not mutate its maps or Content; reload builds a new Project.
 type Project struct {
-	syncOnly           bool
-	videos             map[string]videoAsset
-	MediaRoot          string
-	emails             map[string]emailTemplates
-	layouts            map[string]bool
-	adminTemplates     map[string]*template.Template
-	Admin              AdminAccess
-	Dev                DevSettings
-	Apps               map[string]MiniApp
-	Content            *snips.Store
-	rich               map[string]template.HTML
-	contentIndex       map[string]snips.Entry
-	Root               string
+	syncOnly       bool
+	videos         map[string]videoAsset
+	MediaRoot      string
+	emails         map[string]emailTemplates
+	layouts        map[string]bool
+	adminTemplates map[string]*template.Template
+	Admin          AdminAccess
+	Dev            DevSettings
+	Apps           map[string]MiniApp
+	appPackages    map[string]appPackage
+	Content        *snips.Store
+	rich           map[string]template.HTML
+	contentIndex   map[string]snips.Entry
+	Root           string
+	// RuntimeRoot is the stable, private per-site runtime directory. Production
+	// supplies the managed sibling of admin session state so custom-app storage
+	// survives releases; development defaults to the site tree itself.
+	RuntimeRoot        string
 	App                map[string]any
 	SiteNameConfigured bool
 	Snips              map[string]map[string]any
@@ -55,14 +60,14 @@ func Load(root string) (*Project, error) {
 
 // LoadWithSnips loads a code release with a separately managed content snapshot.
 func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
-	return loadProject(root, content, "", false)
+	return loadProject(root, content, "", "", false)
 }
 
 // LoadSyncSource validates metadata/templates for pull before ignored video files
 // are available. Its result is deliberately not an HTTP serving snapshot.
-func LoadSyncSource(root string) (*Project, error) { return loadProject(root, nil, "", true) }
+func LoadSyncSource(root string) (*Project, error) { return loadProject(root, nil, "", "", true) }
 
-func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly bool) (*Project, error) {
+func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot string, syncOnly bool) (*Project, error) {
 	root, err := filepath.Abs(root)
 	if err != nil {
 		return nil, err
@@ -72,7 +77,10 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 		return nil, err
 	}
 	defer boundary.Close()
-	p := &Project{Root: root, Snips: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
+	if runtimeRoot == "" {
+		runtimeRoot = filepath.Join(root, "flea", "runtime")
+	}
+	p := &Project{Root: root, RuntimeRoot: runtimeRoot, Snips: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
 	loaded := false
 	defer func() {
 		if !loaded {
@@ -325,7 +333,7 @@ func loadProject(root string, content *snips.Store, mediaRoot string, syncOnly b
 			return nil, err
 		}
 	}
-	if err = p.validateApps(); err != nil {
+	if err = p.validateApps(boundary); err != nil {
 		return nil, err
 	}
 	if err = p.loadBlog(); err != nil {

@@ -3,6 +3,7 @@ package appmanager
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"log"
 	"net/http"
 	"os"
@@ -25,12 +26,12 @@ func TestManagedLifecycle(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { http.Error(w, "not admitted", 403) })
-	first, err := Start(ctx, handler, nil)
+	first, err := Start(ctx, Spec{Name: "contact", Bundle: true, Capability: handler}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer first.Close()
-	second, err := Start(ctx, handler, nil)
+	second, err := Start(ctx, Spec{Name: "contact", Bundle: true, Capability: handler}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,11 +71,148 @@ func TestManagedLifecycle(t *testing.T) {
 	}
 }
 
+// TestFreezeExecutableIdentity proves a custom executable is launched only from
+// a private frozen copy that matches the identity recorded at load, and that a
+// file changed after validation is rejected.
+func TestFreezeExecutableIdentity(t *testing.T) {
+	dir := t.TempDir()
+	src := filepath.Join(dir, "app")
+	body := []byte("#!/bin/sh\nexit 0\n")
+	if err := os.WriteFile(src, body, 0500); err != nil {
+		t.Fatal(err)
+	}
+	sum := sha256.Sum256(body)
+	spec := Spec{Name: "demo", Executable: src, Hash: sum, Size: int64(len(body))}
+	frozen, release, err := executableFor(context.Background(), spec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if frozen == src {
+		t.Fatal("launched the source path instead of a frozen copy")
+	}
+	info, err := os.Stat(frozen)
+	if err != nil || info.Mode().Perm() != 0500 {
+		t.Fatalf("frozen mode %v %v", info, err)
+	}
+	got, err := os.ReadFile(frozen)
+	if err != nil || !bytes.Equal(got, body) {
+		t.Fatal("frozen bytes differ")
+	}
+	release()
+	if _, err := os.Stat(frozen); !os.IsNotExist(err) {
+		t.Fatal("frozen copy not cleaned up")
+	}
+
+	if err := os.Chmod(src, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(src, []byte("#!/bin/sh\nexit 1\n"), 0500); err != nil {
+		t.Fatal(err)
+	}
+	if _, rel, err := executableFor(context.Background(), spec); err == nil {
+		rel()
+		t.Fatal("an executable changed after validation was accepted")
+	}
+}
+
+func TestPrepareStorageIsPrivate(t *testing.T) {
+	anchor := t.TempDir()
+	runtimeRoot := filepath.Join(anchor, "flea", "runtime")
+	storage := filepath.Join(runtimeRoot, "apps", "demo")
+	if err := prepareStorage(Spec{Name: "demo", RuntimeRoot: runtimeRoot, Storage: storage}); err != nil {
+		t.Fatal(err)
+	}
+	for _, dir := range []string{runtimeRoot, filepath.Join(runtimeRoot, "apps"), storage} {
+		info, err := os.Stat(dir)
+		if err != nil || info.Mode().Perm() != 0700 {
+			t.Fatalf("storage mode %v %v", dir, err)
+		}
+	}
+}
+
+// TestPrepareStorageRejectsSymlinkedAncestor proves a symlinked component inside
+// the site cannot redirect app state outside the managed runtime.
+func TestPrepareStorageRejectsSymlinkedAncestor(t *testing.T) {
+	anchor := t.TempDir()
+	outside := t.TempDir()
+	if err := os.Symlink(outside, filepath.Join(anchor, "flea")); err != nil {
+		t.Skipf("symlinks unavailable: %v", err)
+	}
+	runtimeRoot := filepath.Join(anchor, "flea", "runtime")
+	storage := filepath.Join(runtimeRoot, "apps", "demo")
+	if err := prepareStorage(Spec{Name: "demo", RuntimeRoot: runtimeRoot, Storage: storage}); err == nil {
+		t.Fatal("symlinked ancestor accepted")
+	}
+	if _, err := os.Stat(filepath.Join(outside, "runtime")); !os.IsNotExist(err) {
+		t.Fatal("state was created through the symlink")
+	}
+}
+
+// TestPrepareStorageRejectsPermissiveDirs proves an existing runtime or app
+// directory that is accessible to other users is rejected rather than chmodded.
+func TestPrepareStorageRejectsPermissiveDirs(t *testing.T) {
+	anchor := t.TempDir()
+	runtimeRoot := filepath.Join(anchor, "flea", "runtime")
+	storage := filepath.Join(runtimeRoot, "apps", "demo")
+	if err := os.MkdirAll(storage, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chmod(runtimeRoot, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := prepareStorage(Spec{Name: "demo", RuntimeRoot: runtimeRoot, Storage: storage}); err == nil {
+		t.Fatal("permissive runtime directory accepted")
+	}
+	if info, err := os.Stat(runtimeRoot); err == nil && info.Mode().Perm() != 0755 {
+		t.Fatal("existing user directory was chmodded")
+	}
+}
+
+// TestPrepareStorageRejectsWritableContainer proves the administrator-owned
+// container directory must not be writable by other users.
+func TestPrepareStorageRejectsWritableContainer(t *testing.T) {
+	anchor := t.TempDir()
+	if err := os.Mkdir(filepath.Join(anchor, "flea"), 0777); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chmod(filepath.Join(anchor, "flea"), 0777); err != nil {
+		t.Fatal(err)
+	}
+	runtimeRoot := filepath.Join(anchor, "flea", "runtime")
+	storage := filepath.Join(runtimeRoot, "apps", "demo")
+	if err := prepareStorage(Spec{Name: "demo", RuntimeRoot: runtimeRoot, Storage: storage}); err == nil {
+		t.Fatal("world-writable container accepted")
+	}
+}
+
+// TestFreezeExecutableRejectsHardlink proves the frozen-copy identity check also
+// refuses a hardlinked source, whose bytes could change through another name.
+func TestFreezeExecutableRejectsHardlink(t *testing.T) {
+	dir := t.TempDir()
+	src := filepath.Join(dir, "app")
+	body := []byte("#!/bin/sh\nexit 0\n")
+	if err := os.WriteFile(src, body, 0500); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Link(src, filepath.Join(dir, "second")); err != nil {
+		t.Skipf("hardlinks unavailable: %v", err)
+	}
+	sum := sha256.Sum256(body)
+	spec := Spec{Name: "demo", Executable: src, Hash: sum, Size: int64(len(body))}
+	if frozen, release, err := executableFor(context.Background(), spec); err == nil {
+		release()
+		t.Fatalf("hardlinked executable frozen at %s", frozen)
+	}
+}
+
 func TestRestartCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	m := &Manager{}
 	done := make(chan struct{})
-	go func() { m.run(ctx, "/nonexistent-flea-contact", http.NotFoundHandler(), nil); close(done) }()
+	go func() {
+		m.run(ctx, Spec{Name: "contact", Executable: "/nonexistent-flea-contact"}, "/nonexistent-flea-contact", nil)
+		close(done)
+	}()
 	time.Sleep(50 * time.Millisecond)
 	cancel()
 	select {
@@ -141,7 +279,10 @@ func TestRunExhaustsProcessAttempts(t *testing.T) {
 	defer cancel()
 	m := &Manager{}
 	done := make(chan struct{})
-	go func() { defer close(done); m.run(ctx, executable, http.NotFoundHandler(), log.New(&logs, "", 0)) }()
+	go func() {
+		defer close(done)
+		m.run(ctx, Spec{Name: "contact", Executable: executable}, executable, log.New(&logs, "", 0))
+	}()
 	select {
 	case <-done:
 	case <-time.After(35 * time.Second):
@@ -168,7 +309,10 @@ func TestRunBackoffCancelsPromptly(t *testing.T) {
 	defer cancel()
 	m := &Manager{}
 	done := make(chan struct{})
-	go func() { defer close(done); m.run(ctx, executable, http.NotFoundHandler(), log.New(logs, "", 0)) }()
+	go func() {
+		defer close(done)
+		m.run(ctx, Spec{Name: "contact", Executable: executable}, executable, log.New(logs, "", 0))
+	}()
 	select {
 	case <-logs.restarting:
 	case <-time.After(5 * time.Second):

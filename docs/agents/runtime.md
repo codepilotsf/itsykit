@@ -96,14 +96,20 @@ Preview mode/sender changes require restart; real local delivery remains explici
 
 Mini apps use internal/appapi and internal/formguard. The included Contact app
 is publicly mounted by apps.contact and launched only during actual dev/host
-startup, never Project loading or status. See apps/contact/README.md for the
-canonical contract. internal/appmanager supervises children; internal/appruntime
-implements the child transport; internal/appbundle packages target-specific
-executables. Keep credentials in inherited pipes and an already-bound listener
-handoff. Never pass provider environment to children. Preserve parent-liveness
-cleanup, bounded restarts and per-site process isolation; this is not an OS sandbox.
-Contact is the only bundled child service. Optional Blog uses the built-in
-content snapshot/editor; custom/remote service registration remains planned.
+startup, never Project loading or status. The developer-facing contract is
+docs/apps.md; see apps/contact/README.md for the included app.
+internal/appmanager supervises children; internal/appruntime implements the
+child transport; internal/appbundle packages the target-specific Contact
+executable. Custom apps are site-local managed executables confined to
+flea/apps/<name>/. Keep credentials in inherited pipes and an already-bound
+listener handoff. Never pass provider environment to children. Preserve
+parent-liveness cleanup, bounded restarts and per-site process isolation; this is
+not an OS sandbox.
+Contact is bundled; Optional Blog uses the built-in content snapshot/editor.
+Custom managed packages are configurable; remote or registry-based registration
+remains unsupported. App-owned sessions ride a separate per-site/per-app cookie
+and the X-Flea-Session header; validate them strictly and never let an app session
+grant admin access.
 Never forward browser cookies or Authorization as service credentials. Keep
 upstream redirects and POST retries disabled, response/deadline/concurrency
 bounds enforced, and app values request-local. Anonymous form cookies are signed,

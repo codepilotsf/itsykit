@@ -36,7 +36,7 @@ func TestAppHelperChild(t *testing.T) {
 		t.Skip("not the app manager helper subprocess")
 	}
 	config := os.NewFile(4, "app-credentials")
-	var launch struct{ Token, CapabilityURL, CapabilityToken string }
+	var launch struct{ Name, Token, Storage, CapabilityURL, CapabilityToken string }
 	decoder := json.NewDecoder(io.LimitReader(config, 4097))
 	decoder.DisallowUnknownFields()
 	err := decoder.Decode(&launch)
@@ -191,7 +191,10 @@ func TestRunReplacesReadyClientsOnChildExit(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	m := &Manager{}
 	done := make(chan struct{})
-	go func() { defer close(done); m.run(ctx, executable, http.NotFoundHandler(), log.New(&logs, "", 0)) }()
+	go func() {
+		defer close(done)
+		m.run(ctx, Spec{Name: "contact", Executable: executable}, executable, log.New(&logs, "", 0))
+	}()
 	defer func() {
 		cancel()
 		select {

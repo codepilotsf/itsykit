@@ -74,7 +74,7 @@ func (s *Store) load() (*site.Project, error) {
 			return nil, err
 		}
 	}
-	p, err := site.LoadWithMedia(s.Root, content, s.mediaRoot())
+	p, err := site.LoadWithMedia(s.Root, content, s.mediaRoot(), s.runtimeRoot())
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (s *Store) Save(u editor.Update) error {
 		page.Description = u.Description
 	}
 	// Validate the full candidate before making it durable or visible to readers.
-	next, err := site.LoadWithMedia(s.Root, p.Content, s.mediaRoot())
+	next, err := site.LoadWithMedia(s.Root, p.Content, s.mediaRoot(), s.runtimeRoot())
 	if err != nil {
 		return err
 	}

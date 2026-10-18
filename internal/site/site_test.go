@@ -236,7 +236,7 @@ func TestRawElements(t *testing.T) {
 func TestInvalidTemplatesAndData(t *testing.T) {
 	cases := map[string]string{
 		"missing partial": `{render missing}`, "unclosed each": `{#each snip.team.members as m}`,
-		"unmatched": `{/if}`, "bad expression": `{app.site_name + 1}`, "empty if": `{#if }x{/if}`, "empty each": `{#each }`,
+		"unmatched": `{/if}`, "empty if": `{#if }x{/if}`, "empty each": `{#each }`,
 		"non-array": `{#each app.site_name as item}x{/each}`, "reserved alias": `{#each snip.team.members as app}{/each}`,
 		"bad alias": `{#each snip.team.members as x-y}{/each}`, "slot": `{slot}`, "unclosed directive": `{app.site_name`,
 		"missing snip": `{snip missing}`, "unclosed script": `<script>{anything}`,
@@ -325,7 +325,7 @@ func TestErrorPageLayouts(t *testing.T) {
 			t.Fatal("HEAD error response must have no body")
 		}
 	}
-	put(t, root, "index.html", "{broken syntax}")
+	put(t, root, "index.html", "{#if broken syntax}")
 	if err := s.Reload(root); err == nil {
 		t.Fatal("expected invalid edit")
 	}
@@ -390,7 +390,7 @@ func TestWatchChangesAndRecovery(t *testing.T) {
 		put(t, root, edit.name, edit.body)
 		wait(func() bool { return strings.Contains(request(s, "GET", edit.url).Body.String(), edit.want) })
 	}
-	put(t, root, "index.html", "{bad syntax}")
+	put(t, root, "index.html", "{#if bad syntax}")
 	wait(func() bool { return request(s, "GET", "/").Code == 500 })
 	put(t, root, "index.html", "fixed")
 	wait(func() bool { return request(s, "GET", "/").Code == 200 })

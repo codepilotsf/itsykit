@@ -52,7 +52,7 @@ func New(endpoint, name, token string) (*Client, error) {
 
 func (c *Client) Close() { c.ready.Store(false); c.http.CloseIdleConnections() }
 
-func (c *Client) call(ctx context.Context, method, route, query string, payload []byte, limit int64, timeout time.Duration) (int, []byte, error) {
+func (c *Client) call(ctx context.Context, method, route, query string, payload []byte, limit int64, timeout time.Duration, sessionToken string) (int, []byte, error) {
 	select {
 	case c.slots <- struct{}{}:
 		defer func() { <-c.slots }()
@@ -81,6 +81,11 @@ func (c *Client) call(ctx context.Context, method, route, query string, payload 
 	}
 	r.Header.Set("Authorization", "Bearer "+c.token)
 	r.Header.Set("Accept", "application/json")
+	// The app's own opaque session token rides as trusted metadata, never as a
+	// browser Cookie or Authorization header, and only when it is well formed.
+	if ValidSessionToken(sessionToken) {
+		r.Header.Set(SessionHeader, sessionToken)
+	}
 	if payload != nil {
 		r.Header.Set("Content-Type", "application/json")
 	}
@@ -101,19 +106,35 @@ func (c *Client) call(ctx context.Context, method, route, query string, payload 
 }
 
 func (c *Client) Handshake(ctx context.Context) error {
+	_, err := c.HandshakeIdentity(ctx)
+	return err
+}
+
+// HandshakeIdentity verifies and returns the running service's declared
+// identity, so a caller can also compare it with the package manifest.
+func (c *Client) HandshakeIdentity(ctx context.Context) (Identity, error) {
 	c.ready.Store(false)
-	status, body, err := c.call(ctx, "GET", "/_flea/handshake", "", nil, HandshakeLimit, c.handshakeTimeout)
+	status, body, err := c.call(ctx, "GET", "/_flea/handshake", "", nil, HandshakeLimit, c.handshakeTimeout, "")
 	var identity Identity
 	if err != nil || status != 200 || decode(body, &identity) != nil || identity.Name != c.name || identity.Protocol != Version || identity.Version == "" {
-		return ErrUnavailable
+		return Identity{}, ErrUnavailable
 	}
 	c.ready.Store(true)
-	return nil
+	return identity, nil
 }
 
 // Request returns only validated envelopes and mount-confined redirects.
 func (c *Client) Request(ctx context.Context, mount Mount, method, publicPath, query string, fields map[string]any) (Envelope, int, error) {
+	return c.RequestWithSession(ctx, mount, method, publicPath, query, fields, "")
+}
+
+// RequestWithSession is Request plus the app-owned session token read from
+// Flea's own cookie. The token is validated again here before it is forwarded.
+func (c *Client) RequestWithSession(ctx context.Context, mount Mount, method, publicPath, query string, fields map[string]any, sessionToken string) (Envelope, int, error) {
 	var empty Envelope
+	if !ValidSessionToken(sessionToken) {
+		sessionToken = ""
+	}
 	if !c.ready.Load() || mount.Name != c.name || len(query) > FormLimit || (method != "GET" && method != "POST") {
 		return empty, 503, ErrUnavailable
 	}
@@ -143,7 +164,7 @@ func (c *Client) Request(ctx context.Context, mount Mount, method, publicPath, q
 	} else if fields != nil {
 		return empty, 503, ErrUnavailable
 	}
-	status, body, err := c.call(ctx, method, route, query, payload, ResponseLimit, c.timeout)
+	status, body, err := c.call(ctx, method, route, query, payload, ResponseLimit, c.timeout, sessionToken)
 	var envelope Envelope
 	if err != nil || decode(body, &envelope) != nil {
 		return empty, 503, ErrUnavailable
@@ -155,6 +176,10 @@ func (c *Client) Request(ctx context.Context, mount Mount, method, publicPath, q
 		return empty, 503, ErrUnavailable
 	}
 	for key, value := range raw {
+		// session:null is meaningful; SessionDirective validates it below.
+		if key == "session" {
+			continue
+		}
 		if string(value) == "null" {
 			return empty, 503, ErrUnavailable
 		}
@@ -168,6 +193,12 @@ func (c *Client) Request(ctx context.Context, mount Mount, method, publicPath, q
 		}
 	}
 	if status != 200 && status != 422 && status != 503 {
+		return empty, 503, ErrUnavailable
+	}
+	// Validate the session instruction before any cookie can change. A session
+	// directive is accepted only on an accepted 200 response.
+	directive, err := envelope.SessionDirective()
+	if err != nil || (directive.Present && status != 200) {
 		return empty, 503, ErrUnavailable
 	}
 	if (status == 200 && (len(envelope.Invalid) != 0 || envelope.Error != "")) || (status == 422 && (len(envelope.Invalid) == 0 || envelope.Error != "")) || (status == 503 && (envelope.Error == "" || len(envelope.Invalid) != 0)) {

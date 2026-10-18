@@ -10,7 +10,7 @@
 - [ ] Markdown pages.
 - [ ] LAN QR code.
 - [ ] Contact unavailable notice when mail is not configured.
-- [ ] Apps beyond Contact: blog, events/booking, custom/remote apps, and storage design.
+- [ ] Apps beyond Contact: blog, events/booking, remote services and richer storage. Managed custom app packages and app-owned sessions are implemented.
 - [ ] Consider ZJAX integration separately.
 - [ ] Media improvements, edit history, and richer fields/forms.
 - [ ] Multi-developer permissions, components, and larger-scale hosting.

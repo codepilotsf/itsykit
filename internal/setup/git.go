@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"flea/internal/release"
+	"flea/internal/sitefiles"
 )
 
 type gitState struct{ Branch, Commit, Prefix string }
@@ -96,7 +97,13 @@ func committedSnapshot(ctx context.Context, root, dest string, s gitState) error
 		if err = os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			return err
 		}
-		if err = os.WriteFile(file, []byte(body), 0644); err != nil {
+		// Preserve committed executables (a custom app binary) so load-time
+		// validation sees a runnable file; everything else is ordinary data.
+		mode := os.FileMode(0644)
+		if fields[0] == "100755" {
+			mode = sitefiles.ExecutableMode
+		}
+		if err = os.WriteFile(file, []byte(body), mode); err != nil {
 			return err
 		}
 	}

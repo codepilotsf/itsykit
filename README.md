@@ -2,9 +2,11 @@
 
 ## Install
 
-Version 0.12.0 is available for Apple Silicon macOS and Linux AMD64/ARM64.
+The current public release is 0.16.1, for Apple Silicon macOS and Linux
+AMD64/ARM64. This source tree is development version 0.17.0-dev, whose custom
+managed apps and app-owned sessions are not part of 0.16.1.
 
-Install the current test release for Apple Silicon Mac or AMD64/ARM64 Linux:
+Install the current public test release for Apple Silicon Mac or AMD64/ARM64 Linux:
 
 ```sh
 curl -fsSL https://fleacms.com/install.sh | bash
@@ -226,7 +228,7 @@ in `.flea.config.json` and are stripped from release archives and backups.
 This structure is required; there is no old-directory fallback or automatic
 migration. Existing projects need an explicit, collision-checked reorganization.
 Keep template-relative paths and public URLs unchanged. Update the server before
-deploying: protocol 25 requires the new structure.
+deploying: protocol 26 requires the new structure.
 
 ## Templates
 
@@ -311,7 +313,48 @@ Values and conditions accept dotted paths only. Missing values render empty. Mis
 
 `{snip a7Km2pQ9xB}` renders sanitized rich HTML from `flea/snips.json`, only in HTML element content. Ordinary dotted-path values remain contextually escaped, including attributes and URLs. Legacy `{snip notice}` still reads the escaped `text` field from `flea/snips/notice.json`; legacy structured snips remain supported during migration. JSON content is never parsed as template syntax. There is no unrestricted raw-HTML directive.
 
-There are no expressions, comparisons, functions, filters, array indexes, or arbitrary code execution. Braces outside script/style elements are template directives; use `&#123;` and `&#125;` for literal text braces. Script/style bodies and their opening tags are left untouched by the FleaCMS parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; snip JSON is treated as data.
+There are no expressions, comparisons, functions, filters, array indexes, or arbitrary code execution. Ordinary literal braces and JSON are preserved; see the recognition rules below. Script/style bodies and their opening tags are left untouched by the FleaCMS parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; snip JSON is treated as data.
+
+### Literal braces and syntax recognition
+
+Flea recognizes exact command words (`snip`, `icon`, `render`, `slot`, `csrf`,
+`#if`, `#unless`, `#each`, `#multisnip`, `:else` and their closing commands),
+followed by whitespace, a brace or the end of input. Recognizable commands retain
+argument, nesting and file/line validation. The retired `flea` command remains
+rejected. Prefixes and unknown phrases such as `{rendering header}` or
+`{#iff app.email}` are literal; typos outside the recognized vocabulary cannot be
+diagnosed reliably.
+
+Dotted paths such as `{app.site_name}` and `{member.name}` interpolate normally,
+including in attributes and mixed values. Bare paths/aliases such as `{member}`
+also interpolate when written without surrounding whitespace; active loop aliases
+also retain whitespace-padded syntax such as `{ member }`. Whitespace-padded
+unknown bare words such as `{ and }` are literal. A bare keyword prefix such as
+`{rendering}` is still a valid path lookup, so a missing value renders empty.
+Unclosed dotted paths, active aliases and recognized commands are errors; an unclosed unknown
+bare word is literal.
+
+Other brace groups remain literal in ordinary template text and attributes:
+`Use { and } to group items.`, `{}`, `{not a Flea expression}`, `{1, 2, {3, 4}}`
+and raw JSON need no brace encoding. A balanced literal group is copied as a
+whole, with nested braces, quoted strings and backslash escapes; Flea-looking
+sequences inside it are inert. For example,
+`data-params='{"value":"{app.site_name}"}'` keeps that JSON string unchanged.
+Single/double quotes and HTML-encoded quotes protect braces inside strings.
+An unquoted `<` ends the group scan at HTML markup. An unmatched literal opening
+brace consumes only itself, so `{ {app.site_name}` still interpolates the path.
+A balanced outer literal group takes precedence over any directives inside it.
+Square brackets alone do not form a literal brace group: `["{app.site_name}"]`
+contains a standalone expression. Encode its braces if that exact string is data.
+
+To display exact Flea syntax literally, use HTML entities:
+`&#123;app.site_name&#125;`. Entities are never decoded and recompiled as commands.
+Literal source is copied without changing bytes; Go `html/template` retains its
+normal contextual escaping and HTML normalization. JSON/content values are never
+recursively compiled. These rules apply to developer templates, not the separate
+sanitized editable-content contract: new snip authoring content still requires
+entity-encoded braces. Comments and complete script/style elements, including
+their opening tags, retain their existing inert treatment.
 
 Loops can include an empty-list fallback:
 
@@ -352,9 +395,12 @@ Ordinary pages do not create visitor cookies.
 The bundled Contact app uses this directive. Configure its mount under
 `apps.contact`; form values and feedback use `contact.data.*`,
 `contact.invalid.*`, `contact.error` and `contact.flash.*`. Admin CSRF fields
-remain unchanged. This is not a general form handler or custom app installer.
-See [Contact](apps/contact/README.md) for its complete contract and the
-[app plan](docs/agents/planning/apps.md) for future apps.
+remain unchanged. Flea is not a general form handler, but you can register a
+managed local app under `apps.<name>` with a validated package at
+`flea/apps/<name>/`; it can own its own sessions. See
+[Flea apps](docs/apps.md) for the model, the exact request and response JSON,
+custom packages and app-owned sessions, and
+[Contact](apps/contact/README.md) for the included app's operational contract.
 
 ## JSON configuration and content
 
@@ -645,8 +691,10 @@ browser's session. Removing an admin revokes their sessions. Session files stay
 private; status reports site and deployment information.
 
 The production service can write the site's private `flea/` directory, not its
-release directory or configuration. Deployment protocol 25 requires the updated
+release directory or configuration. Deployment protocol 26 requires the updated
 server and these permissions; there is no compatibility fallback for older servers.
+Custom-app storage lives under `flea/runtime/apps/<name>/` in that private
+directory, outside the immutable release.
 
 ### Editing content
 
@@ -760,7 +808,7 @@ FLEA_EMAIL_FROM="login@your-verified-domain.com"
 ```
 
 Production admin access requires HTTPS. An admin-enabled HTTP-only deployment is
-refused. Protocol 25 requires both the updated server binary and systemd unit, a
+refused. Protocol 26 requires both the updated server binary and systemd unit, a
 service-owned `/etc/flea/deploy.lock`, and writable managed content/runtime directories.
 Fresh setup installs these. Existing servers need an administrator-reviewed upgrade;
 do not use setup's destructive reset to upgrade a server with sites. Existing
@@ -811,15 +859,17 @@ or browser. Contact has no database, queue, uploads or automatic replies.
 Invalid requests, delivery failures and unavailable apps do not retry a POST.
 
 See the [Contact README](apps/contact/README.md) for form markup, field rules,
-JSON responses, flash, limits and process behavior, and
+JSON responses, flash, limits and process behavior, [Flea apps](docs/apps.md)
+for the general model, the full app JSON contract, custom managed packages and
+app-owned sessions, and
 [email templates](docs/email-templates.md) for message customization.
 
 This replaces top-level `contact` configuration and `/_flea/contact`, without
 aliases or automatic migration. Update existing forms/config explicitly, add
 `{csrf}`, and move the thank-you page beneath the chosen mount. Deployment
-protocol 25 requires the matching server. Nothing is deployed by a local build.
-External services and generic app installation remain planned. Blog is a built-in
-content application, described above.
+protocol 26 requires the matching server. Nothing is deployed by a local build.
+Remote services, package registries and config-declared read routes remain
+planned. Blog is a built-in content application, described above.
 
 ## Styling with Prewind
 
@@ -1350,7 +1400,7 @@ sudo systemctl restart flea
 ```
 
 Existing installations are not upgraded by rerunning setup. Deployment requires
-the current server executable (deployment protocol 25, unquoted snip syntax).
+the current server executable (deployment protocol 26, unquoted snip syntax).
 For an older installation,
 update the executable and systemd unit deliberately, preserve server.json and all
 sites, and create `/var/lib/flea/certs` owned by `flea:flea` with mode
@@ -1495,7 +1545,7 @@ directions and a sample-page review before the full build, unless you explicitly
 delegate those choices. Small maintenance edits do not require a new design review.
 
 Editable regions, short IDs, sanitized HTML, page metadata, content-preserving
-deployment, and archived orphan pruning are implemented. Deployment protocol 25
+deployment, and archived orphan pruning are implemented. Deployment protocol 26
 requires an updated server binary; older servers are refused before upload.
 Local extraction preserves unreferenced content until deployment. There is no
 Markdown renderer or schema migration engine. Inline rich-text editing and

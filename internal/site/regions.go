@@ -14,7 +14,7 @@ import (
 var richRef = regexp.MustCompile(`\{\s*snip\s+([A-Za-z0-9]{10})\s*\}`)
 
 func richMatches(source string) [][]string {
-	return richRef.FindAllStringSubmatch(source, -1)
+	return richRef.FindAllStringSubmatch(directiveView(source), -1)
 }
 
 type region struct {
@@ -74,11 +74,12 @@ func scanRegions(file, source string, legacy map[string]bool) (regions []region,
 			token := z.Token()
 			label := ""
 			has := false
+			syntaxAttrs := directiveAttributes(string(raw))
 			for _, a := range token.Attr {
 				if a.Key == "flea" {
 					return nil, nil, fmt.Errorf("the flea attribute is unsupported; use snip")
 				}
-				for _, match := range richMatches(a.Val) {
+				for _, match := range richMatches(syntaxAttrs[a.Key]) {
 					if !legacy[match[1]] {
 						return nil, nil, fmt.Errorf("rich snips are not allowed in attributes")
 					}

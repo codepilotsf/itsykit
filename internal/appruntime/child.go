@@ -19,7 +19,7 @@ import (
 const CapabilityPath = "/_flea/capabilities/contact-email"
 
 // launchConfig is delivered through an inherited pipe, never argv or environment.
-type launchConfig struct{ Token, CapabilityURL, CapabilityToken string }
+type launchConfig struct{ Name, Token, Storage, CapabilityURL, CapabilityToken string }
 
 // RunContact uses fd 3 for the parent's bound listener, fd 4 for credentials,
 // and fd 5 as a parent-liveness pipe. It never reads provider environment values.

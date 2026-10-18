@@ -55,6 +55,7 @@ dependencies, trust boundaries, loading, transactions or publication.
 | --- | --- |
 | Find code ownership and entry points | [Repository map](docs/agents/repository.md) |
 | Site structure, config, templates, extraction, snips, starter/import conventions | [Templates and content](docs/agents/templates.md) |
+| App model, JSON contract, custom managed packages, app-owned sessions | [Flea apps](docs/apps.md); [Contact](apps/contact/README.md) |
 | Images, videos, collections, multipart saves and media transport | [Media and collections](docs/agents/media-collections.md); applicable [photos](docs/photos.md), [videos](docs/videos.md), [multisnips](docs/multisnips.md) |
 | Pull and explicit snip sync; source CSS | [Synchronization and styling](docs/agents/sync-theme.md) |
 | HTML/CSS, Prewind, icons, starter styling | [Styling and icons](docs/agents/styling.md); `../prewind/README.md` |
@@ -71,9 +72,12 @@ email templates, `flea/` for content/data/media/icons/skills, and
 `flea/runtime/`. Globals use `app.*`; there is no `site.*` alias.
 Bundled Contact uses the Flea App Protocol and explicit `{csrf}` visitor forms.
 Optional Blog uses the built-in content/editor snapshot; read [Blog](docs/blog.md)
-before changing posts, routes, rich bodies or synchronization. See the
-runtime/template guides for both applications.
-Do not change admin form contracts or infer support for arbitrary app installation.
+before changing posts, routes, rich bodies or synchronization. Contact is
+bundled; other apps are managed local executables registered under `apps.<name>`
+with a validated package at `flea/apps/<name>/`, and they own their sessions and
+storage. See [Flea apps](docs/apps.md) and the runtime/template guides for both
+applications. Do not change admin form contracts or add remote-service,
+package-registry or arbitrary-install support.
 Generated-site guidance lives in `templates/AGENTS.md` and the bundled skills in
 `templates/.agents/skills/` (core, delivery, design, Prewind, Flea authoring and
 upstream Impeccable), plus focused `templates/flea/skills/` guides (`add-blog`,

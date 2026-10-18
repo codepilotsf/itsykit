@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 
@@ -18,16 +19,18 @@ type MiniApp struct {
 	Email contact.Email `json:"email"`
 }
 
-func (p *Project) validateApps() error {
+// validateApps registers the built-in Blog and Contact apps plus any managed
+// custom app package under flea/apps/<name>. A custom package is validated at
+// load; the running service is still checked by the authenticated handshake at
+// startup.
+func (p *Project) validateApps(boundary *os.Root) error {
 	var mounts []appapi.Mount
 	assets := make([]string, 0, len(p.Assets))
 	for route := range p.Assets {
 		assets = append(assets, route)
 	}
+	p.appPackages = map[string]appPackage{}
 	for name, cfg := range p.Apps {
-		if name != "contact" && name != "blog" {
-			return fmt.Errorf("app %q is not included in this build", name)
-		}
 		if name == "blog" {
 			if cfg.Email != (contact.Email{}) {
 				return fmt.Errorf("blog does not accept email settings")
@@ -35,12 +38,27 @@ func (p *Project) validateApps() error {
 			mounts = append(mounts, appapi.Mount{Name: name, Path: cfg.Mount})
 			continue
 		}
-		if err := cfg.Email.Validate(); err != nil {
+		if name == "contact" {
+			if err := cfg.Email.Validate(); err != nil {
+				return err
+			}
+			mounts = append(mounts, appapi.Mount{Name: name, Path: cfg.Mount})
+			if p.Pages[cfg.Mount] == nil || p.Pages[cfg.Mount+"/thank-you"] == nil {
+				return fmt.Errorf("Contact needs pages at its mount and mount/thank-you")
+			}
+			continue
+		}
+		if cfg.Email.To != "" || cfg.Email.From != "" {
+			return fmt.Errorf("app %q does not accept email settings", name)
+		}
+		pkg, err := loadAppPackage(boundary, p.Root, p.RuntimeRoot, name)
+		if err != nil {
 			return err
 		}
+		p.appPackages[name] = pkg
 		mounts = append(mounts, appapi.Mount{Name: name, Path: cfg.Mount})
-		if p.Pages[cfg.Mount] == nil || p.Pages[cfg.Mount+"/thank-you"] == nil {
-			return fmt.Errorf("Contact needs pages at its mount and mount/thank-you")
+		if p.Pages[cfg.Mount] == nil {
+			return fmt.Errorf("app %q needs a page at its mount", name)
 		}
 	}
 	return appapi.ValidateMounts(mounts, assets, []string{"/releases"})
@@ -51,7 +69,15 @@ type runningApp struct {
 	config   MiniApp
 	manager  *appmanager.Manager
 	delivery *contact.Delivery
+	pkg      appPackage
 }
+
+// samePackage reports whether a running app still matches the loaded package.
+// A changed executable or manifest fails closed until the next restart.
+func samePackage(running, loaded appPackage) bool {
+	return running.Version == loaded.Version && running.Hash == loaded.Hash && running.Size == loaded.Size && running.Executable == loaded.Executable
+}
+
 type appState struct {
 	sync.RWMutex
 	running map[string]*runningApp
@@ -74,12 +100,23 @@ func (s *Server) StartApps(ctx context.Context, sender mailer.Sender, budget *co
 		if name == "blog" {
 			continue
 		}
-		delivery := &contact.Delivery{Email: cfg.Email, Sender: sender, Budget: budget, Render: s.RenderEmail}
-		manager, err := appmanager.Start(ctx, delivery, s.logger)
-		if err != nil && s.logger != nil {
-			s.logger.Printf("Contact could not start: %s", err)
+		var spec appmanager.Spec
+		var delivery *contact.Delivery
+		if name == "contact" {
+			delivery = &contact.Delivery{Email: cfg.Email, Sender: sender, Budget: budget, Render: s.RenderEmail}
+			spec = appmanager.Spec{Name: name, Bundle: true, Capability: delivery}
+		} else {
+			pkg, ok := p.appPackages[name]
+			if !ok {
+				continue
+			}
+			spec = appmanager.Spec{Name: name, Executable: pkg.Executable, RuntimeRoot: p.RuntimeRoot, Storage: pkg.Storage, Hash: pkg.Hash, Size: pkg.Size, Version: pkg.Version}
 		}
-		s.apps.running[name] = &runningApp{mount: appapi.Mount{Name: name, Path: cfg.Mount}, config: cfg, manager: manager, delivery: delivery}
+		manager, err := appmanager.Start(ctx, spec, s.logger)
+		if err != nil && s.logger != nil {
+			s.logger.Printf("App %s could not start: %s", name, err)
+		}
+		s.apps.running[name] = &runningApp{mount: appapi.Mount{Name: name, Path: cfg.Mount}, config: cfg, manager: manager, delivery: delivery, pkg: p.appPackages[name]}
 	}
 	return func() {
 		s.apps.Lock()
@@ -103,7 +140,7 @@ func (s *Server) appFor(p *Project, route string) (appapi.Mount, *runningApp, bo
 			s.apps.RLock()
 			running := s.apps.running[name]
 			s.apps.RUnlock()
-			if running != nil && running.config != cfg {
+			if running != nil && (running.config != cfg || !samePackage(running.pkg, p.appPackages[name])) {
 				running = nil
 			}
 			return appapi.Mount{Name: name, Path: cfg.Mount}, running, true

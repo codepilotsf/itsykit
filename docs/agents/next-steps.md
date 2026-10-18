@@ -15,7 +15,26 @@ workflow verification are separate planned tasks. Theme removal is included in
 public 0.15.1. Native AMD64 build/full-suite, clean-Mac and notarization
 acceptance remain open.
 
-## Current release status (October 13, 2026)
+## Current release status (October 18, 2026)
+
+Public 0.16.1, the shared server and installed Mac/Linux CLIs are verified.
+The literal-brace fix is on `release/0.16.1` / immutable `v0.16.1` (`57d8378`),
+based on published 0.16.0. All 18 configured HTTPS hosts are healthy; content
+hashes are preserved and recovery is clear. Native Mac/ARM64 Linux full tests,
+vet, race and bundled builds passed, plus native artifact/install/update smoke
+on all advertised platforms. Native AMD64 full-suite/build, clean-Mac and
+notarization remain open. See [release evidence](release-0161-verification.md).
+The older dirty local framework checkout and unrelated main skill work are
+preserved. No source merge into main is implied by the release branch/tag.
+
+The development custom-app work is reconciled onto current main in the
+`integrate/custom-apps-20261018` tree (see
+[custom-apps integration](custom-apps-integration.md)). It is unreleased:
+protocol 26, app wire protocol 2. It still needs a fresh temporary-site smoke
+test, the sample lifecycle A-to-B run, a matching server release and native
+acceptance before any public release.
+
+## Historical release status (October 13, 2026)
 
 - Public 0.16.0 is published from `1c85aae` / `v0.16.0`; website `a49e002`,
   activation `20261013-221944-d1f6169314346e36fd5ab5c7`. Linux ARM64 and M5 Mac
@@ -167,8 +186,14 @@ acceptance, redirect and flash checks. Sean confirmed inbox receipt, the app's
 sender override and Reply-To.
 Next acceptance: HTML/text appearance and default-sender checks, representative mixed workloads,
 longer soaks and deployment peaks. No deployment is
-authorized by this note. General read-route declarations, custom/remote
-registration, databases, storage moves and ZJAX remain separate work.
+authorized by this note. Managed custom app packages and app-owned sessions are
+now implemented, unreleased, with a stable per-site runtime storage root and
+service-readable package extraction. The deployment protocol is now
+`FLEA_DEPLOY=26` (`internal/release/protocol.go`) and the app wire protocol is
+`2`; an older server rejects a package-bearing archive, so shipping requires a
+matching server release. Remote services, config-declared read routes,
+databases, storage moves and ZJAX remain separate work. No server release or
+deployment is authorized by this note.
 
 Capacity follow-up: the [isolated 1/10/30-site VPS probe](benchmarks/2026-10-04-multisite.md)
 passed on a 1 GB host with synthetic traffic and overlapping read-only validation.

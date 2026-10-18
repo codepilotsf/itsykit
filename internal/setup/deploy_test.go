@@ -35,7 +35,7 @@ func TestDeploySSHWorkflow(t *testing.T) {
 				switch {
 				case strings.Contains(args, "FLEA_SYSTEM"):
 					stage = "connect"
-					fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:1000\nFLEA_DEPLOY=25")
+					fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:1000\nFLEA_DEPLOY=26")
 				case strings.Contains(args, "-check-dns"):
 					stage = "dns"
 				case strings.Contains(args, "mktemp"):
@@ -79,7 +79,7 @@ func TestHTTPSCommandAndInvalidInput(t *testing.T) {
 	runner := func(_ context.Context, c command) error {
 		text := strings.Join(c.args, " ")
 		if strings.Contains(text, "FLEA_SYSTEM") {
-			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=25")
+			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=26")
 			return nil
 		}
 		if strings.Contains(text, "-O exit") {
@@ -115,7 +115,7 @@ func TestDirtyDuringDNSStopsUpload(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_SYSTEM"):
-			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=25")
+			fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0\nFLEA_DEPLOY=26")
 			return nil
 		case strings.Contains(text, "-check-dns"):
 			return os.WriteFile(filepath.Join(root, "new-file"), []byte("changed during preflight"), 0644)

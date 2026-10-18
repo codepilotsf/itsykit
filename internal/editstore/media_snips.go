@@ -23,6 +23,15 @@ func (s *Store) mediaRoot() string {
 	return filepath.Join(s.Root, "flea", "media")
 }
 
+// runtimeRoot keeps custom-app storage stable and private beside admin sessions
+// in production, and inside the dev site otherwise.
+func (s *Store) runtimeRoot() string {
+	if s.ConfigPath != "" {
+		return site.ManagedRuntimeRoot(s.ContentPath)
+	}
+	return filepath.Join(s.Root, "flea", "runtime")
+}
+
 // Files become durable before the content transaction. A rejected draft can
 // leave an unreferenced immutable file, never a published missing file.
 func (s *Store) applyMedia(p *site.Project, edit editor.PageEdit) error {

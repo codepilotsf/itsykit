@@ -50,7 +50,7 @@ func (p *Project) checkContentStructure() error {
 				if !constrained || rawText {
 					continue
 				}
-				for _, ref := range richMatches(token.Data) {
+				for _, ref := range richMatches(string(raw)) {
 					content, ok := p.rich[ref[1]]
 					if !ok {
 						continue

@@ -152,13 +152,23 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 				return config, nil, err
 			}
 		}
-		mediaRoot := ""
+		mediaRoot, runtimeRoot := "", ""
 		if contentPath != "" {
 			mediaRoot = site.ManagedMediaRoot(contentPath)
+			// Custom-app storage is stable runtime state beside admin sessions,
+			// never inside the immutable release directory.
+			runtimeRoot = site.ManagedRuntimeRoot(contentPath)
 		}
-		project, err := site.LoadWithMedia(root, content, mediaRoot)
+		project, err := site.LoadWithMedia(root, content, mediaRoot, runtimeRoot)
 		if err != nil {
 			return config, nil, fmt.Errorf("site %s: %w", host, err)
+		}
+		if contentPath == "" {
+			for name := range project.Apps {
+				if name != "contact" && name != "blog" {
+					return config, nil, fmt.Errorf("site %s: custom apps require a managed content snapshot; deploy this site first", host)
+				}
+			}
 		}
 		if logger != nil {
 			for _, warning := range project.Warnings {

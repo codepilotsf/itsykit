@@ -45,8 +45,11 @@ email.from overrides the server sender. Post to the mount, such as /contact.
 Use contact.data.*, contact.invalid.*, contact.error and contact.flash.*.
 Contact needs the mount's index.html and thank-you.html. No old contact config or
 /_flea/contact alias exists. Restart dev after app settings change. Do not replace
-admin CSRF controls. Optional Blog is also bundled; arbitrary app packages and remote registrations
-are not supported. Follow the Blog requirements below when it is enabled.
+admin CSRF controls. Optional Blog is also bundled. Custom managed apps are
+local executables under `flea/apps/<name>/` with a validated `app.json`, enabled
+by `apps.<name>.mount`; they own their sessions and private runtime storage.
+Remote services, package registries, arbitrary installs and config-declared read
+routes are not supported. Follow the Blog requirements below when it is enabled.
 
 Use bare snip attributes to designate editable text, images or videos. Text
 extracts to {snip ID}; an img extracts to src="{snip ID.src}" and

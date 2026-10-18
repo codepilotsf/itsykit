@@ -45,7 +45,7 @@ shared page Save/Cancel applies all changes together. Photo fields offer existin
 library images in a thumbnail picker and JPEG/PNG uploads, with a selected-photo
 preview and contextual alt text. Private previews publish only with page Save.
 Editable `mailers/` templates and local
-email preview are implemented; see docs/email-templates.md. Protocol 24 requires
+email preview are implemented; see docs/email-templates.md. Protocol 26 requires
 these runtime features. Adaptive streaming and automatic retention remain planned.
 
 Dev reloads authenticated public pages when safe, restoring edit mode and scroll.
@@ -73,7 +73,7 @@ and existing private capability URLs also work on network addresses and hostname
 Editable state: `flea pull` retrieves live snips, metadata and referenced media
 into local files. Plain deployment preserves live content; `--with-snips`
 publishes intentional local changes using scoped pull baselines and explicit
-conflict resolution. No config/session/secret or CSS sync. Protocol 24 checks
+conflict resolution. No config/session/secret or CSS sync. Protocol 26 checks
 reviewed state under the activation lock.
 
 Styles are developer-managed in `site/css/theme.css`, using Prewind, theme tokens
@@ -111,7 +111,11 @@ name/email/message through an authenticated JSON child service; Flea owns
 private email templates and delivery. Success redirects to mount/thank-you;
 validation returns 422 and operational failures 503, preserving safe fields.
 No submissions are stored. Old contact config/routes are not supported.
-See apps/contact/README.md for the complete contract and acceptance limits.
+See docs/apps.md for the app model, the full JSON contract, custom managed
+packages (flea/apps/<name>/ with a validated app.json, confined executable and
+app-owned storage) and app-owned sessions, and apps/contact/README.md for the
+included app's acceptance limits. Remote, registry-based and arbitrary-install
+registration are not supported.
 
 The developer CLI also provides `flea admin [email]`: prompt when omitted,
 create or append to admin.emails in the existing JSON config, skip duplicates,
@@ -126,7 +130,7 @@ on authenticated activity. Active editing renews at most once a minute; idle tab
 do not. Sessions survive browser closure, restart and deploy. Logout and owner
 removal revoke sessions. Store hashed tokens and host/CSRF/expiry metadata only,
 with private permissions, bounded reads, locking and atomic saves. Never ship
-session state in Git or release archives. Deployment protocol 24 requires the
+session state in Git or release archives. Deployment protocol 26 requires the
 private writable runtime directory; OTPs remain memory-only.
 
 **Status:** first implementation specification  
@@ -304,7 +308,7 @@ The first version has no `routes.json`. Add redirects only when there is a real 
 
 ## Templates
 
-FleaCMS borrows the structural readability of Svelte templates but does not execute JavaScript. It uses single curly braces.
+FleaCMS borrows the structural readability of Svelte templates but does not execute JavaScript. It uses single curly braces for recognized commands and paths. Other balanced brace groups remain literal, including JSON in attributes; nested Flea-looking strings inside literal groups are inert. Exact syntax can be displayed with `&#123;` and `&#125;`. See README.md, “Literal braces and syntax recognition,” for lexical boundaries, bare-word spacing, unmatched openings and typo behavior.
 
 ### Layouts and slots
 
@@ -439,7 +443,7 @@ Aliases pointing to the same release must select the same content snapshot;
 conflicting paths are rejected and valid aliases share a loaded serving snapshot.
 After successful activation, unreferenced entries move to an archive map, retaining
 last remote content. References are lexical, including false/empty branches and
-unused partials. Failed activation leaves previous content untouched. Protocol 24
+unused partials. Failed activation leaves previous content untouched. Protocol 26
 is required. No automatic archive deletion or rollback command exists yet.
 
 ### Values, conditions, and loops
@@ -491,8 +495,9 @@ element content, independent of admin sessions. Signed visitor cookies and form
 tokens expire after 24 hours or restart; template reloads retain the key.
 The bundled Contact app has public mount routing, private managed launch,
 email capability, mount-relative redirects and bounded visitor flash. Admin
-form fields remain unchanged. General app installation, remote registrations,
-dynamic read routes and databases remain planned in docs/agents/planning/apps.md.
+form fields remain unchanged. Managed local custom-app packages and app-owned
+sessions are implemented (unreleased); remote registrations, dynamic read routes
+and databases remain planned in docs/agents/planning/apps.md.
 
 ## Snip format and schemas
 
@@ -749,7 +754,7 @@ flea rollback
   confirmation, and commit message. Respect Git hooks and signing. Declining or
   failure stops deployment. Sites within larger repositories commit manually.
 
-- Requires deployment protocol 24 before upload, offering first-time setup when absent. Validates the
+- Requires deployment protocol 26 before upload, offering first-time setup when absent. Validates the
   packaged site, uploads over SSH/SCP, stages, and atomically switches host config.
 - Restarts and verifies revision/hostname; restores the prior config on failure.
 - Uses native SSH and the saved current-branch mapping in .flea.config.json. The first

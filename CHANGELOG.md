@@ -8,6 +8,47 @@ During 0.x development, interfaces may change without backward compatibility.
 
 - Include modular core, design, Prewind and Flea website authoring skills in new
   sites, with personal conversation overrides and short agent instruction routing.
+- Register custom apps as managed local executables without changing Flea source.
+  An `apps.<name>` entry with a `mount` uses a validated package at
+  `flea/apps/<name>/`: a strict `app.json` and one executable per
+  `<goos>-<goarch>`. Flea validates the manifest at load, verifies the running
+  service at handshake, supervises the child with bounded backoff, and packages
+  exactly the declared executables (mode 0555, service-readable and never
+  writable, never the runtime data directory) into releases. The same strict
+  manifest and package-file policy gates loading, packing, extraction and the
+  preflight; `app.json` and every declared executable must be a single-link
+  regular file, and the executable for a platform must begin a native ELF or
+  Mach-O binary for it. Before upload the CLI checks the server architecture,
+  against the immutable staged snapshot, and refuses a package that does not
+  provide the server's executable or provides a mislabeled one. At launch Flea
+  re-opens the executable confined, re-verifies its size and SHA-256, and copies
+  it to a private file, so a swap after validation cannot change what runs. A
+  production site with a custom app requires a managed content snapshot.
+- Custom-app storage is stable per-site runtime state beside admin sessions and
+  outside every immutable release, so it survives a release change. It is never
+  packaged or backed up automatically; back it up yourself.
+- Add app-owned sessions. An app reads its opaque token from the
+  `X-Flea-Session` header and may return `session` to set or rotate
+  (`{"token","max_age"}`, exact field names), omit to leave unchanged, or `null`
+  to clear. Flea strictly validates the value, bounds token length and lifetime,
+  reads its host-only cookie by inspecting the raw Cookie header so a malformed
+  duplicate fails closed, commits the cookie before the response status, and
+  never exposes the token in templates, logs, URLs or public JSON. App sessions
+  never grant admin or editor access.
+- Custom apps may read on `GET` for pages below their mount; Contact's read-only
+  pages remain fixed and unchanged, and only Contact's mount accepts a POST.
+- Deployment protocol is now `FLEA_DEPLOY=26` and the app wire protocol is `2`;
+  protocol-25 servers and v1 app services are rejected without fallback.
+
+## 0.16.1 - 2026-10-18
+
+- Preserve literal brace groups and raw JSON in template text and attributes,
+  including Impeccable Live parameters. Keep exact command diagnostics,
+  interpolation, escaping and CSRF checks. Use HTML entities to display exact
+  Flea syntax literally. Whitespace-padded unknown bare words are literal prose;
+  active loop aliases retain their existing syntax. The compiler and the
+  rich/media/multisnip reference scanners share `internal/site/template_lex.go`;
+  sanitized editable content remains a separate, non-executable data boundary.
 
 ## 0.16.0 - 2026-10-13
 

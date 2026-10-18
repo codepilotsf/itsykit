@@ -15,6 +15,36 @@ import (
 	"flea/internal/appapi"
 )
 
+// TestContactRouteMethodPreserved pins Contact's exact route/method behavior:
+// only its mount accepts POST, and the thank-you page is read-only.
+func TestContactRouteMethodPreserved(t *testing.T) {
+	root := fixture(t)
+	put(t, root, ".flea.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.test"}}}}`)
+	put(t, root, "contact/index.html", `<form method="post" action="/contact">{csrf}</form>`)
+	put(t, root, "contact/thank-you.html", `<p>Thanks</p>`)
+	p := mustLoad(t, root)
+	s := NewProductionServer(p, nil)
+	mount := appapi.Mount{Name: "contact", Path: "/contact"}
+	for _, tc := range []struct {
+		method, path string
+		notFound     bool
+	}{
+		{"POST", "/contact/thank-you", true},
+		{"POST", "/contact/list", true},
+		{"GET", "/contact/thank-you", false},
+		{"GET", "/contact", false},
+		{"POST", "/contact", false},
+	} {
+		r := httptest.NewRequest(tc.method, "https://example.test"+tc.path, strings.NewReader(""))
+		r.Header.Set("Origin", "https://example.test")
+		w := httptest.NewRecorder()
+		s.serveInstalledApp(w, r, mount)
+		if (w.Code == http.StatusNotFound) != tc.notFound {
+			t.Fatalf("%s %s -> %d", tc.method, tc.path, w.Code)
+		}
+	}
+}
+
 func TestAppRoundTrip(t *testing.T) {
 	root := fixture(t)
 	const route = "/deep/contact"
@@ -29,7 +59,7 @@ func TestAppRoundTrip(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		if r.URL.Path == "/_flea/handshake" {
-			io.WriteString(w, `{"name":"contact","version":"0.1.0","protocol":1}`)
+			io.WriteString(w, `{"name":"contact","version":"0.1.0","protocol":2}`)
 			return
 		}
 		calls.Add(1)

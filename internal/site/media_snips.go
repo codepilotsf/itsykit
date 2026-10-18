@@ -51,7 +51,7 @@ func scanMediaBindings(file, source string) ([]mediaBinding, error) {
 			return nil, sourceError(file, source, start, fmt.Errorf("%s", msg))
 		}
 		if kind == html.TextToken && strings.Contains(raw, "{snip ") {
-			for _, m := range mediaTextRef.FindAllString(raw, -1) {
+			for _, m := range mediaTextRef.FindAllString(directiveView(raw), -1) {
 				if len(stack) == 0 || (stack[len(stack)-1].tag != "script" && stack[len(stack)-1].tag != "style") {
 					return fail("media snip fields are only allowed in img/video attributes: " + m)
 				}
@@ -78,6 +78,7 @@ func scanMediaBindings(file, source string) ([]mediaBinding, error) {
 		duplicate := false
 		author := false
 		id := ""
+		syntaxAttrs := directiveAttributes(raw)
 		for _, a := range t.Attr {
 			if a.Key == "data-snip-media" {
 				return fail("data-snip-media is reserved")
@@ -86,13 +87,13 @@ func scanMediaBindings(file, source string) ([]mediaBinding, error) {
 				duplicate = true
 			}
 			attrs[a.Key] = a.Val
-			if strings.Contains(a.Val, "{snip ") && strings.Contains(a.Val, ".") && !mediaRef.MatchString(a.Val) {
+			if strings.Contains(syntaxAttrs[a.Key], "{snip ") && strings.Contains(syntaxAttrs[a.Key], ".") && !mediaRef.MatchString(syntaxAttrs[a.Key]) {
 				return fail("media snip attributes require one complete field binding")
 			}
 			if a.Key == "snip" {
 				author = true
 			}
-			if m := mediaRef.FindStringSubmatch(a.Val); m != nil {
+			if m := mediaRef.FindStringSubmatch(syntaxAttrs[a.Key]); m != nil {
 				if id != "" && id != m[1] {
 					return fail("media attributes must reference one snip")
 				}
@@ -140,8 +141,8 @@ func scanMediaBindings(file, source string) ([]mediaBinding, error) {
 			if attrs[field] != "{snip "+id+"."+field+"}" {
 				return fail("media snips require a " + field + " binding")
 			}
-			for key, value := range attrs {
-				if strings.Contains(value, "{snip ") && key != "src" && key != field {
+			for key := range attrs {
+				if strings.Contains(syntaxAttrs[key], "{snip ") && key != "src" && key != field {
 					return fail("unsupported media snip attribute")
 				}
 			}

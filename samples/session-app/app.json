@@ -1,0 +1,9 @@
+{
+  "name": "session",
+  "version": "0.1.0",
+  "protocol": 2,
+  "executable": {
+    "darwin-arm64": "session-darwin-arm64",
+    "linux-amd64": "session-linux-amd64"
+  }
+}

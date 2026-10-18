@@ -90,7 +90,7 @@ func TestQAVideoSaveReplacePosterAndRange(t *testing.T) {
 			if w.Code != 200 || w.Body.Len() != 0 || w.Header().Get("Content-Type") != "video/mp4" {
 				t.Fatal("HEAD failed", w.Code)
 			}
-			p, e := site.LoadWithMedia(s.Root, d.Store, s.mediaRoot())
+			p, e := site.LoadWithMedia(s.Root, d.Store, s.mediaRoot(), s.runtimeRoot())
 			if e != nil {
 				t.Fatal(e)
 			}
