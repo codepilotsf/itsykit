@@ -1,5 +1,68 @@
 # fleacms.com website handoff
 
+## 0.17.0 release October 18, 2026
+
+Framework source `fe15b8934165a90390c8bd4ff88cc5e9c9e0d753`, immutable tag
+`v0.17.0`, adds managed custom apps, app-owned sessions and modular starter
+skills. Deployment protocol is 26; app wire protocol is 2. The literal-brace fix
+from 0.16.1 is included without changing Impeccable. Artifacts are archived
+privately in `/Users/sean/fleacms-releases/0.17.0`.
+
+Mac ARM64 and Linux ARM64 passed full tests, vet, race checks and canonical
+bundled builds. Linux AMD64 was cross-built on Mac, then its native CLI and
+server/systemd paths were tested; there was no native AMD64 build/full suite.
+The exact published server and the sample app passed TLS, sessions, restart
+persistence, CSRF/Origin rejection and shutdown under a transient hardened unit
+with a separate network namespace; this uses the sample app and is not a claim
+that a customer custom app is deployed in production. The Mac binary is ad-hoc
+signed and verified on disk, not notarized.
+
+Published HTTPS binaries match the immutable archive and the older 0.16.1
+manifest still resolves:
+
+```text
+5f9cb8d9bda64d6f00f52eb43e1d38b82cb9d28832f30df5e3b4bbc71973dec5  flea-darwin-arm64
+919ed61f7ac31f5ba3163a16b2bce05d1fcd7fcbce8c82c2a667c15a1f16cad4  flea-linux-amd64
+8c0ac734abf2dcbb2e9aac6e808a74c83040c21d067c2a3c1906c7fe0b96b09d  flea-linux-arm64
+```
+
+The public installer is byte-identical to canonical and passed fresh install,
+reinstall, update from public 0.16.1 and already-current checks on Mac ARM64,
+native Asahi ARM64 and native AMD64 as `nobody`, with installed hashes matching
+the published manifest. Normal Mac `/Users/sean/.local/bin/flea` and Asahi
+`/home/sean/.local/bin/flea` were updated through the public updater and report
+0.17.0 with matching hashes; previous binaries were retained privately. Two
+Asahi previews were gracefully replaced preserving cwd and flags, and their
+`/proc/<pid>/exe` hashes match the release. The Asahi dirty framework checkout
+was left untouched.
+
+The shared server completed supported `update-server` to 0.17.0 / protocol 26:
+service active, no pending journal, and four matching bundled Contact children.
+All 18 configured HTTPS hosts returned 200, with routing, editable content and
+deployed source hashes unchanged. Memory target and swap are unchanged. Website
+source `115a73c`, activation `20261018-195731-803d4f4dc7db80fad2a5fd8a`;
+`latest.txt` selects 0.17.0. Final website verification matched the expected
+global revision, kept all 18 content hashes unchanged after deploy, and left
+non-Flea sources, routing, commits, TLS, downloads, site branches and redirect
+policy unchanged. Public docs, custom-app availability and every new download
+link were checked in a browser. A full post-deploy check returned 200 for all 18
+HTTPS hosts again, and a missing-CSRF production Contact POST returned 403 with
+no email sent. The installed CLI `flea status` passed all 8 known Mac site
+folders, including remote comparisons.
+
+Completed own fixture directories were removed after verifying no active units or
+processes and copying redacted evidence; all real runtime, snapshots, download
+versions and the previous server binary were retained, and no native fixture work
+is pending. Asahi intentionally retained its native build stage, private previous
+CLI and live previews. The current CodePilot Mac website4 checkout is clean after
+independent favicon/guidance commits `42ad6d0` by other work and was not edited or
+deployed here, so only the Asahi preview's tracked files and live remote content
+are claimed unchanged.
+
+Native AMD64 full-suite/build, clean-Mac acceptance, notarization and real email
+remain unverified. No further public site edits are planned. Full details are in
+the framework `docs/agents/release-0170-verification.md`.
+
 ## 0.16.1 release October 18, 2026
 
 Framework source `57d8378df75c9981bb5fe1af173dbad81ac8afb4`, immutable tag
