@@ -14,12 +14,11 @@ change is needed. This guide explains
 the model, the exact JSON contract, the managed launch contract, app-owned
 sessions, and how to write, build, mount and test a compatible service.
 
-This document describes the current development implementation. Custom managed
-apps and app-owned sessions are in the local 0.17.0 release candidate but are
-**not in a published Flea binary**: the current public release is 0.16.1, which
-ships Contact only. The candidate is not built, tagged or published. Deploying a
-site that carries a custom app package requires a matching server at deployment
-protocol 26; the public 0.16.1 server is protocol 25 and refuses it.
+This document describes the shipped 0.17.0 implementation. Custom managed apps
+and app-owned sessions are published in the public 0.17.0 CLI and server.
+Deploying a site that carries a custom app package requires a matching server at
+deployment protocol 26; the previous 0.16.1 server is protocol 25 and refuses it,
+and a protocol-26 CLI refuses a protocol-25 server before upload.
 Proposed future app work lives in [planning/apps.md](agents/planning/apps.md) and
 must not be read as shipped behavior.
 
@@ -71,9 +70,9 @@ returns values under `contact.data.*`, `contact.invalid.*`, `contact.error` and
 | Contact mount path, recipient and optional sender | Shipped |
 | Flea App Protocol v2 types, mount rules, JSON envelope | Shipped |
 | Managed child process launch | Shipped |
-| Register a managed local app package from site config | 0.17.0 candidate |
+| Register a managed local app package from site config | Shipped in 0.17.0 |
 | Site-bound email capability for Contact | Shipped |
-| App-owned server-side sessions (`session`, `X-Flea-Session`) | 0.17.0 candidate |
+| App-owned server-side sessions (`session`, `X-Flea-Session`) | Shipped in 0.17.0 |
 | `url`/port key for an external or remote service | Not supported |
 | Public SDK or importable helper package | Not available |
 | Read-only routes declared in configuration | Not implemented |

@@ -2,10 +2,11 @@
 
 ## Install
 
-The current public release is 0.16.1, for Apple Silicon macOS and Linux
-AMD64/ARM64. This source tree is the local 0.17.0 release candidate, which adds
-custom managed apps and app-owned sessions. It is not built, tagged or published
-yet.
+The current public release is 0.17.0, for Apple Silicon macOS and Linux
+AMD64/ARM64. It adds custom managed apps and app-owned sessions, with deployment
+protocol 26 and app wire protocol 2. The Mac binary is ad-hoc signed, not
+notarized; clean-Mac, real-email and native AMD64 build/full-suite acceptance
+remain unverified.
 
 Install the current public test release for Apple Silicon Mac or AMD64/ARM64 Linux:
 

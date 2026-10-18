@@ -6,13 +6,13 @@ Since 0.7.0, versioned binaries live in the host's separate
 [disk-backed download store](download-hosting.md), not the website Git tree.
 Use the store publication procedure before advancing website latest.txt. Older
 sections describing website version directories are historical staging guidance.
-The current public test release is 0.16.1, based on published 0.16.0; see
-[release verification](release-0161-verification.md) for artifacts, provenance
-and remaining native acceptance limits. The local 0.17.0 release candidate adds
-custom managed apps, app-owned sessions and deployment protocol 26; it is not
-built, tagged or published. Do not advance the public version or deployment
-protocol until its canonical build, native acceptance and reviewed rollout are
-recorded in [0.17.0 verification](release-0170-verification.md).
+The current public release is 0.17.0, source
+`fe15b8934165a90390c8bd4ff88cc5e9c9e0d753` with immutable tag `v0.17.0`. It adds
+custom managed apps, app-owned sessions and deployment protocol 26; see
+[release verification](release-0170-verification.md) for artifacts, provenance,
+public installer checks and remaining native acceptance limits. The shared
+server and normal Mac/Asahi CLIs are on 0.17.0 / protocol 26. Never overwrite
+published 0.17.0 bytes.
 
 ## V1 distribution plan
 
@@ -22,10 +22,12 @@ primary path is the implemented `website/site/install.sh`, intended for
 https://fleacms.com/install.sh, followed by `flea update` for local CLI updates.
 Remote updates use `flea update-server` (including `--recover`), without an alias.
 The public test release is hosted by the separate website repository at
-`/Users/sean/fleacms-website`. Its `RELEASES.md` records build provenance and
+`/Users/sean/Projects/flea-website`. Its `RELEASES.md` records build provenance and
 actual public installer/update checks. Versioned binaries, SHA256SUMS,
-latest.txt and install.sh are live on fleacms.com. Clean-machine Mac testing
-and notarization remain unverified; do not describe this as a completed V1 release.
+latest.txt and install.sh are live on fleacms.com. Public installation, reinstall,
+update and already-current checks pass on all three advertised platforms. The
+Mac binary is ad-hoc signed; clean-machine Mac testing and notarization remain
+unverified, so do not describe this as a completed V1 release.
 See [installation and trust](../installation.md).
 
 CLI release targets are macOS ARM64, Linux AMD64 and Linux ARM64. Each uses a

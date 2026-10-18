@@ -23,12 +23,11 @@ onto current main, together with the already-released literal-brace fix.
 
 ## Version and protocol boundaries
 
-- The 0.17.0 candidate records `internal/buildinfo/version.go` as `0.17.0` and
-  moves the feature entries into the dated `## 0.17.0 - 2026-10-18` changelog
-  section. The public and installed version remains 0.16.1 and the published
-  0.16.1 server remains `FLEA_DEPLOY=25`; the candidate is not built, tagged or
-  published.
-- Development deployment protocol is `FLEA_DEPLOY=26`
+- 0.17.0 ships this integration: `internal/buildinfo/version.go` is `0.17.0`,
+  and the feature entries are in the dated `## 0.17.0 - 2026-10-18` changelog
+  section. The public and installed version is 0.17.0 and the published server is
+  `FLEA_DEPLOY=26`; source is `fe15b89` with immutable tag `v0.17.0`.
+- Deployment protocol is `FLEA_DEPLOY=26`
   (`internal/release/protocol.go`). Protocol 26 adds the custom-app package
   contract (confined `flea/apps/<name>/` manifests and per-platform native
   executables extracted 0555). A protocol-25 server is refused before upload and
@@ -103,23 +102,27 @@ backup named above.
 
 ## Remaining release gates
 
-These are genuine future release and deployment gates, not local test work:
+These were future release and deployment gates at integration time; the public
+0.17.0 release resolves the first:
 
-- A matching server release at deployment protocol 26. The 0.17.0 candidate is
-  that release in preparation, but it is not built or published; the published
-  0.16.1 server is protocol 25 and refuses a custom-app package.
+- A matching server release at deployment protocol 26. Public 0.17.0 is that
+  release and the shared server completed the supported upgrade; the previous
+  0.16.1 server was protocol 25 and refused a custom-app package.
 - Native Linux/systemd acceptance, clean-Mac/AMD64 acceptance and real email
-  acceptance. None are established by local tests.
+  acceptance. The exact artifact passed native AMD64 CLI and isolated systemd
+  checks; there was no native AMD64 build/full suite. Clean-Mac, notarization and
+  real email remain open.
 
 ## Canonical checkout
 
 The reviewed integration is commit `0c850e7` and has been fast-forwarded into
-`main` at `/Users/sean/Projects/flea`. The 0.17.0 release candidate is prepared
-on top at `f09d877`. Use this canonical checkout for further framework
-development. Its `bin/flea` and generated embedded bundles are still the
-development build (`0.17.0-dev`) until the candidate is rebuilt canonically;
-they are not release artifacts. Installed/public runtimes remain `0.16.1`; this
-source consolidation is not a production deployment.
+`main` at `/Users/sean/Projects/flea`. Public 0.17.0 is commit `fe15b89` with
+immutable tag `v0.17.0`. Use this canonical checkout for further framework
+development. Its `bin/flea` and generated embedded bundles were refreshed by the
+canonical 0.17.0 build from that exact commit; the Mac binary matches the published
+artifact. Future source edits require the canonical build again. Installed
+public CLIs and the shared server run published 0.17.0; installed paths were
+verified separately.
 
 The exact original snapshot remains on the pushed branch
 `archive/custom-apps-before-reconcile-20261018` (`719c504`) and in the private

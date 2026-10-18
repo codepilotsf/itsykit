@@ -1,27 +1,56 @@
 # Installation and updates
 
-## 0.17.0 release candidate
+## 0.17.0
 
-Local source preparation only, October 18, 2026. The candidate adds custom
-managed apps and app-owned sessions, and moves deployment to protocol 26 with
-app wire protocol 2. It is not built, tagged, published or installed yet: public
-downloads, the installed CLIs and the shared server remain 0.16.1 / protocol 25
-until the later canonical build, native acceptance and authorized rollout.
+Published October 18, 2026. Source `fe15b8934165a90390c8bd4ff88cc5e9c9e0d753`
+on `main`, immutable tag `v0.17.0`. It adds custom managed apps and app-owned
+sessions, with deployment protocol 26 and app wire protocol 2.
 
 A 0.17.0 server or CLI refuses a protocol mismatch in both directions; there is
 no fallback or migration. Deploying a site that carries a `flea/apps/<name>/`
 package requires the matching protocol-26 server. See [Flea apps](apps.md) and
 [release verification](agents/release-0170-verification.md).
 
-### Custom apps in the 0.17.0 candidate
+Artifacts use Go 1.27.1 with `CGO_ENABLED=0`. Mac ARM64 and Linux ARM64 passed
+full tests, vet, race checks and canonical bundled builds; Linux AMD64 was
+cross-built on the Mac, then its native CLI and server/systemd paths were tested.
+There was no native AMD64 build or full suite. The Mac binary is ad-hoc signed,
+not notarized.
 
-The candidate tree adds custom managed apps, app-owned sessions and the
-`FLEA_DEPLOY=26` package contract. None of this is in the published 0.16.1
-binary: 0.16.1 ships Contact only and its server is protocol 25. A site that
-carries a `flea/apps/<name>/` package requires a matching candidate server at
-protocol 26, which refuses a protocol-25 server before upload and is itself
-refused by one. See [next steps](agents/next-steps.md) for the remaining release
-gates. No deployment, tag or installed-binary change is implied.
+Published HTTPS binaries and manifest:
+
+```text
+5f9cb8d9bda64d6f00f52eb43e1d38b82cb9d28832f30df5e3b4bbc71973dec5  flea-darwin-arm64
+919ed61f7ac31f5ba3163a16b2bce05d1fcd7fcbce8c82c2a667c15a1f16cad4  flea-linux-amd64
+8c0ac734abf2dcbb2e9aac6e808a74c83040c21d067c2a3c1906c7fe0b96b09d  flea-linux-arm64
+```
+
+The public installer is byte-identical to the canonical
+`dist/public/install.sh` and `website/site/install.sh`
+(`a15fda6a2d3ebabe776b81f088938c82ff402f51ac9e37c6444eb59ee0dcbeed`). Public
+installer checks passed on Mac ARM64, native Asahi ARM64 and native AMD64 as
+`nobody`: fresh install, reinstall, update from the public 0.16.1 CLI and an
+already-current update. Every installed and updated hash matched the published
+manifest, and the old 0.16.1 manifest still resolves. Normal Mac and Asahi CLIs
+were updated through `flea update` to 0.17.0 with matching hashes; previous
+binaries were retained privately.
+
+The supported shared-server upgrade completed as 0.17.0 / protocol 26. All 18
+configured HTTPS hosts return 200, and routing, all editable content and all
+deployed source hashes were unchanged across the executable upgrade. The
+existing 320 MiB memory target and swap are unchanged, and no recovery journal
+remains. Website source `115a73c`, activation
+`20261018-195731-803d4f4dc7db80fad2a5fd8a`; `latest.txt` now selects 0.17.0.
+
+### Custom apps in 0.17.0
+
+Custom managed apps, app-owned sessions and the `FLEA_DEPLOY=26` package contract
+ship in 0.17.0. The sample app ran under a private transient TLS namespace with
+production hardening using the exact release artifact. That is a controlled
+acceptance run, not a claim that a customer custom app is deployed in production.
+
+Clean-Mac acceptance, notarization and real email delivery remain unverified.
+See [next steps](agents/next-steps.md) for any remaining gates.
 
 ## 0.16.1 literal-brace fix
 

@@ -1,6 +1,6 @@
 # FleaCMS release and deployment runbook
 
-Updated October 3, 2026 for disk-backed download hosting. This is an operator guide,
+Updated October 18, 2026 for the 0.17.0 release. This is an operator guide,
 not authorization to publish or change a server. Recheck paths, branch mappings,
 host settings and live versions before each release. Read the repository's
 AGENTS.md, [release guide](releasing.md), [deployment requirements](deployment.md)
@@ -9,10 +9,10 @@ and [recovery guide](../recovery.md) first.
 ## Repositories and destinations
 
 - Framework: `/Users/sean/Projects/flea`, branch `main`.
-- Public website: `/Users/sean/fleacms-website`, branch `main`. This is separate
+- Public website: `/Users/sean/Projects/flea-website`, branch `main`. This is separate
   from the framework's `website/` source directory. Preserve its custom layout.
-- Production SSH: `root@fleacms.com`. The shared `flea.service` also serves
-  `bookworm.fleacms.com`; an executable upgrade restarts all hosted sites.
+- Production SSH: `root@fleacms.com`. The shared `flea.service` serves 18
+  configured hostnames; an executable upgrade restarts all hosted sites.
 - Website deployment uses the current branch's saved `.flea.config.json` mapping.
   Confirm it targets the intended host/domain before running anything.
 - Public binaries: `https://fleacms.com/releases/<version>/`.

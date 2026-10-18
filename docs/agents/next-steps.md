@@ -17,18 +17,26 @@ acceptance remain open.
 
 ## Current release status (October 18, 2026)
 
-### 0.17.0 release candidate (local preparation)
+### Public 0.17.0
 
-The local 0.17.0 release candidate is prepared on `main` at `f09d877`. It records
-version `0.17.0`, deployment protocol 26 and app wire protocol 2, and moves the
-Unreleased changelog entries into the dated 0.17.0 section. It is **not built,
-tagged, published, installed or deployed**. Local full source checks are recorded
-in [0.17.0 verification](release-0170-verification.md).
+Public 0.17.0 is published from `main` `fe15b8934165a90390c8bd4ff88cc5e9c9e0d753`
+/ immutable `v0.17.0`. It adds custom managed apps and app-owned sessions, with
+deployment protocol 26 and app wire protocol 2. Website source `115a73c`,
+activation `20261018-195731-803d4f4dc7db80fad2a5fd8a`.
 
-The next phase is the lead's candidate commit, then a canonical bundled build
-from that exact commit so VCS metadata is correct, followed by native Mac/Linux
-checks, immutable download staging and the protocol 25 to 26 server rollout. Do
-not claim public or native acceptance before those are recorded.
+The public installer is byte-identical to canonical and passed fresh install,
+reinstall, update from public 0.16.1 and already-current checks on Mac ARM64,
+native Asahi ARM64 and native AMD64 as `nobody`. All installed hashes match the
+published manifest. The shared server completed supported `update-server` to
+0.17.0 / protocol 26; all 18 HTTPS hosts return 200 and routing, editable content
+and deployed source hashes are unchanged. Memory target, swap and recovery state
+are clear. Normal Mac and Asahi CLIs report 0.17.0 with matching hashes.
+
+The sample app ran under a private transient TLS namespace with production
+hardening using the exact artifact; this is not a claim that a customer custom
+app is deployed in production. Native AMD64 full-suite/build, clean-Mac,
+notarization and real email acceptance remain open. See
+[release verification](release-0170-verification.md).
 
 The integrated custom apps are described in [custom apps
 integration](custom-apps-integration.md); preserved pre-reconcile source remains
@@ -198,15 +206,15 @@ acceptance, redirect and flash checks. Sean confirmed inbox receipt, the app's
 sender override and Reply-To.
 Next acceptance: HTML/text appearance and default-sender checks, representative mixed workloads,
 longer soaks and deployment peaks. No deployment is
-authorized by this note. Managed custom app packages and app-owned sessions are
-implemented in the local 0.17.0 candidate, not yet published, with a stable
+authorized by this note. Managed custom app packages and app-owned sessions
+shipped in public 0.17.0, with a stable
 per-site runtime storage root and service-readable package extraction. The
-deployment protocol is now
+deployment protocol is
 `FLEA_DEPLOY=26` (`internal/release/protocol.go`) and the app wire protocol is
-`2`; an older server rejects a package-bearing archive, so shipping requires a
-matching server release. Remote services, config-declared read routes,
-databases, storage moves and ZJAX remain separate work. No server release or
-deployment is authorized by this note.
+`2`; an older server rejects a package-bearing archive, and the matching 0.17.0
+server is published and running protocol 26. Remote services, config-declared read routes,
+databases, storage moves and ZJAX remain separate work. No additional server
+release or site deployment is authorized by this note.
 
 Capacity follow-up: the [isolated 1/10/30-site VPS probe](benchmarks/2026-10-04-multisite.md)
 passed on a 1 GB host with synthetic traffic and overlapping read-only validation.
