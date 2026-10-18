@@ -152,6 +152,13 @@ and `919ed61f…cad4` (AMD64). Evidence and redacted logs:
   `/home/sean/.local/bin/flea` were updated through the public updater and report
   0.17.0 with matching hashes (`5f9cb8d9…dec5` and `8c0ac734…b09d`). Previous
   binaries were retained privately.
+- Kirin was discovered in the follow-up inventory still running 0.16.0. Its
+  `/home/sean/.local/bin/flea` symlink resolves to
+  `/home/sean/Projects/flea/bin/flea`; the public updater replaced only that
+  executable with 0.17.0, matching Linux AMD64 hash `919ed61f…cad4`. The symlink
+  and dirty checkout status were preserved. The previous binary is retained at
+  `/home/sean/flea-before-0170.r31CJ6/flea`. Fresh `new --skip-git` and `status`
+  passed; no active Flea service or dev preview required a restart.
 - Two Asahi previews were gracefully replaced preserving cwd and flags:
   `codepilot-website-ink-html` `dev --lan -port 3207` (PID 3053469) and
   `codepilot-website` `dev --lan --port 3001` (PID 3053476). Their

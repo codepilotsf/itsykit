@@ -19,6 +19,18 @@ and [recovery guide](../recovery.md) first.
 - Stable channel: `https://fleacms.com/releases/latest.txt`.
 - Installer: `https://fleacms.com/install.sh`.
 
+Known user CLI installations as of October 18, 2026:
+
+- This Mac: `/Users/sean/.local/bin/flea`.
+- Asahi (`sean@asahi`): `/home/sean/.local/bin/flea`.
+- Kirin (`sean@kirin`): `/home/sean/.local/bin/flea`, a symlink to
+  `/home/sean/Projects/flea/bin/flea`. Preserve the dirty source checkout and
+  retain the old executable before updating. Do not pull or reset source just
+  to update this CLI.
+
+Recheck versions, symlink targets and running previews on each machine. Local
+CLI updates do not replace already-running dev processes or remote servers.
+
 Never copy framework source, SSH keys, private runtime state or backups into the
 public website. Do not change Bookworm content as part of a marketing-site release.
 
