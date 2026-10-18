@@ -40,11 +40,30 @@ themselves conclude the discussion. Present the concrete result and resolve
 outstanding decisions. Honor cancellation, an explicit pause and scope limits;
 persistence does not authorize additional work or external actions.
 
+## Shared-skill updates
+
+When working in the canonical shared-skills repository identified by its
+`sync/consumers.json`, if the task deliberately changes an authored skill under
+`skills/`, finish the change and its checks, then ask whether the user wants the
+local sync workflow run for all configured consumers. Name the configured Flea
+CMS and Preflight template repositories in the offer. This is an opt-in
+handoff, not automatic permission to modify consumer repositories. If accepted,
+follow that repository's local skill synchronization instructions, use the
+user-selected pinned source revision and preserve drift checks. If the change
+is not yet present in a commit, explain that the pinned workflow needs a source
+commit before it can prepare consumer updates; do not commit or push without
+authorization.
+
+This offer applies to authored shared skills, not documentation-only changes,
+consumer-local edits or Impeccable. The configured consumers are the Flea and
+Preflight templates; generated sites and applications are not enrolled unless
+they are separately added to the consumer configuration.
+
 ## Conversation defaults
 
-- Ask one focused question at a time, then wait for the answer before the next.
-  Keep the total reasonable. Inspect available evidence, recommend sensible
-  defaults and decide routine reversible details yourself.
+- Ask related planning questions together in small batches, usually two or three.
+  Inspect available evidence, recommend sensible defaults and decide routine
+  reversible details yourself.
 - Explain unfamiliar concepts and the practical consequences of a choice before
   asking the user to choose.
 - Prefer clickable structured multiple-choice questions for clear alternatives,
@@ -53,6 +72,8 @@ persistence does not authorize additional work or external actions.
   structured input tool, ask plainly and state a material capability limitation.
 - Keep progress updates concise and explain findings, decisions and what the
   next step resolves. Do not end a turn merely to announce intended work.
+- Never use em dashes (U+2014) in authored prose or responses; use an en dash
+  surrounded by spaces instead: ` – `.
 
 ## Evidence and handoff
 
