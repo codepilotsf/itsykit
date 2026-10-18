@@ -79,10 +79,11 @@ storage. See [Flea apps](docs/apps.md) and the runtime/template guides for both
 applications. Do not change admin form contracts or add remote-service,
 package-registry or arbitrary-install support.
 Generated-site guidance lives in `templates/AGENTS.md` and the bundled skills in
-`templates/.agents/skills/` (core, delivery, design, Prewind, Flea authoring and
-upstream Impeccable), plus focused `templates/flea/skills/` guides (`add-blog`,
+`templates/.agents/skills/` (core, delivery, coding orchestration, design, Prewind
+and Flea authoring), plus focused `templates/flea/skills/` guides (`add-blog`,
 `add-contact-form`, `import-brochure`). Keep them consistent with starter syntax,
-committed, and excluded from serving/deployment. Personal conversation preferences
+committed, and excluded from serving/deployment. Impeccable stays globally installed
+and must never be copied or linked into a site or template. Personal conversation preferences
 override the shared defaults; project requirements and permissions still apply.
 
 New sites enable `dev.email_preview`. Only `flea dev` opens actual outgoing mail

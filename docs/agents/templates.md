@@ -13,7 +13,8 @@ preferences without changing project security or permissions. Version-specific
 site requirements stay in `.agents/site-requirements.md`. Focused Blog, Contact
 and import guides remain in `flea/skills/`. All agent guidance stays in Git and
 is excluded from serving and archives. The embedded `.agents/` tree is copied
-into both minimal and example sites; keep the Impeccable launcher executable.
+into both minimal and example sites. Include the shared coding orchestration skill;
+Impeccable stays globally installed and must never be copied or linked into a site.
 Generated `AGENTS.md` routes focused Blog and Contact requests to the bundled
 `add-blog` and `add-contact-form` skills. Keep configuration, JSON/form fields and
 template values consistent with the actual app contracts. These additions do not

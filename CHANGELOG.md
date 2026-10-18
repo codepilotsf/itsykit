@@ -6,6 +6,10 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Keep Impeccable globally installed instead of bundling it into generated sites.
+  Include pinned coding orchestration, reasoning and shared skill sync guidance
+  in the starter agent instructions.
+
 ## 0.17.0 - 2026-10-18
 
 - Include modular core, design, Prewind and Flea website authoring skills in new

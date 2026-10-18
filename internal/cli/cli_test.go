@@ -55,12 +55,13 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(root, "embed.go")); !os.IsNotExist(err) {
 		t.Fatal("embedding code must not be scaffolded")
 	}
-	launcher, err := os.Stat(filepath.Join(root, ".agents/skills/impeccable/scripts/impeccable"))
-	if err != nil {
-		t.Fatal(err)
+	for _, skill := range []string{"core", "task-delivery", "deepseek-orchestrator", "design", "prewind", "fleacms-site"} {
+		if _, err := os.Stat(filepath.Join(root, ".agents/skills", skill, "SKILL.md")); err != nil {
+			t.Fatalf("generated site missing shared skill %s: %v", skill, err)
+		}
 	}
-	if launcher.Mode().Perm()&0111 == 0 {
-		t.Fatal("generated Impeccable launcher must be executable")
+	if _, err := os.Lstat(filepath.Join(root, ".agents/skills/impeccable")); !os.IsNotExist(err) {
+		t.Fatal("Impeccable must remain globally installed, not bundled in generated sites")
 	}
 }
 
