@@ -3,8 +3,9 @@
 ## Install
 
 The current public release is 0.16.1, for Apple Silicon macOS and Linux
-AMD64/ARM64. This source tree is development version 0.17.0-dev, whose custom
-managed apps and app-owned sessions are not part of 0.16.1.
+AMD64/ARM64. This source tree is the local 0.17.0 release candidate, which adds
+custom managed apps and app-owned sessions. It is not built, tagged or published
+yet.
 
 Install the current public test release for Apple Silicon Mac or AMD64/ARM64 Linux:
 

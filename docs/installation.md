@@ -1,5 +1,28 @@
 # Installation and updates
 
+## 0.17.0 release candidate
+
+Local source preparation only, October 18, 2026. The candidate adds custom
+managed apps and app-owned sessions, and moves deployment to protocol 26 with
+app wire protocol 2. It is not built, tagged, published or installed yet: public
+downloads, the installed CLIs and the shared server remain 0.16.1 / protocol 25
+until the later canonical build, native acceptance and authorized rollout.
+
+A 0.17.0 server or CLI refuses a protocol mismatch in both directions; there is
+no fallback or migration. Deploying a site that carries a `flea/apps/<name>/`
+package requires the matching protocol-26 server. See [Flea apps](apps.md) and
+[release verification](agents/release-0170-verification.md).
+
+### Custom apps in the 0.17.0 candidate
+
+The candidate tree adds custom managed apps, app-owned sessions and the
+`FLEA_DEPLOY=26` package contract. None of this is in the published 0.16.1
+binary: 0.16.1 ships Contact only and its server is protocol 25. A site that
+carries a `flea/apps/<name>/` package requires a matching candidate server at
+protocol 26, which refuses a protocol-25 server before upload and is itself
+refused by one. See [next steps](agents/next-steps.md) for the remaining release
+gates. No deployment, tag or installed-binary change is implied.
+
 ## 0.16.1 literal-brace fix
 
 Published October 18, 2026. The public update channel, shared server and normal
@@ -20,17 +43,6 @@ The parser fix requires updating both the CLI used for dev and the production
 server. Deployment protocol remains 25; no content migration is introduced.
 See [0.16.1 verification](agents/release-0161-verification.md) for actual rollout
 status and remaining acceptance limits.
-
-### Development custom apps (unreleased 0.17.0-dev)
-
-The development tree adds custom managed apps, app-owned sessions and the
-`FLEA_DEPLOY=26` package contract. None of this is in the published 0.16.1
-binary: 0.16.1 ships Contact only and its server is protocol 25. A site that
-carries a `flea/apps/<name>/` package requires a matching development server at
-protocol 26, which refuses a protocol-25 server before upload and is itself
-refused by one. See [Flea apps](apps.md) for the model, package rules and
-sessions, and [next steps](agents/next-steps.md) for the remaining release gates.
-No deployment, tag or installed-binary change is implied.
 
 ## Historical 0.16.0 release
 

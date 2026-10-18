@@ -15,10 +15,10 @@ the model, the exact JSON contract, the managed launch contract, app-owned
 sessions, and how to write, build, mount and test a compatible service.
 
 This document describes the current development implementation. Custom managed
-apps and app-owned sessions are implemented in the development tree but are
+apps and app-owned sessions are in the local 0.17.0 release candidate but are
 **not in a published Flea binary**: the current public release is 0.16.1, which
-ships Contact only. Custom apps are unreleased 0.17.0-dev work. Deploying a site
-that carries a custom app package requires a matching server at deployment
+ships Contact only. The candidate is not built, tagged or published. Deploying a
+site that carries a custom app package requires a matching server at deployment
 protocol 26; the public 0.16.1 server is protocol 25 and refuses it.
 Proposed future app work lives in [planning/apps.md](agents/planning/apps.md) and
 must not be read as shipped behavior.
@@ -71,9 +71,9 @@ returns values under `contact.data.*`, `contact.invalid.*`, `contact.error` and
 | Contact mount path, recipient and optional sender | Shipped |
 | Flea App Protocol v2 types, mount rules, JSON envelope | Shipped |
 | Managed child process launch | Shipped |
-| Register a managed local app package from site config | Unreleased |
+| Register a managed local app package from site config | 0.17.0 candidate |
 | Site-bound email capability for Contact | Shipped |
-| App-owned server-side sessions (`session`, `X-Flea-Session`) | Unreleased |
+| App-owned server-side sessions (`session`, `X-Flea-Session`) | 0.17.0 candidate |
 | `url`/port key for an external or remote service | Not supported |
 | Public SDK or importable helper package | Not available |
 | Read-only routes declared in configuration | Not implemented |

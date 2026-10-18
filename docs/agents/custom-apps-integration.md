@@ -23,9 +23,11 @@ onto current main, together with the already-released literal-brace fix.
 
 ## Version and protocol boundaries
 
-- `internal/buildinfo/version.go` is `0.17.0-dev`. Feature changes stay under
-  `## Unreleased`. The public and installed version remains 0.16.1 and the
-  published 0.16.1 server remains `FLEA_DEPLOY=25`.
+- The 0.17.0 candidate records `internal/buildinfo/version.go` as `0.17.0` and
+  moves the feature entries into the dated `## 0.17.0 - 2026-10-18` changelog
+  section. The public and installed version remains 0.16.1 and the published
+  0.16.1 server remains `FLEA_DEPLOY=25`; the candidate is not built, tagged or
+  published.
 - Development deployment protocol is `FLEA_DEPLOY=26`
   (`internal/release/protocol.go`). Protocol 26 adds the custom-app package
   contract (confined `flea/apps/<name>/` manifests and per-platform native
@@ -58,10 +60,12 @@ The full disposition inventory (integrated / superseded by current code /
 archived historical guidance, per original change) lives outside the repository
 at `/Users/sean/flea-workspace-backups/2026-10-18-before-reconcile/integration-disposition.md`.
 
-## Verification completed
+## Preserved pre-candidate verification
 
-The final tree was checked before handoff. Commands and evidence logs live under
-`/tmp/deepseek-task.CwLX3m/`:
+The `0.17.0-dev` development tree was checked before handoff. This is preserved
+history, not the 0.17.0 candidate run; the candidate's own checks are recorded in
+[0.17.0 verification](release-0170-verification.md). Commands and evidence logs
+live under `/tmp/deepseek-task.CwLX3m/`:
 
 - `go vet ./...` exit 0 (`logs/vet-2.txt`; the exit is recorded in `worker.log`).
 - `go test ./...` exit 0 (`logs/test-3.txt`), after the stable-version fixture
@@ -101,18 +105,21 @@ backup named above.
 
 These are genuine future release and deployment gates, not local test work:
 
-- A matching server release at deployment protocol 26. The published 0.16.1
-  server is protocol 25 and refuses a custom-app package.
+- A matching server release at deployment protocol 26. The 0.17.0 candidate is
+  that release in preparation, but it is not built or published; the published
+  0.16.1 server is protocol 25 and refuses a custom-app package.
 - Native Linux/systemd acceptance, clean-Mac/AMD64 acceptance and real email
   acceptance. None are established by local tests.
 
 ## Canonical checkout
 
 The reviewed integration is commit `0c850e7` and has been fast-forwarded into
-`main` at `/Users/sean/Projects/flea`. Use this canonical checkout for further
-framework development. Its `bin/flea` and generated embedded bundles match the
-verified development build (`0.17.0-dev`). Installed/public runtimes remain
-`0.16.1`; this source consolidation is not a production deployment.
+`main` at `/Users/sean/Projects/flea`. The 0.17.0 release candidate is prepared
+on top at `f09d877`. Use this canonical checkout for further framework
+development. Its `bin/flea` and generated embedded bundles are still the
+development build (`0.17.0-dev`) until the candidate is rebuilt canonically;
+they are not release artifacts. Installed/public runtimes remain `0.16.1`; this
+source consolidation is not a production deployment.
 
 The exact original snapshot remains on the pushed branch
 `archive/custom-apps-before-reconcile-20261018` (`719c504`) and in the private

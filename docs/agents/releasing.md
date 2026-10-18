@@ -8,9 +8,11 @@ Use the store publication procedure before advancing website latest.txt. Older
 sections describing website version directories are historical staging guidance.
 The current public test release is 0.16.1, based on published 0.16.0; see
 [release verification](release-0161-verification.md) for artifacts, provenance
-and remaining native acceptance limits. The development custom-app work is
-unreleased and must not advance a public version or the deployment protocol
-without a separate, reviewed release.
+and remaining native acceptance limits. The local 0.17.0 release candidate adds
+custom managed apps, app-owned sessions and deployment protocol 26; it is not
+built, tagged or published. Do not advance the public version or deployment
+protocol until its canonical build, native acceptance and reviewed rollout are
+recorded in [0.17.0 verification](release-0170-verification.md).
 
 ## V1 distribution plan
 

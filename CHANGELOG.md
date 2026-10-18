@@ -6,6 +6,8 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.17.0 - 2026-10-18
+
 - Include modular core, design, Prewind and Flea website authoring skills in new
   sites, with personal conversation overrides and short agent instruction routing.
 - Register custom apps as managed local executables without changing Flea source.

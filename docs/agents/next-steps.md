@@ -17,6 +17,25 @@ acceptance remain open.
 
 ## Current release status (October 18, 2026)
 
+### 0.17.0 release candidate (local preparation)
+
+The local 0.17.0 release candidate is prepared on `main` at `f09d877`. It records
+version `0.17.0`, deployment protocol 26 and app wire protocol 2, and moves the
+Unreleased changelog entries into the dated 0.17.0 section. It is **not built,
+tagged, published, installed or deployed**. Local full source checks are recorded
+in [0.17.0 verification](release-0170-verification.md).
+
+The next phase is the lead's candidate commit, then a canonical bundled build
+from that exact commit so VCS metadata is correct, followed by native Mac/Linux
+checks, immutable download staging and the protocol 25 to 26 server rollout. Do
+not claim public or native acceptance before those are recorded.
+
+The integrated custom apps are described in [custom apps
+integration](custom-apps-integration.md); preserved pre-reconcile source remains
+on `archive/custom-apps-before-reconcile-20261018` and in the private backup.
+
+### Public 0.16.1
+
 Public 0.16.1, the shared server and installed Mac/Linux CLIs are verified.
 The literal-brace fix is on `release/0.16.1` / immutable `v0.16.1` (`57d8378`),
 based on published 0.16.0. All 18 configured HTTPS hosts are healthy; content
@@ -26,13 +45,6 @@ on all advertised platforms. Native AMD64 full-suite/build, clean-Mac and
 notarization remain open. See [release evidence](release-0161-verification.md).
 The older dirty local framework checkout and unrelated main skill work are
 preserved. No source merge into main is implied by the release branch/tag.
-
-The development custom-app work is reconciled onto current main in the
-`integrate/custom-apps-20261018` tree (see
-[custom-apps integration](custom-apps-integration.md)). It is unreleased:
-protocol 26, app wire protocol 2. It still needs a fresh temporary-site smoke
-test, the sample lifecycle A-to-B run, a matching server release and native
-acceptance before any public release.
 
 ## Historical release status (October 13, 2026)
 
@@ -187,8 +199,9 @@ sender override and Reply-To.
 Next acceptance: HTML/text appearance and default-sender checks, representative mixed workloads,
 longer soaks and deployment peaks. No deployment is
 authorized by this note. Managed custom app packages and app-owned sessions are
-now implemented, unreleased, with a stable per-site runtime storage root and
-service-readable package extraction. The deployment protocol is now
+implemented in the local 0.17.0 candidate, not yet published, with a stable
+per-site runtime storage root and service-readable package extraction. The
+deployment protocol is now
 `FLEA_DEPLOY=26` (`internal/release/protocol.go`) and the app wire protocol is
 `2`; an older server rejects a package-bearing archive, so shipping requires a
 matching server release. Remote services, config-declared read routes,

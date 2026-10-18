@@ -496,8 +496,9 @@ tokens expire after 24 hours or restart; template reloads retain the key.
 The bundled Contact app has public mount routing, private managed launch,
 email capability, mount-relative redirects and bounded visitor flash. Admin
 form fields remain unchanged. Managed local custom-app packages and app-owned
-sessions are implemented (unreleased); remote registrations, dynamic read routes
-and databases remain planned in docs/agents/planning/apps.md.
+sessions are implemented in the local 0.17.0 candidate, not yet published;
+remote registrations, dynamic read routes and databases remain planned in
+docs/agents/planning/apps.md.
 
 ## Snip format and schemas
 
