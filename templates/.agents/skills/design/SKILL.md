@@ -14,7 +14,23 @@ or external-action permission.
 
 If Impeccable is missing or its launcher cannot run, state the limitation and
 continue permitted work from existing project context and these preferences.
-Do not claim toolkit execution or install missing tools without authorization.
+Do not claim toolkit execution or create a project-local fallback. Report a missing
+global installation so it can be resolved at user scope.
+
+## Model selection
+
+Run Impeccable work with GPT-6.1 Sol (`gpt-6.1-sol`) at high reasoning. This includes
+design planning, UI implementation and delegated Impeccable text/code helpers, such as
+the asset producer, manual edit applier, finish reviewer and documenter. Image-generation
+tools use their own image models.
+
+In T3 Code, discover supported models and reasoning options with
+`orchestrator_capabilities`. Select Sol with `reasoningEffort: high` through
+`t3_thread_configure` before starting a design turn. Pass the provider, model and
+reasoning option explicitly to authorized child tasks. Verify the effective settings
+before proceeding. If the runtime cannot select or verify them, report the limit and
+leave Impeccable work pending. Never rely on upstream helper metadata or a lower
+inherited default.
 
 ## Visual research
 
