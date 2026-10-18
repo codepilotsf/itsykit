@@ -106,5 +106,16 @@ These are genuine future release and deployment gates, not local test work:
 - Native Linux/systemd acceptance, clean-Mac/AMD64 acceptance and real email
   acceptance. None are established by local tests.
 
-Source consolidation and push are performed by the lead after review; they have
-not happened yet.
+## Canonical checkout
+
+The reviewed integration is commit `0c850e7` and has been fast-forwarded into
+`main` at `/Users/sean/Projects/flea`. Use this canonical checkout for further
+framework development. Its `bin/flea` and generated embedded bundles match the
+verified development build (`0.17.0-dev`). Installed/public runtimes remain
+`0.16.1`; this source consolidation is not a production deployment.
+
+The exact original snapshot remains on the pushed branch
+`archive/custom-apps-before-reconcile-20261018` (`719c504`) and in the private
+full-checkout archive. The integration branch also remains available for audit.
+Private implementation/review/revision reports and verification evidence are
+retained under the backup directory above. No custom-app source was discarded.
