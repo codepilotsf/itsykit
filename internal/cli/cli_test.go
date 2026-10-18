@@ -110,7 +110,7 @@ func TestCLI(t *testing.T) {
 	if code := Run(context.Background(), []string{"status"}, &out, io.Discard); code != 0 || !strings.Contains(out.String(), "Valid configuration, templates and content") {
 		t.Fatal(code, out.String())
 	}
-	if err := os.WriteFile("site/index.html", []byte("{broken syntax}"), 0644); err != nil {
+	if err := os.WriteFile("site/index.html", []byte("{#if broken syntax}"), 0644); err != nil {
 		t.Fatal(err)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)

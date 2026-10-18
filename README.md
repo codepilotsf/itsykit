@@ -311,7 +311,48 @@ Values and conditions accept dotted paths only. Missing values render empty. Mis
 
 `{snip a7Km2pQ9xB}` renders sanitized rich HTML from `flea/snips.json`, only in HTML element content. Ordinary dotted-path values remain contextually escaped, including attributes and URLs. Legacy `{snip notice}` still reads the escaped `text` field from `flea/snips/notice.json`; legacy structured snips remain supported during migration. JSON content is never parsed as template syntax. There is no unrestricted raw-HTML directive.
 
-There are no expressions, comparisons, functions, filters, array indexes, or arbitrary code execution. Braces outside script/style elements are template directives; use `&#123;` and `&#125;` for literal text braces. Script/style bodies and their opening tags are left untouched by the FleaCMS parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; snip JSON is treated as data.
+There are no expressions, comparisons, functions, filters, array indexes, or arbitrary code execution. Ordinary literal braces and JSON are preserved; see the recognition rules below. Script/style bodies and their opening tags are left untouched by the FleaCMS parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; snip JSON is treated as data.
+
+### Literal braces and syntax recognition
+
+Flea recognizes exact command words (`snip`, `icon`, `render`, `slot`, `csrf`,
+`#if`, `#unless`, `#each`, `#multisnip`, `:else` and their closing commands),
+followed by whitespace, a brace or the end of input. Recognizable commands retain
+argument, nesting and file/line validation. The retired `flea` command remains
+rejected. Prefixes and unknown phrases such as `{rendering header}` or
+`{#iff app.email}` are literal; typos outside the recognized vocabulary cannot be
+diagnosed reliably.
+
+Dotted paths such as `{app.site_name}` and `{member.name}` interpolate normally,
+including in attributes and mixed values. Bare paths/aliases such as `{member}`
+also interpolate when written without surrounding whitespace; active loop aliases
+also retain whitespace-padded syntax such as `{ member }`. Whitespace-padded
+unknown bare words such as `{ and }` are literal. A bare keyword prefix such as
+`{rendering}` is still a valid path lookup, so a missing value renders empty.
+Unclosed dotted paths, active aliases and recognized commands are errors; an unclosed unknown
+bare word is literal.
+
+Other brace groups remain literal in ordinary template text and attributes:
+`Use { and } to group items.`, `{}`, `{not a Flea expression}`, `{1, 2, {3, 4}}`
+and raw JSON need no brace encoding. A balanced literal group is copied as a
+whole, with nested braces, quoted strings and backslash escapes; Flea-looking
+sequences inside it are inert. For example,
+`data-params='{"value":"{app.site_name}"}'` keeps that JSON string unchanged.
+Single/double quotes and HTML-encoded quotes protect braces inside strings.
+An unquoted `<` ends the group scan at HTML markup. An unmatched literal opening
+brace consumes only itself, so `{ {app.site_name}` still interpolates the path.
+A balanced outer literal group takes precedence over any directives inside it.
+Square brackets alone do not form a literal brace group: `["{app.site_name}"]`
+contains a standalone expression. Encode its braces if that exact string is data.
+
+To display exact Flea syntax literally, use HTML entities:
+`&#123;app.site_name&#125;`. Entities are never decoded and recompiled as commands.
+Literal source is copied without changing bytes; Go `html/template` retains its
+normal contextual escaping and HTML normalization. JSON/content values are never
+recursively compiled. These rules apply to developer templates, not the separate
+sanitized editable-content contract: new snip authoring content still requires
+entity-encoded braces. Comments and complete script/style elements, including
+their opening tags, retain their existing inert treatment.
 
 Loops can include an empty-list fallback:
 

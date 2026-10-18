@@ -586,3 +586,9 @@ JSON and publication. Failures may retain unreferenced files, never prune them.
 Normal merges preserve remote posts and seed new IDs; explicit sync compares whole
 posts and retains omitted IDs. Backups and pull use the existing content/media paths.
 Protocol 25 requires this new optional content and mounted routing contract.
+
+The developer-template compiler and rich/media/multisnip reference detection use
+`internal/site/template_lex.go` to distinguish commands/paths from literal brace
+groups. A validation-only view masks literal braces at original byte offsets;
+rendering compiles original source through Go contextual escaping. Sanitized
+editable content remains a separate, non-executable data boundary.

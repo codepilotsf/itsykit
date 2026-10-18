@@ -39,7 +39,7 @@ func TestDiagnosticSourceLocations(t *testing.T) {
 	for _, tc := range []struct{ file, source, location string }{
 		{"index.html", "<section snip>\n<p snip>Nested</p>\n</section>", "index.html:2"},
 		{"index.html", "<!-- flea\nlayout: /main.layout.html\nunknown: value\n-->\n<p>Hi</p>", "index.html:3"},
-		{"_copy.html", "<p>Copy</p>\n{bad expression}", "_copy.html:2"},
+		{"_copy.html", "<p>Copy</p>\n{#if bad expression}", "_copy.html:2"},
 	} {
 		t.Run(tc.location, func(t *testing.T) {
 			root := fixture(t)
@@ -85,7 +85,7 @@ func TestDevelopmentDiagnosticAndRecovery(t *testing.T) {
 	root := fixture(t)
 	var logs bytes.Buffer
 	s := NewServer(mustLoad(t, root), log.New(&logs, "", 0))
-	put(t, root, "index.html", "<main>\n<h1>Hi</h1>\n{bad expression}\n<script>alert('not executed')</script>\n</main>")
+	put(t, root, "index.html", "<main>\n<h1>Hi</h1>\n{#if bad expression}\n<script>alert('not executed')</script>\n</main>")
 	err := s.Reload(root)
 	if err == nil {
 		t.Fatal("expected invalid template")
@@ -135,7 +135,7 @@ func TestDiagnosticPrivacyBoundary(t *testing.T) {
 		var logs bytes.Buffer
 		s := NewServer(p, log.New(&logs, "", 0))
 		s.production = production
-		put(t, root, "index.html", "{private diagnostic}")
+		put(t, root, "index.html", "{#if private diagnostic}")
 		if err := s.Reload(root); err == nil {
 			t.Fatal("expected invalid template")
 		}
@@ -219,7 +219,7 @@ func TestDiagnosticLineIncludesLeadingPageSettings(t *testing.T) {
 	root := fixture(t)
 	s := NewServer(mustLoad(t, root))
 	put(t, root, "custom.layout.html", `<main>{slot}</main>`)
-	put(t, root, "index.html", "<!-- flea\nlayout: /custom.layout.html\n-->\n{bad expression}")
+	put(t, root, "index.html", "<!-- flea\nlayout: /custom.layout.html\n-->\n{#if bad expression}")
 	if err := s.Reload(root); err == nil {
 		t.Fatal("expected invalid template")
 	}

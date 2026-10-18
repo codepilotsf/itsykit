@@ -1,5 +1,20 @@
 # Installation and updates
 
+## 0.16.1 literal-brace fix
+
+The 0.16.1 candidate preserves literal brace groups and raw JSON in ordinary
+HTML text and attributes, including unchanged Impeccable Live parameters.
+Recognizable malformed commands remain errors, and ordinary interpolation,
+contextual escaping and CSRF checks remain active. Encode exact Flea syntax
+with HTML entities when displaying it literally. See README.md for lexical rules.
+
+Install the published release with `flea update`. Server updates are separate:
+run `flea update-server` from a site with the intended saved SSH destination.
+The parser fix requires updating both the CLI used for dev and the production
+server. Deployment protocol remains 25; no content migration is introduced.
+See [0.16.1 verification](agents/release-0161-verification.md) for actual rollout
+status and remaining acceptance limits.
+
 Version 0.15.1 is the current public test release for Apple Silicon macOS and
 AMD64/ARM64 Linux, published October 13, 2026. The installer and `flea update`
 select it from `https://fleacms.com/releases/latest.txt`.

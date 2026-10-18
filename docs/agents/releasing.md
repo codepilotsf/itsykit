@@ -6,8 +6,8 @@ Since 0.7.0, versioned binaries live in the host's separate
 [disk-backed download store](download-hosting.md), not the website Git tree.
 Use the store publication procedure before advancing website latest.txt. Older
 sections describing website version directories are historical staging guidance.
-The current public test release is 0.15.1; see
-[verified publication](release-0151-verification.md) for artifacts, provenance
+The 0.16.1 candidate is based on the published 0.16.0 source; see
+[release verification](release-0161-verification.md) for artifacts, provenance
 and remaining native acceptance limits.
 
 ## V1 distribution plan

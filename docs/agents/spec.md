@@ -304,7 +304,7 @@ The first version has no `routes.json`. Add redirects only when there is a real 
 
 ## Templates
 
-FleaCMS borrows the structural readability of Svelte templates but does not execute JavaScript. It uses single curly braces.
+FleaCMS borrows the structural readability of Svelte templates but does not execute JavaScript. It uses single curly braces for recognized commands and paths. Other balanced brace groups, including raw JSON in attributes, remain literal. Exact syntax can be displayed with `&#123;` and `&#125;`. See README.md, “Literal braces and syntax recognition,” for the lexical boundaries.
 
 ### Layouts and slots
 
