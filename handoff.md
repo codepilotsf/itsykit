@@ -34,7 +34,21 @@ Service is active, recovery is clear, all 18 configured HTTPS hosts return 200,
 and routing/content hashes match the pre-upgrade baseline. Existing memory/swap
 policy is unchanged. Website backup is private at
 `/Users/sean/fleacms-backups/fleacms-before-0.16.1-20261018.tar.gz`.
-Public installation/update receipts follow channel deployment.
+Website source `d59d74e`, activation
+`20261018-174259-d8975e4a784b2f5837ed6ef4`. Public homepage, docs, download links
+and latest.txt agree on 0.16.1. Public fresh installs, reinstalls, updates from
+0.16.0 and already-current checks passed on Mac ARM64, Linux ARM64 and Linux
+AMD64 as nobody; installed hashes match the published manifest. Normal Mac
+`/Users/sean/.local/bin/flea` and Linux `/home/sean/.local/bin/flea` were updated
+through the public updater and report 0.16.1 with matching hashes. The shared
+server also reports 0.16.1, service active and recovery clear.
+
+Only fleacms.com and www.fleacms.com moved release roots; every hosted content
+hash, TLS policy and download mapping matches the baseline. No real email,
+new Ubuntu/systemd installation, clean-machine Mac or notarization acceptance
+was performed. Native AMD64 build/full-suite remains open. Original older
+framework worktree and unrelated website design work remain untouched.
+
 
 ## 0.16.0 published and installed October 13, 2026
 
