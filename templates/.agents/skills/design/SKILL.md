@@ -5,8 +5,10 @@ description: Apply CodePilot design preferences when designing, redesigning, cri
 
 # CodePilot design guidance
 
-Use the installed [Impeccable skill](../impeccable/SKILL.md) for the relevant design
-workflow, alongside these preferences. Keep its upstream payload unchanged.
+Use the globally installed Impeccable skill discovered by the agent runtime
+(currently `~/.agents/skills/impeccable/SKILL.md`) for the relevant design workflow,
+alongside these preferences. Never install, vendor, copy or link Impeccable into
+a project or starter template. Run its global launcher with the project as cwd.
 Preserve the consuming project's stack, design system, product context, pinned
 brand assets and security rules. Do not add another framework or build step to
 follow a toolkit example. These instructions grant no Git, deployment, delegation

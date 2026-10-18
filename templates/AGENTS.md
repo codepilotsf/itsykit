@@ -1,5 +1,10 @@
 # Working on this Flea CMS site
 
+Use only the global Impeccable installation discovered by the agent runtime.
+Never install, vendor, copy or link Impeccable into this project or its templates.
+Run its global launcher with the project as cwd. Keep project design context and
+`.impeccable/` artifacts here. Report a missing global installation.
+
 At task start, read [.agents/skills/core/SKILL.md](.agents/skills/core/SKILL.md).
 Its conversation preferences are defaults; personal preferences and explicit
 user requests override them. Keep personal instructions/configuration intact.
@@ -8,6 +13,8 @@ Before site edits, read [site requirements](.agents/site-requirements.md),
 [README.md](README.md) and [Flea authoring](.agents/skills/fleacms-site/SKILL.md).
 Load [Prewind](.agents/skills/prewind/SKILL.md) for styling and
 [design](.agents/skills/design/SKILL.md) for visual/UX work.
+For coding delegation or independent review, read
+[orchestration](.agents/skills/deepseek-orchestrator/SKILL.md).
 For focused Blog, Contact or site import work, read the matching skill in
 `flea/skills/` without restarting a full-site consultation.
 
