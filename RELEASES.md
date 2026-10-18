@@ -1,5 +1,41 @@
 # Publishing FleaCMS downloads
 
+## 0.16.1 release October 18, 2026
+
+Framework source `57d8378df75c9981bb5fe1af173dbad81ac8afb4`, immutable tag
+`v0.16.1`, based on published 0.16.0. This patch fixes literal brace groups and
+raw JSON in template text/attributes, with matching rich/media/multisnip scanning.
+Impeccable code, metadata and workflow are unchanged. Unreleased modular skills
+on framework main and the original older dirty checkout are excluded/preserved.
+
+Mac ARM64 and Linux ARM64 full tests, vet, full race checks and bundled builds
+passed with real server/Contact bundles. Native new/status/raw-JSON/HTTP/dev-reload
+smoke passed on both and on Linux AMD64 as nobody. AMD64 was cross-compiled on
+Mac; its native build/full suite remains open. Mac signature validation passed;
+clean-machine Mac/notarization remain open. All artifacts use Go 1.27.1 and the
+same Mac-built embedded Linux servers. The ARM64 CLI was built natively from a
+private archive of the exact tagged source; Mac/AMD64 VCS metadata is clean.
+
+The unchanged Impeccable helper passed initial raw JSON parsing, development
+reload, real Tune slider changes (0.5 to 0.8, padding 10px to 16px), and discard
+cleanup in a disposable site using the exact Mac release binary. Temporary dev
+and helper processes were stopped.
+
+Published HTTPS binaries and manifest match the local immutable archive:
+
+```text
+8191404446e6025408b0e23f7bf84b740bc2d475a22164418b015635deee2390  flea-darwin-arm64
+d3162dab92e5e3376cb93aaa4f0aad0b8fc2d36ddb320d45424df02d80fe8199  flea-linux-amd64
+37443e9b9c5e24f58fece7d2185d2d38bccad6e1e62eb190d121863f53de4bc5  flea-linux-arm64
+```
+
+The shared server is verified at 0.16.1 / protocol 25 after supported update-server.
+Service is active, recovery is clear, all 18 configured HTTPS hosts return 200,
+and routing/content hashes match the pre-upgrade baseline. Existing memory/swap
+policy is unchanged. Website backup is private at
+`/Users/sean/fleacms-backups/fleacms-before-0.16.1-20261018.tar.gz`.
+Public installation/update receipts follow channel deployment.
+
 ## 0.16.0 published and installed October 13, 2026
 
 Framework/tag `1c85aae` / `v0.16.0`, clean Go 1.27.1 artifacts. Includes detected
