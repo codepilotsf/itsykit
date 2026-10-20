@@ -70,9 +70,11 @@ path or a legacy shell runner to drive delegation.
   Loading this skill or classifying work as substantial does not grant that permission.
 - The lead may commit, push a scoped task branch and open a linked pull request or GitLab
   merge request when the project's standing policy or the user authorizes it. Follow
-  the `task-delivery` skill for scoped staging and review handoff. Never merge, deploy, publish artifacts,
-  or mutate production without explicit user approval. Otherwise return an uncommitted
-  reviewable diff.
+  the `task-delivery` skill for scoped staging, verification and integration. Standing
+  merge permission lets the lead merge verified work without asking again, subject to
+  required reviews, CI and branch protections. Deployment, releases, production mutations
+  and destructive Git operations still require separate authorization, including automatic
+  CI side effects. When permission is missing, return the reviewable result and name it.
 - Keep ownership, scope, and external-mutation restrictions explicit in every brief.
 
 ## Briefs and handoffs
@@ -96,11 +98,13 @@ path or a legacy shell runner to drive delegation.
 ## Review tiers
 
 - **Low risk:** implementer, then direct lead review of the diff.
-- **Substantial / security / data / architecture / production behavior / concurrency /
-  irreversible operations — or an explicitly requested independent review:** after
-  implementation, run a sequential fresh read-only reviewer and a bounded revision round,
-  then lead scrutiny. Never run the reviewer concurrently with the editing worker in the
-  same checkout.
+- **High risk / explicitly requested independent review:** for changes affecting
+  security boundaries, money movement, data integrity, concurrency or irreversible
+  operations, run a fresh read-only reviewer after implementation, then lead scrutiny.
+  Size, multiple files or several implementation steps alone do not require another
+  reviewer. Existing project-required reviews still apply. Reuse check evidence; the
+  reviewer reruns checks only for a concrete gap or concern. Never overlap the reviewer
+  with an editing worker in the same checkout.
 
 A fresh review round is a **new** `delegate_task`. Include the original brief, the baseline,
 prior findings, fixes, and any unresolved objections. Do not continue a review round by

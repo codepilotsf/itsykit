@@ -2,9 +2,9 @@
 
 Source repository: `git@gitlab.codepilot.com:sean-schertell/master-skills.git`
 
-Pinned source commit: `9bafcc34c270f2387bd8a1c1fbc2d816f0ab99f4`.
+Pinned source commit: `ceeeddea29ab8de0d7adb68584f9379e7adf25c4`.
 Update mode: local review worktrees.
-Selected complete directories: `core`, `task-delivery`, `deepseek-orchestrator`, `design`, `prewind`, `fleacms-site`.
+Selected complete directories: `core`, `efficient-collaboration`, `task-delivery`, `deepseek-orchestrator`, `design`, `prewind`, `fleacms-site`, `copywriting`.
 Shared files match the pinned canonical source, including licenses and provenance.
 Keep project adaptations outside these shared directories.
 

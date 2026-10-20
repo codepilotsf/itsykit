@@ -11,6 +11,8 @@ take precedence. Keep ordinary HTML/JSON and the existing no-build setup.
 
 ## Load the relevant shared guidance
 
+- Drafting or editing website, marketing or product copy: read
+  [copywriting](../copywriting/SKILL.md).
 - Styling, layout, theme or markup: read [prewind](../prewind/SKILL.md).
 - Visual direction, UX, redesign or polish: also read
   [design](../design/SKILL.md), which routes to Impeccable.
