@@ -1,13 +1,16 @@
 ---
 name: task-delivery
-description: Finish a repository task as a scoped, verified, reviewable change. Use for implementation handoff, committing completed work, and opening or updating a draft PR or merge request. Follows the project's standing Git permissions; never grants permission to merge, deploy, publish or include unrelated work.
+description: Finish a repository task as a scoped, verified, reviewable change. Use for implementation handoff, committing completed work, and opening, updating or merging a PR or merge request. Uses owner-authorized routine Git delivery without repeated approval; preserves checks, project constraints and unrelated work.
 ---
 
 # Task delivery
 
 Read the project's root `AGENTS.md` and applicable guides. Explicit user instructions
-take precedence. Determine whether the project authorizes local commits, branch pushes
-and draft PR/MR creation. A recommendation in this skill is not authorization.
+take precedence. Determine whether the project authorizes local commits, branch pushes,
+PR/MR creation and merging. Existing standing permission covers those steps without
+another approval question. The owner-approved CodePilot default is autonomous routine
+Git delivery after verification; a consuming project records its authorization in root
+instructions. This skill alone grants no permission. Honor explicit stop-at-review requests.
 
 ## Start and scope
 
@@ -49,15 +52,35 @@ and draft PR/MR creation. A recommendation in this skill is not authorization.
   server. If a tool cannot isolate a resource, serialize that operation through the
   coordinator. Worktrees share Git objects, refs and usually configuration; coordinate
   repository-wide Git changes, and never modify another task's branch or worktree.
-- Deliver one scoped draft PR/MR per independent task. Before an approved merge, inspect
-  changes to the target branch since the recorded base. Reconcile overlap in the task's
-  worktree and rerun checks invalidated by the combined changes. The coordinator integrates
-  overlapping tasks sequentially, with explicit merge approval. Earlier review or passing
-  checks alone do not establish that the combined result works.
+- Deliver a scoped change per independent task, using a PR/MR when that is the project's
+  integration workflow. Before merging, inspect target changes since the recorded base.
+  Reconcile overlap in the task worktree and rerun checks invalidated by the combination.
+  Integrate overlapping tasks sequentially. With standing merge permission, continue
+  without asking again; earlier checks on an outdated diff do not verify the combination.
 - Keep worktrees and branches through review. Remove them only after merge or explicit
   abandonment, with the owner's approval and confirmation that no needed dirty, untracked,
   ignored or unpushed work remains and task-owned servers have stopped. Never force-remove
   worktrees, automatically prune other agents' work, or delete another task's branch.
+
+## Choose proportionate verification
+
+Define checks by changed behavior and failure impact, not file count or a fixed
+ritual. Honor required repository checks and CI; these defaults do not weaken them.
+
+- Prose, skill or configuration guidance with no runtime change: review accuracy,
+  links, format and consistency. Do not run unrelated application suites.
+- Isolated behavior changes: exercise the changed path and meaningful failure cases;
+  use focused existing tests and add regression coverage when it proves useful behavior.
+- Authentication, permissions, payments, data integrity, concurrency and shared
+  infrastructure: include affected integration boundaries and required broader suites.
+  Use browser checks for changed critical user journeys, not every internal edit.
+
+During iteration, run focused checks. Run the required broader set on the final
+candidate and reuse passing results until later changes, target-branch movement or
+unresolved concerns invalidate them. Do not write tests that merely mirror the code,
+add runtime suites for formatting-only edits, or repeat another agent's checks without
+an evidence gap. Never delete tests, weaken assertions, bypass protected components
+or silently reduce mandatory coverage for speed. Report unverified boundaries plainly.
 
 ## Complete and review
 
@@ -70,7 +93,7 @@ Preserve check evidence and state unverified limits. Failed required checks mean
 task is not ready. Report a blocker or, when authorized and useful, open an explicitly
 incomplete draft for review; never claim it is completed or ready to merge.
 
-## Commit and draft review
+## Commit, review and integrate
 
 If standing project policy already authorizes these steps, perform them without another
 permission question. Otherwise finish the concrete diff and checks first, then request
@@ -80,18 +103,29 @@ only the missing authorization with the policy's location and reason.
    bulk staging to sweep in unrelated files. Inspect the entire staged diff before a
    scoped conventional commit. If unrelated work is staged, resolve ownership rather
    than committing or unstaging it silently.
-2. Push only the task branch to the intended remote. Do not force-push, merge, rebase
-   another person's history, push tags or publish releases without authorization.
-3. Open a draft PR/MR against the intended base branch, or update the existing one for
-   this task rather than creating duplicates. Describe the concrete problem, resulting
-   behavior, checks and remaining limits. Draft status and rejection leave the target
-   branch unchanged, but a push may trigger CI; keep secrets and private state out.
+2. Push only the task branch to the intended remote. Inspect applicable CI/deployment
+   configuration before pushing or merging. If it triggers deployment or another action
+   outside standing permission, obtain that authorization first. Do not force-push,
+   rewrite another person's history, push release tags or publish releases without authorization.
+3. Open or update the task's PR/MR when the project uses that workflow; avoid duplicates.
+   Describe the problem, resulting behavior, checks and limits. Use draft status while
+   incomplete or when requested. Keep secrets and private state out.
 4. Register the full review URL with the app's PR-linking tool when available. Before
    finishing, verify that every review request worked on is linked. Report a linking
    failure accurately. Use app-native watching only if the user asks for monitoring.
 
-Stop at review. Merge, deployment, production changes and release publication require
-their own explicit approval. Approval to open a review is not approval for those steps.
+5. With standing merge permission, finish required reviews and CI and merge the verified
+   task through the project's supported workflow. Do not bypass branch protections,
+   unresolved objections or failing checks. For local integration, use a clean target
+   checkout and prefer fast-forward integration when possible. Preserve unrelated edits;
+   do not reset, stash or switch another task's checkout to force integration.
+
+Stop at review when explicitly requested or when a real blocker prevents integration.
+Deployment, production changes, releases and destructive Git operations still require
+separate authorization. Routine merge permission does not authorize their CI side effects.
+
+For a requested undo, inspect subsequent changes and prefer a scoped revert commit.
+Handle merge reverts with the correct mainline; do not reset or force-push shared history.
 
 ## Handoff
 

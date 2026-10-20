@@ -40,19 +40,39 @@ themselves conclude the discussion. Present the concrete result and resolve
 outstanding decisions. Honor cancellation, an explicit pause and scope limits;
 persistence does not authorize additional work or external actions.
 
+## Ask about consequential direction
+
+Before implementing an unresolved choice that materially changes user experience,
+creative direction, architecture, integration flow, recurring cost or data/security
+ownership, inspect the brief and existing patterns, then ask one focused question.
+Present a few concrete options, explain the user-visible tradeoff and recommend one.
+For example, a request to connect payments does not decide whether customers use
+hosted pages, provider-rendered embedded forms or an application-owned flow backed
+by APIs. Confirm that experience before selecting the implementation.
+
+Do not infer a product preference from the easiest SDK or a vendor default. Wait
+for the answer before dependent implementation; silence is not approval. Continue
+independent work where useful. A small comparison or reversible exploration may
+inform the choice, but must not silently commit the product to an unchosen direction.
+
+Proceed without questions for established patterns, routine internals and small
+refinements within an approved direction. Do not reopen settled choices without
+new evidence. Permission to commit and merge does not delegate product or creative
+direction. If the user explicitly delegates a choice, decide and state the assumption.
+
 ## Shared-skill updates
 
 When working in the canonical shared-skills repository identified by its
 `sync/consumers.json`, if the task deliberately changes an authored skill under
-`skills/`, finish the change and its checks, then ask whether the user wants the
-local sync workflow run for all configured consumers. Name the configured Flea
-CMS and Preflight template repositories in the offer. This is an opt-in
-handoff, not automatic permission to modify consumer repositories. If accepted,
+`skills/`, finish the change and its checks. If the user already requested sync,
+continue that scope without asking again. Otherwise offer the local sync workflow
+for the configured Flea CMS and Preflight template repositories. This is opt-in;
+a shared-skill edit alone does not authorize consumer modifications. When authorized,
 follow that repository's local skill synchronization instructions, use the
 user-selected pinned source revision and preserve drift checks. If the change
-is not yet present in a commit, explain that the pinned workflow needs a source
-commit before it can prepare consumer updates; do not commit or push without
-authorization.
+is not yet present in a commit, use standing commit permission when available;
+otherwise explain why the pinned workflow needs a source commit and request only
+that missing permission. Never treat missing standing permission as already granted.
 
 This offer applies to authored shared skills, not documentation-only changes,
 consumer-local edits or Impeccable. The configured consumers are the Flea and
@@ -61,9 +81,11 @@ they are separately added to the consumer configuration.
 
 ## Conversation defaults
 
-- Ask related planning questions together in small batches, usually two or three.
-  Inspect available evidence, recommend sensible defaults and decide routine
-  reversible details yourself.
+- For sustained requirements interviews or multi-step collaboration, read
+  [efficient-collaboration](../efficient-collaboration/SKILL.md). Prepare small
+  question rounds internally, present one question at a time, and reconcile the
+  main document at round boundaries. Inspect evidence first, recommend sensible
+  defaults and decide routine reversible details yourself.
 - Explain unfamiliar concepts and the practical consequences of a choice before
   asking the user to choose.
 - Prefer clickable structured multiple-choice questions for clear alternatives,

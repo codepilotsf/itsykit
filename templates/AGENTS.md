@@ -21,9 +21,23 @@ For focused Blog, Contact or site import work, read the matching skill in
 - Preserve content, custom layouts, assets, authentication and CSRF contracts.
   Keep secrets and agent guidance out of public assets and deployment.
 - Ask before adding dependencies, backward compatibility or changing access or
-  deployment settings. Do not commit, deploy or publish unless authorized.
+  deployment settings. Deployment, releases and production mutations require
+  separate authorization.
 - Default implementation tasks to separate worktrees using the
   [delivery skill](.agents/skills/task-delivery/SKILL.md); coordinate runtime
   resources. Use one agent unless delegation is authorized.
 
 Follow the site's requirements and run relevant checks before claiming completion.
+
+## Owner-authorized delivery and decisions
+
+Routine scoped commits, task-branch pushes, PR/MRs and verified merges are
+owner-authorized without per-step approval. Respect required reviews, CI and
+branch protections. Honor explicit stop-at-review requests. Preserve unrelated
+work and prefer scoped revert commits for requested undo work. Deployment,
+releases, destructive Git operations and production mutations still require
+separate authorization, including automatic effects of pushes or merges.
+
+Follow core's consequential-direction rule: ask before unresolved product,
+creative, architecture or integration choices; proceed within approved direction.
+Follow task-delivery's proportionate verification guidance; preserve required checks.

@@ -6,7 +6,7 @@ This is the framework repository; `templates/` is the canonical starter.
 ## Start here
 
 - Inspect `git status --short` before editing. Preserve existing modified,
-  deleted and untracked work. Do not reset, bulk-stage or commit without permission.
+  deleted and untracked work. Never reset or bulk-stage unrelated work.
 - Use [next-steps.md](docs/agents/next-steps.md) for the agreed V1 scope, sprint order and
   release criteria, and [checklist.md](docs/agents/checklist.md)
   for manual QA; preserve the user's checklist answers. Neither authorizes
@@ -216,3 +216,16 @@ assumptions when warranted. CLI messages should explain what happened and the
 next action, with readable spacing; avoid raw subprocess commands, exit codes
 and Git jargon in routine errors without hiding useful diagnostic context.
 Finish with what changed, what was checked and any remaining limits.
+
+## Owner-authorized Git delivery
+
+Routine scoped commits, task-branch pushes, PR/MRs and verified merges are
+owner-authorized without per-step approval. Respect branch protections, required
+reviews and CI. Honor explicit stop-at-review requests. Preserve unrelated work;
+use scoped revert commits when an undo is requested. Deployment, releases,
+production mutations and destructive Git operations need separate authorization,
+including when triggered automatically by pushing or merging.
+
+Ask before unresolved consequential product, creative, architecture or integration
+choices. Inspect existing context, recommend an option and wait before dependent
+implementation. Proceed autonomously for routine details within approved direction.
