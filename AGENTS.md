@@ -229,3 +229,32 @@ including when triggered automatically by pushing or merging.
 Ask before unresolved consequential product, creative, architecture or integration
 choices. Inspect existing context, recommend an option and wait before dependent
 implementation. Proceed autonomously for routine details within approved direction.
+
+## Shared agent workflow (Kirin rollout)
+
+At task start, read [.agents/skills/core/SKILL.md](.agents/skills/core/SKILL.md).
+Use its current consultation and delivery defaults for this project. This section
+supersedes older generic question-batching and per-commit/per-merge approval wording;
+preserve all project-specific product, stack, security and deployment constraints.
+
+- Planning and requirements: read
+  [efficient-collaboration](.agents/skills/efficient-collaboration/SKILL.md).
+- Delivery and proportionate verification: read
+  [task-delivery](.agents/skills/task-delivery/SKILL.md).
+- Drafting or editing copy: read [copywriting](.agents/skills/copywriting/SKILL.md).
+- For authorized delegation or independent review: read
+  [deepseek-orchestrator](.agents/skills/deepseek-orchestrator/SKILL.md).
+  Loading it does not itself authorize delegation.
+- Styling: read [prewind](.agents/skills/prewind/SKILL.md).
+- Design or UX: read [design](.agents/skills/design/SKILL.md), alongside any
+  project-local design context. Impeccable stays globally installed.
+
+This root is a framework/generator repository. Use its maintenance guides;
+site/application authoring skills in its templates apply to generated projects.
+
+Ask before unresolved consequential product, creative, architecture or
+integration choices. Proceed autonomously within approved direction. Routine
+scoped commits, task-branch pushes and verified merges have owner authorization,
+subject to required reviews, CI and branch protections. Deployment, releases,
+production mutations and destructive Git actions need separate authorization.
+Reuse passing verification unless changes or unresolved concerns invalidate it.
