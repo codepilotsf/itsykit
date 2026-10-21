@@ -128,8 +128,8 @@ func fileHash(f *os.File) (string, error) {
 }
 
 func (u updater) run(ctx context.Context, current string, out io.Writer) error {
-	if u.system != "darwin" && u.system != "linux" || u.arch != "arm64" && u.arch != "amd64" {
-		return fmt.Errorf("automatic updates are unavailable for this platform")
+	if !(u.system == "darwin" && u.arch == "arm64" || u.system == "linux" && u.arch == "amd64") {
+		return fmt.Errorf("automatic updates support Apple Silicon macOS and x86-64 Linux")
 	}
 	var latest, manifest strings.Builder
 	if err := u.download(ctx, "latest.txt", &latest, 128); err != nil {

@@ -47,6 +47,9 @@ No Go or source checkout is needed on either machine. Extract the matching gzip
 server from the CLI, verify its bundled SHA-256 and static Linux ELF architecture,
 then upload. Limit extraction to 100 MiB, honor cancellation and remove failed
 outputs. No network/compiler fallback. Never import serverbundle from the server.
+Build CLIs on Apple Silicon macOS or x86-64 Linux; Linux ARM64 CLI builds are
+no longer supported. ARM64 Linux servers remain supported through cross-compilation,
+with native server acceptance recorded separately.
 Build with bash scripts/build.sh: refresh both CGO-disabled Linux variants before
 embedding into the native CLI. Plain go build may embed stale assets. CI still
 builds/tests on native Linux/Mac runners; see docs/agents/releasing.md.

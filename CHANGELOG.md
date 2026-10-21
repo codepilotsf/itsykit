@@ -6,6 +6,12 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.18.0 - 2026-10-21
+
+- Stop publishing Linux ARM64 CLI downloads. The installer and updater support
+  Apple Silicon macOS and x86-64 Linux. Both CLIs continue to bundle servers for
+  x86-64 and ARM64 Linux; ARM64 server builds are cross-compiled, with native
+  acceptance recorded separately. Existing published downloads remain available.
 - Create sites in existing empty directories with `flea new .` or a directory
   path. Refuse nonempty directories, including hidden files, without overwriting.
 - Keep Impeccable globally installed instead of bundling it into generated sites.

@@ -1,5 +1,10 @@
 # QA checklist
 
+Current platform matrix from 0.18.0: Apple Silicon macOS and x86-64 Linux CLIs.
+Both bundle x86-64 and cross-compiled ARM64 Linux servers; record native ARM64
+server acceptance separately. Linux ARM64 CLI downloads are discontinued.
+Earlier dated results below retain their historical scope and checklist answers.
+
 Use a fresh test site and the rebuilt CLI. Restart any existing dev server after
 updating the binary. Mark each result **Pass**, **Fail**, or **Skipped**, and add
 notes inline. For failures, include what you did and what happened. Do not paste

@@ -1,6 +1,6 @@
 # FleaCMS release and deployment runbook
 
-Updated October 18, 2026 for the 0.17.0 release. This is an operator guide,
+Updated October 21, 2026 for the 0.18.0 release. This is an operator guide,
 not authorization to publish or change a server. Recheck paths, branch mappings,
 host settings and live versions before each release. Read the repository's
 AGENTS.md, [release guide](releasing.md), [deployment requirements](deployment.md)
@@ -84,11 +84,11 @@ and exercise changed behavior using the exact final artifacts. Stop test servers
 Confirm the installed CLI path/version separately from `bin/flea`.
 
 The preferred release matrix uses native runners through `scripts/release.sh`:
-Linux AMD64/ARM64 server builds, then Mac ARM64 and Linux AMD64/ARM64 CLI builds
-embedding both servers. See releasing.md for prerequisites. Run
+native Linux AMD64 server checks/builds plus a cross-compiled ARM64 server,
+then native Mac ARM64 and Linux AMD64 CLI builds embedding both servers.
+An ARM64 Linux runner is optional for native server acceptance; record any gap. See releasing.md for prerequisites. Run
 `CI_COMMIT_TAG=v<version> bash scripts/stage-release.sh` only with verified
-`dist/flea-darwin-arm64`, `dist/flea-linux-amd64` and `dist/flea-linux-arm64`
-artifacts. It stages files; it does not upload them. Use a fresh staging directory rather than overwriting one.
+`dist/flea-darwin-arm64` and `dist/flea-linux-amd64` artifacts. It stages files; it does not upload them. Use a fresh staging directory rather than overwriting one.
 
 For 0.6.1, Linux AMD64 was cross-compiled on the Mac after refreshing bundles:
 
@@ -268,7 +268,7 @@ Check the public homepage, docs, `latest.txt`, all platform download URLs, check
 installer and social-preview image. Check Bookworm after shared-service restarts.
 Verify both public HTTPS status and relevant body contents, not status alone.
 
-On Mac ARM64 and native Linux AMD64/ARM64:
+On Mac ARM64 and native Linux AMD64:
 
 1. Download the public installer and install into a fresh absolute directory using
    `FLEA_INSTALL_DIR`. Keep this separate from the user's normal installation.

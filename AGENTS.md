@@ -178,6 +178,10 @@ build script, set `GO_BINARY=/usr/local/go/bin/go` if necessary.
 Browser tests use
 `FLEA_TEST_BROWSER='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'`.
 
+CLI builds and public releases support Apple Silicon macOS and x86-64 Linux.
+Do not publish a Linux ARM64 CLI. Both CLIs retain the cross-compiled ARM64 server;
+record native ARM64 server acceptance separately rather than requiring an ARM64
+Linux runner for every release. Preserve historical published downloads.
 When a build is required, use `scripts/build.sh`: it refreshes
 the matching Contact child before each parent, then both embedded Linux servers
 before building `bin/flea`. Plain `go build` can

@@ -1,5 +1,24 @@
 # Installation and updates
 
+## 0.18.0
+
+0.18.0 adds `flea new .` and creation in existing empty directories. Hidden
+files and `.git` count as content; nonempty directories are refused without
+an overwrite prompt. Folder-derived naming and Git setup are preserved.
+
+Supported CLI downloads are Apple Silicon macOS and x86-64 Linux. Linux ARM64
+CLI downloads are discontinued; an existing ARM64 CLI cannot update to 0.18.0,
+and the installer rejects ARM64 Linux before changing an installation. Older
+published artifacts remain available at their immutable versioned URLs.
+Both supported CLIs still deploy to x86-64 or ARM64 Linux servers. ARM64 servers
+are cross-compiled; native server acceptance is recorded separately. Deployment
+protocol stays 26 and app wire protocol 2. No server upgrade is required for
+this CLI creation feature.
+
+See [0.18.0 verification](agents/release-0180-verification.md) for publication,
+artifact hashes and the actual platform checks. Historical records below describe
+their original platform matrix, not current download support.
+
 ## 0.17.0
 
 Published October 18, 2026. Source `fe15b8934165a90390c8bd4ff88cc5e9c9e0d753`
