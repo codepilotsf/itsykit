@@ -687,7 +687,7 @@ Required deployment properties:
 Keep the initial command surface small:
 
 ```text
-flea new <site-name>
+flea new <directory>
 flea dev
 flea setup
 flea deploy
@@ -714,8 +714,14 @@ flea rollback
 - Initial host listens publicly on HTTP port 80. Deploy and HTTPS are subsequent
   explicit commands; no firewall changes are made.
 
-`flea new <site-name>`
+`flea new <directory>`
 
+- Accepts relative or absolute directory paths; `.` selects the current directory.
+  Creates a missing directory when its parent exists. Existing directories must
+  be completely empty, including hidden files and `.git`; files and directory
+  symlinks are rejected without writing. No overwrite confirmation is offered.
+  The destination folder supplies the usual naming defaults; interactive dev
+  still asks for the display name on first run.
 - Creates a minimal layout/index site by default. `--starter`/`-s` adds the
   complete example site, including six fictional team members and contact pages.
   Native HTML popover navigation supplies the mobile menu without JavaScript.

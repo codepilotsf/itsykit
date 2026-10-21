@@ -87,7 +87,10 @@ development rules. docs/agents/spec.md also describes features that are not impl
 ## Where to start
 
 Local site creation composes the canonical starter with embedded minimal content
-overrides by default; `--starter` opts into the examples. `cli/reset.go` validates
+overrides by default; `--starter` opts into the examples. Creation accepts a new
+or empty directory, including the current directory via `flea new .`; the CLI
+checks emptiness before scaffold writes confined by os.Root with exclusive file
+creation. It refuses nonempty directories and linked targets. `cli/reset.go` validates
 a fresh minimal tree before confirmation, takes the dev/pull lock, and moves old
 entries (except .git) to a mode-0700 sibling backup before publishing the new tree.
 Ordinary failures attempt rollback; interruptions leave the printed backup and

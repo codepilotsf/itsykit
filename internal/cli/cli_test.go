@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/fs"
 	"net/http"
@@ -20,48 +21,57 @@ import (
 )
 
 func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
-	root := filepath.Join(t.TempDir(), "site")
-	if err := createSite(root, true); err != nil {
-		t.Fatal(err)
-	}
-	err := fs.WalkDir(templates.Files, ".", func(name string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if entry.IsDir() {
-			return nil
-		}
-		want, err := templates.Files.ReadFile(name)
-		if err != nil {
-			return err
-		}
-		got, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(name)))
-		if err != nil {
-			return err
-		}
-		if !bytes.Equal(got, want) {
-			t.Errorf("generated %s differs from embedded template", name)
-		}
-		return nil
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, name := range []string{".flea.config.json", "flea/snips.json", "site/main.layout.html", "site/_404.html", "site/_500.html"} {
-		if _, err := os.Stat(filepath.Join(root, name)); err != nil {
-			t.Fatal(err)
-		}
-	}
-	if _, err := os.Stat(filepath.Join(root, "embed.go")); !os.IsNotExist(err) {
-		t.Fatal("embedding code must not be scaffolded")
-	}
-	for _, skill := range []string{"core", "task-delivery", "deepseek-orchestrator", "design", "prewind", "fleacms-site"} {
-		if _, err := os.Stat(filepath.Join(root, ".agents/skills", skill, "SKILL.md")); err != nil {
-			t.Fatalf("generated site missing shared skill %s: %v", skill, err)
-		}
-	}
-	if _, err := os.Lstat(filepath.Join(root, ".agents/skills/impeccable")); !os.IsNotExist(err) {
-		t.Fatal("Impeccable must remain globally installed, not bundled in generated sites")
+	for _, existing := range []bool{false, true} {
+		t.Run(fmt.Sprintf("existing=%t", existing), func(t *testing.T) {
+			root := filepath.Join(t.TempDir(), "site")
+			if existing {
+				if err := os.Mkdir(root, 0755); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if err := createSite(root, true); err != nil {
+				t.Fatal(err)
+			}
+			err := fs.WalkDir(templates.Files, ".", func(name string, entry fs.DirEntry, err error) error {
+				if err != nil {
+					return err
+				}
+				if entry.IsDir() {
+					return nil
+				}
+				want, err := templates.Files.ReadFile(name)
+				if err != nil {
+					return err
+				}
+				got, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(name)))
+				if err != nil {
+					return err
+				}
+				if !bytes.Equal(got, want) {
+					t.Errorf("generated %s differs from embedded template", name)
+				}
+				return nil
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, name := range []string{".flea.config.json", "flea/snips.json", "site/main.layout.html", "site/_404.html", "site/_500.html"} {
+				if _, err := os.Stat(filepath.Join(root, name)); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if _, err := os.Stat(filepath.Join(root, "embed.go")); !os.IsNotExist(err) {
+				t.Fatal("embedding code must not be scaffolded")
+			}
+			for _, skill := range []string{"core", "task-delivery", "deepseek-orchestrator", "design", "prewind", "fleacms-site"} {
+				if _, err := os.Stat(filepath.Join(root, ".agents/skills", skill, "SKILL.md")); err != nil {
+					t.Fatalf("generated site missing shared skill %s: %v", skill, err)
+				}
+			}
+			if _, err := os.Lstat(filepath.Join(root, ".agents/skills/impeccable")); !os.IsNotExist(err) {
+				t.Fatal("Impeccable must remain globally installed, not bundled in generated sites")
+			}
+		})
 	}
 }
 
@@ -88,7 +98,7 @@ func TestHelpWithoutSite(t *testing.T) {
 
 func TestCLI(t *testing.T) {
 	t.Chdir(t.TempDir())
-	for _, args := range [][]string{{"unknown"}, {"upgrade"}, {"update", "extra"}, {"new"}, {"new", "../escape"}, {"dev", "-port", "-1"}, {"status", "extra"}, {"setup", "extra"}, {"deploy", "extra"}, {"https", "extra"}} {
+	for _, args := range [][]string{{"unknown"}, {"upgrade"}, {"update", "extra"}, {"new"}, {"new", "--unknown"}, {"dev", "-port", "-1"}, {"status", "extra"}, {"setup", "extra"}, {"deploy", "extra"}, {"https", "extra"}} {
 		if code := Run(context.Background(), args, io.Discard, io.Discard); code != 2 {
 			t.Fatalf("%v returned %d", args, code)
 		}
