@@ -1,19 +1,58 @@
 # Publishing FleaCMS downloads
 
-## 0.18.0 preparation, October 21, 2026
+## 0.18.0 published October 21, 2026
 
-This release adds `flea new .` and paths to new or existing empty project
-directories. Hidden files and `.git` count as content; nonempty destinations are
-refused without overwriting. Existing naming and initial Git commit behavior remain.
+Framework source `7ab8f6ea022f276600bc373d7353559c8552bc11`, immutable tag
+`v0.18.0`, merged as `f02af1d` (MR !16). Adds `flea new .` and relative/absolute
+paths into new or existing completely empty project directories. Hidden files
+and `.git` count as content; nonempty destinations are refused without overwriting.
+Existing folder-derived naming and initial Git commit behavior are preserved.
 
-Supported CLI downloads are Apple Silicon macOS and x86-64 Linux. Linux ARM64
-CLI downloads are discontinued. Both supported CLIs retain the cross-compiled
-ARM64 Linux server; native ARM64 server acceptance is recorded separately.
-Published old downloads remain immutable and available. Deployment protocol is
-26 and app wire protocol is 2; no server upgrade is required for this CLI feature.
+Linux ARM64 CLI downloads are discontinued. Supported CLIs are Apple Silicon
+macOS and x86-64 Linux; both retain the cross-compiled ARM64 Linux server.
+Native ARM64 server acceptance is recorded separately and was not run because
+Asahi was offline. Published older binaries and hashes remain immutable.
 
-Framework release source, hashes, supported-platform checks, publication and
-website activation receipts are pending and will be recorded after verification.
+Native Mac ARM64 (Go 1.27.1) and Linux AMD64 (Go 1.26.9) full tests, race, vet and
+bundled builds pass. Both final CLIs embed the same native AMD64/cross-compiled
+ARM64 Linux server binaries. Exact final binaries and public installed binaries
+pass current-directory creation, initial commit, starter parity, status and
+nonempty/hidden-file/symlink refusal checks. Mac ad-hoc signature verification
+passes; clean-Mac acceptance and notarization remain unverified.
+
+```text
+e6b9a3dde2a7e832501d7df2bfe1acb6c9c7a2bf1789e88de14205631fc81a5f  flea-darwin-arm64
+eb0c6659cd032c72a38fc1989252217d5629cdec66e10ee35189e3b7cbb5d6ae  flea-linux-amd64
+```
+
+The two-file public manifest and anonymous HTTPS downloads match those hashes.
+The new installer is byte-identical to canonical. Fresh install, reinstall,
+update from public 0.17.0 and already-current checks passed as the ordinary user
+on both supported platforms, with matching installed hashes. Checks used
+isolated installation directories; normal CLI installations were not replaced.
+
+The version directory was validated and installed without overwrite under the
+deployment lock. The existing shared server restarted to load its catalogue;
+an immediate loopback probe raced startup, while subsequent readiness and all
+public checks passed. Production remains **0.17.0 / protocol 26**; no executable
+server upgrade is needed for this CLI feature. App wire protocol stays 2.
+Memory/swap safeguards are intact and no recovery journal remains.
+
+Website MR !5 merged as `1c786f2daad2c5489207eac840ed954654536655`, deployed as
+`20261021-174934-4dbfcc67281f82d2e68b36a4`. `latest.txt` selects 0.18.0 and live
+homepage/docs show the current platform matrix and empty-directory instructions.
+Website status reports matching deployed code/content from that commit. All 19
+configured HTTPS hostnames return 200, host policy and non-website release roots
+are unchanged, and every editable-content hash is preserved.
+
+The previous 0.17.0 manifest and ARM64 CLI still resolve; the old ARM64 binary
+still matches `8c0ac734abf2dcbb2e9aac6e808a74c83040c21d067c2a3c1906c7fe0b96b09d`.
+Task-owned preview was stopped. Native ARM64 server execution, clean-Mac,
+notarization and real email remain unverified. Tag CI pipeline 481 was pending
+runners at publication; this release used the recorded manual native checks.
+Private evidence is under `/home/sean/fleacms-releases/0.18.0` and
+`/Users/sean/fleacms-releases/0.18.0`. These receipt-only follow-up changes do not
+alter the deployed website snapshot.
 
 ## 0.17.0 release October 18, 2026
 
