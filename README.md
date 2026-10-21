@@ -22,9 +22,17 @@ flea dev
 ```
 
 Install the public test release with `curl -fsSL https://fleacms.com/install.sh | bash`.
-Downloads cover Apple Silicon macOS and AMD64/ARM64 Linux. See
+Downloads cover Apple Silicon macOS and x86-64 Linux. Linux ARM64 CLI downloads
+are discontinued from 0.18.0; both supported CLIs retain ARM64 Linux server
+deployment support. Older published downloads remain available. See
 https://fleacms.com/docs#installation for PATH setup and current testing limits.
 This generated folder already is a site, so you can skip directly to `flea dev`.
+Use `flea new .` to create a site in the current empty directory, or pass a
+relative or absolute directory path. Flea creates a missing directory when its
+parent exists. Existing directories must be completely empty, including hidden
+files and `.git`; file targets and directory symlinks are refused. The folder
+name supplies the default site name, which first-run dev lets you change.
+
 `flea new` creates a clean layout and editable homepage. Use `flea new --starter
 foobar` (or `-s`) for example pages, a six-person fictional team and a contact form.
 Navigation uses a native HTML popover on mobile, with no menu JavaScript.
@@ -87,7 +95,9 @@ This validates the site without rewriting files. Review your changes, then commi
 the templates and extracted content together.
 
 New sites have a Git repository on `main`, unless created with `--skip-git` or
-without Git installed. Flea does not make an initial commit.
+without Git installed. Flea creates an `Initial site` commit using your normal
+Git identity, hooks and signing settings, then prints commands to connect and
+push a remote repository. A failed commit preserves the site with retry instructions.
 
 ## Project structure
 

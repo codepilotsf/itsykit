@@ -1,5 +1,20 @@
 # fleacms.com website handoff
 
+## 0.18.0 preparation, October 21, 2026
+
+This release adds `flea new .` and paths to new or existing empty project
+directories. Hidden files and `.git` count as content; nonempty destinations are
+refused without overwriting. Existing naming and initial Git commit behavior remain.
+
+Supported CLI downloads are Apple Silicon macOS and x86-64 Linux. Linux ARM64
+CLI downloads are discontinued. Both supported CLIs retain the cross-compiled
+ARM64 Linux server; native ARM64 server acceptance is recorded separately.
+Published old downloads remain immutable and available. Deployment protocol is
+26 and app wire protocol is 2; no server upgrade is required for this CLI feature.
+
+Framework release source, hashes, supported-platform checks, publication and
+website activation receipts are pending and will be recorded after verification.
+
 ## 0.17.0 release October 18, 2026
 
 Framework source `fe15b8934165a90390c8bd4ff88cc5e9c9e0d753`, immutable tag
