@@ -2,6 +2,12 @@
 
 ## 0.18.0
 
+Published October 21, 2026 from `7ab8f6e`, immutable tag `v0.18.0`. Both supported
+native CLIs passed full tests, race, vet, bundled builds and public install,
+reinstall, update from 0.17.0 and already-current checks with matching hashes.
+The live website and public update channel select 0.18.0. Production remains
+0.17.0 / protocol 26; this feature required no executable server upgrade.
+
 0.18.0 adds `flea new .` and creation in existing empty directories. Hidden
 files and `.git` count as content; nonempty directories are refused without
 an overwrite prompt. Folder-derived naming and Git setup are preserved.

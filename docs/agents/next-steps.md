@@ -17,13 +17,23 @@ acceptance remain open.
 
 ## Current release status (October 21, 2026)
 
-### 0.18.0 preparation
+### Public 0.18.0
 
-The 0.18.0 release adds empty-directory site creation and discontinues Linux
-ARM64 CLI downloads. Supported CLIs are Apple Silicon macOS and x86-64 Linux.
-Both retain the cross-compiled ARM64 server; native ARM64 server testing is a
-separate acceptance record. Publication, native supported-CLI checks and website
-rollout are pending; see [0.18.0 verification](release-0180-verification.md).
+0.18.0 is published from `7ab8f6e` / immutable `v0.18.0`, merged as `f02af1d`.
+It adds creation in existing empty directories and discontinues Linux ARM64 CLI
+downloads. Native Mac ARM64 and Linux AMD64 full tests, vet, race, bundled builds,
+public installer/reinstaller and 0.17.0-to-0.18.0 updater checks pass.
+
+Both CLIs retain the cross-compiled ARM64 server; native ARM64 server acceptance
+was not run and is recorded separately. Production remains 0.17.0 / protocol 26;
+this CLI feature required no executable server upgrade. Website `1c786f2`,
+activation `20261021-174934-4dbfcc67281f82d2e68b36a4`, advances the public channel
+and docs. All 19 HTTPS hosts are healthy, all editable-content hashes are
+preserved, and recovery is clear. Old published ARM64 downloads remain available.
+
+Native AMD64 build/full-suite acceptance now passes for 0.18.0. Native ARM64
+server execution, clean-Mac, notarization and real email remain unverified.
+See [release verification](release-0180-verification.md).
 
 ## Previous release status (October 18, 2026)
 
