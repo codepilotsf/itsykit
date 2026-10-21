@@ -7,6 +7,12 @@ source "$(dirname "$0")/version.sh"
 version=$(flea_version release)
 [[ "$arch" == amd64 || "$arch" == arm64 ]] || exit 1
 [[ "$(go env GOHOSTARCH)" == "$arch" ]] || { echo 'Use a native runner for this architecture.' >&2; exit 1; }
+if [[ "$kind" == client ]]; then
+  case "$(go env GOHOSTOS)-$arch" in
+    darwin-arm64|linux-amd64) ;;
+    *) echo 'CLI releases support Apple Silicon macOS and x86-64 Linux.' >&2; exit 1 ;;
+  esac
+fi
 export GOARCH="$arch"
 unset GOOS
 bash scripts/bundle-app.sh "$(go env GOHOSTOS)" "$arch"
@@ -21,6 +27,10 @@ if [[ "$kind" == server ]]; then
   file="dist/flea-server-linux-$arch"
   CGO_ENABLED=0 go build -trimpath -ldflags "$flags" -o "$file" ./cmd/flea-server
   "$file" -protocol
+  if [[ "$arch" == amd64 ]]; then
+    bash scripts/bundle-app.sh linux arm64
+    CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "$flags" -o dist/flea-server-linux-arm64 ./cmd/flea-server
+  fi
 elif [[ "$kind" == client ]]; then
   system=$(go env GOHOSTOS)
   [[ "$system" == darwin || "$system" == linux ]] || exit 1

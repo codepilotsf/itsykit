@@ -15,7 +15,17 @@ workflow verification are separate planned tasks. Theme removal is included in
 public 0.15.1. Native AMD64 build/full-suite, clean-Mac and notarization
 acceptance remain open.
 
-## Current release status (October 18, 2026)
+## Current release status (October 21, 2026)
+
+### 0.18.0 preparation
+
+The 0.18.0 release adds empty-directory site creation and discontinues Linux
+ARM64 CLI downloads. Supported CLIs are Apple Silicon macOS and x86-64 Linux.
+Both retain the cross-compiled ARM64 server; native ARM64 server testing is a
+separate acceptance record. Publication, native supported-CLI checks and website
+rollout are pending; see [0.18.0 verification](release-0180-verification.md).
+
+## Previous release status (October 18, 2026)
 
 ### Public 0.17.0
 

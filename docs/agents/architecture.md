@@ -140,7 +140,8 @@ and waits for its watcher, HTTP shutdown and development-lock release before
 loading the project. Pull/reset do not expose this endpoint and remain exclusive.
 The lock remains authoritative; stale sockets never authorize concurrent writes.
 Build both Linux servers before embedding their compressed bytes and hashes into
-the CLI. Setup validates extraction before reset confirmation/upload. There is
+the CLI. Supported CLI targets are darwin/arm64 and linux/amd64; the linux/arm64
+server is cross-compiled and its native acceptance recorded separately. Setup validates extraction before reset confirmation/upload. There is
 no runtime download/compiler fallback. scripts/build.sh refreshes generated assets.
 
 ## Loading and serving

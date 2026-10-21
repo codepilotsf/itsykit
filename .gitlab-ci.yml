@@ -9,7 +9,7 @@ servers:
   stage: servers
   parallel:
     matrix:
-      - ARCH: [amd64, arm64]
+      - ARCH: [amd64]
   tags: ["linux-$ARCH"]
   script:
     - bash scripts/release.sh server "$ARCH"
@@ -26,8 +26,6 @@ clients:
         RUNNER: macos-arm64
       - ARCH: amd64
         RUNNER: linux-amd64
-      - ARCH: arm64
-        RUNNER: linux-arm64
   tags: ["$RUNNER"]
   script:
     - bash scripts/release.sh client "$ARCH"

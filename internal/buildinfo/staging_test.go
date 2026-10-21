@@ -20,7 +20,7 @@ func TestPublicReleaseStaging(t *testing.T) {
 		stable = stable[:i]
 	}
 	for _, missing := range []bool{false, true} {
-		t.Run(fmt.Sprintf("missing-arm64=%t", missing), func(t *testing.T) {
+		t.Run(fmt.Sprintf("missing-amd64=%t", missing), func(t *testing.T) {
 			root := t.TempDir()
 			for _, name := range []string{"scripts/stage-release.sh", "scripts/version.sh", "internal/buildinfo/version.go", "website/site/install.sh"} {
 				body, err := os.ReadFile(filepath.Join("../..", name))
@@ -41,14 +41,18 @@ func TestPublicReleaseStaging(t *testing.T) {
 			if err := os.Mkdir(filepath.Join(root, "dist"), 0755); err != nil {
 				t.Fatal(err)
 			}
-			files := []string{"flea-darwin-arm64", "flea-linux-amd64", "flea-linux-arm64"}
+			files := []string{"flea-darwin-arm64", "flea-linux-amd64"}
 			for _, name := range files {
-				if missing && name == "flea-linux-arm64" {
+				if missing && name == "flea-linux-amd64" {
 					continue
 				}
 				if err := os.WriteFile(filepath.Join(root, "dist", name), []byte(name), 0755); err != nil {
 					t.Fatal(err)
 				}
+			}
+			// A leftover artifact from an older build must not enter this release.
+			if err := os.WriteFile(filepath.Join(root, "dist/flea-linux-arm64"), []byte("old ARM64 CLI"), 0755); err != nil {
+				t.Fatal(err)
 			}
 			run := func() ([]byte, error) {
 				cmd := exec.Command("bash", "scripts/stage-release.sh")
@@ -58,7 +62,7 @@ func TestPublicReleaseStaging(t *testing.T) {
 			}
 			out, err := run()
 			if missing {
-				if err == nil || !strings.Contains(string(out), "Missing native-verified artifact: flea-linux-arm64") {
+				if err == nil || !strings.Contains(string(out), "Missing native-verified artifact: flea-linux-amd64") {
 					t.Fatal(err, string(out))
 				}
 				if _, err := os.Stat(filepath.Join(root, "dist/public")); !os.IsNotExist(err) {
@@ -70,6 +74,9 @@ func TestPublicReleaseStaging(t *testing.T) {
 				t.Fatal(err, string(out))
 			}
 			release := filepath.Join(root, "dist/public/releases", stable)
+			if _, err := os.Stat(filepath.Join(release, "flea-linux-arm64")); !os.IsNotExist(err) {
+				t.Fatal("staged unsupported Linux ARM64 CLI", err)
+			}
 			manifest, err := os.ReadFile(filepath.Join(release, "SHA256SUMS"))
 			if err != nil {
 				t.Fatal(err)

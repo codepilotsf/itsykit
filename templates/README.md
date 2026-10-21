@@ -18,7 +18,8 @@ flea dev
 
 The planned installer is `curl -fsSL https://fleacms.com/install.sh | bash`.
 Install the public test release with `curl -fsSL https://fleacms.com/install.sh | bash`.
-Downloads cover Apple Silicon macOS and x86-64 Linux; see
+Downloads cover Apple Silicon macOS and x86-64 Linux. Linux ARM64 CLI downloads
+are discontinued; deploying to ARM64 Linux servers remains supported. See
 https://fleacms.com/docs#installation for PATH setup and testing limits.
 This generated folder already is a site, so you can skip directly to `flea dev`.
 

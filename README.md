@@ -2,13 +2,14 @@
 
 ## Install
 
-The current public release is 0.17.0, for Apple Silicon macOS and Linux
-AMD64/ARM64. It adds custom managed apps and app-owned sessions, with deployment
-protocol 26 and app wire protocol 2. The Mac binary is ad-hoc signed, not
-notarized; clean-Mac, real-email and native AMD64 build/full-suite acceptance
-remain unverified.
+FleaCMS 0.18.0 supports Apple Silicon macOS and x86-64 Linux CLIs. It adds
+`flea new .` and existing empty project directories. Linux ARM64 CLI downloads
+are discontinued; both supported CLIs still bundle x86-64 and ARM64 Linux servers.
+Deployment protocol remains 26 and app wire protocol 2. The Mac binary is ad-hoc
+signed, not notarized; clean-Mac and real-email acceptance remain unverified.
+ARM64 servers are cross-compiled; native ARM64 server testing is recorded separately.
 
-Install the current public test release for Apple Silicon Mac or AMD64/ARM64 Linux:
+Install the public test release for Apple Silicon Mac or x86-64 Linux:
 
 ```sh
 curl -fsSL https://fleacms.com/install.sh | bash

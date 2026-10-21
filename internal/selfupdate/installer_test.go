@@ -17,13 +17,14 @@ func TestInstallerOffline(t *testing.T) {
 	}
 	for _, scenario := range []struct {
 		name, system, machine, artifact string
-		bad, missing                    bool
+		bad, missing, unsupported       bool
 	}{
-		{"mac arm64", "Darwin", "arm64", "flea-darwin-arm64", false, false},
-		{"linux amd64", "Linux", "x86_64", "flea-linux-amd64", false, false},
-		{"linux arm64", "Linux", "aarch64", "flea-linux-arm64", false, false},
-		{"bad checksum", "Linux", "aarch64", "flea-linux-arm64", true, false},
-		{"missing linux arm64", "Linux", "aarch64", "flea-linux-arm64", false, true},
+		{"mac arm64", "Darwin", "arm64", "flea-darwin-arm64", false, false, false},
+		{"linux amd64", "Linux", "x86_64", "flea-linux-amd64", false, false, false},
+		{"linux arm64", "Linux", "aarch64", "flea-linux-arm64", false, false, true},
+		{"linux arm64 alias", "Linux", "arm64", "flea-linux-arm64", false, false, true},
+		{"bad checksum", "Linux", "x86_64", "flea-linux-amd64", true, false, false},
+		{"missing linux amd64", "Linux", "x86_64", "flea-linux-amd64", false, true, false},
 	} {
 		t.Run(scenario.name, func(t *testing.T) {
 			dir := t.TempDir()
@@ -43,7 +44,7 @@ func TestInstallerOffline(t *testing.T) {
 			}
 			manifest := hash + "  " + name + "\n"
 			if scenario.missing {
-				manifest = hash + "  flea-linux-amd64\n"
+				manifest = hash + "  flea-darwin-arm64\n"
 			}
 			uname := fmt.Sprintf("#!/bin/sh\ncase \"$1\" in -s) echo %s;; -m) echo %s;; *) exit 1;; esac\n", scenario.system, scenario.machine)
 			if err := os.WriteFile(filepath.Join(fake, "uname"), []byte(uname), 0755); err != nil {
@@ -75,15 +76,18 @@ if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/
 			cmd := exec.Command("bash", installer)
 			cmd.Env = append(os.Environ(), "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
 			out, err := cmd.CombinedOutput()
-			if (err != nil) != (scenario.bad || scenario.missing) {
+			if (err != nil) != (scenario.bad || scenario.missing || scenario.unsupported) {
 				t.Fatal(err, string(out))
 			}
 			got, _ := os.ReadFile(target)
-			if scenario.bad || scenario.missing {
+			if scenario.bad || scenario.missing || scenario.unsupported {
 				if string(got) != "old installation" {
 					t.Fatal("installer replaced before checksum validation")
 				}
-				if scenario.missing && !strings.Contains(string(out), "FleaCMS 1.0.1 has no verified download for linux/arm64") {
+				if scenario.unsupported && !strings.Contains(string(out), "Linux ARM64 CLI downloads are no longer supported") {
+					t.Fatal("missing platform diagnostic", string(out))
+				}
+				if scenario.missing && !strings.Contains(string(out), "FleaCMS 1.0.1 has no verified download for linux/amd64") {
 					t.Fatal("missing platform diagnostic", string(out))
 				}
 			} else {

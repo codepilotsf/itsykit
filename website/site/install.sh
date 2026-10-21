@@ -10,6 +10,11 @@ flea_install() (
   command -v curl >/dev/null || fail 'Install curl, then run this command again.'
   case "$(uname -s)" in Darwin) system=darwin ;; Linux) system=linux ;; *) fail 'This installer supports macOS and Linux.' ;; esac
   case "$(uname -m)" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; *) fail 'This processor is not supported.' ;; esac
+  case "$system-$arch" in
+    darwin-arm64|linux-amd64) ;;
+    linux-arm64) fail 'Linux ARM64 CLI downloads are no longer supported. Use Apple Silicon macOS or x86-64 Linux.' ;;
+    *) fail 'CLI downloads support Apple Silicon macOS and x86-64 Linux.' ;;
+  esac
   file="flea-$system-$arch"
   # The published checksum list decides which platforms have been verified.
   fetch() { curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 15 --max-time 180 "$@"; }

@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -149,5 +150,25 @@ func TestDownloadRequiresHTTPSAndBounds(t *testing.T) {
 	u.base = "http://example.test"
 	if err := u.download(context.Background(), "latest.txt", &b, 128); err == nil {
 		t.Fatal("accepted HTTP")
+	}
+}
+
+func TestUpdateRejectsUnsupportedPlatformsBeforeDownloading(t *testing.T) {
+	for _, platform := range [][2]string{{"linux", "arm64"}, {"darwin", "amd64"}, {"windows", "amd64"}} {
+		t.Run(strings.Join(platform[:], "/"), func(t *testing.T) {
+			target := filepath.Join(t.TempDir(), "flea")
+			if err := os.WriteFile(target, []byte("existing CLI"), 0755); err != nil {
+				t.Fatal(err)
+			}
+			u := updater{system: platform[0], arch: platform[1], executable: target}
+			err := u.run(context.Background(), "0.17.0", io.Discard)
+			if err == nil || !strings.Contains(err.Error(), "Apple Silicon macOS and x86-64 Linux") {
+				t.Fatal("missing unsupported-platform diagnostic", err)
+			}
+			data, err := os.ReadFile(target)
+			if err != nil || string(data) != "existing CLI" {
+				t.Fatal("changed existing CLI", string(data), err)
+			}
+		})
 	}
 }
