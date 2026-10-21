@@ -21,6 +21,11 @@ Install the public test release with `curl -fsSL https://fleacms.com/install.sh 
 Downloads cover Apple Silicon macOS and x86-64 Linux; see
 https://fleacms.com/docs#installation for PATH setup and testing limits.
 This generated folder already is a site, so you can skip directly to `flea dev`.
+
+Use `flea new .` to create a site in the current empty directory. Named paths
+also accept existing empty directories. Hidden files and `.git` count as content;
+Flea refuses nonempty directories.
+
 `flea new` creates a clean layout and editable homepage. Use `flea new --starter
 foobar` (or `-s`) for example pages, a six-person fictional team and a contact form.
 Navigation uses a native HTML popover on mobile, with no menu JavaScript.

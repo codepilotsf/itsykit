@@ -32,6 +32,12 @@ cd foobar
 flea dev
 ```
 
+To create a site in the current empty directory, run `flea new .`. You can also
+pass a relative or absolute directory path, such as `flea new ./foobar`. Flea
+creates the directory if missing; an existing directory must be completely empty,
+including hidden files. The folder name still supplies the default site name,
+which you can change when `flea dev` first asks for it.
+
 FleaCMS is a small website server for people who like HTML and CSS. Sites stay in
 ordinary files, with browser-editable content and Git-based deployment to Ubuntu.
 No Node, Docker, database, or separate web server is needed.
@@ -1479,7 +1485,7 @@ Run `source ~/.zshrc`, then `flea-build` from any directory. The script finds
 Go on PATH or at `/usr/local/go/bin/go`; `GO_BINARY` overrides that location.
 Contributors need Go, Bash, gzip and shasum; installed users do not need them.
 
-`new` accepts a simple name containing letters, digits, underscores, and hyphens, starting with a letter or digit. It refuses existing destinations, including empty directories and symlinks. An interrupted creation may leave a partial new directory for inspection. `status` validates configuration, routes, templates, and current content without listening on a port. Exit codes are 0 for success, 1 for project or runtime failures, and 2 for invalid CLI usage.
+`new` accepts a directory path, including `.` for the current directory. The parent directory must exist. Quote paths containing spaces, for example `flea new "my project"`. Existing directories must be empty, including hidden files and `.git`; directory symlinks and file targets are refused. An interrupted creation may leave partial generated files for inspection. `status` validates configuration, routes, templates, and current content without listening on a port. Exit codes are 0 for success, 1 for project or runtime failures, and 2 for invalid CLI usage.
 
 `flea new my-site` also initializes Git on `main`, stages the generated files
 and creates an `Initial site` commit using your normal Git identity, hooks and

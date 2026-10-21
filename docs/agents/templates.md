@@ -104,6 +104,10 @@ separate from the site/ template boundary: logical template names remain site-re
 while extraction journal edit paths begin with site/. No old-directory fallback or
 automatic migration. Protocol 25 prevents old servers receiving this structure.
 
+`flea new <directory>` creates a site in a new or completely empty directory;
+`.` selects the current directory. Count hidden entries and `.git` as content,
+reject directory symlinks, and never merge or overwrite existing files. The
+actual folder name supplies the existing display-name and deployment defaults.
 `flea new` initializes Git on main and commits the generated files as
 `Initial site`, respecting normal identity, hooks and signing. Commit failure
 keeps the site with recovery instructions; no remote is configured automatically.

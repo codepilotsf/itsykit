@@ -4,7 +4,7 @@ Implementation requirements linked from [AGENTS.md](../../AGENTS.md).
 Read this when the task touches this subsystem. Paths in prose and code are
 relative to the repository root unless stated otherwise.
 
-Core commands include `flea new <site-name>`, `flea status`,
+Core commands include `flea new <directory>`, `flea status`,
 `flea dev [-port 3000]`, `flea setup`, `flea version`,
 `flea deploy`, `flea admin [email]`, and `flea https`.
 `flea server list [ssh-target]` and `flea server remove [ssh-target] [site-name]`
@@ -30,6 +30,13 @@ Bare `flea`, `flea help`, `flea -h`, and `flea --help` show the grouped command
 overview on stdout and exit successfully. Each command supports `--help` and
 `-h` without requiring a site or starting work. Keep the overview spacious;
 put flags and deployment requirements in command-specific help.
+`flea new <directory>` accepts relative or absolute paths, including `.` for the
+current directory. Create a missing final directory; its parent must exist.
+Existing targets must be real, completely empty directories, including hidden
+entries and `.git`. Reject file targets and directory symlinks before writing.
+Do not prompt to merge or overwrite files. Confine scaffold writes with os.Root
+and retain exclusive file creation. Use the actual destination folder for naming
+defaults. For `.` end with `flea dev`; otherwise show a shell-quoted `cd` when needed.
 `flea new` initializes Git on main and creates an `Initial site` commit of the
 generated files, respecting Git identity, hooks and signing. Keep inherited Git
 location overrides out of every Git subprocess so another repository is untouched.
@@ -37,7 +44,7 @@ Commit failure preserves the site and prints diagnostics plus manual retry comma
 missing Git also preserves site creation. `--skip-git` skips all Git operations.
 Do not configure a remote or create a hosted project automatically. After a successful
 commit, show `git remote add origin <repository-url>` and `git push -u origin main`.
-Output still ends with `cd <site>` and `flea dev`; do not add deployment instructions.
+Output ends with local development instructions; do not add deployment instructions.
 Dev uses pinned github.com/fsnotify/fsnotify directory notifications with a
 100 ms debounce, not periodic file scans. Register included subdirectories,
 reconcile new/renamed/deleted directories, and keep atomic saves working.

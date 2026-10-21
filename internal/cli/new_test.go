@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"flea/internal/site"
 )
 
 func configureNewTestGit(t *testing.T, config string) {
@@ -171,5 +173,133 @@ func TestNewIgnoresGitLocationOverrides(t *testing.T) {
 	branch, err := exec.Command("git", "-C", other, "symbolic-ref", "--short", "HEAD").Output()
 	if err != nil || string(branch) != "other\n" {
 		t.Fatal("changed another repository's branch", string(branch), err)
+	}
+}
+
+func TestNewDirectoryPaths(t *testing.T) {
+	for _, kind := range []string{"current", "existing", "relative", "absolute", "spaces", "shell characters", "leading dash"} {
+		t.Run(kind, func(t *testing.T) {
+			root := t.TempDir()
+			t.Chdir(root)
+			target := "my-project"
+			wantCD := "cd my-project"
+			args := []string{"new", "--skip-git"}
+			switch kind {
+			case "current":
+				target, wantCD = ".", ""
+			case "existing":
+				if err := os.Mkdir(target, 0755); err != nil {
+					t.Fatal(err)
+				}
+			case "relative":
+				target = "./my-project"
+			case "absolute":
+				target = filepath.Join(root, target)
+				wantCD = "cd " + target
+			case "spaces":
+				target, wantCD = "my project", "cd 'my project'"
+			case "shell characters":
+				target, wantCD = "my project's $files", "cd 'my project'\"'\"'s $files'"
+			case "leading dash":
+				target, wantCD = "-project", "cd './-project'"
+				args = append(args, "--")
+			}
+			args = append(args, target)
+			var out, errOut bytes.Buffer
+			if code := Run(context.Background(), args, &out, &errOut); code != 0 {
+				t.Fatalf("code=%d stdout=%s stderr=%s", code, &out, &errOut)
+			}
+			p, err := site.Load(target)
+			if err != nil {
+				t.Fatal(err)
+			}
+			absolute, err := filepath.Abs(target)
+			if err != nil || p.App["site_name"] != site.DefaultSiteName(absolute) {
+				t.Fatalf("folder-derived name: %v, %v", p.App["site_name"], err)
+			}
+			if kind == "current" {
+				if !strings.HasSuffix(out.String(), "Start developing:\n  flea dev\n\n") {
+					t.Fatal(out.String())
+				}
+			} else if !strings.Contains(out.String(), "  "+wantCD+"\n  flea dev\n") {
+				t.Fatal("incorrect directory instructions", out.String())
+			}
+			if _, err := os.Stat(filepath.Join(target, ".git")); !os.IsNotExist(err) {
+				t.Fatal("initialized Git despite skip flag", err)
+			}
+		})
+	}
+}
+
+func TestNewCurrentDirectoryInitializesGit(t *testing.T) {
+	configureNewTestGit(t, "[user]\nname = Flea Test\nemail = flea@example.test\n")
+	t.Chdir(t.TempDir())
+	var out, errOut bytes.Buffer
+	if code := Run(context.Background(), []string{"new", "."}, &out, &errOut); code != 0 {
+		t.Fatal(code, out.String(), errOut.String())
+	}
+	data, err := exec.Command("git", "log", "-1", "--format=%s").Output()
+	if err != nil || strings.TrimSpace(string(data)) != "Initial site" {
+		t.Fatal("missing initial commit", string(data), err)
+	}
+	data, err = exec.Command("git", "status", "--porcelain").Output()
+	if err != nil || len(data) != 0 {
+		t.Fatal("new site should be clean", string(data), err)
+	}
+}
+
+func TestNewRefusesNonemptyDirectory(t *testing.T) {
+	for _, name := range []string{"notes.txt", ".hidden", ".git", "subdirectory"} {
+		t.Run(name, func(t *testing.T) {
+			root := t.TempDir()
+			t.Chdir(root)
+			if name == ".git" || name == "subdirectory" {
+				if err := os.Mkdir(name, 0755); err != nil {
+					t.Fatal(err)
+				}
+			} else if err := os.WriteFile(name, []byte("keep this"), 0644); err != nil {
+				t.Fatal(err)
+			}
+			var out, errOut bytes.Buffer
+			if code := Run(context.Background(), []string{"new", "."}, &out, &errOut); code != 1 || !strings.Contains(errOut.String(), "isn't empty. Choose an empty directory") {
+				t.Fatal(code, out.String(), errOut.String())
+			}
+			entries, err := os.ReadDir(root)
+			if err != nil || len(entries) != 1 || entries[0].Name() != name {
+				t.Fatal("modified nonempty directory", entries, err)
+			}
+			if !entries[0].IsDir() {
+				data, err := os.ReadFile(name)
+				if err != nil || string(data) != "keep this" {
+					t.Fatal("modified existing file", string(data), err)
+				}
+			}
+		})
+	}
+}
+
+func TestNewRefusesFileAndLinkedDirectory(t *testing.T) {
+	root := t.TempDir()
+	t.Chdir(root)
+	if err := os.WriteFile("file", []byte("keep this"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	outside := t.TempDir()
+	if err := os.Symlink(outside, "linked"); err != nil {
+		t.Fatal(err)
+	}
+	for _, target := range []string{"file", "linked", "linked/"} {
+		var errOut bytes.Buffer
+		if code := Run(context.Background(), []string{"new", target}, io.Discard, &errOut); code != 1 || !strings.Contains(errOut.String(), "not a directory") {
+			t.Fatal(target, code, errOut.String())
+		}
+	}
+	entries, err := os.ReadDir(outside)
+	if err != nil || len(entries) != 0 {
+		t.Fatal("wrote through linked directory", entries, err)
+	}
+	data, err := os.ReadFile("file")
+	if err != nil || string(data) != "keep this" {
+		t.Fatal("modified existing file", string(data), err)
 	}
 }

@@ -6,6 +6,8 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Create sites in existing empty directories with `flea new .` or a directory
+  path. Refuse nonempty directories, including hidden files, without overwriting.
 - Keep Impeccable globally installed instead of bundling it into generated sites.
   Include pinned coding orchestration, reasoning and shared skill sync guidance
   in the starter agent instructions.

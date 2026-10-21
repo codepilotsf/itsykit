@@ -99,6 +99,9 @@ the development lock. See the runtime guide.
 `--lan`/`-l` explicitly enables full trusted-network development over HTTP;
 preserve the shared exact Host/port and private/Tailscale peer gate, including
 detected hostname/local aliases, and ordinary auth/CSRF.
+`flea new <directory>` accepts paths, including `.` for the current directory.
+Existing directories must be completely empty, including hidden files and `.git`;
+reject file targets and directory symlinks without writing or prompting to overwrite.
 `flea new` creates an initial Git commit on main unless `--skip-git` is used;
 see the runtime guide for failure recovery and remote setup. It defaults to a
 clean layout/index. `--starter`/`-s` adds demo pages and a six-person fictional team. `flea reset` confirms before resetting all local files
