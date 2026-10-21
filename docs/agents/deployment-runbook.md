@@ -86,9 +86,11 @@ Confirm the installed CLI path/version separately from `bin/flea`.
 The preferred release matrix uses native runners through `scripts/release.sh`:
 native Linux AMD64 server checks/builds plus a cross-compiled ARM64 server,
 then native Mac ARM64 and Linux AMD64 CLI builds embedding both servers.
-An ARM64 Linux runner is optional for native server acceptance; record any gap. See releasing.md for prerequisites. Run
+An ARM64 Linux runner is optional for native server acceptance; record any gap.
+See releasing.md for prerequisites. Run
 `CI_COMMIT_TAG=v<version> bash scripts/stage-release.sh` only with verified
-`dist/flea-darwin-arm64` and `dist/flea-linux-amd64` artifacts. It stages files; it does not upload them. Use a fresh staging directory rather than overwriting one.
+`dist/flea-darwin-arm64` and `dist/flea-linux-amd64` artifacts. It stages files;
+it does not upload them. Use a fresh staging directory rather than overwriting one.
 
 For 0.6.1, Linux AMD64 was cross-compiled on the Mac after refreshing bundles:
 

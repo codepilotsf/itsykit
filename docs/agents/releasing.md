@@ -25,14 +25,14 @@ The public test release is hosted by the separate website repository at
 `/Users/sean/Projects/flea-website`. Its `RELEASES.md` records build provenance and
 actual public installer/update checks. Versioned binaries, SHA256SUMS,
 latest.txt and install.sh are live on fleacms.com. Public installation, reinstall,
-update and already-current checks pass on all three advertised platforms. The
+update and already-current checks pass on both currently supported platforms. The
 Mac binary is ad-hoc signed; clean-machine Mac testing and notarization remain
 unverified, so do not describe this as a completed V1 release.
 See [installation and trust](../installation.md).
 
 CLI release targets are macOS ARM64 and Linux AMD64. Each uses a native runner
 for tests, race checks, vet and bundled CLI smoke tests. Linux ARM64 and macOS AMD64
-is outside the public release matrix. The pipeline has not been run remotely;
+are outside the public release matrix. The pipeline has not been run remotely;
 manual verification must record any cross-compilation and remaining native gaps.
 Public artifacts are hosted in the website's versioned release directories without
 opening the source repository. The registry instructions below are historical.
@@ -128,7 +128,8 @@ GitLab package API: https://docs.gitlab.com/user/packages/generic_packages/
    It does not upload to fleacms.com or advance the public update channel.
    Upload to the selected public host only after approval and verification.
 6. Test the downloaded Mac CLI on a clean Mac and setup on a disposable Ubuntu
-   machine for each architecture before announcing the release or updating a tap.
+   machine for x86-64 before announcing the release or updating a tap. Record
+   ARM64 server native acceptance separately when hardware is available.
 
 Public CLI artifacts are flea-linux-amd64 and flea-darwin-arm64. Build artifacts
 also include flea-server-linux-amd64 and flea-server-linux-arm64 for embedding.
