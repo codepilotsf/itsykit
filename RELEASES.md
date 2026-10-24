@@ -1,5 +1,12 @@
 # Publishing FleaCMS downloads
 
+## 0.19.0 rollout in preparation
+
+Exact-host indexing uses deployment protocol 27. Native platform builds, public
+artifact checks, shared-server upgrade and live staging verification will be
+recorded here after they run. The existing staging meta fallback remains until
+native enforcement is verified. No publication is claimed by this prepared change.
+
 ## 0.18.0 published October 21, 2026
 
 Framework source `7ab8f6ea022f276600bc373d7353559c8552bc11`, immutable tag
