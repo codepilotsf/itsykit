@@ -1,5 +1,22 @@
 # Installation and updates
 
+## 0.19.0 hostname indexing
+
+Adds server-owned exact-host `noindex`/`allow` policy with
+`flea server indexing root@server staging.example.com noindex`. Policies survive
+deployment, content synchronization, code rollback and site restore without a
+website app flag or different templates. Keep robots.txt crawlable. Inspect the
+effective policy with `flea server list` or `flea status`.
+
+Deployment protocol moves to 27 with no fallback. Update the CLI with `flea update`
+and explicitly update the shared server with `flea update-server` before using
+protocol-27 deployment or host administration. Local updates do not change the
+remote executable, site releases or running dev servers. Existing configs without
+an indexing map keep their behavior. See [host indexing](host-indexing.md) and
+[0.19.0 verification](agents/release-0190-verification.md) for rollout status.
+Supported CLIs remain Apple Silicon macOS and x86-64 Linux; ARM64 Linux servers
+are cross-compiled and native server acceptance is recorded separately.
+
 ## 0.18.0
 
 Published October 21, 2026 from `7ab8f6e`, immutable tag `v0.18.0`. Both supported

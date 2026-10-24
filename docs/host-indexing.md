@@ -5,8 +5,8 @@ hostname while serving the same website release on another hostname without that
 restriction. Website templates, app globals and content stay identical. This is
 cooperative search indexing control, not authentication or a private preview.
 
-This feature is unreleased and requires matching protocol-27 clients and servers.
-The public 0.17.0 release uses protocol 26 and does not implement it. Ordinary
+This feature starts in FleaCMS 0.19.0 and requires matching protocol-27 clients
+and servers. Releases through 0.18.0 use protocol 26 and do not implement it. Ordinary
 website deployment never installs a server executable. Upgrade and release work
 require separate authorization and the existing release checks.
 

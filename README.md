@@ -2,12 +2,13 @@
 
 ## Install
 
-FleaCMS 0.18.0 supports Apple Silicon macOS and x86-64 Linux CLIs. It adds
-`flea new .` and existing empty project directories. Linux ARM64 CLI downloads
-are discontinued; both supported CLIs still bundle x86-64 and ARM64 Linux servers.
-Deployment protocol remains 26 and app wire protocol 2. The Mac binary is ad-hoc
-signed, not notarized; clean-Mac and real-email acceptance remain unverified.
-ARM64 servers are cross-compiled; native ARM64 server testing is recorded separately.
+FleaCMS 0.19.0 supports Apple Silicon macOS and x86-64 Linux CLIs. It adds
+exact-host search indexing policy so staging and production can use the same
+website files. Deployment protocol is 27; update the server separately before
+using the matching CLI for deployment or host administration. App wire protocol
+remains 2. The Mac binary is ad-hoc signed, not notarized; clean-Mac and real-email
+acceptance remain unverified. Both CLIs bundle x86-64 and cross-compiled ARM64
+Linux servers; native ARM64 server testing is recorded separately.
 
 Install the public test release for Apple Silicon Mac or x86-64 Linux:
 
@@ -1426,7 +1427,7 @@ interactive sudo prompts, and successful updates print a completion message.
 
 ### Hostname indexing policy
 
-The unreleased protocol-27 client/server supports exact-host staging protection:
+FleaCMS 0.19.0 with matching protocol-27 clients and servers supports exact-host staging protection:
 
 ```sh
 flea server indexing root@server staging.example.com noindex
@@ -1440,7 +1441,7 @@ deploys, content sync, code rollback and site restore. Omitted settings never
 reset them. Website files stay unchanged; owner-authored restrictions still apply.
 Keep robots.txt crawlable so crawlers can discover noindex. The command asks for
 the exact hostname and restarts the shared service. Matching client/server
-protocols are required; public 0.17.0 does not include this feature. See
+protocols are required; 0.18.0 and earlier do not include this feature. See
 [configuration, preservation and rollout](docs/host-indexing.md).
 
 ### List or remove sites on a server

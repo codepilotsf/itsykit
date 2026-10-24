@@ -6,6 +6,8 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.19.0 - 2026-10-24
+
 - Add exact-host indexing policy in server configuration and
   `flea server indexing [ssh-target] <hostname> <noindex|allow>`. Enforce
   `X-Robots-Tag: noindex, nofollow` across site, app, asset, error, download and
