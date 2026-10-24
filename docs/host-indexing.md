@@ -110,7 +110,9 @@ backup. See [recovery](recovery.md).
 
 ## CodePilot rollout and rollback
 
-These are future operator steps, not actions performed by the implementation:
+The October 24 rollout completed this sequence; see the actual installed versions,
+commits, checks and limits in [0.19.0 verification](agents/release-0190-verification.md).
+Use the same ordering for a future rollout:
 
 1. Review the change. Complete release verification for a new minor release and
    install its matching client and server through the supported release and

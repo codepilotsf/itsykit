@@ -2,6 +2,12 @@
 
 ## 0.19.0 hostname indexing
 
+Published October 24, 2026 from `da7d0c7`, immutable `v0.19.0`. Native Linux AMD64
+and Mac ARM64 full tests, race, vet, bundled builds, public install/reinstall and
+0.18.0 update checks passed. The public channel, shared server and normal
+Kirin/Mac CLIs are 0.19.0. Native staging enforcement is verified after removing
+the consumer meta fallback. See the release receipt below for remaining limits.
+
 Adds server-owned exact-host `noindex`/`allow` policy with
 `flea server indexing root@server staging.example.com noindex`. Policies survive
 deployment, content synchronization, code rollback and site restore without a

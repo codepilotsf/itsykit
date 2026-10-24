@@ -10,16 +10,28 @@ for completed changes, and [README.md](../../README.md) for current usage.
 
 Before updating older site sources, remove their obsolete Theme toolbar button
 while preserving custom layouts. Existing hosted toolbar partials have not been
-rewritten by the shared executable rollout. Native host indexing implementation
-is prepared for 0.19.0; protocol-27 release verification, authorized shared-server
-upgrade and live header checks remain pending. Keep CodePilot's meta fallback
-until native staging enforcement is verified; consumer cleanup is a separate
-change. See [rollout](../host-indexing.md#codepilot-rollout-and-rollback).
+rewritten by the shared executable rollout. Native host indexing shipped in 0.19.0 / protocol 27.
+Shared-server upgrade, live header isolation and the separately deployed CodePilot
+consumer cleanup are verified. See [release evidence](release-0190-verification.md)
+and the [rollback procedure](../host-indexing.md#codepilot-rollout-and-rollback).
 Hub branch workflow verification remains a separate task. Theme removal is included in
 public 0.15.1. Native AMD64 build/full-suite, clean-Mac and notarization
 acceptance remain open.
 
-## Current release status (October 21, 2026)
+## Current release status (October 24, 2026)
+
+### Public 0.19.0
+
+Published from `da7d0c7` / immutable `v0.19.0`, merged as `a6bab4e` through MR !18.
+Native Linux AMD64 and Mac ARM64 full tests, race, vet, bundled builds and exact
+artifact smoke passed. Both platforms passed public install/reinstall/update
+checks, and normal Kirin/Mac CLIs are updated with matching public hashes.
+The shared server is 0.19.0 / protocol 27, with only staging.codepilot.com set to
+noindex. Its native header remains after the consumer flag/meta cleanup and two
+normal deployments; all 21 HTTPS hosts are healthy, all live content hashes and
+13 unaffected roots/source hashes are preserved. Public website/docs/channel
+show 0.19.0. See [verification and limits](release-0190-verification.md).
+
 
 ### Public 0.18.0
 

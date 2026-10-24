@@ -17,6 +17,8 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `cmd/flea/main.go`: executable entry point.
 - `cmd/flea-server/main.go`: standalone persistent server entry point.
 - `internal/host/`: strict server JSON config, hostname routing, readiness, and shutdown.
+- `internal/host/indexing.go`: exact-host indexing enforcement and static crawl diagnostics.
+- `internal/admin/indexing.go` and `internal/setup/indexing.go`: reviewed SSH host-policy changes and inspection.
 - `internal/setup/`: interactive SSH bootstrap, installer, and systemd unit.
 - `internal/serverbundle/`: compressed embedded Linux servers and verified extraction.
 - `internal/setup/deploy.go`: native SSH/SCP deployment and local deployment settings.
