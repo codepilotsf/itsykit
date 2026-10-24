@@ -12,7 +12,8 @@ value tokens. CodePilot Hub agents can author it through site files. A basic
 admin interface is included for independent Flea users, reusing existing login,
 rich text and photo selection/upload rather than introducing another editor.
 
-Earlier work still has separate follow-ups: preview noindex, older site toolbar
+Earlier work still has separate follow-ups: native host-indexing rollout (see
+[rollout](../../host-indexing.md)), older site toolbar
 updates, public 0.14.0 publication. This blog plan does
 not complete or authorize those tasks.
 

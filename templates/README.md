@@ -37,6 +37,14 @@ all local files/settings except `.git`, including uploads, `.env`, customization
 and deployment destinations. Stop dev first. Original files remain in the private
 sibling backup path printed by the command. No commit or remote change is made.
 
+With a matching protocol-27 client/server, staging indexing can be configured
+outside this site: `flea server indexing root@server staging.example.com noindex`.
+The hostname must already be registered. This sends a noindex/nofollow response
+header and survives deployments without an app flag or different templates.
+`flea server list root@server` shows each host's effective policy. Keep robots.txt
+crawlable so crawlers can discover the header. Public 0.17.0 does not include this
+feature; arrange the framework upgrade separately from website deployment.
+
 ### 1. Start the development server
 
 With the `flea` command installed, run this from your site folder:

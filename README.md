@@ -237,7 +237,7 @@ in `.flea.config.json` and are stripped from release archives and backups.
 This structure is required; there is no old-directory fallback or automatic
 migration. Existing projects need an explicit, collision-checked reorganization.
 Keep template-relative paths and public URLs unchanged. Update the server before
-deploying: protocol 26 requires the new structure.
+deploying: protocol 27 requires the new structure.
 
 ## Templates
 
@@ -700,7 +700,7 @@ browser's session. Removing an admin revokes their sessions. Session files stay
 private; status reports site and deployment information.
 
 The production service can write the site's private `flea/` directory, not its
-release directory or configuration. Deployment protocol 26 requires the updated
+release directory or configuration. Deployment protocol 27 requires the updated
 server and these permissions; there is no compatibility fallback for older servers.
 Custom-app storage lives under `flea/runtime/apps/<name>/` in that private
 directory, outside the immutable release.
@@ -817,7 +817,7 @@ FLEA_EMAIL_FROM="login@your-verified-domain.com"
 ```
 
 Production admin access requires HTTPS. An admin-enabled HTTP-only deployment is
-refused. Protocol 26 requires both the updated server binary and systemd unit, a
+refused. Protocol 27 requires both the updated server binary and systemd unit, a
 service-owned `/etc/flea/deploy.lock`, and writable managed content/runtime directories.
 Fresh setup installs these. Existing servers need an administrator-reviewed upgrade;
 do not use setup's destructive reset to upgrade a server with sites. Existing
@@ -876,7 +876,7 @@ app-owned sessions, and
 This replaces top-level `contact` configuration and `/_flea/contact`, without
 aliases or automatic migration. Update existing forms/config explicitly, add
 `{csrf}`, and move the thank-you page beneath the chosen mount. Deployment
-protocol 26 requires the matching server. Nothing is deployed by a local build.
+protocol 27 requires the matching server. Nothing is deployed by a local build.
 Remote services, package registries and config-declared read routes remain
 planned. Blog is a built-in content application, described above.
 
@@ -1409,7 +1409,7 @@ sudo systemctl restart flea
 ```
 
 Existing installations are not upgraded by rerunning setup. Deployment requires
-the current server executable (deployment protocol 26, unquoted snip syntax).
+the current server executable (deployment protocol 27, unquoted snip syntax).
 For an older installation,
 update the executable and systemd unit deliberately, preserve server.json and all
 sites, and create `/var/lib/flea/certs` owned by `flea:flea` with mode
@@ -1424,6 +1424,25 @@ After confirmation, a terminal spinner shows that the update is running; redirec
 output uses a plain progress line. Animation stops before SSH diagnostics or
 interactive sudo prompts, and successful updates print a completion message.
 
+### Hostname indexing policy
+
+The unreleased protocol-27 client/server supports exact-host staging protection:
+
+```sh
+flea server indexing root@server staging.example.com noindex
+flea server list root@server
+```
+
+This sends `X-Robots-Tag: noindex, nofollow` on that registered hostname while
+other aliases can serve the same release without the restriction. Set `allow`
+to stop adding it. Policies live in server configuration and survive ordinary
+deploys, content sync, code rollback and site restore. Omitted settings never
+reset them. Website files stay unchanged; owner-authored restrictions still apply.
+Keep robots.txt crawlable so crawlers can discover noindex. The command asks for
+the exact hostname and restarts the shared service. Matching client/server
+protocols are required; public 0.17.0 does not include this feature. See
+[configuration, preservation and rollout](docs/host-indexing.md).
+
 ### List or remove sites on a server
 
 These commands manage sites already installed on a server. They accept an
@@ -1437,8 +1456,8 @@ flea server remove root@server example
 ```
 
 `flea server list` shows each site's name and branch, then its HTTPS domains,
-then its HTTP-only domains, then any redirects. It omits the release and never
-repeats the domains as plain lines, and is read-only.
+then its HTTP-only domains, indexing policies and any redirects. It omits the
+release and never repeats the domains as plain lines, and is read-only.
 
 `flea server remove` unregisters one site's hostnames after showing the exact
 affected domains and asking you to type the site name. Omit the site name to see
@@ -1554,7 +1573,7 @@ directions and a sample-page review before the full build, unless you explicitly
 delegate those choices. Small maintenance edits do not require a new design review.
 
 Editable regions, short IDs, sanitized HTML, page metadata, content-preserving
-deployment, and archived orphan pruning are implemented. Deployment protocol 26
+deployment, and archived orphan pruning are implemented. Deployment protocol 27
 requires an updated server binary; older servers are refused before upload.
 Local extraction preserves unreferenced content until deployment. There is no
 Markdown renderer or schema migration engine. Inline rich-text editing and

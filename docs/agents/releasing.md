@@ -14,6 +14,12 @@ not block CLI publication. Deployment protocol remains 26 and app protocol 2.
 See [0.18.0 verification](release-0180-verification.md) for actual publication,
 artifact and acceptance status. Historical published downloads remain immutable.
 
+Unreleased hostname indexing uses protocol 27 and needs matching clients and
+servers. Cut a new minor release when authorized; never publish these development
+builds as 0.17.0 or replace its existing bytes. Follow the separate
+[host-indexing rollout](../host-indexing.md#codepilot-rollout-and-rollback), keeping
+CodePilot's current staging fallback until live native enforcement is verified.
+
 ## V1 distribution plan
 
 The agreed plan is in [next-steps.md](next-steps.md). Source remains private;

@@ -247,6 +247,7 @@ func printSiteSummary(out io.Writer, site admin.SiteSummary) {
 	if !site.Managed {
 		fmt.Fprintln(out, "  not managed by this server")
 	}
+	printIndexing(out, site)
 	for _, redirect := range site.Redirects {
 		fmt.Fprintf(out, "  redirect %s\n", redirect)
 	}

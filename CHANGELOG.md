@@ -6,6 +6,15 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Add exact-host indexing policy in server configuration and
+  `flea server indexing [ssh-target] <hostname> <noindex|allow>`. Enforce
+  `X-Robots-Tag: noindex, nofollow` across site, app, asset, error, download and
+  redirect responses without changing website files or buffering bodies. Show
+  effective policies and static robots.txt crawl-block warnings in inspection.
+  Preserve current policies through deploy, sync, rollback and restore; remove
+  only unregistered sites' entries. Deployment protocol 27 requires matching
+  clients and servers to prevent older config writers discarding the policy.
+
 ## 0.18.0 - 2026-10-21
 
 - Stop publishing Linux ARM64 CLI downloads. The installer and updater support

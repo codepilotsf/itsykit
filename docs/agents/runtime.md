@@ -13,6 +13,13 @@ saved deployment settings. An omitted target is prompted for (the server login,
 for example root@fleacms.com); an omitted site name lists the managed sites and
 asks for one by its exact name.
 See README.md for pull, synchronization, recovery and the complete command list.
+`flea server indexing [ssh-target] <hostname> <noindex|allow>` sets one exact
+registered host policy through SSH with hostname confirmation and shared-service
+restart. List/status show effective policies and static robots.txt warnings.
+Policy enforcement belongs outside cached site handlers, at writes and flushes,
+including downloads/errors and host redirects. Never buffer response bodies or
+trust forwarding headers for selection. Keep readiness and TLS rejection unchanged.
+See [host indexing](../host-indexing.md); this requires protocol 27.
 `flea email` configures local Resend delivery interactively.
 Run status/dev from a generated site. Setup uses native SSH.
 `flea status` prints local validation, counts and Git state before automatically

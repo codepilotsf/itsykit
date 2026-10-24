@@ -71,8 +71,9 @@ Command details
 
 const serverUsage = `Usage: flea server list [ssh-target]
        flea server remove [ssh-target] [site-name]
+       flea server indexing [ssh-target] <hostname> <noindex|allow>
 
-List or remove sites installed on a FleaCMS server over SSH. No local site,
+Inspect or configure sites installed on a FleaCMS server over SSH. No local site,
 Git repository or saved deployment settings are required. Omit the SSH target to
 be asked for the server login.
 
@@ -87,7 +88,11 @@ be asked for the server login.
            same name; back up or pull the site first if a later deployment must
            keep it.
 
-Both commands reject servers running an older FleaCMS protocol; update the
+  indexing Set one registered hostname to noindex, nofollow or add no restriction.
+           Keeps website files unchanged. Requires typing the exact hostname and
+           restarts the shared service. Policies survive deploy, sync and rollback.
+
+All commands reject servers running an older FleaCMS protocol; update the
 server first. Nothing is deleted or pruned.
 
 `
@@ -701,6 +706,24 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 		return 0
 	}
 	switch args[0] {
+	case "indexing":
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprint(out, serverUsage)
+			return 0
+		}
+		if len(args) != 3 && len(args) != 4 {
+			fmt.Fprintln(errOut, "Usage: flea server indexing [ssh-target] <hostname> <noindex|allow>")
+			return 2
+		}
+		target := ""
+		if len(args) == 4 {
+			target = args[1]
+		}
+		if err := setup.ServerIndexing(ctx, target, args[len(args)-2], args[len(args)-1], in, out, errOut); err != nil {
+			fmt.Fprintln(errOut, "flea:", err)
+			return 1
+		}
+		return 0
 	case "list":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			fmt.Fprint(out, serverUsage)

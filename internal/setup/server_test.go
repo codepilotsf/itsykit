@@ -21,7 +21,7 @@ func inventoryRunner(t *testing.T, listJSON string, extra func(c command) (bool,
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=26\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=27\n")
 			return nil
 		case strings.Contains(text, "-list-sites"):
 			fmt.Fprint(c.out, listJSON)
@@ -42,7 +42,7 @@ func TestServerListWorkflow(t *testing.T) {
 	if err := serverList(context.Background(), "server", strings.NewReader(""), &out, io.Discard, inventoryRunner(t, "["+testSiteJSON+"]", nil)); err != nil {
 		t.Fatal(err)
 	}
-	want := "Sites on server:\ndemo  (branch main)\n  https example.test, www.example.test\n  redirect www.example.test -> example.test\n\n"
+	want := "Sites on server:\ndemo  (branch main)\n  https example.test, www.example.test\n  indexing example.test: allow (no restriction added)\n  indexing www.example.test: allow (no restriction added)\n  redirect www.example.test -> example.test\n\n"
 	if out.String() != want {
 		t.Fatalf("listing:\n got %q\nwant %q", out.String(), want)
 	}
@@ -63,9 +63,9 @@ func TestServerListHTTPAndMixedDisplay(t *testing.T) {
 		t.Fatal(err)
 	}
 	want := "Sites on server:\n" +
-		"alpha\n  https a.test\n\n" +
-		"beta\n  http b.test, c.test\n\n" +
-		"gamma\n  https d.test\n  http e.test\n  not managed by this server\n  redirect e.test -> d.test\n\n"
+		"alpha\n  https a.test\n  indexing a.test: allow (no restriction added)\n\n" +
+		"beta\n  http b.test, c.test\n  indexing b.test: allow (no restriction added)\n  indexing c.test: allow (no restriction added)\n\n" +
+		"gamma\n  https d.test\n  http e.test\n  not managed by this server\n  indexing d.test: allow (no restriction added)\n  indexing e.test: allow (no restriction added)\n  redirect e.test -> d.test\n\n"
 	if out.String() != want {
 		t.Fatalf("listing:\n got %q\nwant %q", out.String(), want)
 	}
@@ -87,7 +87,7 @@ func TestServerListEmptyAndOlderProtocol(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=23\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=26\n")
 			return nil
 		}
 		ran = true
@@ -128,7 +128,7 @@ func TestServerListPromptsForTarget(t *testing.T) {
 			if !strings.Contains(text, "-- root@fleacms.com ") {
 				t.Fatalf("prompted target not used: %q", text)
 			}
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=26\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=27\n")
 			return nil
 		case strings.Contains(text, "-list-sites"):
 			fmt.Fprint(c.out, "[]")
@@ -169,7 +169,7 @@ func TestServerRemoveWorkflow(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=26\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=27\n")
 			return nil
 		case strings.Contains(text, "-site-info"):
 			if !strings.Contains(text, "-site-info 'demo'") {
@@ -314,7 +314,7 @@ func TestServerRemoveCancellation(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=26\n")
+			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=27\n")
 			return nil
 		case strings.Contains(text, "-site-info"):
 			fmt.Fprint(c.out, testSiteJSON)
@@ -373,7 +373,7 @@ func TestServerRemoveNonRootUsesSudo(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			fmt.Fprint(c.out, "FLEA_UID=1000\nFLEA_DEPLOY=26\n")
+			fmt.Fprint(c.out, "FLEA_UID=1000\nFLEA_DEPLOY=27\n")
 			return nil
 		case strings.Contains(text, "mktemp"):
 			fmt.Fprintln(c.out, stage)

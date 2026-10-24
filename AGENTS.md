@@ -132,6 +132,11 @@ dialog Done separate from publishing with page Save changes.
 The declarative toolbar and its icons render before bootstrap; do not recreate
 its shell. Preserve drafts after errors and during source reloads.
 
+Host indexing belongs to optional server `indexing` policy, never site `app`
+values. Preserve it on deploy/sync/code recovery; removal clears only owned hosts.
+See [host indexing](docs/host-indexing.md) and the deployment guide. Protocol 27
+requires matching clients/servers; keep release rollout separate from site deploy.
+
 `flea status` shows local validation first, then automatically checks the current
 branch's saved remote. Keep it read-only; see the runtime and sync guides.
 
