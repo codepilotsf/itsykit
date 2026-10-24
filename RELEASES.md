@@ -1,11 +1,60 @@
 # Publishing FleaCMS downloads
 
-## 0.19.0 rollout in preparation
+## 0.19.0 published October 24, 2026
 
-Exact-host indexing uses deployment protocol 27. Native platform builds, public
-artifact checks, shared-server upgrade and live staging verification will be
-recorded here after they run. The existing staging meta fallback remains until
-native enforcement is verified. No publication is claimed by this prepared change.
+Framework source `da7d0c70775dea352e00cfc6cf2c86e31f9cea16`, immutable `v0.19.0`,
+merged as `a6bab4e` through MR !18. Adds native exact-host indexing policy,
+protocol 27 and matching client/server enforcement; app protocol remains 2.
+Both supported CLIs retain the same AMD64/cross-compiled ARM64 Linux servers.
+
+Native Linux AMD64 (Go 1.26.9) and Mac ARM64 (Go 1.27.1) full tests, full race,
+vet and bundled builds pass. Exact CLIs passed new/current-directory, initial
+commit, starter parity, status and refusal checks; the exact Linux server also
+passed shared-root hostname/header isolation checks. Mac final ad-hoc signature
+verification passes. Tag pipeline 610 was pending runners at publication; the
+release used these manual native checks and does not claim remote CI success.
+
+Anonymous HTTPS downloads match the final signed-byte manifest:
+
+```text
+e68848a053a8cec0d31313554a1dcd12570ef1fff9f6f5bdb4a2b04982d842ec  flea-darwin-arm64
+004c36487647c1967faa7ecf1afbd977aab0f39e9af703636d3d6e25e40c46bd  flea-linux-amd64
+```
+
+The public installer matches canonical source. Public fresh install, reinstall,
+0.18.0-to-0.19.0 update and already-current checks pass on both supported native
+platforms, including install paths with spaces and matching final hashes. Normal
+Kirin/Mac CLIs were updated through `flea update`, with prior binaries retained.
+The old 0.18.0 manifest is unchanged; all older downloads remain available.
+
+Supported `flea update-server` completed. The shared server is 0.19.0 / protocol
+27. All 15 roots, 1,339 source hashes and every live content hash were unchanged
+across upgrade and policy activation. Only staging.codepilot.com was set to
+noindex. Native headers were verified before separately removing the consumer
+flag/meta fallback. They remain on live GET/HEAD page, asset, admin, 404 and
+robots.txt responses and the HTTP redirect, with health unchanged. The consumer
+homepage content, signup URLs and robots.txt bytes are preserved. No production
+hostname registration, DNS, Hub code or billing changes occurred.
+
+Website MR !7 merged as `e8ee4aa`, deployed as
+`20261024-204456-c663ba719e4e604fe65116f6`. Channel, homepage, installation/docs,
+release notes and links now show 0.19.0. The live browser confirmed the new
+[Search indexing section](https://fleacms.com/docs#indexing), contents link,
+commands/download URLs and no horizontal overflow at 1280px. The consumer
+`efd26ef` deployed as `20261024-204619-be34ce7d4a930362a4fa8147`. After both normal
+deploys, every live content hash and all 13 unrelated roots/source hashes still
+match. All 21 HTTPS hosts have valid TLS and expected 200/308 responses. Memory
+and swap safeguards are unchanged; no recovery journal remains.
+
+Private evidence/artifacts and site backups are under
+`/home/sean/fleacms-releases/host-indexing-rollout`, with the Mac counterpart under
+`/Users/sean/fleacms-releases/host-indexing-rollout`. Remote pre-upgrade config and
+binary are retained privately at `/var/backups/flea-host-indexing.D6ChkUu8Kj`.
+These receipt-only follow-ups do not change the deployed website snapshot.
+Native ARM64 server execution, clean-Mac acceptance, notarization and real email
+remain unverified. Source browser tests requiring FLEA_TEST_BROWSER were not run;
+the live browser check covered public documentation. No task-owned dev server
+remains running.
 
 ## 0.18.0 published October 21, 2026
 
