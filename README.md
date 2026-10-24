@@ -11,6 +11,29 @@ screenshot, with no frontend build dependency. Keep the image URL absolute.
 
 Build pages with HTML, style them with CSS, and let site admins edit their own content. FleaCMS builds the server, and serves multiple sites with HTTPS directly.
 
+## Hostname indexing
+
+FleaCMS 0.19.0 adds exact-host indexing policy with deployment protocol 27.
+Update the CLI and explicitly upgrade the shared server before using it:
+
+```sh
+flea update
+flea update-server
+flea server indexing root@server staging.example.com noindex
+flea server list root@server
+```
+
+The hostname must already be registered. Type it to confirm; changing policy
+restarts the shared service. Staging receives `X-Robots-Tag: noindex, nofollow`
+without a website app flag or different templates. Policies survive deploy, sync,
+code rollback and site restore. `allow` stops adding the restriction and preserves
+owner-authored restrictions. Keep robots.txt crawlable so crawlers can discover
+noindex; Flea warns about detected static site-wide blocks without rewriting it.
+Site backups exclude policy; removal clears only owned hosts. Verify native
+headers before removing an existing meta fallback. See the
+[public documentation](https://fleacms.com/docs#indexing) and RELEASES.md for
+actual rollout evidence.
+
 ## Getting started
 
 For a new project, install FleaCMS first, then run:
