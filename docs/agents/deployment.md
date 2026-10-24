@@ -47,6 +47,9 @@ No Go or source checkout is needed on either machine. Extract the matching gzip
 server from the CLI, verify its bundled SHA-256 and static Linux ELF architecture,
 then upload. Limit extraction to 100 MiB, honor cancellation and remove failed
 outputs. No network/compiler fallback. Never import serverbundle from the server.
+Build CLIs on Apple Silicon macOS or x86-64 Linux; Linux ARM64 CLI builds are
+no longer supported. ARM64 Linux servers remain supported through cross-compilation,
+with native server acceptance recorded separately.
 Build with bash scripts/build.sh: refresh both CGO-disabled Linux variants before
 embedding into the native CLI. Plain go build may embed stale assets. CI still
 builds/tests on native Linux/Mac runners; see docs/agents/releasing.md.
@@ -75,6 +78,21 @@ Readiness probes wildcard listeners via loopback before setup succeeds; this
 does not verify public firewall access. Administrators must allow inbound TCP 80.
 Tests mock SSH/SCP, verify both Linux ELF builds, and exercise HTTP locally.
 Do not claim real Ubuntu/password/systemd installation was tested without a target.
+
+### Host indexing
+
+Read [hostname indexing](../host-indexing.md). Optional server `indexing` maps
+exact registered hosts to `noindex` or `allow`; omission adds no restriction.
+Use `flea server indexing [ssh-target] <hostname> <noindex|allow>` for explicit,
+reviewed changes. It shares the deployment lock, candidate validation, journal,
+restart and recovery transaction with removal. A fresh revision prevents stale
+readiness. Site/removal review digests include every owned indexing entry.
+Policies persist on ordinary deploy, sync, rollback and site restore; backups
+exclude them. Removal clears only owned aliases, and redeployment after removal
+does not recover prior policy. Full journal recovery restores prior host config.
+Protocol 27 requires matching clients/servers; older typed writers could discard
+this optional map. No migration or site flag is added. Keep release/server update
+and CodePilot consumer fallback removal separately authorized and ordered.
 
 ### Deployment and HTTPS
 
@@ -226,7 +244,7 @@ The server computes an expected-state digest over exactly the routing and
 ancillary entries removal would change. Review prints it; removal recomputes it
 under the existing deployment/content lock and refuses if the site changed since
 review. The operation blocks on a pending deployment or executable recovery and
-removes only the target's `sites`, `content`, `downloads`, owned
+removes only the target's `sites`, `content`, `downloads`, `indexing`, owned
 redirects, TLS allowlist entries and site/branch/commit bookkeeping. The digest
 covers branch and commit, so a commit-only change since review also fails closed.
 Other sites' routing and ancillary entries are preserved. Removing the site that

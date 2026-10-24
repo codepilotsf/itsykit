@@ -1,5 +1,53 @@
 # Installation and updates
 
+## 0.19.0 hostname indexing
+
+Published October 24, 2026 from `da7d0c7`, immutable `v0.19.0`. Native Linux AMD64
+and Mac ARM64 full tests, race, vet, bundled builds, public install/reinstall and
+0.18.0 update checks passed. The public channel, shared server and normal
+Kirin/Mac CLIs are 0.19.0. Native staging enforcement is verified after removing
+the consumer meta fallback. See the release receipt below for remaining limits.
+
+Adds server-owned exact-host `noindex`/`allow` policy with
+`flea server indexing root@server staging.example.com noindex`. Policies survive
+deployment, content synchronization, code rollback and site restore without a
+website app flag or different templates. Keep robots.txt crawlable. Inspect the
+effective policy with `flea server list` or `flea status`.
+
+Deployment protocol moves to 27 with no fallback. Update the CLI with `flea update`
+and explicitly update the shared server with `flea update-server` before using
+protocol-27 deployment or host administration. Local updates do not change the
+remote executable, site releases or running dev servers. Existing configs without
+an indexing map keep their behavior. See [host indexing](host-indexing.md) and
+[0.19.0 verification](agents/release-0190-verification.md) for rollout status.
+Supported CLIs remain Apple Silicon macOS and x86-64 Linux; ARM64 Linux servers
+are cross-compiled and native server acceptance is recorded separately.
+
+## 0.18.0
+
+Published October 21, 2026 from `7ab8f6e`, immutable tag `v0.18.0`. Both supported
+native CLIs passed full tests, race, vet, bundled builds and public install,
+reinstall, update from 0.17.0 and already-current checks with matching hashes.
+The live website and public update channel select 0.18.0. Production remains
+0.17.0 / protocol 26; this feature required no executable server upgrade.
+
+0.18.0 adds `flea new .` and creation in existing empty directories. Hidden
+files and `.git` count as content; nonempty directories are refused without
+an overwrite prompt. Folder-derived naming and Git setup are preserved.
+
+Supported CLI downloads are Apple Silicon macOS and x86-64 Linux. Linux ARM64
+CLI downloads are discontinued; an existing ARM64 CLI cannot update to 0.18.0,
+and the installer rejects ARM64 Linux before changing an installation. Older
+published artifacts remain available at their immutable versioned URLs.
+Both supported CLIs still deploy to x86-64 or ARM64 Linux servers. ARM64 servers
+are cross-compiled; native server acceptance is recorded separately. Deployment
+protocol stays 26 and app wire protocol 2. No server upgrade is required for
+this CLI creation feature.
+
+See [0.18.0 verification](agents/release-0180-verification.md) for publication,
+artifact hashes and the actual platform checks. Historical records below describe
+their original platform matrix, not current download support.
+
 ## 0.17.0
 
 Published October 18, 2026. Source `fe15b8934165a90390c8bd4ff88cc5e9c9e0d753`

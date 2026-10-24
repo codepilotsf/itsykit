@@ -2,13 +2,15 @@
 
 ## Install
 
-The current public release is 0.17.0, for Apple Silicon macOS and Linux
-AMD64/ARM64. It adds custom managed apps and app-owned sessions, with deployment
-protocol 26 and app wire protocol 2. The Mac binary is ad-hoc signed, not
-notarized; clean-Mac, real-email and native AMD64 build/full-suite acceptance
-remain unverified.
+FleaCMS 0.19.0 supports Apple Silicon macOS and x86-64 Linux CLIs. It adds
+exact-host search indexing policy so staging and production can use the same
+website files. Deployment protocol is 27; update the server separately before
+using the matching CLI for deployment or host administration. App wire protocol
+remains 2. The Mac binary is ad-hoc signed, not notarized; clean-Mac and real-email
+acceptance remain unverified. Both CLIs bundle x86-64 and cross-compiled ARM64
+Linux servers; native ARM64 server testing is recorded separately.
 
-Install the current public test release for Apple Silicon Mac or AMD64/ARM64 Linux:
+Install the public test release for Apple Silicon Mac or x86-64 Linux:
 
 ```sh
 curl -fsSL https://fleacms.com/install.sh | bash
@@ -31,6 +33,12 @@ flea new foobar
 cd foobar
 flea dev
 ```
+
+To create a site in the current empty directory, run `flea new .`. You can also
+pass a relative or absolute directory path, such as `flea new ./foobar`. Flea
+creates the directory if missing; an existing directory must be completely empty,
+including hidden files. The folder name still supplies the default site name,
+which you can change when `flea dev` first asks for it.
 
 FleaCMS is a small website server for people who like HTML and CSS. Sites stay in
 ordinary files, with browser-editable content and Git-based deployment to Ubuntu.
@@ -230,7 +238,7 @@ in `.flea.config.json` and are stripped from release archives and backups.
 This structure is required; there is no old-directory fallback or automatic
 migration. Existing projects need an explicit, collision-checked reorganization.
 Keep template-relative paths and public URLs unchanged. Update the server before
-deploying: protocol 26 requires the new structure.
+deploying: protocol 27 requires the new structure.
 
 ## Templates
 
@@ -693,7 +701,7 @@ browser's session. Removing an admin revokes their sessions. Session files stay
 private; status reports site and deployment information.
 
 The production service can write the site's private `flea/` directory, not its
-release directory or configuration. Deployment protocol 26 requires the updated
+release directory or configuration. Deployment protocol 27 requires the updated
 server and these permissions; there is no compatibility fallback for older servers.
 Custom-app storage lives under `flea/runtime/apps/<name>/` in that private
 directory, outside the immutable release.
@@ -810,7 +818,7 @@ FLEA_EMAIL_FROM="login@your-verified-domain.com"
 ```
 
 Production admin access requires HTTPS. An admin-enabled HTTP-only deployment is
-refused. Protocol 26 requires both the updated server binary and systemd unit, a
+refused. Protocol 27 requires both the updated server binary and systemd unit, a
 service-owned `/etc/flea/deploy.lock`, and writable managed content/runtime directories.
 Fresh setup installs these. Existing servers need an administrator-reviewed upgrade;
 do not use setup's destructive reset to upgrade a server with sites. Existing
@@ -869,7 +877,7 @@ app-owned sessions, and
 This replaces top-level `contact` configuration and `/_flea/contact`, without
 aliases or automatic migration. Update existing forms/config explicitly, add
 `{csrf}`, and move the thank-you page beneath the chosen mount. Deployment
-protocol 26 requires the matching server. Nothing is deployed by a local build.
+protocol 27 requires the matching server. Nothing is deployed by a local build.
 Remote services, package registries and config-declared read routes remain
 planned. Blog is a built-in content application, described above.
 
@@ -1402,7 +1410,7 @@ sudo systemctl restart flea
 ```
 
 Existing installations are not upgraded by rerunning setup. Deployment requires
-the current server executable (deployment protocol 26, unquoted snip syntax).
+the current server executable (deployment protocol 27, unquoted snip syntax).
 For an older installation,
 update the executable and systemd unit deliberately, preserve server.json and all
 sites, and create `/var/lib/flea/certs` owned by `flea:flea` with mode
@@ -1417,6 +1425,25 @@ After confirmation, a terminal spinner shows that the update is running; redirec
 output uses a plain progress line. Animation stops before SSH diagnostics or
 interactive sudo prompts, and successful updates print a completion message.
 
+### Hostname indexing policy
+
+FleaCMS 0.19.0 with matching protocol-27 clients and servers supports exact-host staging protection:
+
+```sh
+flea server indexing root@server staging.example.com noindex
+flea server list root@server
+```
+
+This sends `X-Robots-Tag: noindex, nofollow` on that registered hostname while
+other aliases can serve the same release without the restriction. Set `allow`
+to stop adding it. Policies live in server configuration and survive ordinary
+deploys, content sync, code rollback and site restore. Omitted settings never
+reset them. Website files stay unchanged; owner-authored restrictions still apply.
+Keep robots.txt crawlable so crawlers can discover noindex. The command asks for
+the exact hostname and restarts the shared service. Matching client/server
+protocols are required; 0.18.0 and earlier do not include this feature. See
+[configuration, preservation and rollout](docs/host-indexing.md).
+
 ### List or remove sites on a server
 
 These commands manage sites already installed on a server. They accept an
@@ -1430,8 +1457,8 @@ flea server remove root@server example
 ```
 
 `flea server list` shows each site's name and branch, then its HTTPS domains,
-then its HTTP-only domains, then any redirects. It omits the release and never
-repeats the domains as plain lines, and is read-only.
+then its HTTP-only domains, indexing policies and any redirects. It omits the
+release and never repeats the domains as plain lines, and is read-only.
 
 `flea server remove` unregisters one site's hostnames after showing the exact
 affected domains and asking you to type the site name. Omit the site name to see
@@ -1479,7 +1506,7 @@ Run `source ~/.zshrc`, then `flea-build` from any directory. The script finds
 Go on PATH or at `/usr/local/go/bin/go`; `GO_BINARY` overrides that location.
 Contributors need Go, Bash, gzip and shasum; installed users do not need them.
 
-`new` accepts a simple name containing letters, digits, underscores, and hyphens, starting with a letter or digit. It refuses existing destinations, including empty directories and symlinks. An interrupted creation may leave a partial new directory for inspection. `status` validates configuration, routes, templates, and current content without listening on a port. Exit codes are 0 for success, 1 for project or runtime failures, and 2 for invalid CLI usage.
+`new` accepts a directory path, including `.` for the current directory. The parent directory must exist. Quote paths containing spaces, for example `flea new "my project"`. Existing directories must be empty, including hidden files and `.git`; directory symlinks and file targets are refused. An interrupted creation may leave partial generated files for inspection. `status` validates configuration, routes, templates, and current content without listening on a port. Exit codes are 0 for success, 1 for project or runtime failures, and 2 for invalid CLI usage.
 
 `flea new my-site` also initializes Git on `main`, stages the generated files
 and creates an `Initial site` commit using your normal Git identity, hooks and
@@ -1547,7 +1574,7 @@ directions and a sample-page review before the full build, unless you explicitly
 delegate those choices. Small maintenance edits do not require a new design review.
 
 Editable regions, short IDs, sanitized HTML, page metadata, content-preserving
-deployment, and archived orphan pruning are implemented. Deployment protocol 26
+deployment, and archived orphan pruning are implemented. Deployment protocol 27
 requires an updated server binary; older servers are refused before upload.
 Local extraction preserves unreferenced content until deployment. There is no
 Markdown renderer or schema migration engine. Inline rich-text editing and

@@ -6,6 +6,10 @@ if [[ -z "${GO_BINARY:-}" ]]; then
   GO_BINARY=$(command -v go || true)
   if [[ -z "$GO_BINARY" ]]; then GO_BINARY=/usr/local/go/bin/go; fi
 fi
+case "$("$GO_BINARY" env GOOS)-$("$GO_BINARY" env GOARCH)" in
+  darwin-arm64|linux-amd64) ;;
+  *) echo 'CLI builds support Apple Silicon macOS and x86-64 Linux.' >&2; exit 1 ;;
+esac
 source scripts/version.sh
 version=$(flea_version)
 export CGO_ENABLED=0 GOFLAGS=

@@ -13,7 +13,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
 
@@ -37,7 +36,7 @@ Usage
   flea <command>
 
 Build your site
-  new <site-name>  Create a new site
+  new <directory>  Create a new site
   reset            Reset this local site to a clean start
   dev              Start the local development server
   status           Show local and remote site status
@@ -72,8 +71,9 @@ Command details
 
 const serverUsage = `Usage: flea server list [ssh-target]
        flea server remove [ssh-target] [site-name]
+       flea server indexing [ssh-target] <hostname> <noindex|allow>
 
-List or remove sites installed on a FleaCMS server over SSH. No local site,
+Inspect or configure sites installed on a FleaCMS server over SSH. No local site,
 Git repository or saved deployment settings are required. Omit the SSH target to
 be asked for the server login.
 
@@ -88,7 +88,11 @@ be asked for the server login.
            same name; back up or pull the site first if a later deployment must
            keep it.
 
-Both commands reject servers running an older FleaCMS protocol; update the
+  indexing Set one registered hostname to noindex, nofollow or add no restriction.
+           Keeps website files unchanged. Requires typing the exact hostname and
+           restarts the shared service. Policies survive deploy, sync and rollback.
+
+All commands reject servers running an older FleaCMS protocol; update the
 server first. Nothing is deleted or pruned.
 
 `
@@ -378,25 +382,36 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		skipGit := false
 		starter := false
 		var names []string
+		pathsOnly := false
 		for _, arg := range args[1:] {
+			if pathsOnly {
+				names = append(names, arg)
+				continue
+			}
 			switch arg {
+			case "--":
+				pathsOnly = true
 			case "--starter", "-s":
 				starter = true
 			case "--skip-git", "-skip-git":
 				skipGit = true
 			case "-h", "--help":
-				fmt.Fprintln(out, "Usage: flea new [--starter|-s] <site-name> [--skip-git]\n\nCreates a clean site with an initial Git commit on main.\nUse --starter or -s for example pages and team content.\nUse --skip-git to leave Git setup to you.")
+				fmt.Fprintln(out, "Usage: flea new [--starter|-s] <directory> [--skip-git]\n\nCreates a clean site with an initial Git commit on main.\nUse . for the current directory. Existing directories must be empty.\nUse --starter or -s for example pages and team content.\nUse --skip-git to leave Git setup to you.")
 				fmt.Fprintln(out)
 				return 0
 			default:
+				if strings.HasPrefix(arg, "-") {
+					fmt.Fprintf(errOut, "Unknown option: %s\nRun flea new --help for usage.\n", arg)
+					return 2
+				}
 				names = append(names, arg)
 			}
 		}
-		if len(names) != 1 || !regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9_-]*$`).MatchString(names[0]) {
+		if len(names) != 1 || strings.TrimSpace(names[0]) == "" {
 			fmt.Fprint(errOut, usage)
 			return 2
 		}
-		name := names[0]
+		name := filepath.Clean(names[0])
 		if err := createSite(name, starter); err != nil {
 			return fail(err)
 		}
@@ -437,7 +452,19 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				}
 			}
 		}
-		fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\n", name)
+		if name == "." {
+			fmt.Fprint(out, "\nStart developing:\n  flea dev\n\n")
+		} else {
+			// Quote paths containing spaces or shell metacharacters for copying.
+			cdPath := name
+			if strings.ContainsAny(cdPath, " \t\n\r'\"`$;&|<>(){}[]*?!~#\\") || strings.HasPrefix(cdPath, "-") {
+				if strings.HasPrefix(cdPath, "-") {
+					cdPath = "./" + cdPath
+				}
+				cdPath = "'" + strings.ReplaceAll(cdPath, "'", "'\"'\"'") + "'"
+			}
+			fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\n", cdPath)
+		}
 		return 0
 	case "reset":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
@@ -679,6 +706,24 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 		return 0
 	}
 	switch args[0] {
+	case "indexing":
+		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
+			fmt.Fprint(out, serverUsage)
+			return 0
+		}
+		if len(args) != 3 && len(args) != 4 {
+			fmt.Fprintln(errOut, "Usage: flea server indexing [ssh-target] <hostname> <noindex|allow>")
+			return 2
+		}
+		target := ""
+		if len(args) == 4 {
+			target = args[1]
+		}
+		if err := setup.ServerIndexing(ctx, target, args[len(args)-2], args[len(args)-1], in, out, errOut); err != nil {
+			fmt.Fprintln(errOut, "flea:", err)
+			return 1
+		}
+		return 0
 	case "list":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
 			fmt.Fprint(out, serverUsage)
@@ -728,16 +773,44 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 	}
 }
 
-// Create reserves a new directory first and never overwrites an existing target.
+// Create makes a site in a new or empty directory without overwriting files.
 func Create(target string) error {
 	return createSite(target, false)
 }
 
 func createSite(target string, starter bool) error {
-	if err := os.Mkdir(target, 0755); err != nil {
+	target = filepath.Clean(target)
+	if err := os.Mkdir(target, 0755); err != nil && !errors.Is(err, fs.ErrExist) {
 		return err
 	}
-	err := fs.WalkDir(templates.Files, ".", func(name string, entry fs.DirEntry, err error) error {
+	info, err := os.Lstat(target)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("%s is not a directory. Choose an empty directory", target)
+	}
+	boundary, err := os.OpenRoot(target)
+	if err != nil {
+		return err
+	}
+	defer boundary.Close()
+	dir, err := boundary.Open(".")
+	if err != nil {
+		return err
+	}
+	entries, readErr := dir.Readdirnames(1)
+	closeErr := dir.Close()
+	if readErr != nil && readErr != io.EOF {
+		return readErr
+	}
+	if closeErr != nil {
+		return closeErr
+	}
+	if len(entries) != 0 {
+		return fmt.Errorf("Directory %s isn't empty. Choose an empty directory", target)
+	}
+	err = fs.WalkDir(templates.Files, ".", func(name string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -766,11 +839,11 @@ func createSite(target string, starter bool) error {
 				return err
 			}
 		}
-		dest := filepath.Join(target, filepath.FromSlash(name))
-		if err := os.MkdirAll(filepath.Dir(dest), 0755); err != nil {
+		dest := filepath.FromSlash(name)
+		if err := boundary.MkdirAll(filepath.Dir(dest), 0755); err != nil {
 			return err
 		}
-		f, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+		f, err := boundary.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
 		if err != nil {
 			return err
 		}
@@ -792,7 +865,7 @@ func createSite(target string, starter bool) error {
 		err = site.IgnoreSessionFiles(target)
 	}
 	if err == nil {
-		err = os.Mkdir(filepath.Join(target, "flea", "media"), 0755)
+		err = boundary.Mkdir(filepath.Join("flea", "media"), 0755)
 	}
 	return err
 }

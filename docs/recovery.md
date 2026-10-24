@@ -26,7 +26,8 @@ flea server remove [ssh-target] [site-name]
 
 Rollback republishes earlier code as a new release while preserving current admin
 snips, multisnips and photos. Styles come from the selected code release. It moves all of this site's aliases together;
-other sites, HTTPS policy and redirects stay unchanged. It asks for confirmation
+other sites, HTTPS policy, hostname indexing policy and redirects stay unchanged.
+It asks for confirmation
 and refuses if the active release changed after review. Incompatible old templates
 fail validation rather than discarding current content.
 
@@ -48,13 +49,14 @@ Credentials, certificates, deployment settings, sessions and custom-app storage
 are excluded. Custom-app storage lives in the stable per-site runtime directory
 (`/var/lib/flea/sites/<name>/flea/runtime/apps/<name>`), so a rollback or restore
 does not remove it, but it is never backed up automatically; back it up yourself.
-A backup is not a whole-server disaster-recovery image. Record server/email setup
-separately.
+Host indexing policy is excluded too. A backup is not a whole-server
+disaster-recovery image. Record server/email setup separately.
 
 Restore requires typing `RESTORE`. It replaces live code, site configuration and
 editable content with the backup, so first take a fresh backup if newer changes
 might matter. The destination must already exist and match the backup's site and
-branch. Host routing, credentials, certificates and session files stay in place.
+branch. Host routing, current hostname indexing policy, credentials, certificates
+and session files stay in place.
 Restored admin configuration still determines who has access.
 
 Checksums detect corruption, not authorship. Only restore backups you trust.
@@ -62,6 +64,13 @@ Extraction rejects links, traversal, malformed archives and oversized payloads.
 If live state changes while you review the restore, the operation stops. Failed
 activation restores the previous configuration; interrupted activation retains
 the existing server-side recovery journal.
+
+Interrupted indexing-policy changes use the same `sudo flea-server -recover`
+transaction as deployment/removal. It restores the complete prior host config,
+including indexing policy; code rollback and site restore instead preserve the
+current policy. Removing a site clears its owned indexing entries, so record and
+reconfigure them explicitly after redeployment. See [host indexing](host-indexing.md)
+for rollout, policy rollback and protocol downgrade limits.
 
 ## Server upgrades
 

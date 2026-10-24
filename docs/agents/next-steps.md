@@ -10,12 +10,48 @@ for completed changes, and [README.md](../../README.md) for current usage.
 
 Before updating older site sources, remove their obsolete Theme toolbar button
 while preserving custom layouts. Existing hosted toolbar partials have not been
-rewritten by the shared executable rollout. Preview noindex and Hub branch
-workflow verification are separate planned tasks. Theme removal is included in
+rewritten by the shared executable rollout. Native host indexing shipped in 0.19.0 / protocol 27.
+Shared-server upgrade, live header isolation and the separately deployed CodePilot
+consumer cleanup are verified. See [release evidence](release-0190-verification.md)
+and the [rollback procedure](../host-indexing.md#codepilot-rollout-and-rollback).
+Hub branch workflow verification remains a separate task. Theme removal is included in
 public 0.15.1. Native AMD64 build/full-suite, clean-Mac and notarization
 acceptance remain open.
 
-## Current release status (October 18, 2026)
+## Current release status (October 24, 2026)
+
+### Public 0.19.0
+
+Published from `da7d0c7` / immutable `v0.19.0`, merged as `a6bab4e` through MR !18.
+Native Linux AMD64 and Mac ARM64 full tests, race, vet, bundled builds and exact
+artifact smoke passed. Both platforms passed public install/reinstall/update
+checks, and normal Kirin/Mac CLIs are updated with matching public hashes.
+The shared server is 0.19.0 / protocol 27, with only staging.codepilot.com set to
+noindex. Its native header remains after the consumer flag/meta cleanup and two
+normal deployments; all 21 HTTPS hosts are healthy, all live content hashes and
+13 unaffected roots/source hashes are preserved. Public website/docs/channel
+show 0.19.0. See [verification and limits](release-0190-verification.md).
+
+
+### Public 0.18.0
+
+0.18.0 is published from `7ab8f6e` / immutable `v0.18.0`, merged as `f02af1d`.
+It adds creation in existing empty directories and discontinues Linux ARM64 CLI
+downloads. Native Mac ARM64 and Linux AMD64 full tests, vet, race, bundled builds,
+public installer/reinstaller and 0.17.0-to-0.18.0 updater checks pass.
+
+Both CLIs retain the cross-compiled ARM64 server; native ARM64 server acceptance
+was not run and is recorded separately. Production remains 0.17.0 / protocol 26;
+this CLI feature required no executable server upgrade. Website `1c786f2`,
+activation `20261021-174934-4dbfcc67281f82d2e68b36a4`, advances the public channel
+and docs. All 19 HTTPS hosts are healthy, all editable-content hashes are
+preserved, and recovery is clear. Old published ARM64 downloads remain available.
+
+Native AMD64 build/full-suite acceptance now passes for 0.18.0. Native ARM64
+server execution, clean-Mac, notarization and real email remain unverified.
+See [release verification](release-0180-verification.md).
+
+## Previous release status (October 18, 2026)
 
 ### Public 0.17.0
 

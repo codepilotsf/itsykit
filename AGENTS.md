@@ -99,6 +99,9 @@ the development lock. See the runtime guide.
 `--lan`/`-l` explicitly enables full trusted-network development over HTTP;
 preserve the shared exact Host/port and private/Tailscale peer gate, including
 detected hostname/local aliases, and ordinary auth/CSRF.
+`flea new <directory>` accepts paths, including `.` for the current directory.
+Existing directories must be completely empty, including hidden files and `.git`;
+reject file targets and directory symlinks without writing or prompting to overwrite.
 `flea new` creates an initial Git commit on main unless `--skip-git` is used;
 see the runtime guide for failure recovery and remote setup. It defaults to a
 clean layout/index. `--starter`/`-s` adds demo pages and a six-person fictional team. `flea reset` confirms before resetting all local files
@@ -128,6 +131,11 @@ Collection photos use a thumbnail picker with private upload previews; keep
 dialog Done separate from publishing with page Save changes.
 The declarative toolbar and its icons render before bootstrap; do not recreate
 its shell. Preserve drafts after errors and during source reloads.
+
+Host indexing belongs to optional server `indexing` policy, never site `app`
+values. Preserve it on deploy/sync/code recovery; removal clears only owned hosts.
+See [host indexing](docs/host-indexing.md) and the deployment guide. Protocol 27
+requires matching clients/servers; keep release rollout separate from site deploy.
 
 `flea status` shows local validation first, then automatically checks the current
 branch's saved remote. Keep it read-only; see the runtime and sync guides.
@@ -175,6 +183,10 @@ build script, set `GO_BINARY=/usr/local/go/bin/go` if necessary.
 Browser tests use
 `FLEA_TEST_BROWSER='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'`.
 
+CLI builds and public releases support Apple Silicon macOS and x86-64 Linux.
+Do not publish a Linux ARM64 CLI. Both CLIs retain the cross-compiled ARM64 server;
+record native ARM64 server acceptance separately rather than requiring an ARM64
+Linux runner for every release. Preserve historical published downloads.
 When a build is required, use `scripts/build.sh`: it refreshes
 the matching Contact child before each parent, then both embedded Linux servers
 before building `bin/flea`. Plain `go build` can

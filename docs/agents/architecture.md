@@ -87,7 +87,10 @@ development rules. docs/agents/spec.md also describes features that are not impl
 ## Where to start
 
 Local site creation composes the canonical starter with embedded minimal content
-overrides by default; `--starter` opts into the examples. `cli/reset.go` validates
+overrides by default; `--starter` opts into the examples. Creation accepts a new
+or empty directory, including the current directory via `flea new .`; the CLI
+checks emptiness before scaffold writes confined by os.Root with exclusive file
+creation. It refuses nonempty directories and linked targets. `cli/reset.go` validates
 a fresh minimal tree before confirmation, takes the dev/pull lock, and moves old
 entries (except .git) to a mode-0700 sibling backup before publishing the new tree.
 Ordinary failures attempt rollback; interruptions leave the printed backup and
@@ -137,7 +140,8 @@ and waits for its watcher, HTTP shutdown and development-lock release before
 loading the project. Pull/reset do not expose this endpoint and remain exclusive.
 The lock remains authoritative; stale sockets never authorize concurrent writes.
 Build both Linux servers before embedding their compressed bytes and hashes into
-the CLI. Setup validates extraction before reset confirmation/upload. There is
+the CLI. Supported CLI targets are darwin/arm64 and linux/amd64; the linux/arm64
+server is cross-compiled and its native acceptance recorded separately. Setup validates extraction before reset confirmation/upload. There is
 no runtime download/compiler fallback. scripts/build.sh refreshes generated assets.
 
 ## Loading and serving
@@ -366,6 +370,22 @@ that the active release, branch and domains agree before comparing commits.
 `syncstate.CompareContent` and `CompareValue` are pure read-only comparisons;
 they classify direction only with the corresponding destination-scoped baseline.
 Public reachability is a separate bounded HEAD probe, never evidence of code sync.
+
+### Host indexing boundary
+
+`host.Config.Indexing` is optional administrator-owned exact-host policy outside
+site/runtime app settings and portable snapshots. `host/indexing.go` enforces
+noindex/nofollow at response commitment and flush without buffering. Selection
+uses registered `requestHost`, outside shared-by-root handlers and around HTTP
+redirects; health and TLS isolation retain their contracts. Static robots.txt
+warnings derive from validated assets at load, never request filesystem reads.
+`admin.SetIndexing` changes one managed hostname using a reviewed site digest,
+shared lock and config-publication transaction. It assigns a fresh readiness
+revision without changing site releases/history. Inventory includes effective
+policies and diagnostics. Typed rewrites retain the map; removal deletes only
+owned hosts. Code recovery retains current policy; journal recovery restores the
+prior whole config. Protocol 27 gates old clients that could discard the map.
+See [host indexing](../host-indexing.md).
 
 ### Remote activation
 

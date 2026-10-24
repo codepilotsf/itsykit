@@ -6,13 +6,19 @@ Since 0.7.0, versioned binaries live in the host's separate
 [disk-backed download store](download-hosting.md), not the website Git tree.
 Use the store publication procedure before advancing website latest.txt. Older
 sections describing website version directories are historical staging guidance.
-The current public release is 0.17.0, source
-`fe15b8934165a90390c8bd4ff88cc5e9c9e0d753` with immutable tag `v0.17.0`. It adds
-custom managed apps, app-owned sessions and deployment protocol 26; see
-[release verification](release-0170-verification.md) for artifacts, provenance,
-public installer checks and remaining native acceptance limits. The shared
-server and normal Mac/Asahi CLIs are on 0.17.0 / protocol 26. Never overwrite
-published 0.17.0 bytes.
+0.18.0 adds creation in empty destination directories and removes the Linux ARM64
+CLI from the supported release matrix. Apple Silicon macOS and x86-64 Linux
+remain supported CLI platforms. Both CLIs retain x86-64 and cross-compiled ARM64
+Linux servers; native ARM64 server acceptance is recorded separately and does
+not block CLI publication. That release uses deployment protocol 26 and app protocol 2.
+See [0.18.0 verification](release-0180-verification.md) for actual publication,
+artifact and acceptance status. Historical published downloads remain immutable.
+
+0.19.0 adds hostname indexing with protocol 27 and needs matching clients and
+servers. See [0.19.0 verification](release-0190-verification.md) for build and
+rollout status. Never replace existing published bytes. Follow the separate
+[host-indexing rollout](../host-indexing.md#codepilot-rollout-and-rollback), keeping
+CodePilot's current staging fallback until live native enforcement is verified.
 
 ## V1 distribution plan
 
@@ -25,21 +31,21 @@ The public test release is hosted by the separate website repository at
 `/Users/sean/Projects/flea-website`. Its `RELEASES.md` records build provenance and
 actual public installer/update checks. Versioned binaries, SHA256SUMS,
 latest.txt and install.sh are live on fleacms.com. Public installation, reinstall,
-update and already-current checks pass on all three advertised platforms. The
+update and already-current checks pass on both currently supported platforms. The
 Mac binary is ad-hoc signed; clean-machine Mac testing and notarization remain
 unverified, so do not describe this as a completed V1 release.
 See [installation and trust](../installation.md).
 
-CLI release targets are macOS ARM64, Linux AMD64 and Linux ARM64. Each uses a
-native runner for tests, race checks, vet and bundled CLI smoke tests. macOS AMD64
-is outside the public release matrix. The pipeline has not been run remotely;
+CLI release targets are macOS ARM64 and Linux AMD64. Each uses a native runner
+for tests, race checks, vet and bundled CLI smoke tests. Linux ARM64 and macOS AMD64
+are outside the public release matrix. The pipeline has not been run remotely;
 manual verification must record any cross-compilation and remaining native gaps.
 Public artifacts are hosted in the website's versioned release directories without
 opening the source repository. The registry instructions below are historical.
 
 `scripts/release.sh client <arch>` now supports native Linux as well as Mac
 runners. Each needs both previously built Linux server artifacts in dist/.
-After native checks for all three CLIs, `scripts/stage-release.sh` prepares only
+After native checks for both supported CLIs, `scripts/stage-release.sh` prepares only
 `dist/public/install.sh`, `releases/latest.txt`, and immutable
 `releases/<version>/` binaries plus SHA256SUMS. It requires a matching stable tag
 and refuses an existing version staging directory. It does not upload anything.
@@ -94,8 +100,11 @@ as required by the existing committed-source workflow.
 
 The repository's .gitlab-ci.yml builds tagged releases on native runners:
 
-- linux-amd64 and linux-arm64 for server builds and tests.
-- macos-arm64, linux-amd64 and linux-arm64 for CLI builds and tests.
+- linux-amd64 for native server tests/builds and cross-compiling the ARM64 server.
+- macos-arm64 and linux-amd64 for native CLI builds and tests.
+
+An ARM64 Linux runner is optional for additional native server acceptance. A
+cross-built server is not native-tested; record that gap in each release receipt.
 
 Register trusted shell runners with those exact tags. Each needs Go, Git, Bash,
 gzip and shasum; the publishing Linux runner also needs curl. Race tests need a C
@@ -117,18 +126,20 @@ GitLab package API: https://docs.gitlab.com/user/packages/generic_packages/
    the Unreleased changelog entries into a dated section for that version.
    Commit the changes and run the tests.
 2. Create and push a new immutable tag, for example v0.2.0.
-3. Both native Linux jobs test and build static server binaries.
-4. The native Mac ARM64 and both Linux CLI jobs embed both Linux artifacts using
+3. The native Linux AMD64 job tests/builds its server and cross-compiles the ARM64 server.
+4. The native Mac ARM64 and Linux AMD64 CLI jobs embed both Linux artifacts using
    scripts/bundle.sh, test extraction and build CLIs with the same version.
 5. Review the artifacts, then run the manual publish-stage job. Despite its
    stage name, it only prepares downloadable `dist/public/` CI artifacts.
    It does not upload to fleacms.com or advance the public update channel.
    Upload to the selected public host only after approval and verification.
 6. Test the downloaded Mac CLI on a clean Mac and setup on a disposable Ubuntu
-   machine for each architecture before announcing the release or updating a tap.
+   machine for x86-64 before announcing the release or updating a tap. Record
+   ARM64 server native acceptance separately when hardware is available.
 
-Artifacts are raw executables named flea-linux-amd64, flea-linux-arm64,
-flea-darwin-arm64, flea-server-linux-amd64, and flea-server-linux-arm64.
+Public CLI artifacts are flea-linux-amd64 and flea-darwin-arm64. Build artifacts
+also include flea-server-linux-amd64 and flea-server-linux-arm64 for embedding.
+Linux ARM64 CLI artifacts are no longer built, staged or published.
 A Homebrew formula can install the appropriate Mac binary directly, with its release SHA-256 and
 no Go dependency. Creating/publishing that tap remains a separate step.
 

@@ -30,6 +30,7 @@ import (
 const HealthPath = "/_flea/health"
 
 type Config struct {
+	Indexing     map[string]string `json:"indexing,omitempty"`
 	Downloads    map[string]string `json:"downloads,omitempty"`
 	Content      map[string]string `json:"content,omitempty"`
 	Listen       string            `json:"listen"`
@@ -39,6 +40,8 @@ type Config struct {
 	Redirects    map[string]string `json:"redirects,omitempty"`
 	SiteBranches map[string]string `json:"site_branches,omitempty"`
 	Commits      map[string]string `json:"commits,omitempty"`
+
+	indexingWarnings map[string][]string
 }
 
 func Load(configPath string, logger *log.Logger) (Config, http.Handler, error) {
@@ -72,6 +75,10 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 			return config, nil, fmt.Errorf("invalid WWW redirect %s to %s", from, to)
 		}
 	}
+	if err := validateIndexing(config); err != nil {
+		return config, nil, err
+	}
+	robotsWarnings := map[string]string{}
 	handlers := map[string]http.Handler{}
 	downloadHandlers := map[string]*downloads{}
 	downloadRoots := map[string]string{}
@@ -175,6 +182,7 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 				logger.Printf("Warning: %s: %s", host, warning)
 			}
 		}
+		robotsWarnings[key] = robotsCrawlWarning(project)
 		public := site.NewProductionServer(project, logger)
 		appSites = append(appSites, public)
 		handlers[host] = public
@@ -194,6 +202,15 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 		}
 		byRoot[key] = handlers[host]
 		contentPaths[key] = contentPath
+	}
+	config.indexingWarnings = map[string][]string{}
+	for domain, mode := range config.Indexing {
+		if warning := robotsWarnings[filepath.Clean(config.Sites[domain])]; mode == "noindex" && warning != "" {
+			config.indexingWarnings[domain] = []string{warning}
+			if logger != nil {
+				logger.Printf("Warning: %s: %s", domain, warning)
+			}
+		}
 	}
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == HealthPath {
@@ -237,7 +254,7 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 		}
 		http.NotFound(w, r)
 	})
-	return config, &runtimeHandler{Handler: handler, sites: appSites, sender: sender, budget: contactBudget}, nil
+	return config, &runtimeHandler{Handler: indexingHandler(config, handler), sites: appSites, sender: sender, budget: contactBudget}, nil
 }
 
 type runtimeHandler struct {
