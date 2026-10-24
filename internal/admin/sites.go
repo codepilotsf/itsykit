@@ -24,15 +24,17 @@ func ValidSiteName(name string) bool {
 // site. State digests exactly the routing and ancillary entries that removal
 // would change, so a stale review cannot remove a concurrently edited site.
 type SiteSummary struct {
-	Name      string   `json:"name"`
-	Branch    string   `json:"branch,omitempty"`
-	Domains   []string `json:"domains"`
-	Release   string   `json:"release,omitempty"`
-	Redirects []string `json:"redirects,omitempty"`
-	HTTPS     []string `json:"https,omitempty"`
-	Retained  string   `json:"retained,omitempty"`
-	State     string   `json:"state"`
-	Managed   bool     `json:"managed"`
+	Indexing  map[string]string `json:"indexing"`
+	Warnings  []string          `json:"warnings,omitempty"`
+	Name      string            `json:"name"`
+	Branch    string            `json:"branch,omitempty"`
+	Domains   []string          `json:"domains"`
+	Release   string            `json:"release,omitempty"`
+	Redirects []string          `json:"redirects,omitempty"`
+	HTTPS     []string          `json:"https,omitempty"`
+	Retained  string            `json:"retained,omitempty"`
+	State     string            `json:"state"`
+	Managed   bool              `json:"managed"`
 }
 
 // siteGroup is the routing currently owned by one release root.
@@ -46,6 +48,7 @@ type siteGroup struct {
 // siteState is the canonical form the removal digest covers. Map keys marshal
 // in sorted order, so the digest is stable across processes.
 type siteState struct {
+	Indexing  map[string]string `json:"indexing,omitempty"`
 	Name      string            `json:"name"`
 	Branch    string            `json:"branch,omitempty"`
 	Commit    string            `json:"commit,omitempty"`
@@ -127,6 +130,12 @@ func (m Manager) RemoveSite(ctx context.Context, name, expected string) error {
 	if err = removeSiteEntries(&c, g); err != nil {
 		return err
 	}
+	return m.publishHostConfig(ctx, c, old, fmt.Sprintf("Removing site %s from routing (files retained)...", name))
+}
+
+// publishHostConfig requires the deployment lock and a checked recovery journal.
+// Both removal and indexing changes use the same validated, recoverable transaction.
+func (m Manager) publishHostConfig(ctx context.Context, c host.Config, old []byte, progress string) error {
 	data, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		return err
@@ -152,7 +161,7 @@ func (m Manager) RemoveSite(ctx context.Context, name, expected string) error {
 		return err
 	}
 	if m.Progress != nil {
-		fmt.Fprintf(m.Progress, "Removing site %s from routing (files retained)...\n", name)
+		fmt.Fprintln(m.Progress, progress)
 	}
 	if err = atomicWrite(m.ConfigPath, data, 0644); err == nil {
 		err = m.Restart(ctx)
@@ -164,12 +173,12 @@ func (m Manager) RemoveSite(ctx context.Context, name, expected string) error {
 		recovery, cancel := context.WithTimeout(context.Background(), 45*time.Second)
 		defer cancel()
 		if restoreErr := m.restore(recovery); restoreErr != nil {
-			return fmt.Errorf("removal failed: %w; recovery also failed: %v; run sudo flea-server -recover", err, restoreErr)
+			return fmt.Errorf("host configuration change failed: %w; recovery also failed: %v; run sudo flea-server -recover", err, restoreErr)
 		}
-		return fmt.Errorf("removal failed; previous configuration restored: %w", err)
+		return fmt.Errorf("host configuration change failed; previous configuration restored: %w", err)
 	}
 	if err = atomicWrite(filepath.Join(filepath.Dir(m.ConfigPath), "server.previous.json"), old, 0600); err != nil {
-		return fmt.Errorf("site removed but backup failed; recovery journal retained: %w", err)
+		return fmt.Errorf("host configuration active but backup failed; recovery journal retained: %w", err)
 	}
 	if err = os.Remove(m.pending()); err != nil {
 		return err
@@ -189,6 +198,7 @@ func removeSiteEntries(c *host.Config, g siteGroup) error {
 		delete(c.Sites, d)
 		delete(c.Content, d)
 		delete(c.Downloads, d)
+		delete(c.Indexing, d)
 	}
 	for from, to := range c.Redirects {
 		if !owned[from] && !owned[to] {
@@ -253,6 +263,17 @@ func summarize(c host.Config, dataDir string, g siteGroup) SiteSummary {
 		HTTPS:     append([]string{}, st.TLS...),
 		Redirects: make([]string, 0, len(st.Redirects)),
 	}
+	s.Indexing = map[string]string{}
+	for _, domain := range s.Domains {
+		mode := c.Indexing[domain]
+		if mode == "" {
+			mode = "allow"
+		}
+		s.Indexing[domain] = mode
+		for _, warning := range c.IndexingWarnings(domain) {
+			s.Warnings = append(s.Warnings, domain+": "+warning)
+		}
+	}
 	if g.managed {
 		s.Retained = filepath.Join(dataDir, "sites", g.name)
 	}
@@ -278,6 +299,12 @@ func stateFor(c host.Config, g siteGroup) siteState {
 		st.Release = filepath.Base(g.root)
 	}
 	for _, d := range domains {
+		if v := c.Indexing[d]; v != "" {
+			if st.Indexing == nil {
+				st.Indexing = map[string]string{}
+			}
+			st.Indexing[d] = v
+		}
 		if v := c.Content[d]; v != "" {
 			if st.Content == nil {
 				st.Content = map[string]string{}

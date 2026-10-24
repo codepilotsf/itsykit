@@ -86,6 +86,7 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 	var remote syncstate.Snapshot
 	var record admin.ReleaseRecord
 	var websiteErr error
+	var liveInfo admin.SiteSummary
 	baseline, err := readBaseline(ctx, p.Root, settings)
 	if err == nil && baseline.Snips != nil {
 		var raw []byte
@@ -111,6 +112,7 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 			found := map[string]bool{}
 			for _, item := range inventory {
 				if item.Name == settings.Name && item.Branch == state.Branch && item.Managed && item.Release == filepath.Base(remote.Revision) {
+					liveInfo = item
 					for _, domain := range item.Domains {
 						found[domain] = true
 					}
@@ -152,6 +154,7 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 		fmt.Fprintln(out, "  State        Not deployed\n\nNext: run flea deploy to publish this branch.")
 		return nil
 	}
+	printIndexing(out, liveInfo)
 	if websiteErr == nil {
 		fmt.Fprintln(out, "  Connection   Reachable")
 	} else {

@@ -10,9 +10,15 @@ sections describing website version directories are historical staging guidance.
 CLI from the supported release matrix. Apple Silicon macOS and x86-64 Linux
 remain supported CLI platforms. Both CLIs retain x86-64 and cross-compiled ARM64
 Linux servers; native ARM64 server acceptance is recorded separately and does
-not block CLI publication. Deployment protocol remains 26 and app protocol 2.
+not block CLI publication. That release uses deployment protocol 26 and app protocol 2.
 See [0.18.0 verification](release-0180-verification.md) for actual publication,
 artifact and acceptance status. Historical published downloads remain immutable.
+
+0.19.0 adds hostname indexing with protocol 27 and needs matching clients and
+servers. See [0.19.0 verification](release-0190-verification.md) for build and
+rollout status. Never replace existing published bytes. Follow the separate
+[host-indexing rollout](../host-indexing.md#codepilot-rollout-and-rollback), keeping
+CodePilot's current staging fallback until live native enforcement is verified.
 
 ## V1 distribution plan
 

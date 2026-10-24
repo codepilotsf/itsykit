@@ -10,8 +10,12 @@ for completed changes, and [README.md](../../README.md) for current usage.
 
 Before updating older site sources, remove their obsolete Theme toolbar button
 while preserving custom layouts. Existing hosted toolbar partials have not been
-rewritten by the shared executable rollout. Preview noindex and Hub branch
-workflow verification are separate planned tasks. Theme removal is included in
+rewritten by the shared executable rollout. Native host indexing implementation
+is prepared for 0.19.0; protocol-27 release verification, authorized shared-server
+upgrade and live header checks remain pending. Keep CodePilot's meta fallback
+until native staging enforcement is verified; consumer cleanup is a separate
+change. See [rollout](../host-indexing.md#codepilot-rollout-and-rollback).
+Hub branch workflow verification remains a separate task. Theme removal is included in
 public 0.15.1. Native AMD64 build/full-suite, clean-Mac and notarization
 acceptance remain open.
 

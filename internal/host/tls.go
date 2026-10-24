@@ -120,7 +120,7 @@ func managedTransports(c Config, handler http.Handler, manager *autocert.Manager
 }
 
 func redirectHTTPS(c Config, fallback http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return indexingHandler(c, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		host := requestHost(r)
 		if r.URL.Path == HealthPath || !hasTLS(c, host) {
 			fallback.ServeHTTP(w, r)
@@ -131,7 +131,7 @@ func redirectHTTPS(c Config, fallback http.Handler) http.Handler {
 			target.Host = canonical
 		}
 		http.Redirect(w, r, target.String(), http.StatusPermanentRedirect)
-	})
+	}))
 }
 
 func tlsHandler(c Config, fallback http.Handler) http.Handler {

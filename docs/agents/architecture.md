@@ -371,6 +371,22 @@ that the active release, branch and domains agree before comparing commits.
 they classify direction only with the corresponding destination-scoped baseline.
 Public reachability is a separate bounded HEAD probe, never evidence of code sync.
 
+### Host indexing boundary
+
+`host.Config.Indexing` is optional administrator-owned exact-host policy outside
+site/runtime app settings and portable snapshots. `host/indexing.go` enforces
+noindex/nofollow at response commitment and flush without buffering. Selection
+uses registered `requestHost`, outside shared-by-root handlers and around HTTP
+redirects; health and TLS isolation retain their contracts. Static robots.txt
+warnings derive from validated assets at load, never request filesystem reads.
+`admin.SetIndexing` changes one managed hostname using a reviewed site digest,
+shared lock and config-publication transaction. It assigns a fresh readiness
+revision without changing site releases/history. Inventory includes effective
+policies and diagnostics. Typed rewrites retain the map; removal deletes only
+owned hosts. Code recovery retains current policy; journal recovery restores the
+prior whole config. Protocol 27 gates old clients that could discard the map.
+See [host indexing](../host-indexing.md).
+
 ### Remote activation
 
 1. The CLI captures a clean Git commit, validates and packages its runtime files,

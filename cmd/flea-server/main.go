@@ -33,6 +33,8 @@ func main() {
 	export := flag.Bool("export-state", false, "export admin-editable state (root only)")
 	listSites := flag.Bool("list-sites", false, "list managed sites (read-only)")
 	siteInfo := flag.String("site-info", "", "print reviewed state for one managed site (read-only)")
+	setIndexing := flag.String("set-indexing", "", "set one registered hostname indexing policy (root only)")
+	indexingMode := flag.String("indexing-mode", "", "noindex or allow")
 	removeSite := flag.String("remove-site", "", "unregister a managed site, retaining its files (root only)")
 	planPath := flag.String("sync-plan", "", "reviewed sync plan accompanying deployment")
 	version := flag.Bool("version", false, "print FleaCMS release version")
@@ -202,6 +204,15 @@ func main() {
 			if err == nil {
 				err = json.NewEncoder(os.Stdout).Encode(info)
 			}
+		}
+	} else if *setIndexing != "" || *indexingMode != "" {
+		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {
+			logger.Print("Indexing configuration requires root and the installed server config.")
+			os.Exit(1)
+		}
+		err = admin.System().SetIndexing(ctx, *setIndexing, *indexingMode, *expectedState)
+		if err == nil {
+			fmt.Printf("Indexing policy for %s: %s\n", *setIndexing, *indexingMode)
 		}
 	} else if *removeSite != "" {
 		if os.Geteuid() != 0 || *config != "/etc/flea/server.json" {

@@ -45,7 +45,7 @@ shared page Save/Cancel applies all changes together. Photo fields offer existin
 library images in a thumbnail picker and JPEG/PNG uploads, with a selected-photo
 preview and contextual alt text. Private previews publish only with page Save.
 Editable `mailers/` templates and local
-email preview are implemented; see docs/email-templates.md. Protocol 26 requires
+email preview are implemented; see docs/email-templates.md. Protocol 27 requires
 these runtime features. Adaptive streaming and automatic retention remain planned.
 
 Dev reloads authenticated public pages when safe, restoring edit mode and scroll.
@@ -73,7 +73,7 @@ and existing private capability URLs also work on network addresses and hostname
 Editable state: `flea pull` retrieves live snips, metadata and referenced media
 into local files. Plain deployment preserves live content; `--with-snips`
 publishes intentional local changes using scoped pull baselines and explicit
-conflict resolution. No config/session/secret or CSS sync. Protocol 26 checks
+conflict resolution. No config/session/secret or CSS sync. Protocol 27 checks
 reviewed state under the activation lock.
 
 Styles are developer-managed in `site/css/theme.css`, using Prewind, theme tokens
@@ -130,7 +130,7 @@ on authenticated activity. Active editing renews at most once a minute; idle tab
 do not. Sessions survive browser closure, restart and deploy. Logout and owner
 removal revoke sessions. Store hashed tokens and host/CSRF/expiry metadata only,
 with private permissions, bounded reads, locking and atomic saves. Never ship
-session state in Git or release archives. Deployment protocol 26 requires the
+session state in Git or release archives. Deployment protocol 27 requires the
 private writable runtime directory; OTPs remain memory-only.
 
 **Status:** first implementation specification  
@@ -443,7 +443,7 @@ Aliases pointing to the same release must select the same content snapshot;
 conflicting paths are rejected and valid aliases share a loaded serving snapshot.
 After successful activation, unreferenced entries move to an archive map, retaining
 last remote content. References are lexical, including false/empty branches and
-unused partials. Failed activation leaves previous content untouched. Protocol 26
+unused partials. Failed activation leaves previous content untouched. Protocol 27
 is required. No automatic archive deletion or rollback command exists yet.
 
 ### Values, conditions, and loops
@@ -637,6 +637,17 @@ live separately under content/<release-id>.json, selected by the host config.
 Successful activation archives/prunes unreferenced IDs; failed activation restores
 the prior code and content paths. See docs/recovery.md for the current rollback contract.
 
+Current implementation: exact-host `indexing` in server config adds
+`X-Robots-Tag: noindex, nofollow` on selected registered hosts. `allow` or omission
+adds no restriction, and never overrides owner-authored restrictions. Shared-root
+aliases can differ. `flea server indexing [ssh-target] <hostname> <noindex|allow>`
+uses SSH, reviewed-state confirmation and the existing locked config/recovery
+transaction. Policies survive deploy, sync, code rollback and site restore;
+removal deletes only owned entries. List/status report effective policies and
+static robots.txt crawl-block diagnostics. No website files are rewritten.
+Readiness and host/TLS isolation stay unchanged. Matching protocol-27 clients and
+servers are required. See [host indexing](../host-indexing.md).
+
 Current implementation: `flea server list [ssh-target]` lists installed sites
 read-only and `flea server remove [ssh-target] [site-name]` unregisters one
 site's routing after an exact typed confirmation. An omitted target is prompted
@@ -761,7 +772,7 @@ flea rollback
   confirmation, and commit message. Respect Git hooks and signing. Declining or
   failure stops deployment. Sites within larger repositories commit manually.
 
-- Requires deployment protocol 26 before upload, offering first-time setup when absent. Validates the
+- Requires deployment protocol 27 before upload, offering first-time setup when absent. Validates the
   packaged site, uploads over SSH/SCP, stages, and atomically switches host config.
 - Restarts and verifies revision/hostname; restores the prior config on failure.
 - Uses native SSH and the saved current-branch mapping in .flea.config.json. The first

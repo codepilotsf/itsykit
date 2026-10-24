@@ -68,7 +68,8 @@ func TestStatusRemoteReadOnlyAndLocalFirst(t *testing.T) {
 	before := testGit(t, p.Root, "status", "--porcelain")
 	revision := "/var/lib/flea/sites/demo/releases/20260101-120000-abcdef"
 	var out bytes.Buffer
-	run := inventoryRunner(t, "["+testSiteJSON+"]", func(c command) (bool, error) {
+	payload := strings.TrimSuffix(testSiteJSON, "}") + `,"indexing":{"example.test":"noindex","www.example.test":"allow"},"warnings":["example.test: robots.txt contains a site-wide Disallow rule"]}`
+	run := inventoryRunner(t, "["+payload+"]", func(c command) (bool, error) {
 		if !strings.Contains(out.String(), "Local\n") || !strings.Contains(out.String(), "Checking remote...\n") {
 			t.Fatal("network before local summary", out.String())
 		}
@@ -91,6 +92,9 @@ func TestStatusRemoteReadOnlyAndLocalFirst(t *testing.T) {
 	})
 	if err != nil || checks != 1 || !strings.Contains(out.String(), "Code and content match. Styles are part of the code release.") || strings.Contains(out.String(), "\x1b") {
 		t.Fatal(err, out.String())
+	}
+	if !strings.Contains(out.String(), "indexing example.test: noindex, nofollow") || !strings.Contains(out.String(), "indexing www.example.test: allow (no restriction added)") || !strings.Contains(out.String(), "site-wide Disallow") {
+		t.Fatal("effective remote policy/diagnostic missing", out.String())
 	}
 	if after := testGit(t, p.Root, "status", "--porcelain"); after != before {
 		t.Fatal("status changed files", before, after)
