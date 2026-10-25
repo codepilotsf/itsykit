@@ -86,6 +86,9 @@ they are separately added to the consumer configuration.
   question rounds internally, present one question at a time, and reconcile the
   main document at round boundaries. Inspect evidence first, recommend sensible
   defaults and decide routine reversible details yourself.
+- During interviews, move directly from an answer to the next prepared question.
+  Skip repeated confirmations and duplicate question text; put brief context in
+  the clickable question and batch routine tool work and document updates.
 - Explain unfamiliar concepts and the practical consequences of a choice before
   asking the user to choose.
 - Prefer clickable structured multiple-choice questions for clear alternatives,

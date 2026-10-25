@@ -31,9 +31,18 @@ Explicit user preferences and project requirements take precedence over these de
   input, including for Yes/No choices. Explain unfamiliar terms or meaningful
   tradeoffs briefly before asking. Use free text when choices would distort the
   answer, or a plain question if no structured tool is available.
-- After an answer, capture the decision and promptly ask the next relevant
-  question. Do not interleave routine document edits, repeated reads, lengthy
-  recaps or another broad audit after every answer.
+- After an answer, keep the decision in conversation state and immediately
+  present the next prepared question. Put its brief recommendation and tradeoff
+  in the question itself; skip a separate confirmation or recap unless the
+  answer changes direction or needs clarification.
+- Keep the gap between questions free of routine file reads, document edits,
+  verification and other tool calls. Do necessary new investigation only when
+  the answer changes what must be known before the next question; batch the
+  remaining work at round boundaries.
+- Present each question once. Do not repeat a clickable question or its options
+  in commentary and final messages. If the runtime requires a closing message
+  while input is pending, keep it minimal without repeating the question or
+  recapping the answer. An asynchronous input request stays pending until answered.
 - Adapt the round to corrections and new requirements. Replace obsolete or
   lower-priority questions instead of extending the interview automatically.
   Reopen a settled decision only when new evidence materially changes it.
