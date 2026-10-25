@@ -75,6 +75,27 @@ ritual. Honor required repository checks and CI; these defaults do not weaken th
   infrastructure: include affected integration boundaries and required broader suites.
   Use browser checks for changed critical user journeys, not every internal edit.
 
+For small projects, default to the happy path and consequential failures at the
+observable contract, not a test for every private method. Avoid overlapping coverage
+across layers unless each protects a distinct risk. Prefer representative boundary
+cases to combinatorial permutations; reserve exhaustive coverage for justified
+security, permissions, payments, data-integrity risks or complex invariants. For real
+bugs, reproduce the failure before the fix and verify it afterward when feasible;
+add regression coverage where it meaningfully protects against recurrence.
+
+New tests, harnesses and mocks should resolve concrete uncertainty that affects an
+implementation or acceptance decision. Keep fixtures and mocks proportionate; rethink
+the design or test approach when scaffolding dwarfs the change. After repeated cycles
+produce no useful new evidence, simplify the approach or escalate the unresolved
+decision and expose any blocker instead of expanding the machinery. Verify the actual
+user flow where relevant; passing mocks or emulators do not establish required
+actual-device acceptance. Honor explicit user deadlines and report remaining gaps or
+blocked required checks before the deadline; do not silently waive acceptance gates.
+
+Judge existing suites by useful evidence and cost, not test or assertion counts.
+A fast existing broad suite can be a sensible final or release check; that does not
+justify creating redundant tests or repeatedly rerunning unchanged broad suites.
+
 During iteration, run focused checks. Run the required broader set on the final
 candidate and reuse passing results until later changes, target-branch movement or
 unresolved concerns invalidate them. Do not write tests that merely mirror the code,
