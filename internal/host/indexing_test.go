@@ -27,6 +27,62 @@ func writeIndexingConfig(t *testing.T, file string, c Config) {
 	}
 }
 
+func TestSEOSharedHostIndexingIsolation(t *testing.T) {
+	file := testConfig(t, ":80")
+	c, _, err := Load(file, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	root := c.Sites["example.test"]
+	c.Sites["staging.test"] = root
+	c.Indexing = map[string]string{"staging.test": "noindex"}
+	for name, body := range map[string]string{
+		".flea.config.json": `{"app":{},"seo":{"url":"https://example.test","exclude":["/receipt"]}}`,
+		"site/index.html":   `<html><head><title>Home</title></head><body>Home</body></html>`,
+		"site/receipt.html": "Receipt",
+	} {
+		if err := os.WriteFile(filepath.Join(root, name), []byte(body), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	writeIndexingConfig(t, file, c)
+	_, handler, err := Load(file, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, method := range []string{"GET", "HEAD"} {
+		for _, host := range []string{"example.test", "staging.test", "unknown.test"} {
+			for _, route := range []string{"/", "/receipt", "/robots.txt", "/sitemap.xml"} {
+				r := httptest.NewRequest(method, "https://"+host+route, nil)
+				r.Header.Set("X-Forwarded-Host", "attacker.test")
+				w := httptest.NewRecorder()
+				handler.ServeHTTP(w, r)
+				if host == "unknown.test" {
+					if w.Code != 404 || strings.Contains(w.Body.String(), "example.test") {
+						t.Fatal("SEO bypassed host registration", w)
+					}
+					continue
+				}
+				wantRobots := ""
+				if host == "staging.test" {
+					wantRobots = "noindex, nofollow"
+				} else if route == "/receipt" {
+					wantRobots = "noindex"
+				}
+				if w.Code != 200 || w.Header().Get("X-Robots-Tag") != wantRobots || (method == "HEAD" && w.Body.Len() != 0) {
+					t.Fatalf("%s %s%s: %d %s", method, host, route, w.Code, w.Header())
+				}
+				if method == "GET" && route != "/receipt" {
+					body := w.Body.String()
+					if !strings.Contains(body, "https://example.test/") || strings.Contains(body, "https://staging.test") || strings.Contains(body, "attacker.test") || strings.Contains(body, "Disallow: /\n") {
+						t.Fatal("SEO selected the wrong origin or blocked crawling", body)
+					}
+				}
+			}
+		}
+	}
+}
+
 func TestIndexingSharedRootAndResponsePaths(t *testing.T) {
 	file := testConfig(t, ":80")
 	c, _, err := Load(file, nil)

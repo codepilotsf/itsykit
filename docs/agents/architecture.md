@@ -84,6 +84,17 @@ server invalidates open forms. Contact requires this protection; admin handling 
 Read this alongside README.md for the supported behavior and AGENTS.md for
 development rules. docs/agents/spec.md also describes features that are not implemented.
 
+SEO is optional site configuration, separate from the server's exact-host indexing
+policy. `internal/site/seo.go` validates a fixed production HTTPS origin, reads
+visitor metadata from the load-time validation render, and builds bounded sitemap
+and robots byte snapshots after public routes are complete. Publication swaps
+routes, content and discovery documents together. Successful public responses
+insert only a missing canonical without reserializing HTML; fragments use a Link
+header. Custom documents retain the normal asset/page path and streaming rules.
+Exact page exclusions add noindex without blocking crawling. No Host or forwarding
+header chooses the production origin; outer host noindex enforcement still wins.
+See [SEO](../seo.md) for eligibility and custom app boundaries.
+
 ## Where to start
 
 Local site creation composes the canonical starter with embedded minimal content
@@ -103,6 +114,7 @@ reset, deployment, or content synchronization. Backups may contain secrets.
 | Validated site snapshot and rendering | `internal/site/project.go` |
 | Template grammar and alias scope | `internal/site/template.go` |
 | Page filename to canonical route | `internal/site/routes.go` |
+| SEO settings, snapshot sitemap/robots and response canonicals | `internal/site/seo.go` |
 | Legacy snips and structured JSON loading | `internal/site/data.go` |
 | HTML region scanning and lexical snip references | `internal/site/regions.go` |
 | Dev-only content extraction | `internal/site/extraction.go` |

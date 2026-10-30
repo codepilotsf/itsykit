@@ -220,6 +220,42 @@ Merge these values into your existing configuration, preserving other settings.
 Use `{app.site_name}` or `{app.phone}` in templates. Dev saves the initial site
 name here; commit it before deploying.
 
+### Search discovery and SEO
+
+Add a top-level `seo` object alongside `app` in `.flea.config.json` when the
+production address is known:
+
+```json
+"seo": {
+  "url": "https://example.com",
+  "exclude": ["/contact/thank-you"]
+}
+```
+
+`url` must be an HTTPS origin without credentials, a subdirectory, query or
+fragment. Flea generates `/sitemap.xml` from public pages and published blog
+posts, plus `/robots.txt` with a production Sitemap line. Missing canonical tags
+are inserted into public responses without changing template files; HTML
+fragments use a canonical HTTP Link header. No external service is needed.
+
+`exclude` contains exact page paths, without wildcards or trailing slashes.
+Excluded pages stay accessible with a noindex header and are omitted from the
+generated sitemap and canonicals. Admin routes, drafts, assets and custom managed
+app routes are omitted from automatic discovery. Enabled Contact's form is
+included; its thank-you page is excluded and noindex by default. Existing robots
+or googlebot noindex metadata also excludes a page from the sitemap.
+
+Custom `site/robots.txt`, `site/sitemap.xml` and canonical tags are preserved.
+Add the Sitemap line and manage exclusions yourself in custom discovery files.
+A page with a custom canonical enters the generated sitemap only when that
+canonical exactly matches its absolute production URL. Flea does not invent
+modification dates; beyond 50,000 URLs or 50 MiB, provide a custom sitemap index.
+
+Without `seo`, automatic SEO behavior is disabled. Setting a production URL does
+not register hosts, configure TLS or protect staging: keep the separate server
+indexing policy described above. A supporting Flea server executable is required;
+deploying this site's configuration alone does not upgrade it.
+
 ### Editable content
 
 Add a bare `snip` attribute to an element whose content admins should edit:
