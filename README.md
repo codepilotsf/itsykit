@@ -39,19 +39,46 @@ protocol 28 before deploying; public 0.19.0 and earlier ignore these rules. See
 
 ## Search discovery
 
-FleaCMS 0.20.0 also supports opt-in discovery through top-level config:
+FleaCMS 0.20.0 can generate a sitemap, advertise it in robots.txt and add missing
+canonical tags. A canonical tag identifies a page's preferred address. Update
+the local CLI with `flea update`; for an older shared server, run
+`flea update-server` from a site with that server saved as the current branch's
+deployment destination. The server update briefly restarts every site on it.
+Deploying website files does not update the server executable.
+
+Add this object alongside `app` in the site's `.flea.config.json`, preserving
+the other settings:
 
 ```json
-"seo": {"url": "https://example.com", "exclude": ["/campaign/receipt"]}
+"seo": {
+  "url": "https://example.com",
+  "exclude": ["/campaign/receipt"]
+}
 ```
 
-Use the production HTTPS origin. Flea generates a sitemap and robots.txt
-Sitemap declaration, adds missing public-page canonicals and gives exact excluded
-page paths a crawlable noindex response. Contact receipts, drafts, private routes,
-custom managed apps and redirects stay out of generated discovery. Authored
-robots.txt/sitemap.xml and existing canonicals take precedence. Without `seo`,
-automatic discovery is disabled; this does not classify or protect staging.
-Exact-host policy remains separate. See [the public guide](https://fleacms.com/docs#seo-discovery).
+Use the production HTTPS address even in dev or staging. `exclude` is optional;
+replace the example with a real page you want kept out of search. Entries match
+exact paths, without wildcards, queries or trailing slashes. Excluded pages remain
+accessible with a noindex header and are omitted from the generated sitemap and
+canonical tags. Contact receipts, drafts, private routes, custom managed apps and
+redirects stay out of automatic discovery.
+
+Run `flea status`, then `flea dev`. At the printed local address, check
+`/sitemap.xml`, `/robots.txt`, a public page's canonical tag in View Source and
+an excluded page's `X-Robots-Tag: noindex` response header. Commit the reviewed
+configuration, deploy from the intended branch with `flea deploy`, and repeat
+those checks on the public domain.
+
+Custom robots.txt/sitemap.xml files and existing canonical tags take precedence.
+Maintain sitemap declarations and exclusions yourself in custom discovery files.
+Without `seo`, automatic discovery is disabled. Staging protection still uses
+the separate exact-host indexing policy.
+
+Google Search Console is optional: generated robots.txt already advertises the
+sitemap. To see Google's processing reports, verify ownership of the production
+site and add `https://example.com/sitemap.xml` in its Sitemaps report. Submit the
+URL, not an uploaded file; it stays current without resubmitting after every edit.
+See [the public walkthrough](https://fleacms.com/docs#seo-discovery).
 
 ## Hostname indexing
 
