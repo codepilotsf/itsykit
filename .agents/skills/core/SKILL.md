@@ -60,6 +60,21 @@ refinements within an approved direction. Do not reopen settled choices without
 new evidence. Permission to commit and merge does not delegate product or creative
 direction. If the user explicitly delegates a choice, decide and state the assumption.
 
+## Browser resource cleanup
+
+Track browser tabs and recordings created for the task. Reuse an appropriate
+task-owned tab before opening another. Close temporary inspection tabs through
+the runtime's normal tab lifecycle once checks finish or the tab is no longer
+needed; do not wait for automatic idle cleanup. Stop task-owned recordings when
+finished. Opening a preview without showing it still leaves a running page and
+does not replace cleanup.
+
+Preserve user-opened or user-controlled tabs and tabs belonging to other tasks.
+Keep previews explicitly requested for review, previews being handed to the user,
+and visual decision boards open until the review or pending answer is complete.
+Never close all tabs or terminate a shared browser to clean up one task. If normal
+tab cleanup fails, report it and preserve other work.
+
 ## Shared-skill updates
 
 When working in the canonical shared-skills repository identified by its
