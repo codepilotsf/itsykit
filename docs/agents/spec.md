@@ -2,6 +2,13 @@
 
 ## Product and build specification
 
+Optional site SEO foundations are implemented: `seo.url` selects the production
+HTTPS origin for a snapshot-generated sitemap, robots.txt discovery and missing
+response canonical tags. Exact `seo.exclude` page paths stay crawlable with
+noindex. Custom files/metadata and server host indexing policies are preserved.
+See [SEO](../seo.md) for eligibility and limits. Structured data, SEO diagnostics,
+automatic redirects and AI-specific discovery files are outside this feature.
+
 Default `flea dev` starts at port 3000 and tries consecutive ports when occupied,
 with clear console messages. Explicit ports remain fixed; port 0 is OS-selected.
 Same-site replacement precedes binding; actual listener ports drive URLs and

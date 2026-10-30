@@ -6,6 +6,14 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Add opt-in SEO foundations through `seo.url` and exact `seo.exclude` page
+  paths: a snapshot-generated XML sitemap, robots.txt sitemap discovery, missing
+  canonical tags (or Link headers for HTML fragments), and crawlable noindex
+  exclusions. Include published Blog routes and Contact's form while omitting
+  drafts, private/admin routes, managed custom apps and Contact receipts. Preserve
+  custom discovery files and canonical markup, and keep exact-host staging
+  indexing policies separate. No external services or generated files are needed.
+
 ## 0.19.0 - 2026-10-24
 
 - Add exact-host indexing policy in server configuration and

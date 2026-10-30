@@ -137,6 +137,12 @@ values. Preserve it on deploy/sync/code recovery; removal clears only owned host
 See [host indexing](docs/host-indexing.md) and the deployment guide. Protocol 27
 requires matching clients/servers; keep release rollout separate from site deploy.
 
+Optional `seo.url` supplies the production HTTPS origin for snapshot-generated
+sitemaps, robots discovery and missing canonical tags; exact `seo.exclude` paths
+remain crawlable with noindex. Preserve custom discovery files and canonical
+markup, omit non-public routes and never derive production URLs from requests.
+Read [SEO](docs/seo.md) before changing this behavior; host indexing stays separate.
+
 `flea status` shows local validation first, then automatically checks the current
 branch's saved remote. Keep it read-only; see the runtime and sync guides.
 

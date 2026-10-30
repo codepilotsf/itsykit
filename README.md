@@ -990,6 +990,29 @@ streamed file in place causes detected size/timestamp changes to return 503
 (or interrupt a transfer already in progress), rather than serve changed bytes
 from an old snapshot. The operating system manages file caching.
 
+## Search discovery and SEO
+
+Set the production HTTPS origin in `.flea.config.json` to enable automatic SEO:
+
+```json
+"seo": {
+  "url": "https://example.com",
+  "exclude": ["/contact/thank-you"]
+}
+```
+
+Add this alongside `app`, preserving other configuration. Flea generates
+`/sitemap.xml` from public pages and published blog posts, advertises it in a
+generated `/robots.txt`, and adds missing canonical tags to public HTML responses.
+HTML fragments use an HTTP canonical Link header. Excluded pages stay accessible,
+receive a noindex header and are omitted from the generated sitemap. Custom
+robots.txt files, sitemaps, canonical markup and host indexing policies are preserved.
+No files are generated on disk. Without `seo`, behavior is unchanged.
+
+See [SEO configuration](docs/seo.md) for exact exclusions, custom app boundaries,
+custom discovery files, sitemap limits and staging behavior. A website deployment
+does not upgrade the server executable to support this feature.
+
 ## Reload behavior
 
 Dev logs requests to the terminal without timestamps. Successful requests use

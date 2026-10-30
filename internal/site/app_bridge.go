@@ -67,6 +67,9 @@ func (s *Server) serveApp(w http.ResponseWriter, r *http.Request, mount appapi.M
 		http.NotFound(w, r)
 		return
 	}
+	if p.seoExcluded[r.URL.Path] {
+		w.Header().Add("X-Robots-Tag", "noindex")
+	}
 	if r.Method != "GET" && r.Method != "HEAD" && r.Method != "POST" {
 		w.Header().Set("Allow", "GET, HEAD, POST")
 		http.Error(w, "Method not allowed.", 405)
@@ -181,5 +184,8 @@ func (s *Server) serveApp(w http.ResponseWriter, r *http.Request, mount appapi.M
 	commit(w)
 	finish(w, true)
 	finished = true
+	if status == http.StatusOK && (r.Method == http.MethodGet || r.Method == http.MethodHead) {
+		body = p.canonicalResponse(w, r.URL.Path, body)
+	}
 	writeHTML(w, r, status, body)
 }

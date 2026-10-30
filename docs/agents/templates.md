@@ -25,6 +25,12 @@ delegates those decisions. Keep generated README/AGENTS summaries aligned.
 Branch destinations live under `deploy.branches` in that same file. Preserve other
 JSON fields when saving destinations and strip `deploy` from releases/backups.
 Templates use app.site_name and other app.* values; no site.* compatibility alias.
+
+Optional top-level `seo` holds the production HTTPS `url` and exact `exclude`
+page paths. It is developer-managed configuration, separate from app globals,
+editable metadata and server host indexing. Runtime canonical insertion does not
+rewrite layouts. Custom robots/sitemap files and canonical markup win; maintain
+their discovery/exclusions yourself. See [SEO](../seo.md).
 New sites omit site_name until interactive dev prompts with the title-cased project
 folder default and saves the answer. Saved names must be nonempty strings.
 Read-only/noninteractive loads use the folder default without writing; deployment

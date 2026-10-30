@@ -83,8 +83,9 @@ allowlist and Host/SNI rejection checks stay in place.
 
 ## Crawling and preservation
 
-Keep a public noindex site crawlable so crawlers can discover the header. Flea
-does not rewrite robots.txt, sitemaps, canonicals or templates, and never generates
+Keep a public noindex site crawlable so crawlers can discover the header. Host
+indexing policy does not rewrite robots.txt, sitemaps, canonicals or templates,
+and never generates
 `noindex` or `nofollow` robots.txt directives or a blanket crawl block. A static
 robots.txt is served unchanged on each alias. A site-wide `Disallow` rule can
 prevent the noindex header from being discovered. Startup logs and server/status
@@ -93,6 +94,12 @@ inspection warn when the validated static robots.txt contains `Disallow: /`,
 Allow exceptions yourself. Files above the in-memory asset limit produce a
 manual-review warning rather than being buffered for analysis. This diagnostic
 does not interpret dynamic robots routes or every crawler's rule syntax.
+
+Optional [site SEO settings](seo.md) can independently generate missing discovery
+documents and response canonicals from a configured production origin. They
+preserve custom files and do not classify hosts, block crawling or override the
+host restriction. Staging responses keep noindex/nofollow on generated endpoints
+while sitemap entries and canonicals continue to name the production origin.
 
 Normal deployment, deploying another site, explicit content sync, code rollback
 and site-backup restore retain the **current** host policies. A site backup does

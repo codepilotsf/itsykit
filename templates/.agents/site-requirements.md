@@ -28,6 +28,14 @@ lives in flea/snips.json, uploads in flea/media/, and ignored runtime in flea/ru
 Mail templates live in root mailers/, named *.email.html and *.email.txt with
 main.layout.html. Keep public URLs site-relative; never expose private directories.
 
+Optional top-level `seo.url` is the production HTTPS origin for automatic
+sitemaps, robots discovery and missing response canonical tags. Use exact
+`seo.exclude` page paths for crawlable noindex exclusions. Do not infer the
+production domain from staging or dev, add duplicate canonical markup, or
+overwrite custom robots/sitemap files during an import. Custom files require
+their own sitemap discovery/exclusions. Keep server host indexing separate;
+see README.md for the complete site configuration and supported server requirement.
+
 Keep the explicit `{#if app.current_admin}` blocks in the layout: a csrf-token
 meta in head and `{render /admin/toolbar}` directly inside body. The reserved
 current_admin object is supplied per request, never configured in JSON. Keep the
