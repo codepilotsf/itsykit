@@ -6,6 +6,8 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.20.0 - 2026-10-30
+
 - Add exact, developer-managed 301 migration redirects in the top-level
   `.flea.config.json` `redirects` object. Support explicitly listed legacy
   extensions and trailing slashes, preserve or replace queries, and validate
