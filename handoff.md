@@ -1,5 +1,49 @@
 # fleacms.com website handoff
 
+## 0.20.0 published October 30, 2026
+
+Immutable framework tag `v0.20.0` selects
+`f5f47d1251c25da2271b8dc3bf353313ed122968`, merged as `14dde06` through MR !22.
+This release combines 301 migration redirects and URL-inventory guidance with
+opt-in sitemap/robots discovery, missing canonicals and exact noindex exclusions.
+Deployment protocol is 28; app protocol remains 2. Existing sites are not opted
+into SEO automatically.
+
+Native Linux AMD64 (Go 1.26.9) and Mac ARM64 (Go 1.27.1) full tests, full race,
+vet and bundled builds passed on the same source archive. Both CLIs embed the
+same final Linux servers. Exact CLI checks covered minimal/starter parity,
+initial commit/status and real redirect, query, sitemap, robots, canonical and
+exclusion behavior. Final Mac ad-hoc signature verification passed. Tag pipeline
+658 was pending runners; manual native checks supplied release evidence.
+
+Anonymous HTTPS downloads and public fresh install, reinstall, 0.19.0 update and
+already-current checks passed on both native platforms with these final hashes:
+
+```text
+f9820e1ca70976f2489b4149839173052e1cd160cf0c074a83f8a98229d05826  flea-darwin-arm64
+2a9411fd9d243c58be201dcd10d048a8724fd855bb1ce9550f5139e3f31bf1f9  flea-linux-amd64
+```
+
+The supported server update completed at 0.20.0 / protocol 28, with no recovery.
+Website MR !9 merged as `9190acb`, activation
+`20261030-004255-1885fadf131e62d999b94551`. Homepage, docs, download links and
+latest.txt select 0.20.0. README explains the new settings and migration skill;
+public docs include desktop/mobile contents links and configuration examples.
+The installer is unchanged. Normal Kirin/Mac CLIs match the public hashes, with
+prior executables retained.
+
+All 23 HTTPS hostnames are healthy, every live content hash and all 16 unaffected
+site roots/source hashes are preserved, and host indexing/TLS/redirect/download
+policies are unchanged. The website changed only docs.html, _docs-toc.html,
+index.html and releases/latest.txt in deployed source. Existing memory/swap
+safeguards remain intact. Older downloads, including 0.19.0, are unchanged.
+
+Private evidence is retained under `fleacms-releases/0.20.0-candidate2` on Kirin
+and Mac; the superseded, unpublished redirect-only candidate and site backup are
+retained in adjacent `0.20.0`. Native ARM64 server execution, clean-Mac acceptance,
+notarization, real email and hosted crawler/Search Console acceptance remain
+unverified. Task-owned dev servers and temporary transport were stopped.
+
 ## 0.19.0 published October 24, 2026
 
 Framework source `da7d0c70775dea352e00cfc6cf2c86e31f9cea16`, immutable `v0.19.0`,
