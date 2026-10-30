@@ -272,7 +272,7 @@ Rules:
 
 1. `index.html` represents its containing directory.
 2. Any other `.html` page represents the same URL without `.html`.
-3. URLs containing `.html` are not alternate routes and return 404. FleaCMS does not redirect `/about.html` to `/about`.
+3. URLs containing `.html` are not alternate routes and return 404 unless explicitly listed as a 301 source in config `redirects`.
 4. An asset retains its filename and extension.
 5. Reserved/private underscore paths are not routes.
 6. A duplicate route, such as both `about.html` and `about/index.html`, is a build error. `flea dev` reports it and `flea deploy` refuses it.
@@ -304,7 +304,7 @@ The layout explicitly gates admin/_toolbar.html with {#if app.current_admin} and
 supplies a csrf-token meta tag. This reserved request-only object is absent for
 visitors. External editor assets and a protected metadata endpoint keep source small.
 
-The first version has no `routes.json`. Add redirects only when there is a real need, through `.flea.config.json`.
+There is no `routes.json`. Top-level `.flea.config.json` `redirects` maps exact old paths to existing local public URLs for 301 GET/HEAD responses. Sources may have legacy extensions or trailing slashes. No query-specific/wildcard/external rules, private paths, chains, loops or active route/app conflicts are accepted. Incoming queries survive unless the target supplies a query. Deployment protocol 28 requires matching clients and servers.
 
 ## Templates
 
@@ -535,7 +535,7 @@ FleaCMS validates a snip before writing it. It writes content atomically: create
 
 ## Configuration
 
-`.flea.config.json` contains JSON only. Comments and trailing commas are not supported. The site loader reads the `app` object. Local `.flea.config.json` stores a `branches` map of confirmed deployment settings (target, domain, name, www_redirect, https, email, agree_tos, expected_ips). First deploy prompts and saves; later deploys select only the current branch. Changed settings require `-configure` confirmation. It contains no credentials and is excluded from uploads. Use branch names directly without environment labels or questions. Generate the internal site name automatically; staging suggests a subdomain. General page redirect settings remain deferred; WWW-to-primary redirects are supported.
+`.flea.config.json` contains JSON only. Comments and trailing commas are not supported. The site loader reads the `app` object. Local `.flea.config.json` stores a `deploy.branches` map of confirmed deployment settings (target, domain, name, www_redirect, https, email, agree_tos, expected_ips). First deploy prompts and saves; later deploys select only the current branch. Changed settings require `-configure` confirmation. The `deploy` section contains no credentials and is excluded from uploads; runtime settings, including redirects, are retained. Use branch names directly without environment labels or questions. Generate the internal site name automatically; staging suggests a subdomain. Top-level `redirects` now supplies exact page migration mappings; WWW-to-primary redirects remain host-level 308 responses.
 
 Example:
 

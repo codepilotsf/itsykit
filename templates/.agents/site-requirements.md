@@ -28,6 +28,14 @@ lives in flea/snips.json, uploads in flea/media/, and ignored runtime in flea/ru
 Mail templates live in root mailers/, named *.email.html and *.email.txt with
 main.layout.html. Keep public URLs site-relative; never expose private directories.
 
+Top-level config `redirects` maps exact old paths to existing local public URLs
+for 301 GET/HEAD responses. It requires deployment protocol 28; older runtimes
+ignore it. For a site migration or URL inventory, use the `fleacms-site` migration
+reference and preserve custom config/rules. Sources may include `.html` or trailing
+slashes, but cannot shadow live routes or managed app subtrees. No external,
+wildcard or query-specific mappings; preserve queries unless the target replaces
+them. Validate and verify locally before claiming redirects work.
+
 Keep the explicit `{#if app.current_admin}` blocks in the layout: a csrf-token
 meta in head and `{render /admin/toolbar}` directly inside body. The reserved
 current_admin object is supplied per request, never configured in JSON. Keep the

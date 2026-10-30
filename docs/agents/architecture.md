@@ -206,6 +206,13 @@ inspection, not concurrent editing. HTTP handlers select from validated maps;
 they never turn request paths into filesystem reads. Template output is buffered
 before sending headers, so a render failure can still produce a proper 500.
 
+`site/redirects.go` compiles config-owned legacy path mappings after the public
+route snapshot is complete. Its separate source validator permits explicitly
+listed `.html` and trailing-slash paths without weakening ordinary serving.
+Only GET/HEAD use the immutable map; destinations must be local public snapshot
+routes/assets, and chains, private paths and live route/app conflicts fail load.
+Protocol 28 keeps older servers from accepting deployments while ignoring rules.
+
 Native cross-document transition CSS lives in the site's navigation.css, linked
 directly by both layout heads before global.css. Each head also declares the
 small native opt-in and reduced-motion opt-out before external styles resolve.

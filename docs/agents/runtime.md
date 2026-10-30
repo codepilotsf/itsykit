@@ -153,7 +153,20 @@ Test cross-site recipients, credentials, flashes and aliases without live email.
 
 `index.html` maps to `/`. `about.html` and `about/index.html`
 both map to `/about`; providing both is a route collision. Explicit `.html`
-URLs and trailing slashes other than `/` return 404. Assets retain their paths.
+URLs and trailing slashes other than `/` return 404 unless explicitly listed in
+top-level config `redirects`. Assets retain their paths.
+
+`site/redirects.go` validates an exact old-path to local-destination object after
+pages, media, apps and published Blog routes are loaded. Store it in the immutable
+Project. GET/HEAD may use this map before ordinary safeURL rejects `.html` or a
+trailing slash; this exception must never serve files. Decode config paths once,
+reject unsafe/private/internal sources, duplicate decoded keys, route/app conflicts,
+external or missing destinations, and any chain/self redirect/loop. Former Blog
+slugs may redirect; other app subtrees retain their dispatch. Preserve incoming
+queries unless the destination supplies one (including an explicit empty `?`).
+Never redirect POST/mutations or serve a stale map after a failed reload. Query-
+specific and wildcard matching are unsupported. Protocol 28 prevents deployment
+to older servers that would silently ignore the rules. See README.md for syntax.
 
 Files and directories beginning with `_` or `.` are private. Preserve URL
 validation, confined reads, symlink rejection, and immutable asset snapshots.

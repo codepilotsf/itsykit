@@ -6,6 +6,14 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Add exact, developer-managed 301 migration redirects in the top-level
+  `.flea.config.json` `redirects` object. Support explicitly listed legacy
+  extensions and trailing slashes, preserve or replace queries, and validate
+  destinations, collisions and chains. Deployment protocol 28 requires matching
+  clients and servers so older servers cannot silently ignore these rules.
+- Teach the shared Flea site skill and brochure import workflow to inventory an
+  existing site's public URLs, map replacements and verify migration redirects.
+
 ## 0.19.0 - 2026-10-24
 
 - Add exact-host indexing policy in server configuration and

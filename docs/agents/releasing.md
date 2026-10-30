@@ -22,6 +22,10 @@ CodePilot's current staging fallback until live native enforcement is verified.
 
 ## V1 distribution plan
 
+Unreleased migration redirects require deployment protocol 28. Build and roll
+out matching CLI/server executables before deploying site rules; older servers
+silently ignore them. Publication and server rollout remain separate tasks.
+
 The agreed plan is in [next-steps.md](next-steps.md). Source remains private;
 public binaries will be free to use without an account or license key. The
 primary path is the implemented `website/site/install.sh`, intended for

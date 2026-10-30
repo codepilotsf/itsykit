@@ -14,7 +14,7 @@ import (
 
 func TestArchiveRoundTripAndScope(t *testing.T) {
 	root := t.TempDir()
-	for name, body := range map[string]string{"site/index.html": "hello", ".flea.config.json": `{"app":{"site_name":"test"},"admin":{"emails":["owner@example.test"]},"deploy":{"branches":{"main":{"target":"private-target"}}}}`, "flea/data/home.json": "{}", "flea/runtime/sessions.json": "private-session", ".git/config": "secret", "README.md": "local", ".agents/skills/core/SKILL.md": "private agent instructions", ".agents/skills-source.md": "local source provenance"} {
+	for name, body := range map[string]string{"site/index.html": "hello", ".flea.config.json": `{"app":{"site_name":"test"},"admin":{"emails":["owner@example.test"]},"redirects":{"/old.html":"/"},"deploy":{"branches":{"main":{"target":"private-target"}}}}`, "flea/data/home.json": "{}", "flea/runtime/sessions.json": "private-session", ".git/config": "secret", "README.md": "local", ".agents/skills/core/SKILL.md": "private agent instructions", ".agents/skills-source.md": "local source provenance"} {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)
@@ -56,6 +56,10 @@ func TestArchiveRoundTripAndScope(t *testing.T) {
 	}
 	if config["app"] == nil || config["admin"] == nil {
 		t.Fatal("runtime config fields lost")
+	}
+	var redirects map[string]string
+	if err := json.Unmarshal(config["redirects"], &redirects); err != nil || redirects["/old.html"] != "/" {
+		t.Fatal("migration redirects lost from runtime archive", err)
 	}
 	if data, err := os.ReadFile(filepath.Join(dest, "mailers", "sign-in.email.html")); err != nil || string(data) != "{email.code}" {
 		t.Fatal("mailer missing from release", err)
