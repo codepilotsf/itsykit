@@ -22,7 +22,7 @@ CodePilot's current staging fallback until live native enforcement is verified.
 
 ## V1 distribution plan
 
-Unreleased migration redirects require deployment protocol 28. Build and roll
+0.20.0 migration redirects and opt-in SEO discovery require deployment protocol 28. Build and roll
 out matching CLI/server executables before deploying site rules; older servers
 silently ignore them. Publication and server rollout remain separate tasks.
 
