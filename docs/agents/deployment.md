@@ -142,6 +142,10 @@ the snapshot from immutable Git objects, including when the site is a subfolder.
 Resolve missing icons in the temporary snapshot, never the working directory.
 The deploy section contains settings only, never credentials, and is stripped
 from the uploaded config. Runtime app/admin/apps settings are retained.
+Top-level site `redirects` is runtime config too: preserve it in the committed
+snapshot/archive and validate its destination routes on both sides. Protocol 28
+requires matching clients/servers because older servers silently ignore these
+rules. Keep server updates separate from site deployment.
 Deploy packages committed site/ pages/assets/partials, .flea.config.json,
 mailers/, flea/snips.json, flea/media/, flea/data/, legacy flea/snips/, flea/icons/,
 and each custom app's `flea/apps/<name>/app.json` with exactly the executables it

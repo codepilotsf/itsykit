@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -52,6 +53,7 @@ type Project struct {
 	SnipsUpdated       bool // A dev extraction changed templates or the active content index.
 	missingIcons       map[string]string
 	csrfTemplates      map[*template.Template]bool
+	redirects          map[string]url.URL
 }
 
 func Load(root string) (*Project, error) {
@@ -95,11 +97,12 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 	}
 	p.signature = fingerprint(root)
 	var config struct {
-		Dev     DevSettings     `json:"dev"`
-		App     map[string]any  `json:"app"`
-		Admin   AdminAccess     `json:"admin"`
-		Contact json.RawMessage `json:"contact"`
-		Apps    json.RawMessage `json:"apps"`
+		Dev       DevSettings     `json:"dev"`
+		App       map[string]any  `json:"app"`
+		Admin     AdminAccess     `json:"admin"`
+		Contact   json.RawMessage `json:"contact"`
+		Apps      json.RawMessage `json:"apps"`
+		Redirects json.RawMessage `json:"redirects"`
 	}
 	// Reject symbolic links throughout the site to keep both public and private
 	// reads within the project. Deployment can reuse this validation boundary.
@@ -337,6 +340,9 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 		return nil, err
 	}
 	if err = p.loadBlog(); err != nil {
+		return nil, err
+	}
+	if err = p.loadRedirects(config.Redirects); err != nil {
 		return nil, err
 	}
 	for route, t := range p.Pages {

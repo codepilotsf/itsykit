@@ -134,8 +134,10 @@ its shell. Preserve drafts after errors and during source reloads.
 
 Host indexing belongs to optional server `indexing` policy, never site `app`
 values. Preserve it on deploy/sync/code recovery; removal clears only owned hosts.
-See [host indexing](docs/host-indexing.md) and the deployment guide. Protocol 27
-requires matching clients/servers; keep release rollout separate from site deploy.
+See [host indexing](docs/host-indexing.md) and the deployment guide. Host indexing
+was introduced in protocol 27; keep release rollout separate from site deploy.
+Site migration redirects use top-level config `redirects` and 301 GET/HEAD;
+protocol 28 prevents older servers from ignoring them. See the runtime guide.
 
 `flea status` shows local validation first, then automatically checks the current
 branch's saved remote. Keep it read-only; see the runtime and sync guides.
