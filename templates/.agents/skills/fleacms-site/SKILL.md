@@ -1,6 +1,6 @@
 ---
 name: fleacms-site
-description: Build, import, redesign or maintain a website using Flea CMS. Use for site templates, editable snips, media, theme, navigation and Contact forms. Includes truthful business content and local verification; excludes development of the Flea CMS framework itself.
+description: Build, import, redesign or maintain a website using Flea CMS. Use for site templates, editable snips, media, theme, navigation, Contact forms and migration redirect inventories. Can crawl an existing site's public URLs and map moved pages into Flea's 301 config; excludes development of the Flea CMS framework itself.
 ---
 
 # Build a Flea CMS website
@@ -69,6 +69,17 @@ Routine maintenance does not require restarting this process.
   root and named fields; do not nest groups or place them in layouts/partials.
 - Use `{icon name}` and the `flea/icons/` cache. Do not introduce another icon or
   component system to follow a design example.
+
+## Migrations and permanent redirects
+
+For an existing-site migration, URL inventory or redirect request, read
+[migration redirects](references/migration-redirects.md). This workflow can run
+on its own without a redesign consultation: discover public URLs from the current
+website, map them to the new site's pages, and update the top-level `redirects`
+object in `.flea.config.json`. Preserve existing rules and verify actual 301
+responses locally. Check installed runtime support before relying on the config;
+older Flea versions silently ignore it. Do not deploy or upgrade as an incidental
+part of an inventory.
 
 ## Styling and Contact
 
