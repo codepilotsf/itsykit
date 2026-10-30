@@ -53,6 +53,11 @@ type Project struct {
 	SnipsUpdated       bool // A dev extraction changed templates or the active content index.
 	missingIcons       map[string]string
 	csrfTemplates      map[*template.Template]bool
+	seo                seoSettings
+	seoExcluded        map[string]bool
+	seoSitemap         []byte
+	seoRobots          []byte
+	seoPages           map[string]seoHTML
 	redirects          map[string]url.URL
 }
 
@@ -103,6 +108,7 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 		Contact   json.RawMessage `json:"contact"`
 		Apps      json.RawMessage `json:"apps"`
 		Redirects json.RawMessage `json:"redirects"`
+		SEO       json.RawMessage `json:"seo"`
 	}
 	// Reject symbolic links throughout the site to keep both public and private
 	// reads within the project. Deployment can reuse this validation boundary.
@@ -132,6 +138,10 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 		return nil, err
 	}
 	p.App = config.App
+	p.seo, err = decodeSEO(config.SEO)
+	if err != nil {
+		return nil, fmt.Errorf(".flea.config.json: %w", err)
+	}
 	p.Apps, err = decodeApps(config.Apps)
 	if err != nil {
 		return nil, err
@@ -342,13 +352,21 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 	if err = p.loadBlog(); err != nil {
 		return nil, err
 	}
+	p.seoPages = map[string]seoHTML{}
 	if err = p.loadRedirects(config.Redirects); err != nil {
 		return nil, err
 	}
 	for route, t := range p.Pages {
-		if _, err = p.render(t, route); err != nil {
-			return nil, fmt.Errorf("%s: %w", routes[route], err)
+		body, renderErr := p.render(t, route)
+		if renderErr != nil {
+			return nil, fmt.Errorf("%s: %w", routes[route], renderErr)
 		}
+		if p.seo.URL != "" {
+			p.seoPages[route] = inspectSEO(body)
+		}
+	}
+	if err = p.loadSEO(); err != nil {
+		return nil, err
 	}
 	for code, t := range p.Errors {
 		if _, err = p.render(t, fmt.Sprintf("/%d", code)); err != nil {

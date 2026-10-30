@@ -227,7 +227,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.serveError(w, r, p, 500, revision, loadErr)
 		return
 	}
+	if p.serveSEO(w, r) {
+		return
+	}
 	if t, ok := p.Pages[r.URL.Path]; ok {
+		if p.seoExcluded[r.URL.Path] {
+			w.Header().Add("X-Robots-Tag", "noindex")
+		}
 		decorate, owner := r.Context().Value(ownerRenderKey{}).(ownerTransform)
 		var admin map[string]any
 		if identity, authenticated := viewer.From(r.Context()); owner && authenticated {
@@ -261,6 +267,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if commitForm != nil {
 			commitForm(w)
 		}
+		body = p.canonicalResponse(w, r.URL.Path, body)
 		writeHTML(w, r, 200, body)
 		return
 	}

@@ -139,6 +139,12 @@ was introduced in protocol 27; keep release rollout separate from site deploy.
 Site migration redirects use top-level config `redirects` and 301 GET/HEAD;
 protocol 28 prevents older servers from ignoring them. See the runtime guide.
 
+Optional `seo.url` supplies the production HTTPS origin for snapshot-generated
+sitemaps, robots discovery and missing canonical tags; exact `seo.exclude` paths
+remain crawlable with noindex. Preserve custom discovery files and canonical
+markup, omit non-public routes and never derive production URLs from requests.
+Read [SEO](docs/seo.md) before changing this behavior; host indexing stays separate.
+
 `flea status` shows local validation first, then automatically checks the current
 branch's saved remote. Keep it read-only; see the runtime and sync guides.
 

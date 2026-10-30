@@ -8,6 +8,14 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## 0.20.0 - 2026-10-30
 
+- Add opt-in SEO foundations through `seo.url` and exact `seo.exclude` page
+  paths: a snapshot-generated XML sitemap, robots.txt sitemap discovery, missing
+  canonical tags (or Link headers for HTML fragments), and crawlable noindex
+  exclusions. Include published Blog routes and Contact's form while omitting
+  drafts, private/admin routes, managed custom apps and Contact receipts. Preserve
+  custom discovery files and canonical markup, and keep exact-host staging
+  indexing policies separate. No external services or generated files are needed.
+
 - Add exact, developer-managed 301 migration redirects in the top-level
   `.flea.config.json` `redirects` object. Support explicitly listed legacy
   extensions and trailing slashes, preserve or replace queries, and validate

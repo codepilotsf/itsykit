@@ -108,6 +108,13 @@ Preview mode/sender changes require restart; real local delivery remains explici
 
 ## Routing and isolation
 
+Optional `seo.url` enables snapshot-generated `/sitemap.xml`, a default
+`/robots.txt` with sitemap discovery, and missing public-page canonicals. Exact
+`seo.exclude` paths stay crawlable with noindex. Preserve custom endpoint files,
+canonical markup, immutable snapshots, pinned asset streaming and outer host
+indexing enforcement. Read [SEO](../seo.md) for route eligibility, limits and the
+separate production-origin and host-policy boundaries.
+
 Mini apps use internal/appapi and internal/formguard. The included Contact app
 is publicly mounted by apps.contact and launched only during actual dev/host
 startup, never Project loading or status. The developer-facing contract is
