@@ -6,11 +6,16 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
-## Migration redirect rollout
+## Current release status (October 30, 2026)
 
-Migration redirects now use deployment protocol 28 in source. Public release and
-matching server rollout remain pending; public 0.19.0 / protocol 27 does not
-support these site rules. Keep that rollout separate from migration config edits.
+Public 0.20.0 and the shared server are deployed with protocol 28. Native Linux
+AMD64 and Mac ARM64 full tests, race, vet, bundled builds, exact redirect/SEO
+artifact smoke and public install/reinstall/update checks passed. The website
+channel/docs and normal Kirin/Mac CLIs are updated. All 23 HTTPS hosts are healthy;
+live content and 16 unaffected sites' source hashes are preserved. No existing
+site was opted into SEO automatically. See [release verification](release-0200-verification.md).
+Native ARM64 server execution, clean-Mac/notarization, actual email and hosted
+crawler acceptance remain unverified.
 
 ## Theme removal follow-up
 
@@ -24,7 +29,7 @@ Hub branch workflow verification remains a separate task. Theme removal is inclu
 public 0.15.1. Native AMD64 build/full-suite, clean-Mac and notarization
 acceptance remain open.
 
-## Current release status (October 24, 2026)
+## Previous release status (October 24, 2026)
 
 ### Public 0.19.0
 
