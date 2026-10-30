@@ -1,6 +1,6 @@
 # Search discovery and canonical URLs
 
-Flea can generate a sitemap, advertise it through robots.txt, add canonical URLs
+From 0.20.0, Flea can generate a sitemap, advertise it through robots.txt, add canonical URLs
 and exclude selected pages from search. Enable this in `.flea.config.json`,
 preserving the other settings:
 
@@ -24,8 +24,9 @@ never selects this address from a request Host or forwarding header.
 Without `seo`, automatic SEO behavior is disabled. Adding the object requires
 `url`; `exclude` is optional. Unknown SEO settings and malformed values fail site
 validation. No additional first-run questions or external services are involved.
-This feature requires a server built with the SEO implementation; deploying site
-configuration alone does not upgrade the server executable.
+This feature requires matching CLI/server deployment protocol 28; older servers
+ignore SEO settings. Deploying site configuration alone does not upgrade the
+server executable.
 
 ## Sitemap
 

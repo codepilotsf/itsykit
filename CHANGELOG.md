@@ -6,6 +6,8 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.20.0 - 2026-10-30
+
 - Add opt-in SEO foundations through `seo.url` and exact `seo.exclude` page
   paths: a snapshot-generated XML sitemap, robots.txt sitemap discovery, missing
   canonical tags (or Link headers for HTML fragments), and crawlable noindex

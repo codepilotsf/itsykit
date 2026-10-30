@@ -998,7 +998,7 @@ from an old snapshot. The operating system manages file caching.
 
 ### Permanent redirects for site migrations
 
-Map old paths to their replacements in the top-level `redirects` object in
+From 0.20.0, map old paths to their replacements in the top-level `redirects` object in
 `.flea.config.json`:
 
 ```json
