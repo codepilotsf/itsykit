@@ -99,6 +99,9 @@ existing pinned asset handles. It does not append a Sitemap line to custom
 robots.txt or remove excluded URLs from a custom sitemap. Add the production
 Sitemap line and maintain exclusions yourself when providing these files.
 An authored HTML page mapped to either discovery endpoint also takes precedence.
+Migration redirects cannot use `/sitemap.xml` or `/robots.txt` as a source while
+automatic SEO is enabled. Old page redirects remain outside the sitemap and do
+not receive automatic canonical markup.
 
 [Host indexing policy](host-indexing.md) remains separate, in server configuration.
 A staging hostname configured as noindex still receives its noindex/nofollow

@@ -144,7 +144,34 @@ are never served as public assets. Keep secrets out of configuration and Git.
 Create `site/about.html` to add `/about`. You can also use
 `site/about/index.html`, but not both for the same route.
 
-Use `/about` in links. Explicit `.html` URLs and trailing slashes return 404.
+Use `/about` in links. Explicit `.html` URLs and trailing slashes return 404
+unless listed as migration redirects.
+
+### Migration redirects
+
+Add a top-level `redirects` object in `.flea.config.json`, alongside `app`:
+
+```json
+"redirects": {
+  "/about-us.html": "/about",
+  "/services/": "/services"
+}
+```
+
+Each exact, case-sensitive old path returns **301** on GET/HEAD. Destinations
+must be existing public pages/assets on this site. Incoming queries survive unless
+the destination supplies its own query; a final `?` clears the query. Destinations
+may include fragments. No wildcard, query-specific or external-URL rules exist.
+Private/internal paths, duplicate decoded sources, chains, loops and conflicts
+with active routes or managed app subtrees fail validation. Former Blog slugs
+can be listed explicitly. Update redirects when removing their destination.
+
+Ask the `fleacms-site` skill to inventory the old website and prepare redirects,
+or use `flea/skills/import-brochure/SKILL.md` during a full import. Preserve old URL
+spellings and report URLs the crawl cannot discover or map. Run `flea status`
+and verify each 301 and its final destination on a local server. This requires
+deployment protocol 28; public 0.19.0 / protocol 27 and earlier ignore these rules.
+An inventory does not authorize deployment or runtime upgrades.
 Assets keep their paths: `site/images/logo.svg` is `/images/logo.svg`.
 Files and directories beginning with `_` or `.` are private.
 

@@ -116,6 +116,11 @@ func (p *Project) loadSEO() error {
 	if p.seo.URL == "" {
 		return nil
 	}
+	for _, route := range []string{"/sitemap.xml", "/robots.txt"} {
+		if _, exists := p.redirects[route]; exists {
+			return fmt.Errorf("redirect %q conflicts with an automatic SEO endpoint; remove the redirect or disable seo", route)
+		}
+	}
 	p.seoExcluded = map[string]bool{}
 	for _, route := range p.seo.Exclude {
 		p.seoExcluded[route] = true

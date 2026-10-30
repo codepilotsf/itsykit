@@ -547,8 +547,9 @@ structure described above; no old filename or directory fallback is supported.
 ```
 
 Other fields within `app` are available to templates. `admin.emails` controls admin
-access as described below. Other unknown top-level settings are ignored; redirects
-and deploy settings have no effect here. JSON comments and trailing commas are errors.
+access as described below. Top-level `redirects` defines permanent URL redirects
+as described under routing. Unknown top-level settings are ignored; `deploy`
+settings are used only by the CLI. JSON comments and trailing commas are errors.
 Rich snips live in `flea/snips.json`; structured data lives in `flea/data/*.json`.
 Use `{app.site_name}`, `{app.email}`, or your own `{app.phone}` in any page or
 layout. Keep secrets out of `app`. Page-specific values stay in `page.*`, and
@@ -978,7 +979,12 @@ introduced through this feature. Browse names at [Lucide](https://lucide.dev/ico
 
 `index.html` maps to its directory: `/` at the root or `/about` for `about/index.html`. `about.html` also maps to `/about`; having both is a validation error. Page/asset route collisions are also errors. Assets keep their exact relative paths. There are no directory listings or implicit asset indexes.
 
-URLs are case sensitive. Trailing slashes other than `/` return 404, without redirects. URLs containing `.html` (case insensitive), dot segments, doubled slashes, backslashes, NUL, or residual percent signs return 404. Standard percent encoding is decoded once by Go's HTTP parser and then validated; encoded private names are still private. Filenames that cannot produce an accepted URL fail validation.
+URLs are case sensitive. Trailing slashes other than `/` and URLs containing
+`.html` (case insensitive) return 404 unless explicitly listed in `redirects`.
+Dot segments, doubled slashes, backslashes, control characters, or residual percent
+signs cannot be redirect sources. Standard percent encoding is decoded once by
+Go's HTTP parser and then validated; encoded private names are still private.
+Filenames that cannot produce an accepted URL fail validation.
 
 Files and directories beginning with `_` or `.` are private, including configuration and snips. `/admin` is reserved and cannot be a page or asset. `/_flea/reload` is a development-only version endpoint, not a filesystem route. Symlinks and nonregular files in the included site tree are rejected. Reads use confined directory handles with file identity checks. Requests serve only validated route maps, never request-derived filesystem paths.
 
@@ -989,6 +995,53 @@ Replace files atomically and let dev reload, or deploy a new release. Editing a
 streamed file in place causes detected size/timestamp changes to return 503
 (or interrupt a transfer already in progress), rather than serve changed bytes
 from an old snapshot. The operating system manages file caching.
+
+### Permanent redirects for site migrations
+
+Map old paths to their replacements in the top-level `redirects` object in
+`.flea.config.json`:
+
+```json
+{
+  "app": {"site_name": "Example"},
+  "redirects": {
+    "/about-us.html": "/about",
+    "/services/": "/services",
+    "/old-team.php": "/about#team"
+  }
+}
+```
+
+GET and HEAD return **301 Moved Permanently** for exactly the listed paths.
+Sources are case sensitive and may contain old extensions or trailing slashes;
+unlisted legacy URLs still return 404. Percent-encoded source paths are decoded
+once; duplicate decoded sources are rejected. There are no wildcard, regex or
+query-specific rules. POST and other mutation requests are never redirected by
+these rules.
+
+Destinations must be existing public pages or assets on this site, including
+published Blog posts. They may include a query or fragment. Flea preserves the
+incoming query unless the destination supplies one; a destination ending in `?`
+explicitly clears it. External URLs, private/internal paths, self redirects,
+chains, loops and sources that shadow existing pages/assets or managed app
+subtrees fail validation. Former Blog slugs may be explicit sources; slug changes
+do not add rules automatically. Removing a destination requires updating its
+redirects in the same change.
+
+Run `flea status`, then check each old URL locally without following redirects
+and confirm its `Location` leads directly to the intended content. The shared
+`fleacms-site` skill can inventory the original website and prepare these mappings;
+the bundled `import-brochure` skill includes this step for imports. A crawl cannot
+discover orphaned URLs without additional sources such as analytics or an old
+URL list. Query-based legacy pages, such as `/?p=123`, need a separate migration
+decision because path mappings cannot distinguish their content.
+
+This feature requires matching CLI/server deployment protocol **28**. Older
+servers ignore site redirect settings; update the server separately before
+deploying them. Path rules do not configure DNS, TLS or arbitrary hostname
+redirects for a domain move. The existing HTTP-to-HTTPS and WWW redirects remain
+host-level 308 responses.
+
 
 ## Search discovery and SEO
 

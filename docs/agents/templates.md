@@ -31,6 +31,12 @@ page paths. It is developer-managed configuration, separate from app globals,
 editable metadata and server host indexing. Runtime canonical insertion does not
 rewrite layouts. Custom robots/sitemap files and canonical markup win; maintain
 their discovery/exclusions yourself. See [SEO](../seo.md).
+
+Top-level `redirects` maps exact legacy paths to existing local public URLs for
+301 GET/HEAD responses. It is developer-managed runtime config, preserved in
+archives and by destination-setting writes, never template data. Keep starter
+README/site requirements and the import skill aligned with the runtime contract;
+the canonical shared `fleacms-site` migration workflow lives in Master Skills.
 New sites omit site_name until interactive dev prompts with the title-cased project
 folder default and saves the answer. Saved names must be nonempty strings.
 Read-only/noninteractive loads use the folder default without writing; deployment

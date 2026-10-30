@@ -833,7 +833,7 @@ func createSite(target string, starter bool) error {
 			case "site/_navigation.html":
 				body = []byte("<a href=\"/\">Home</a>\n")
 			case ".flea.config.json":
-				body = []byte("{\n  \"app\": {},\n  \"dev\": {\"email_preview\": true},\n  \"admin\": {\"emails\": [], \"session_idle_days\": 30}\n}\n")
+				body = []byte("{\n  \"app\": {},\n  \"redirects\": {},\n  \"dev\": {\"email_preview\": true},\n  \"admin\": {\"emails\": [], \"session_idle_days\": 30}\n}\n")
 			}
 			if err != nil {
 				return err

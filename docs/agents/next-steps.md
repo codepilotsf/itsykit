@@ -6,6 +6,12 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
+## Migration redirect rollout
+
+Migration redirects now use deployment protocol 28 in source. Public release and
+matching server rollout remain pending; public 0.19.0 / protocol 27 does not
+support these site rules. Keep that rollout separate from migration config edits.
+
 ## Theme removal follow-up
 
 Before updating older site sources, remove their obsolete Theme toolbar button

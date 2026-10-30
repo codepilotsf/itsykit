@@ -36,6 +36,14 @@ overwrite custom robots/sitemap files during an import. Custom files require
 their own sitemap discovery/exclusions. Keep server host indexing separate;
 see README.md for the complete site configuration and supported server requirement.
 
+Top-level config `redirects` maps exact old paths to existing local public URLs
+for 301 GET/HEAD responses. It requires deployment protocol 28; older runtimes
+ignore it. For a site migration or URL inventory, use the `fleacms-site` migration
+reference and preserve custom config/rules. Sources may include `.html` or trailing
+slashes, but cannot shadow live routes or managed app subtrees. No external,
+wildcard or query-specific mappings; preserve queries unless the target replaces
+them. Validate and verify locally before claiming redirects work.
+
 Keep the explicit `{#if app.current_admin}` blocks in the layout: a csrf-token
 meta in head and `{render /admin/toolbar}` directly inside body. The reserved
 current_admin object is supplied per request, never configured in JSON. Keep the

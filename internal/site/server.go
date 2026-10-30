@@ -216,6 +216,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	if p != nil && loadErr == nil && p.serveRedirect(w, r) {
+		return
+	}
 	if !safeURL(r.URL.Path) {
 		s.serveError(w, r, p, 404, revision, nil)
 		return

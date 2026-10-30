@@ -278,3 +278,23 @@ func TestSEOGeneratedDocumentsNeverWriteSiteFiles(t *testing.T) {
 		t.Fatal("generation rewrote configuration", err)
 	}
 }
+
+func TestSEORedirectBoundaries(t *testing.T) {
+	root := fixture(t)
+	put(t, root, ".flea.config.json", `{"app":{},"seo":{"url":"https://example.test"},"redirects":{"/old-about.html":"/about"}}`)
+	s := NewProductionServer(mustLoad(t, root), nil)
+	w := request(s, "GET", "/old-about.html")
+	if w.Code != 301 || w.Header().Get("Location") != "/about" || w.Header().Get("Link") != "" || strings.Contains(w.Body.String(), `rel="canonical"`) {
+		t.Fatal("SEO changed a migration redirect", w)
+	}
+	locations := sitemapLocations(t, request(s, "GET", "/sitemap.xml").Body.Bytes())
+	if !reflect.DeepEqual(locations, []string{"https://example.test/", "https://example.test/about"}) {
+		t.Fatal("redirect source entered sitemap", locations)
+	}
+	for _, source := range []string{"/sitemap.xml", "/robots.txt"} {
+		put(t, root, ".flea.config.json", `{"app":{},"seo":{"url":"https://example.test"},"redirects":{"`+source+`":"/about"}}`)
+		if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "automatic SEO endpoint") {
+			t.Fatal("redirect shadowed generated discovery", source, err)
+		}
+	}
+}

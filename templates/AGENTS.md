@@ -17,6 +17,8 @@ For coding delegation or independent review, read
 [orchestration](.agents/skills/deepseek-orchestrator/SKILL.md).
 For focused Blog, Contact or site import work, read the matching skill in
 `flea/skills/` without restarting a full-site consultation.
+For old-site URL discovery and 301 mapping without a redesign, use the migration
+reference in `fleacms-site`.
 
 - Preserve content, custom layouts, assets, authentication and CSRF contracts.
   Keep secrets and agent guidance out of public assets and deployment.

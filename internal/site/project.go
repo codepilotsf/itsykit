@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -57,6 +58,7 @@ type Project struct {
 	seoSitemap         []byte
 	seoRobots          []byte
 	seoPages           map[string]seoHTML
+	redirects          map[string]url.URL
 }
 
 func Load(root string) (*Project, error) {
@@ -100,12 +102,13 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 	}
 	p.signature = fingerprint(root)
 	var config struct {
-		Dev     DevSettings     `json:"dev"`
-		App     map[string]any  `json:"app"`
-		Admin   AdminAccess     `json:"admin"`
-		Contact json.RawMessage `json:"contact"`
-		Apps    json.RawMessage `json:"apps"`
-		SEO     json.RawMessage `json:"seo"`
+		Dev       DevSettings     `json:"dev"`
+		App       map[string]any  `json:"app"`
+		Admin     AdminAccess     `json:"admin"`
+		Contact   json.RawMessage `json:"contact"`
+		Apps      json.RawMessage `json:"apps"`
+		Redirects json.RawMessage `json:"redirects"`
+		SEO       json.RawMessage `json:"seo"`
 	}
 	// Reject symbolic links throughout the site to keep both public and private
 	// reads within the project. Deployment can reuse this validation boundary.
@@ -350,6 +353,9 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 		return nil, err
 	}
 	p.seoPages = map[string]seoHTML{}
+	if err = p.loadRedirects(config.Redirects); err != nil {
+		return nil, err
+	}
 	for route, t := range p.Pages {
 		body, renderErr := p.render(t, route)
 		if renderErr != nil {

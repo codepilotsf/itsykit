@@ -41,6 +41,16 @@ forms. Keep a short route mapping and identify missing assets or interactive
 features. Reuse assets only when the user has permission. Do not copy tracking,
 embedded credentials, unrelated scripts or opaque application bundles.
 
+Read `.agents/skills/fleacms-site/references/migration-redirects.md` and inventory
+the original site's public URLs from sitemaps and internal links, supplemented by
+any supplied old URL/analytics exports. Preserve URLs where useful; map moved
+pages to their actual replacements in top-level config `redirects`. Include legacy
+`.html` and trailing-slash paths. Keep ambiguous destinations and query-based old
+pages unresolved for a focused decision rather than redirecting everything to `/`.
+Check installed runtime support first: protocol 28 is required, and older versions
+ignore the settings. If the shared reference is missing, report it and follow the
+installed README contract; do not assume this skill upgrades the runtime.
+
 Send a compact brief: page count, proposed route map, media count and total weight,
 missing/broken assets, and any unsupported features (forms, ecommerce, video
 delivery). Ask only what changes the build — full import vs a curated subset, keep
@@ -133,6 +143,9 @@ hundreds of images cannot be image snips. For large galleries:
   stop it. Run `flea status` and fix what it reports.
 - Sweep every route: expect HTTP 200, the right `<title>`, exactly one `<h1>`, and
   **zero** unresolved `{snip}`/`{data}`/`{app}`/`{page}`/`{icon}` tokens.
+- Check each configured old URL without following redirects: GET/HEAD return 301
+  and the correct `Location`, followed by the intended content in one hop. Report
+  retained, redirected and unresolved URLs and the inventory's coverage limits.
 - Verify visually at desktop **and** a real mobile width. In headless Chrome, set
   emulation with the DevTools `Emulation.setDeviceMetricsOverride` (width, mobile)
   rather than `--window-size` alone, and check `documentElement.scrollWidth` equals

@@ -85,8 +85,8 @@ allowlist and Host/SNI rejection checks stay in place.
 
 Keep a public noindex site crawlable so crawlers can discover the header. Host
 indexing policy does not rewrite robots.txt, sitemaps, canonicals or templates,
-and never generates
-`noindex` or `nofollow` robots.txt directives or a blanket crawl block. A static
+and never generates `noindex` or `nofollow` robots.txt directives or a blanket
+crawl block. A static
 robots.txt is served unchanged on each alias. A site-wide `Disallow` rule can
 prevent the noindex header from being discovered. Startup logs and server/status
 inspection warn when the validated static robots.txt contains `Disallow: /`,
