@@ -22,9 +22,11 @@ CodePilot's current staging fallback until live native enforcement is verified.
 
 ## V1 distribution plan
 
-0.20.0 migration redirects and opt-in SEO discovery require deployment protocol 28. Build and roll
-out matching CLI/server executables before deploying site rules; older servers
-silently ignore them. Publication and server rollout remain separate tasks.
+0.20.0 includes migration redirects and opt-in SEO discovery with deployment
+protocol 28. The public channel and matching shared server are deployed; see
+[0.20.0 verification](release-0200-verification.md). Other hosts still need an
+explicit matching server update before deploying these settings; older servers
+silently ignore them. Publication and server rollout remain separate operations.
 
 The agreed plan is in [next-steps.md](next-steps.md). Source remains private;
 public binaries will be free to use without an account or license key. The

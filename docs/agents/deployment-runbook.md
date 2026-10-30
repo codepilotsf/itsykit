@@ -1,6 +1,6 @@
 # FleaCMS release and deployment runbook
 
-Updated October 24, 2026 for the 0.19.0 release. This is an operator guide,
+Updated October 30, 2026 for the 0.20.0 release. This is an operator guide,
 not authorization to publish or change a server. Recheck paths, branch mappings,
 host settings and live versions before each release. Read the repository's
 AGENTS.md, [release guide](releasing.md), [deployment requirements](deployment.md)
@@ -11,7 +11,7 @@ and [recovery guide](../recovery.md) first.
 - Framework: `/Users/sean/Projects/flea`, branch `main`.
 - Public website: `/Users/sean/Projects/flea-website`, branch `main`. This is separate
   from the framework's `website/` source directory. Preserve its custom layout.
-- Production SSH: `root@fleacms.com`. The shared `flea.service` serves 21
+- Production SSH: `root@fleacms.com`. The shared `flea.service` serves 23
   configured hostnames; an executable upgrade restarts all hosted sites.
 - Website deployment uses the current branch's saved `.flea.config.json` mapping.
   Confirm it targets the intended host/domain before running anything.
@@ -34,8 +34,8 @@ CLI updates do not replace already-running dev processes or remote servers.
 Never copy framework source, SSH keys, private runtime state or backups into the
 public website. Do not change Bookworm content as part of a marketing-site release.
 
-The 0.19.0 rollout is recorded in [verification](release-0190-verification.md).
-The shared server and normal Kirin/Mac CLIs are 0.19.0 / protocol 27; older
+The 0.20.0 rollout is recorded in [verification](release-0200-verification.md).
+The shared server and normal Kirin/Mac CLIs are 0.20.0 / protocol 28; older
 clients must update before deployment/host administration. Only the CodePilot
 staging hostname has native noindex policy. Preserve it through future releases.
 
