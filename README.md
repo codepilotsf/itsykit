@@ -11,6 +11,48 @@ screenshot, with no frontend build dependency. Keep the image URL absolute.
 
 Build pages with HTML, style them with CSS, and let site admins edit their own content. FleaCMS builds the server, and serves multiple sites with HTTPS directly.
 
+## Migration redirects
+
+FleaCMS 0.20.0 adds 301 redirects for old site URLs. Merge a top-level object
+into `.flea.config.json`, preserving other settings:
+
+```json
+"redirects": {
+  "/about-us.html": "/about",
+  "/services/": "/services"
+}
+```
+
+GET/HEAD match exact paths, including listed extensions and trailing slashes.
+Destinations must exist as public pages/assets on this site. Incoming queries
+survive unless the target supplies one; a final `?` clears them. Targets may have
+fragments. Validation rejects unsafe/private paths, duplicate decoded sources,
+live route/app conflicts, missing destinations, chains and loops. No wildcard,
+query-specific or external-URL mappings exist.
+
+Use the `fleacms-site` skill to inventory an old website from sitemaps and links,
+map replacements and verify responses. Provide old URL/analytics exports for
+orphaned pages; leave ambiguous mappings for a decision. Run `flea status` and
+verify 301/Location and the final content locally. Update both CLI and server to
+protocol 28 before deploying; public 0.19.0 and earlier ignore these rules. See
+[the public guide](https://fleacms.com/docs#redirects).
+
+## Search discovery
+
+FleaCMS 0.20.0 also supports opt-in discovery through top-level config:
+
+```json
+"seo": {"url": "https://example.com", "exclude": ["/campaign/receipt"]}
+```
+
+Use the production HTTPS origin. Flea generates a sitemap and robots.txt
+Sitemap declaration, adds missing public-page canonicals and gives exact excluded
+page paths a crawlable noindex response. Contact receipts, drafts, private routes,
+custom managed apps and redirects stay out of generated discovery. Authored
+robots.txt/sitemap.xml and existing canonicals take precedence. Without `seo`,
+automatic discovery is disabled; this does not classify or protect staging.
+Exact-host policy remains separate. See [the public guide](https://fleacms.com/docs#seo-discovery).
+
 ## Hostname indexing
 
 FleaCMS 0.19.0 adds exact-host indexing policy with deployment protocol 27.
@@ -150,7 +192,7 @@ are never served as public assets. Keep secrets out of configuration and Git.
 Create `site/about.html` to add `/about`. You can also use
 `site/about/index.html`, but not both for the same route.
 
-Use `/about` in links. Explicit `.html` URLs and trailing slashes return 404.
+Use `/about` in links. Explicit `.html` URLs and trailing slashes return 404 unless explicitly listed in `redirects`.
 Assets keep their paths: `site/images/logo.svg` is `/images/logo.svg`.
 Files and directories beginning with `_` or `.` are private.
 
