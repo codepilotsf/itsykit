@@ -37,6 +37,22 @@ verify 301/Location and the final content locally. Update both CLI and server to
 protocol 28 before deploying; public 0.19.0 and earlier ignore these rules. See
 [the public guide](https://fleacms.com/docs#redirects).
 
+## Search discovery
+
+FleaCMS 0.20.0 also supports opt-in discovery through top-level config:
+
+```json
+"seo": {"url": "https://example.com", "exclude": ["/campaign/receipt"]}
+```
+
+Use the production HTTPS origin. Flea generates a sitemap and robots.txt
+Sitemap declaration, adds missing public-page canonicals and gives exact excluded
+page paths a crawlable noindex response. Contact receipts, drafts, private routes,
+custom managed apps and redirects stay out of generated discovery. Authored
+robots.txt/sitemap.xml and existing canonicals take precedence. Without `seo`,
+automatic discovery is disabled; this does not classify or protect staging.
+Exact-host policy remains separate. See [the public guide](https://fleacms.com/docs#seo-discovery).
+
 ## Hostname indexing
 
 FleaCMS 0.19.0 adds exact-host indexing policy with deployment protocol 27.
