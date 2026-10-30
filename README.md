@@ -1045,16 +1045,34 @@ host-level 308 responses.
 
 ## Search discovery and SEO
 
-Set the production HTTPS origin in `.flea.config.json` to enable automatic SEO:
+FleaCMS 0.20.0 can generate a sitemap, advertise it in robots.txt and add missing
+canonical tags. A canonical tag identifies the preferred address of a page.
+Update your local CLI with `flea update`. If an existing server runs an older
+version, run `flea update-server` from a site with that server saved as its current
+branch's destination. Server updates briefly restart every site on that host;
+deploying website files alone does not update the server software.
+
+Add a top-level `seo` object to `.flea.config.json`, alongside `app`:
 
 ```json
 "seo": {
   "url": "https://example.com",
-  "exclude": ["/contact/thank-you"]
+  "exclude": ["/receipt"]
 }
 ```
 
-Add this alongside `app`, preserving other configuration. Flea generates
+Keep your existing app, admin and deployment settings. Use the production HTTPS
+address even during local development or staging. `exclude` is optional; replace
+`/receipt` with an existing page you want kept out of search. Each entry matches
+one exact path, without a wildcard, query or trailing slash.
+
+Run `flea status`, then `flea dev`. At the address printed by dev, open
+`/sitemap.xml` and `/robots.txt`. View a public page's source to check its canonical
+tag; an excluded page should still load and return `X-Robots-Tag: noindex`.
+Commit the reviewed configuration and run `flea deploy` from the intended branch,
+then repeat those checks on the production domain.
+
+Flea generates
 `/sitemap.xml` from public pages and published blog posts, advertises it in a
 generated `/robots.txt`, and adds missing canonical tags to public HTML responses.
 HTML fragments use an HTTP canonical Link header. Excluded pages stay accessible,
@@ -1062,9 +1080,14 @@ receive a noindex header and are omitted from the generated sitemap. Custom
 robots.txt files, sitemaps, canonical markup and host indexing policies are preserved.
 No files are generated on disk. Without `seo`, behavior is unchanged.
 
-See [SEO configuration](docs/seo.md) for exact exclusions, custom app boundaries,
-custom discovery files, sitemap limits and staging behavior. A website deployment
-does not upgrade the server executable to support this feature.
+Google Search Console submission is optional. Generated robots.txt already
+advertises the sitemap. To inspect Google's processing reports, verify ownership
+of your production site in Search Console and add its sitemap URL under Sitemaps.
+Submit the address, such as `https://example.com/sitemap.xml`, rather than uploading
+a file. You do not need to resubmit it after each content edit.
+
+See [SEO configuration](docs/seo.md) for the full walkthrough, custom files,
+sitemap limits and staging behavior.
 
 ## Reload behavior
 

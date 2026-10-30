@@ -28,6 +28,40 @@ This feature requires matching CLI/server deployment protocol 28; older servers
 ignore SEO settings. Deploying site configuration alone does not upgrade the
 server executable.
 
+## Enable, check and deploy
+
+1. Update your local CLI with `flea update`, then check `flea version`. This feature
+   starts in 0.20.0. For an existing older server, run `flea update-server` from a
+   site whose current Git branch has the intended server saved as its deployment
+   destination. It confirms before briefly restarting every site on that host.
+   A new server set up with the current CLI already receives its bundled runtime.
+2. Merge the `seo` settings above into your existing configuration. Keep your
+   app, admin, apps and deployment settings. Use the production address even when
+   working locally or on staging. Omit `exclude` if no additional page needs it.
+3. Run `flea status`, then `flea dev`. Open the address printed by dev and check
+   `/sitemap.xml` and `/robots.txt`. The XML should contain your production URLs,
+   including while served locally. View a public page's source to find its
+   canonical tag. A page listed in `exclude` should still load but return a
+   `X-Robots-Tag: noindex` response header.
+4. Commit your reviewed configuration and site changes, then run `flea deploy`
+   from the intended branch. Normal deployment publishes the committed
+   configuration and preserves existing live editable content. Repeat the URL,
+   canonical and exclusion checks on the production domain.
+
+The example paths are placeholders: replace them with real routes on your site.
+An excluded page that does not exist still returns 404; exclusion does not create
+it. In a browser, use View Source for canonical markup and the Network panel for
+response headers. If you use curl, an existing excluded page can be checked with:
+
+```sh
+curl -I https://example.com/campaign/receipt
+```
+
+Expect `X-Robots-Tag: noindex`. A fragment without a closing head uses a canonical
+`Link` response header instead of an HTML tag. Custom discovery files take
+precedence, as explained below; they can account for a sitemap or robots.txt that
+does not match the automatic output.
+
 ## Sitemap
 
 `GET /sitemap.xml` returns UTF-8 XML with absolute production URLs in stable
@@ -111,5 +145,21 @@ URLs still name the configured production origin. SEO settings never remove that
 host restriction or add a crawl block. Configure staging policy explicitly; a
 production URL does not automatically classify other hosts as staging.
 
-After publication, verify the production property in Search Console and submit
-the sitemap. Discovery, indexing, ranking and AI citations are not guaranteed.
+## Optional Google Search Console submission
+
+Google Search Console is Google's free reporting tool for website owners. Flea
+does not require an account or a Search Console integration to generate a sitemap.
+Its generated robots.txt already advertises the sitemap so Google can discover it.
+
+To check whether Google has read the sitemap and reported processing errors:
+
+1. Open [Search Console](https://search.google.com/search-console) and verify that
+   you own the production domain or site address.
+2. Select that site and open **Sitemaps**.
+3. Submit `https://example.com/sitemap.xml`. If the form already supplies the site
+   address, enter only `sitemap.xml`. You are submitting the URL, not uploading XML.
+
+Do this after the sitemap is reachable on your public domain. The same URL stays
+current as public content changes; you do not need to submit it after every edit.
+This step is optional and does not guarantee indexing, ranking or AI citations.
+See [Google's sitemap guide](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap).
