@@ -1,5 +1,7 @@
 # FleaCMS
 
+<img src="site/images/logo.svg" alt="FleaCMS" width="249" height="60">
+
 ## Temporary packaging storage
 
 FleaCMS 0.20.1 respects `TMPDIR` for local deployment and setup. On Linux with a
