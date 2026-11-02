@@ -1,5 +1,12 @@
 # FleaCMS
 
+## Temporary packaging storage
+
+FleaCMS 0.20.1 respects `TMPDIR` for local deployment and setup. On Linux with a
+small RAM-backed `/tmp`, use a private directory on verified disk-backed storage
+for each job, and keep worktrees and retained review evidence outside scratch.
+The public documentation includes the supported per-deployment command.
+
 ## Website sharing preview
 
 The public layout includes Open Graph and large-image card metadata with each
