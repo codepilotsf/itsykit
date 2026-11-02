@@ -20,6 +20,12 @@ rollout status. Never replace existing published bytes. Follow the separate
 [host-indexing rollout](../host-indexing.md#codepilot-rollout-and-rollback), keeping
 CodePilot's current staging fallback until live native enforcement is verified.
 
+0.20.2 adopts the approved Little Skip/Nunito branding in the starter, diagnostic
+page, website and docs, with outlined SVG logos and browser/touch icons. The
+public channel, shared server and normal Kirin/Mac CLIs are updated. See
+[0.20.2 verification](release-0202-verification.md). Custom customer branding and
+live content are preserved. Protocols remain 28 and 2.
+
 ## V1 distribution plan
 
 0.20.0 includes migration redirects and opt-in SEO discovery with deployment

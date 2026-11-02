@@ -8,6 +8,18 @@ for completed changes, and [README.md](../../README.md) for current usage.
 
 ## Current release status (November 2, 2026)
 
+Public 0.20.2, the shared server and normal Kirin/Mac CLIs are updated with the
+approved Little Skip/Nunito branding. Native Linux AMD64 and Mac ARM64 release
+checks, downloaded-artifact smoke, public install/reinstall/update and
+desktop/mobile branding verification passed. All 24 HTTPS names remain healthy;
+live CMS content and the other 17 sites are preserved. See
+[release verification](release-0202-verification.md). Protocols remain 28 and 2.
+Customer logos and active development jobs were not replaced. Asahi stays retired.
+Existing native ARM64, clean-Mac/notarization, installer and real-email limits
+remain open.
+
+## Previous release status (November 2, 2026)
+
 Public 0.20.1, the shared server and normal Kirin/Mac CLIs are updated, retaining
 protocol 28 and app protocol 2. Native Linux AMD64 and Mac ARM64 full tests,
 race, vet, bundled builds, artifact smoke and public install/reinstall/update

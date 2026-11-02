@@ -1,5 +1,15 @@
 # Installation and updates
 
+## 0.20.2 approved branding
+
+Published November 2, 2026 from immutable `v0.20.2` (`279ec50`). New sites use
+the approved Little Skip mascot, outlined Nunito wordmark and updated browser
+and touch icons. CLI/server updates preserve existing custom site branding.
+The public website, docs, shared server and normal Kirin/Mac CLIs are updated.
+Native release, public installer and artifact checks passed on both supported
+platforms. Protocols remain 28 and 2. See
+[release verification](agents/release-0202-verification.md) for hashes and limits.
+
 ## 0.20.1 temporary storage
 
 Published November 2, 2026 from immutable `v0.20.1` (`c14efd7`). Deployment,
