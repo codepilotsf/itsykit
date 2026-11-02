@@ -11,7 +11,7 @@ and [recovery guide](../recovery.md) first.
 - Framework: `/Users/sean/Projects/flea`, branch `main`.
 - Public website: `/Users/sean/Projects/flea-website`, branch `main`. This is separate
   from the framework's `website/` source directory. Preserve its custom layout.
-- Production SSH: `root@fleacms.com`. The shared `flea.service` serves 23
+- Production SSH: `root@fleacms.com`. The shared `flea.service` serves 24
   configured hostnames; an executable upgrade restarts all hosted sites.
 - Website deployment uses the current branch's saved `.flea.config.json` mapping.
   Confirm it targets the intended host/domain before running anything.
