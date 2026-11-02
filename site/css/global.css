@@ -18,8 +18,8 @@
   .skip-link:focus { transform:translateY(0); }
   .site-header { position:sticky; top:var(--flea-toolbar-height,0px); z-index:10; background:rgb(255 255 255 / .96); border-bottom:1px solid var(--light); }
   .site-header > nav { min-height:76px; }
-  .wordmark { color:var(--black); font-size:1.35rem; font-weight:700; letter-spacing:-.045em; text-decoration:none; gap:8px; }
-  .wordmark img { width:38px; height:38px; }
+  .wordmark { display:inline-flex; align-items:center; text-decoration:none; }
+  .flea-logo { display:block; width:166px; height:40px; max-width:100%; }
   .site-links > a { text-decoration:none; font-size:.85rem; font-weight:600; }
   .ui-brand-1 { background:var(--accent); color:var(--black); border-color:var(--accent); }
   .ui-button { border-radius:var(--rounded); font-size:.88rem; min-height:46px; padding:12px 20px; gap:20px; }
@@ -73,9 +73,7 @@
   }
   @media (max-width:640px) {
     .site-header > nav { min-height:68px; }
-    .wordmark { gap:4px; }
-    .wordmark img { width:30px; height:30px; }
-    .wordmark span { font-size:1.05rem; }
+    .flea-logo { width:141px; height:34px; }
     .site-links { gap:14px; }
     .site-links .ui-button { padding:10px 12px; min-height:42px; font-size:.75rem; gap:8px; }
     .site-links > a { font-size:.78rem; }
