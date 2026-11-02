@@ -337,7 +337,8 @@ The starter uses Prewind 1.3.1 from unpkg, without Node or a CSS build step.
 `global.css` imports the theme, typography, forms, button styles, and navigation
 transitions. The default font is Inter from Google Fonts, with warm off-white
 backgrounds and forest-green accents controlled by theme tokens. Replace
-`site/images/mark.svg` with your own logo.
+`site/images/logo.svg` with your own full logo, `site/images/mark.svg` with your
+standalone mark, and the favicon/touch-icon assets with your site icons.
 
 ### Icons
 

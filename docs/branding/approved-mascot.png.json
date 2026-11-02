@@ -1,0 +1,7 @@
+{
+  "prompt": "Precisely edit the supplied Paired Little Skip flea mascot, which is the edit target. Make its existing dark forest-black strokes around 20–25 percent thicker: outer head and body contour, short antennae, small front limbs, compact paired zigzag rear legs, face and the two body-segment curves. Keep the outer silhouette, character proportions, friendly smile and eye expression, left-facing three-quarter pose, body segmentation, exact number and placement of legs and all existing details as close to the reference as possible. Retain round caps and clean smooth simple linework. Internal segment lines can stay slightly lighter than the outer contour so the face and body spaces remain open at small logo sizes. This is only a gentle increase in ink weight, not a new character design. No additional details, no long legs, no turkey-leg loops, no changes to expression, no shading or texture. Use flat single ink #19241c, no text or lettering. Genuinely transparent background, same square canvas and centered scale as the reference. One complete isolated mascot.",
+  "method": "built-in image_gen edit",
+  "source": "/home/sean/.codex/generated_images/01a19d81-8a21-79e0-b14f-1dbc7103fada/exec-85f17607-9a61-4e68-b213-81d62c319425.png",
+  "reference": "../flea-logo-lettering/paired.png",
+  "approved": false
+}

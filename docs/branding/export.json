@@ -1,0 +1,21 @@
+{
+  "approved_source": "flea-logo-exploration f5b19f8, accepted by owner",
+  "font": "Nunito 800; outlined through existing FreeType",
+  "mascot": "Alpha silhouette, threshold 128/255; subpixel outline simplification 0.65 source pixels",
+  "source_dimensions": [
+    1254,
+    1254
+  ],
+  "source_ink_bounds": [
+    111,
+    101,
+    1066,
+    1051
+  ],
+  "contours": 8,
+  "logo_viewbox": "8.622 7.665 393.858 94.909",
+  "glyph_advance": 285.47999999999996,
+  "font_units": 1000,
+  "approved_source_sha256": "b178d0281ae2c08d047d74511bc4dc6cc81e48c8a56fc4c50194efae151fdcd4",
+  "font_sha256": "2363d3ed037283ebb961e8c4b4917e40a8bc8853cf9965cf1ea7b4daa1df630a"
+}

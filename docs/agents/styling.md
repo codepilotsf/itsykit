@@ -87,3 +87,11 @@ Keep the vendored `prewind-1.3.1.css` unchanged; customize the other files.
 The theme and general styles are adapted from `../preflight/lib/templates/app/assets/stylesheets/`.
 The library matches `../prewind/prewind.css` at version 1.3.1. Preserve the simple
 starter with its inline header/footer when making styling changes.
+
+### FleaCMS identity
+
+The FleaCMS lockup uses the approved Little Skip mascot and outlined Nunito 800.
+Use `images/logo.svg` for branded headers and `images/mark.svg` for the mascot.
+The outlined lettering needs no runtime font request. Keep normal site body and
+heading typography unchanged. Canonical masters and export notes live in
+[branding](../branding/README.md); do not redraw the mascot or retune its spacing.

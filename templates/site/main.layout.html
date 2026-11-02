@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{page.title} | {app.site_name}</title>
     <meta name="description" content="{page.description}" />
-    <link rel="icon" href="/images/mark.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/css/navigation.css" />
     <style>@view-transition { navigation: auto; } @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }</style>
     <link rel="stylesheet" href="/css/global.css" />
     {#if app.current_admin}
     <meta name="csrf-token" content="{app.current_admin.csrf_token}" />
     {/if}
+    <link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" sizes="180x180" />
   </head>
   <body class="flex flex-col min-h-screen m-0 p-0">
     {#if app.current_admin}
@@ -20,8 +22,7 @@
     <header class="sticky top-0 bg-lighter bg-opacity-80 backdrop-blur-sm">
       <nav class="container flex flex-wrap items-center gap-md py-xs">
         <a class="inline-flex items-center text-black no-underline" href="/">
-          <img src="/images/mark.svg" width="48" height="48" alt="" />
-          <span class="text-lg font-semibold tracking-tight">FleaCMS</span>
+          <img class="flea-logo" src="/images/logo.svg" width="166" height="40" alt="FleaCMS" />
         </a>
         <div class="desktop-navigation">{render /navigation}</div>
         {#unless app.current_admin}

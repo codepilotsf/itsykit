@@ -24,8 +24,8 @@ This is the framework repository; `templates/` is the canonical starter.
   support is not permission to add more.
 - Keep Go 1.26+, minimal dependencies and ordinary HTML/JSON. No npm/frontend
   build step. Do not add dependencies without a concrete need.
-- Preserve custom site layouts and the selected Skip logo
-  (`templates/site/images/mark.svg`). Framework fixes belong here.
+- Preserve custom site layouts and the approved Little Skip mark and Nunito logo
+  (`templates/site/images/mark.svg` and `logo.svg`). Framework fixes belong here.
   Ask for the current test site's path before modifying it; do not assume
   `../bookworm` is the site in scope.
 - Keep published Projects immutable, reads confined, and request paths separate

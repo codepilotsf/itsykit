@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{page.title} | {app.site_name}</title><meta name="description" content="{page.description}">
-  <link rel="icon" href="/images/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/global.css">
-</head>
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/css/global.css">
+    <link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" sizes="180x180" />
+  </head>
 <body class="flex flex-col min-h-screen">
   <a class="skip-link" href="#content">Skip to content</a>
   <header class="border-b border-light"><nav class="container flex flex-wrap items-center gap-md py-sm" aria-label="Main navigation">
-    <a class="inline-flex items-center gap-xs font-bold" href="/"><img src="/images/mark.svg" width="44" height="44" alt="">FleaCMS</a>
+    <a class="inline-flex items-center" href="/"><img class="flea-logo" src="/images/logo.svg" width="166" height="40" alt="FleaCMS"></a>
     <a class="ml-auto" href="/features">Features</a><a href="/getting-started">Get started</a><a href="/admin">Sign in</a>
   </nav></header>
   <main id="content" class="flex-1">{slot}</main>
