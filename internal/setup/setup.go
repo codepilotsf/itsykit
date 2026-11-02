@@ -126,16 +126,17 @@ func run(ctx context.Context, in io.Reader, out, errOut io.Writer, runCommand ru
 	return runTarget(ctx, target, in, out, errOut, runCommand)
 }
 
-func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.Writer, runCommand runner) error {
+func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.Writer, runCommand runner) (result error) {
 	target, err := targetName(target)
 	if err != nil {
 		return err
 	}
-	temp, err := os.MkdirTemp("/tmp", "flea-setup-")
+	temp, err := os.MkdirTemp("", "flea-setup-")
 	if err != nil {
-		return err
+		return temporaryStorageError(os.TempDir(), err)
 	}
 	defer os.RemoveAll(temp)
+	defer func() { result = explainTemporaryStorageError(temp, result) }()
 	sshOptions := connectionOptions(temp)
 	ssh := func(commandText string, tty bool, output io.Writer) error {
 		args := append([]string{}, sshOptions...)

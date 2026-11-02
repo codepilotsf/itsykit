@@ -6,6 +6,11 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Respect `TMPDIR` for local deployment packaging, server setup and Mac installer
+  packaging. Keep private per-invocation scratch directories and cleanup, and
+  explain local temporary-space/quota failures with the location and recovery
+  guidance. Document disk-backed scratch placement for development jobs.
+
 ## 0.20.0 - 2026-10-30
 
 - Add opt-in SEO foundations through `seo.url` and exact `seo.exclude` page

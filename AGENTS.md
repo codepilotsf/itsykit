@@ -185,8 +185,11 @@ Before publication, run the full release checks against the final candidate as
 specified in [RELEASING.md](docs/agents/releasing.md).
 Loopback tests need bind permission; a sandbox bind failure is not a product failure.
 
-On this Mac use `/usr/local/go/bin/go` if needed, with
-`GOCACHE=/tmp/flea-go-cache` when the default cache is restricted. For the
+For constrained temporary storage use the private, disk-backed per-job pattern
+in [development storage](docs/development-storage.md); retain review artifacts
+outside scratch. Never clean unrelated jobs or change global storage policy.
+On this Mac use `/usr/local/go/bin/go` if needed, with a writable disk-backed
+`GOCACHE` when the default cache is restricted. For the
 build script, set `GO_BINARY=/usr/local/go/bin/go` if necessary.
 Browser tests use
 `FLEA_TEST_BROWSER='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'`.

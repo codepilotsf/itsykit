@@ -2,6 +2,13 @@
 
 ## Product and build specification
 
+Local deployment packaging and server setup follow Go's standard temporary
+directory selection, including `TMPDIR` on Linux/macOS. Each invocation owns a
+private, unique scratch directory and removes it after completion, ordinary
+errors and handled cancellation. Explicit invalid locations fail without a
+fallback; space/quota errors identify the location and suggest `TMPDIR`.
+See [development storage](../development-storage.md) for per-job placement.
+
 Optional site SEO foundations are implemented: `seo.url` selects the production
 HTTPS origin for a snapshot-generated sitemap, robots.txt discovery and missing
 response canonical tags. Exact `seo.exclude` page paths stay crawlable with
