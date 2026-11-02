@@ -13,7 +13,7 @@ version=$(flea_version)
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'Installer packages require a stable numeric version.' >&2; exit 1; }
 test -x bin/flea
 [[ $(bin/flea version) == "FleaCMS $version" ]] || { echo 'Rebuild bin/flea for this version first.' >&2; exit 1; }
-stage=$(mktemp -d /tmp/flea-package.XXXXXX)
+stage=$(mktemp -d "${TMPDIR:-/tmp}/flea-package.XXXXXX")
 trap 'rm -rf -- "$stage"' EXIT
 mkdir -p "$stage/root/usr/local/bin" dist
 cp -X bin/flea "$stage/root/usr/local/bin/flea"

@@ -617,13 +617,16 @@ Remaining work and limits, not claims of completed sign-off:
 From this repository, using the installed Go executable:
 
 ```sh
-export GOCACHE=/tmp/flea-go-cache
 /usr/local/go/bin/go test ./...
 /usr/local/go/bin/go test -race ./...
 /usr/local/go/bin/go vet ./...
 bash scripts/build.sh
 /usr/local/go/bin/go build -o bin/flea-server ./cmd/flea-server
 ```
+
+Use the normal disk-backed Go cache. On hosts with a small RAM-backed `/tmp`,
+select private disk-backed scratch per job as described in
+[development storage](../development-storage.md).
 
 `TestExecutableWorkflow` creates a site, starts dev, checks pages/assets/private
 paths, exercises edits/extraction/error recovery, and shuts down. Tests also cover

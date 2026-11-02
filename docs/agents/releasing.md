@@ -154,8 +154,11 @@ no Go dependency. Creating/publishing that tap remains a separate step.
 Run from anywhere on this Mac:
 
 ```sh
-GOCACHE=/tmp/flea-go-cache bash /Users/sean/Projects/flea/scripts/build.sh
+bash /Users/sean/Projects/flea/scripts/build.sh
 ```
+
+Use the normal Go cache and, when temporary storage is constrained, the private
+per-job `TMPDIR` pattern in [development storage](../development-storage.md).
 
 The script locates Go on PATH or /usr/local/go/bin/go (GO_BINARY overrides it).
 It cross-compiles both Linux servers with CGO disabled, compresses them with

@@ -96,6 +96,14 @@ and CodePilot consumer fallback removal separately authorized and ordered.
 
 ### Deployment and HTTPS
 
+Local deployment and setup use private, unique scratch directories selected by
+Go (`TMPDIR` on Linux/macOS), with deferred removal on completion and handled
+cancellation. Preserve independent timeout contexts for remote/SSH cleanup.
+Storage errors retain their cause and identify the local temporary location.
+Do not fall back after an explicit temporary-directory setting fails or clean
+other invocations' leftovers. Remote staging remains separate. See
+[development storage](../development-storage.md) for disk-backed job placement.
+
 Optional host `downloads` maps configured hostnames to absolute administrator-owned
 release stores outside site snapshots. Aliases must match; normal deployment keeps
 this host policy. See [download hosting](download-hosting.md) for publication,

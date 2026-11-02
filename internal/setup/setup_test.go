@@ -134,9 +134,20 @@ func TestSetupExtractsRealBundleBeforeResetPrompt(t *testing.T) {
 func TestSetupStages(t *testing.T) {
 	for _, failure := range []string{"", "reinstall", "connect", "extract", "upload", "install", "check"} {
 		t.Run(failure, func(t *testing.T) {
+			tempRoot := t.TempDir()
+			t.Setenv("TMPDIR", tempRoot)
+			var scratch string
 			var output bytes.Buffer
 			var stages []string
 			fake := func(_ context.Context, c command) error {
+				for _, arg := range c.args {
+					if strings.HasPrefix(arg, "ControlPath=") {
+						scratch = filepath.Dir(strings.TrimPrefix(arg, "ControlPath="))
+					}
+				}
+				if filepath.Dir(scratch) != tempRoot {
+					t.Fatalf("setup scratch %q is outside TMPDIR %q", scratch, tempRoot)
+				}
 				joined := strings.Join(c.args, " ")
 				if strings.Contains(joined, "-O exit") || strings.Contains(joined, "rm -f --") {
 					return nil
@@ -192,6 +203,9 @@ func TestSetupStages(t *testing.T) {
 				input += "DESTROY\n"
 			}
 			err := run(context.Background(), strings.NewReader(input), &output, io.Discard, fake)
+			if _, statErr := os.Stat(scratch); !errors.Is(statErr, os.ErrNotExist) {
+				t.Fatalf("setup scratch remains: %s (%v)", scratch, statErr)
+			}
 			if failure == "" || failure == "reinstall" {
 				if err != nil || strings.Join(stages, ",") != "connect,extract,upload,install,check" || !strings.Contains(output.String(), "FleaCMS server is running") {
 					t.Fatal(stages, err, output.String())
