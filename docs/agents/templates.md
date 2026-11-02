@@ -158,10 +158,13 @@ settings and icon caches in version control by default.
   editable headings/body copy on Home, Team, Contact and Thank you, plus the
   shared footer. Keep snips outside form controls and navigation. Contact uses
   a responsive two-column introduction/form layout that stacks on narrow screens.
-  Its logo is the selected
-  option C (Skip): a happy side-profile flea with a folded jumping leg, in
-  slate-800 rounded line art. templates/site/images/mark.svg is the shipped logo,
-  shared by the header and favicon. Keep the selected design unchanged.
+  Its approved logo pairs the heavier Little Skip mascot with outlined Nunito 800
+  lettering. `templates/site/images/logo.svg` is the full lockup; `mark.svg` is
+  the standalone mascot. Layouts use `favicon.svg`, a 32px PNG and an Apple touch
+  icon; the root ICO includes 16px and 32px images. Keep the approved proportions
+  and spacing. See [brand assets](../branding/README.md). Existing custom site
+  branding is never replaced by CLI or server updates.
+
 - Optional partials are underscore-prefixed HTML files anywhere under site/.
   There is no special `_partials/` directory.
 - `{render footer}` resolves `_footer.html` beside the calling template.

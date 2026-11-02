@@ -6,6 +6,13 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.20.2 - 2026-11-02
+
+- Adopt the approved heavier Little Skip mascot with Nunito lettering and balanced
+  spacing across the starter, development diagnostics, website and documentation.
+  Include outlined SVG logos, light artwork and browser/touch favicon assets.
+  Existing custom website branding remains unchanged by executable updates.
+
 ## 0.20.1 - 2026-11-02
 
 - Respect `TMPDIR` for local deployment packaging, server setup and Mac installer

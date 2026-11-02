@@ -1,0 +1,36 @@
+# FleaCMS brand assets
+
+<img src="logo.svg" alt="FleaCMS" width="332" height="80">
+
+The owner approved this Little Skip mascot, Nunito 800 lettering and spacing on
+November 2, 2026, following the `f5b19f8` Nunito proof. Preserve the character,
+heavier strokes, proportions, spelling and gap. Body typography stays independent.
+
+- `logo.svg`: full forest-black lockup, with outlined lettering.
+- `logo-light.svg`: the same lockup for dark surfaces.
+- `mark.svg`: standalone mascot. Use it for icons, not as a replacement wordmark.
+- `favicon.svg`: mascot with a light ink variant for dark browser chrome.
+- `favicon.ico`: 16px and 32px PNG images in an ICO container.
+- `favicon-32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`: browser
+  raster exports from the SVG. Keep alpha and use their native dimensions.
+
+`approved-mascot.png` and its prompt sidecar retain the approved raster source.
+The SVG traces its alpha outline at source resolution, then simplifies below one
+source pixel. Nunito outlines come from `nunito-800.woff2`; its SIL Open Font
+License is retained in `Nunito-OFL.txt`. SVGs contain paths only, with no external
+images, font downloads, scripts or runtime dependencies.
+
+`export.py` records the vector export, using Python's standard library and the
+existing Linux FreeType library. It is an optional asset-authoring utility, not
+part of site generation or the Go build. Run it from this directory to regenerate
+the vector masters. `export.json` records the conversion settings. Raster icons
+are exported from `mark.svg` through the browser canvas at their stated sizes.
+
+The framework copies these assets into the starter and its website source. The
+public website repository uses identical files. Header, footer, docs and admin
+links use the full SVG with an accessible FleaCMS label. README files use the
+same master. The development diagnostic page includes the static logo so it
+still renders when a site's own files fail.
+
+CLI/server updates do not replace existing website layouts, customer logos,
+favicons, editable content or media. Deploy Flea-owned site changes separately.
