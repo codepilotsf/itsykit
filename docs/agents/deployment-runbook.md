@@ -1,6 +1,6 @@
 # FleaCMS release and deployment runbook
 
-Updated November 2, 2026 for the 0.20.1 release. This is an operator guide,
+Updated November 2, 2026 for the 0.20.2 release. This is an operator guide,
 not authorization to publish or change a server. Recheck paths, branch mappings,
 host settings and live versions before each release. Read the repository's
 AGENTS.md, [release guide](releasing.md), [deployment requirements](deployment.md)
@@ -33,8 +33,8 @@ CLI updates do not replace already-running dev processes or remote servers.
 Never copy framework source, SSH keys, private runtime state or backups into the
 public website. Do not change Bookworm content as part of a marketing-site release.
 
-The 0.20.1 rollout is recorded in [verification](release-0201-verification.md).
-The shared server and normal Kirin/Mac CLIs are 0.20.1 / protocol 28. The current
+The 0.20.2 rollout is recorded in [verification](release-0202-verification.md).
+The shared server and normal Kirin/Mac CLIs are 0.20.2 / protocol 28. The current
 inventory has 18 sites and 24 HTTPS names; CodePilot staging and Dropr preview
 have native noindex policy. Preserve all host policies through future releases.
 Asahi was decommissioned. It is excluded from the active inventory and future
