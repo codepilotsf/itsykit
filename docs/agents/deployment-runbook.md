@@ -11,7 +11,7 @@ and [recovery guide](../recovery.md) first.
 - Framework: `/Users/sean/Projects/flea`, branch `main`.
 - Public website: `/Users/sean/Projects/flea-website`, branch `main`. This is separate
   from the framework's `website/` source directory. Preserve its custom layout.
-- Production SSH: `root@fleacms.com`. The shared `flea.service` serves 23
+- Production SSH: `root@fleacms.com`. The shared `flea.service` serves 24
   configured hostnames; an executable upgrade restarts all hosted sites.
 - Website deployment uses the current branch's saved `.flea.config.json` mapping.
   Confirm it targets the intended host/domain before running anything.
@@ -19,10 +19,9 @@ and [recovery guide](../recovery.md) first.
 - Stable channel: `https://fleacms.com/releases/latest.txt`.
 - Installer: `https://fleacms.com/install.sh`.
 
-Known user CLI installations as of October 18, 2026:
+Active user CLI installations as of November 2, 2026:
 
 - This Mac: `/Users/sean/.local/bin/flea`.
-- Asahi (`sean@asahi`): `/home/sean/.local/bin/flea`.
 - Kirin (`sean@kirin`): `/home/sean/.local/bin/flea`, a symlink to
   `/home/sean/Projects/flea/bin/flea`. Preserve the dirty source checkout and
   retain the old executable before updating. Do not pull or reset source just
@@ -34,10 +33,12 @@ CLI updates do not replace already-running dev processes or remote servers.
 Never copy framework source, SSH keys, private runtime state or backups into the
 public website. Do not change Bookworm content as part of a marketing-site release.
 
-The 0.20.0 rollout is recorded in [verification](release-0200-verification.md).
-The shared server and normal Kirin/Mac CLIs are 0.20.0 / protocol 28; older
-clients must update before deployment/host administration. Only the CodePilot
-staging hostname has native noindex policy. Preserve it through future releases.
+The 0.20.1 rollout is recorded in [verification](release-0201-verification.md).
+The shared server and normal Kirin/Mac CLIs are 0.20.1 / protocol 28. The current
+inventory has 18 sites and 24 HTTPS names; CodePilot staging and Dropr preview
+have native noindex policy. Preserve all host policies through future releases.
+Asahi was decommissioned. It is excluded from the active inventory and future
+rollouts; older release receipts mention it only as historical test evidence.
 
 ## 1. Scope, version and source
 

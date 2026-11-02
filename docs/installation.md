@@ -1,5 +1,21 @@
 # Installation and updates
 
+## 0.20.1 temporary storage
+
+Published November 2, 2026 from immutable `v0.20.1` (`c14efd7`). Deployment,
+setup and Mac installer packaging respect `TMPDIR`; private invocation directories
+and cleanup are preserved. Space/quota errors identify the temporary location and
+explain how to choose another one. See [development storage](development-storage.md)
+for private disk-backed per-job placement. Deployment protocol stays 28 and app
+protocol stays 2. CLI and server updates remain separate commands.
+
+Native Linux AMD64 and Mac ARM64 full tests, race, vet, bundled builds, artifact
+smoke and public install/reinstall/update checks passed. The public channel,
+shared server and normal Kirin/Mac CLIs are 0.20.1. All 24 hosted HTTPS names are
+healthy with live content preserved. Asahi is decommissioned and no longer part
+of the installation inventory. See
+[release verification](agents/release-0201-verification.md) for provenance and limits.
+
 ## 0.19.0 hostname indexing
 
 Published October 24, 2026 from `da7d0c7`, immutable `v0.19.0`. Native Linux AMD64

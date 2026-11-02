@@ -107,7 +107,7 @@ pause reloads so they are not lost. Cancel a draft to accept pending source chan
 
 To test from a phone or another computer on the same trusted network, run
 `flea dev --lan` (or `flea dev -l`). Open a printed Network or Hostname URL on that device, such as
-`http://asahi:3000` or `http://asahi.local:3000` when that name resolves to this
+`http://devbox:3000` or `http://devbox.local:3000` when that name resolves to this
 computer. Sign-in, editing, uploads, forms, reloads and dev diagnostics work
 there too. Each device signs in separately. Email previews still open on the
 computer running Flea; enter that code on your other device. To share a private
