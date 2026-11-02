@@ -6,10 +6,13 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.20.1 - 2026-11-02
+
 - Respect `TMPDIR` for local deployment packaging, server setup and Mac installer
   packaging. Keep private per-invocation scratch directories and cleanup, and
   explain local temporary-space/quota failures with the location and recovery
   guidance. Document disk-backed scratch placement for development jobs.
+- Remove the release client's own smoke-test directory when the job exits.
 
 ## 0.20.0 - 2026-10-30
 
