@@ -1,5 +1,51 @@
 # Publishing FleaCMS downloads
 
+## 0.20.1 published November 2, 2026
+
+Immutable framework `v0.20.1` selects `c14efd7`, merged through MR !27 as
+`cba671b`. Deployment protocol stays 28; app protocol stays 2. Packaging respects
+TMPDIR, storage errors explain recovery, and the release client removes its own
+smoke directory. Native Linux AMD64 (Go 1.26.9) and Mac ARM64 (Go 1.27.1) full
+tests, full race checks, vet, canonical builds and release scripts passed. Exact
+artifacts passed creation/starter/status and host-isolation smoke checks; the Mac
+signature passed. Tag pipeline 704 was pending runners, not reported as passed.
+
+Final anonymous HTTPS download hashes:
+
+```text
+981e4c1d6cd2a6c5c50ee36d731bf2bac773b011d52c81585562c3b0dce06968  flea-darwin-arm64
+8c0894c23f2f5298ad01da92f88af4d49b0b837ca021bdc789bba7df480a70b9  flea-linux-amd64
+```
+
+The new immutable catalogue was staged on disk, verified and moved without
+overwrite under deploy.lock. Prior 0.20.0 hashes are unchanged. Supported
+`flea update-server` installed 0.20.1, SHA256
+`b0ed25ede09f614eb35f2c167462a08a84090236af065cdd7043d52e847631c4`.
+All 18 source trees, live content and byte-identical server config were preserved
+across the upgrade. Existing memory/swap policy remains; recovery is clear.
+
+Website MR !12 merged as `619f8a2`, activated normally as
+`20261102-185436-78c8e68d3d9d74d6f432dd9a`. Only index.html, docs.html and
+releases/latest.txt changed in deployed source. All live content and the other
+17 sites' roots/source hashes are unchanged. All 24 HTTPS hosts retained expected
+status, redirects and indexing headers before and after publication. Live browser
+checks at 1280px/390px verified release text and the TMPDIR example without
+horizontal overflow, missing images or observed console errors.
+
+Anonymous public install/reinstall, 0.20.0 update, already-current behavior and
+CLI smoke passed on both native platforms. Normal Kirin/Mac CLIs were updated
+through `flea update`, preserving prior binaries and Kirin's symlink. Kirin local
+site workflows share that CLI; no separate project executable or running Flea
+dev process was found. Asahi is decommissioned and excluded from future rollouts;
+references in older receipts below are historical, not active deployment targets.
+
+Evidence and artifacts: `fleacms-releases/0.20.1` in Sean's home on Kirin and Mac.
+The Linux archive includes a site backup; root-only remote config/executable
+backups are in `/var/backups/flea-0201.uVhW4aef`. No retained downloads, site
+releases, content or media were pruned. Native ARM64 server execution, clean-Mac,
+notarization, native installer packaging and real email delivery remain untested.
+No Rails, payments, native distribution, quota, mount or cleanup policy changes.
+
 ## 0.20.0 published October 30, 2026
 
 Immutable framework tag `v0.20.0` selects
