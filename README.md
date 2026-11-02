@@ -2,10 +2,10 @@
 
 ## Install
 
-FleaCMS 0.19.0 supports Apple Silicon macOS and x86-64 Linux CLIs. It adds
-exact-host search indexing policy so staging and production can use the same
-website files. Deployment protocol is 27; update the server separately before
-using the matching CLI for deployment or host administration. App wire protocol
+FleaCMS 0.20.1 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
+setup and installer packaging respect `TMPDIR`, with private scratch directories
+and actionable storage diagnostics. Deployment protocol remains 28; CLI updates
+and server updates are separate operations. App wire protocol
 remains 2. The Mac binary is ad-hoc signed, not notarized; clean-Mac and real-email
 acceptance remain unverified. Both CLIs bundle x86-64 and cross-compiled ARM64
 Linux servers; native ARM64 server testing is recorded separately.

@@ -40,6 +40,7 @@ elif [[ "$kind" == client ]]; then
   CGO_ENABLED=0 go build -trimpath -ldflags "$flags" -o "$file" ./cmd/flea
   "$file" version
   smoke=$(mktemp -d)
+  trap 'rm -rf -- "$smoke"' EXIT
   executable="$PWD/$file"
   (cd "$smoke"; "$executable" new demo --skip-git; cd demo; "$executable" status)
 else

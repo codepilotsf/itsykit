@@ -1,6 +1,6 @@
 # FleaCMS release and deployment runbook
 
-Updated October 30, 2026 for the 0.20.0 release. This is an operator guide,
+Updated November 2, 2026 for the 0.20.1 release. This is an operator guide,
 not authorization to publish or change a server. Recheck paths, branch mappings,
 host settings and live versions before each release. Read the repository's
 AGENTS.md, [release guide](releasing.md), [deployment requirements](deployment.md)
@@ -71,14 +71,17 @@ a public deployment: CI's publish stage only prepares artifacts.
 Use Go 1.26 or newer. On Sean's Mac, from the framework repository:
 
 ```sh
-GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go test ./...
-GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go vet ./...
-GOCACHE=/tmp/flea-go-cache /usr/local/go/bin/go test -race ./...
-GOCACHE=/tmp/flea-go-cache GO_BINARY=/usr/local/go/bin/go bash scripts/build.sh
+/usr/local/go/bin/go test ./...
+/usr/local/go/bin/go vet ./...
+/usr/local/go/bin/go test -race ./...
+GO_BINARY=/usr/local/go/bin/go bash scripts/build.sh
 ./bin/flea version
 ```
 
 Race checks are required for concurrency, reload and shared-state changes.
+Use the normal disk-backed Go cache and private per-job `TMPDIR` placement from
+[development storage](../development-storage.md) on constrained hosts. Keep native
+builds and their scratch off the production server.
 Run applicable browser/manual checks too. Do not overlap the bundled build with
 tests compiling bundle assets. Socket tests may need sandbox bind permission.
 `scripts/build.sh` rebuilds both embedded Linux servers before the local CLI;
