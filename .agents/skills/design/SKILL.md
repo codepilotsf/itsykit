@@ -26,13 +26,20 @@ design planning, UI implementation and delegated Impeccable text/code helpers, s
 the asset producer, manual edit applier, finish reviewer and documenter. Image-generation
 tools use their own image models.
 
-In T3 Code, discover supported models and reasoning options with
-`orchestrator_capabilities`. Select Sol with `reasoningEffort: high` through
-`t3_thread_configure` before starting a design turn. Pass the provider, model and
-reasoning option explicitly to authorized child tasks. Verify the effective settings
-before proceeding. If the runtime cannot select or verify them, report the limit and
-leave Impeccable work pending. Never rely on upstream helper metadata or a lower
-inherited default.
+In T3 Code, verify the current turn's effective model and reasoning from explicit
+runtime metadata. When they already match, continue without changing the thread.
+`orchestrator_capabilities` discovers supported provider/model IDs and reasoning
+options for authorized child tasks; catalog defaults are not evidence of the
+current turn's effective settings. Pass the provider, model and reasoning option
+explicitly to those child tasks.
+
+Never call `t3_thread_configure` on the thread executing the current turn, including
+same-model or reasoning-only updates. Reconfiguring an active thread can interrupt
+the calling run and appear as "Run interrupted by user." If the required settings
+do not match or cannot be verified, report the limit and leave Impeccable work
+pending until the user selects the required settings in T3 and starts a new turn.
+Continue independent authorized work where useful. Never rely on upstream helper
+metadata or a lower inherited default.
 
 ## Visual research
 
