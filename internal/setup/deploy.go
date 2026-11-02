@@ -43,7 +43,7 @@ func deploy(ctx context.Context, root string, s DeploySettings, httpsOnly bool, 
 	return deployWithSetup(ctx, root, s, httpsOnly, in, out, errOut, runCommand, nil)
 }
 
-func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOnly bool, in io.Reader, out, errOut io.Writer, runCommand runner, install func(context.Context, string) error) error {
+func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOnly bool, in io.Reader, out, errOut io.Writer, runCommand runner, install func(context.Context, string) error) (result error) {
 	state, err := currentGit(ctx, root, true)
 	if err != nil {
 		return err
@@ -76,11 +76,12 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 	if err = opts.Validate(); err != nil {
 		return err
 	}
-	temp, err := os.MkdirTemp("/tmp", "flea-deploy-")
+	temp, err := os.MkdirTemp("", "flea-deploy-")
 	if err != nil {
-		return err
+		return temporaryStorageError(os.TempDir(), err)
 	}
 	defer os.RemoveAll(temp)
+	defer func() { result = explainTemporaryStorageError(temp, result) }()
 	archive := filepath.Join(temp, "site.tar.gz")
 	snapshot := ""
 	needsMail := false

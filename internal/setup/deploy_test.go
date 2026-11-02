@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"flea/internal/release"
 )
 
 func TestDeploySSHWorkflow(t *testing.T) {
@@ -19,13 +21,32 @@ func TestDeploySSHWorkflow(t *testing.T) {
 	os.WriteFile(filepath.Join(root, "site", "index.html"), []byte("Hello"), 0644)
 	os.WriteFile(filepath.Join(root, ".flea.config.json"), []byte(`{"app":{"site_name":"test"}}`), 0644)
 	initRepo(t, root)
-	for _, fail := range []string{"", "connect", "dns", "upload", "activate"} {
+	for _, fail := range []string{"", "connect", "dns", "upload", "activate", "cancel-upload"} {
 		t.Run(fail, func(t *testing.T) {
+			tempRoot := t.TempDir()
+			t.Setenv("TMPDIR", tempRoot)
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
 			var out bytes.Buffer
 			var stages []string
+			var scratch string
+			var cleanedRemote, closedSSH bool
 			runner := func(ctx context.Context, c command) error {
+				for _, arg := range c.args {
+					if strings.HasPrefix(arg, "ControlPath=") {
+						scratch = filepath.Dir(strings.TrimPrefix(arg, "ControlPath="))
+					}
+				}
+				if filepath.Dir(scratch) != tempRoot {
+					t.Fatalf("scratch %q is outside TMPDIR %q", scratch, tempRoot)
+				}
 				args := strings.Join(c.args, " ")
 				if strings.Contains(args, "-O exit") || strings.Contains(args, "rm -f --") {
+					if ctx.Err() != nil {
+						t.Fatal("cleanup used cancelled context", ctx.Err())
+					}
+					closedSSH = closedSSH || strings.Contains(args, "-O exit")
+					cleanedRemote = cleanedRemote || strings.Contains(args, "rm -f --")
 					return nil
 				}
 				if strings.Contains(args, "StrictHostKeyChecking=no") || strings.Contains(args, "BatchMode=yes") {
@@ -43,8 +64,17 @@ func TestDeploySSHWorkflow(t *testing.T) {
 					return nil
 				case c.name == "scp":
 					stage = "upload"
-					if _, err := os.Stat(c.args[len(c.args)-2]); err != nil {
+					archive, err := os.Open(c.args[len(c.args)-2])
+					if err != nil {
 						t.Fatal(err)
+					}
+					defer archive.Close()
+					extracted := t.TempDir()
+					if err := release.Extract(archive, extracted); err != nil {
+						t.Fatal(err)
+					}
+					if body, err := os.ReadFile(filepath.Join(extracted, "site", "index.html")); err != nil || string(body) != "Hello" {
+						t.Fatalf("packaged page = %q, %v", body, err)
 					}
 				case strings.Contains(args, " -deploy "):
 					stage = "activate"
@@ -55,18 +85,32 @@ func TestDeploySSHWorkflow(t *testing.T) {
 					t.Fatal("unexpected command", args)
 				}
 				stages = append(stages, stage)
+				if stage == "upload" && fail == "cancel-upload" {
+					cancel()
+					return ctx.Err()
+				}
 				if stage == fail {
 					return errors.New("simulated " + stage)
 				}
 				return nil
 			}
-			err := deploy(context.Background(), root, DeploySettings{Target: "ubuntu@server", Domain: "example.test", Name: "demo"}, false, strings.NewReader(""), &out, io.Discard, runner)
+			err := deploy(ctx, root, DeploySettings{Target: "ubuntu@server", Domain: "example.test", Name: "demo"}, false, strings.NewReader(""), &out, io.Discard, runner)
+			if _, statErr := os.Stat(scratch); !errors.Is(statErr, os.ErrNotExist) {
+				t.Fatalf("scratch directory remains: %s (%v)", scratch, statErr)
+			}
 			if fail == "" {
 				if err != nil || strings.Join(stages, ",") != "connect,dns,upload,activate" || !strings.Contains(out.String(), "http://example.test") {
 					t.Fatal(err, stages, out.String())
 				}
+			} else if fail == "cancel-upload" {
+				if !errors.Is(err, context.Canceled) || !cleanedRemote || strings.Contains(out.String(), "Deployed main branch") {
+					t.Fatal(err, cleanedRemote, out.String())
+				}
 			} else if err == nil || len(stages) == 0 || stages[len(stages)-1] != fail || strings.Contains(out.String(), "Deployed main branch") {
 				t.Fatal(err, out.String())
+			}
+			if !closedSSH {
+				t.Fatal("SSH control connection was not closed")
 			}
 		})
 	}

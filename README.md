@@ -1124,6 +1124,28 @@ are intended for small local sites, not large media libraries.
 
 ## Deploy a site
 
+Local deployment and setup scratch directories follow Go's standard temporary
+directory selection, including `TMPDIR` on Linux and macOS. Flea creates a private,
+unique directory for each invocation and removes it on completion, ordinary
+failure and handled cancellation. An invalid explicit `TMPDIR` fails without
+falling back elsewhere.
+
+For a Linux machine with a small RAM-backed `/tmp`, run a deployment with private
+disk-backed scratch space (check that `/var/tmp` is disk-backed first):
+
+```sh
+(
+  scratch=$(mktemp -d /var/tmp/flea-job.XXXXXXXX) || exit 1
+  trap 'rm -rf -- "$scratch"' EXIT
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
+  TMPDIR="$scratch" flea deploy
+)
+```
+
+This affects only this invocation. See [development storage](docs/development-storage.md)
+for builds, persistent artifacts and cleanup limits.
+
 ### Snip synchronization
 
 Commit `flea/snips.json` with your site. It seeds the first deployment. Subsequent
