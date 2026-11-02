@@ -6,7 +6,17 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
-## Current release status (October 30, 2026)
+## Current release status (November 2, 2026)
+
+Public 0.20.1, the shared server and normal Kirin/Mac CLIs are updated, retaining
+protocol 28 and app protocol 2. Native Linux AMD64 and Mac ARM64 full tests,
+race, vet, bundled builds, artifact smoke and public install/reinstall/update
+checks passed. All 24 HTTPS hosts are healthy; all live content and the other
+17 sites' source hashes are preserved. See [release verification](release-0201-verification.md).
+Asahi is decommissioned and excluded from future rollouts. Native ARM64 server execution, clean-Mac/notarization,
+native installer packaging and real email acceptance remain unverified.
+
+## Previous release status (October 30, 2026)
 
 Public 0.20.0 and the shared server are deployed with protocol 28. Native Linux
 AMD64 and Mac ARM64 full tests, race, vet, bundled builds, exact redirect/SEO
