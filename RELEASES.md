@@ -1,5 +1,46 @@
 # Publishing FleaCMS downloads
 
+## 0.20.2 published November 2, 2026
+
+Framework MR !29 merged as `f00132e`; immutable `v0.20.2` selects tested source
+`279ec50`. Website MR !14 merged as `648e922` and activated normally as
+`20261102-203411-64cea67e0d016a92327e5c39`. The owner approved the heavier
+Little Skip mascot, Nunito 800 lettering and intermediate spacing. The website
+header/footer, docs/admin wrappers, social preview and SVG/PNG/ICO/touch favicons
+now use the matching outlined artwork. Current release links/channel are 0.20.2.
+
+Native Linux AMD64 (Go 1.26.9) and Mac ARM64 (Go 1.27.1) passed full tests, race
+tests, vet, canonical bundled builds and release checks. Exact/public clients
+passed fresh-site creation, initial commit, starter parity, status and overwrite
+refusal. Anonymous fresh install, reinstall, 0.20.1 update and already-current
+checks passed on both platforms. Mac ad-hoc signature verification passed.
+
+```text
+015c092a3622335f3e78a9cee364d8b9bef2ad907875ec0c7ebc1bb6f87b4bbc  flea-darwin-arm64
+6ccfa190ac5db9165db3a9327e5195e3f17727484239dc3bd4c9b02a488b0e7a  flea-linux-amd64
+```
+
+Shared server, public channel and normal Kirin/Mac CLIs report 0.20.2. The server
+hash is `83af63cae6cc3b5fe6c89f10143f88b255d898b7c8806eb8dcf9804ec986d840`.
+All 24 HTTPS names retained expected statuses, redirects and indexing headers.
+Live CMS content and all other 17 sites' source hashes are preserved; existing
+customer logos and an active Dropr development job were not overwritten.
+Kirin's CLI symlink is preserved. Asahi remains decommissioned. No old downloads,
+retained content or media were removed. Memory/swap policy, TLS, quotas, mounts
+and cleanup configuration are unchanged. Only task-owned scratch is cleaned up.
+
+All eight public logo/favicon/social files match the reviewed source; desktop
+and mobile website/docs/admin checks show loaded logos and no overflow.
+The source archive SHA-256 matches on both platforms:
+`0991e4848a4e5c6ee6f31848e76d0ef530b097e8e470257bd740f2552f698513`.
+Private evidence is under `fleacms-releases/0.20.2` in Sean's home on both
+machines; the server backup is `/var/backups/flea-0202.BArcPnY2`.
+
+Tag pipeline 709 was pending runners; successful native manual checks supplied
+publication evidence. Native ARM64 server execution, clean-Mac acceptance,
+notarization, native installer packaging and real email remain unverified.
+No Rails, payment or native app distribution work was performed.
+
 ## 0.20.1 published November 2, 2026
 
 Immutable framework `v0.20.1` selects `c14efd7`, merged through MR !27 as
