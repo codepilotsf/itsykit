@@ -1,6 +1,6 @@
 ---
 name: deepseek-orchestrator
-description: T3-owned multi-agent orchestration for this project. Use when a task should be split between a lead reviewer model and a DeepSeek implementation worker, when delegating or reviewing subagent work, or when routing a child task to a specific provider and model. Covers discovering live provider/model IDs with orchestrator_capabilities, delegate_task briefs and handoffs, risk-tiered review rounds, clientRequestId and taskId tracking, async completion versus task_status and cancellation, git and external-mutation restrictions, and pull request or merge request linking.
+description: Choose direct Sol implementation or bounded, flat DeepSeek delegation in T3 Code. Use for deciding whether to delegate coding work, coordinating up to three independent developer/QA workstreams, reviewing worker results, or routing child tasks to the configured provider and model. Covers live model discovery, reasoning levels, worktree ownership, risk-based review and authorized delivery.
 ---
 
 # DeepSeek orchestrator
@@ -10,13 +10,14 @@ schema copied here; those tool descriptions have priority when they differ.
 
 ## Roles and models
 
-- **Lead / final scrutiny:** GPT-6.1 Sol. Owns the decision, reviews the settled diff, and
-  presents the reviewable diff and opens a linked PR/MR only when authorized. The lead
+- **Lead / final scrutiny:** GPT-6.1 Sol. Implements small tasks directly, owns the decision,
+  reviews and presents the settled diff, and opens a linked PR/MR only when authorized. The lead
   never edits the same task worktree concurrently with an active worker.
 - **Implementation, research, debugging worker:** DeepSeek V4.1 Flash through OpenCode. It
   handles routine fixes and test diagnosis.
-- **Substantial-tier reviewer:** a fresh DeepSeek V4.1 Flash Go worker, read-only and
-  sequential. Sol retains final scrutiny; a DeepSeek review never replaces the lead's.
+- **Independent QA when warranted:** a fresh DeepSeek V4.1 Flash Go worker, read-only and
+  sequential within its workstream. Sol retains final scrutiny; a DeepSeek review never
+  replaces the lead's.
 
 Discover the actual IDs at runtime with `orchestrator_capabilities` and use the returned
 provider instance and model. Never assume every environment matches the defaults below.
@@ -28,6 +29,28 @@ provider instance and model. Never assume every environment matches the defaults
 Use the Go subscription route **only**. Never substitute `opencode/deepseek-v4.1-flash` or
 another pay-as-you-go route for the worker. If the configured model is unavailable, report
 it and stop; do not silently switch models, providers, or routes.
+
+## Choose the smallest useful team
+
+Optimize time to verified completion while avoiding unnecessary token usage and handoffs.
+Within the project's delegation authorization:
+
+- Handle small, clear edits and straightforward fixes directly with Sol when briefing and
+  reviewing a worker would cost more than doing the work. Required checks and reviews still apply.
+- Prefer one DeepSeek developer for substantial, cohesive implementation. Sol retains
+  planning, consequential decisions, integration and final scrutiny.
+- Actively consider parallel work for larger tasks. Expand to two or at most three
+  developer/QA workstreams only when each can make independent progress with a clear scope,
+  acceptance criteria and agreed shared interfaces. Keep dependent steps sequential.
+- Three workstreams is a ceiling, not a target. Allow at most three active developers and
+  three active QA reviewers across the request; other research/debugging workers consume
+  developer capacity. Respect any lower runtime limit and queue work rather than bypass it.
+- Keep delegation flat: only the main Sol lead creates workers. Do not create Sol subleads
+  or let workers delegate further. Include this restriction in every delegated brief.
+- A pair describes a developer followed by independent QA when the review tier requires it,
+  not two agents launched together. Start QA on a settled candidate with its writer paused;
+  other independent workstreams may continue. Do not launch idle reviewers or require QA
+  solely because developer capacity is available.
 
 ## Reasoning levels
 
@@ -90,14 +113,16 @@ path or a legacy shell runner to drive delegation.
   iteration run targeted checks only and repeat the full set only when a change invalidates
   it.
 - Batch revision fixes into rounds and incorporate updates safely without overlapping
-  editors. If a review round still has unresolved findings after two rounds, escalate to the
-  lead instead of looping.
+  editors. If findings remain unresolved after two fix/review rounds, the lead takes
+  ownership of diagnosis and resolution instead of continuing worker handoffs. Pause the
+  editor before Sol takes over; surface any decision or blocker that needs user input.
 - Use a distinct `clientRequestId` per round, stable across retries of that round, and
   retain each returned `taskId`.
 
 ## Review tiers
 
-- **Low risk:** implementer, then direct lead review of the diff.
+- **Low risk:** Sol implements and inspects the diff directly, or reviews the delegated
+  implementer's diff. No separate QA agent is required by this skill.
 - **High risk / explicitly requested independent review:** for changes affecting
   security boundaries, money movement, data integrity, concurrency or irreversible
   operations, run a fresh read-only reviewer after implementation, then lead scrutiny.
