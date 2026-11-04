@@ -46,7 +46,16 @@ question at a time by default, respecting personal conversation preferences and
 an explicit instruction to proceed without pauses.
 Routine maintenance does not require restarting this process.
 
-## Templates and editable content
+## Templates and content
+
+Build agent-managed Flea websites without snips by default. Write copy directly
+in HTML templates, keep media in `site/`, and use `flea/data/` for structured lists
+when useful. Do not add text, image or video snips, `snip` attributes, generated
+snip bindings or multisnips unless the user explicitly requests browser-editable
+content. A request to build, import or redesign a site is not such a request.
+Preserve existing snips unless their conversion is requested; do not silently
+remove a client's editing workflow. Route titles and descriptions may still live
+in `flea/snips.json` without any editable snip entries.
 
 - Public pages and assets live in `site/`. `site/index.html` maps to `/` and
   `site/about.html` to `/about`; use site-relative public URLs. Keep private
@@ -59,14 +68,16 @@ Routine maintenance does not require restarting this process.
   `app.current_admin` is request-supplied, not a JSON setting.
 - Public settings belong under `app` in `.flea.config.json`; secrets do not.
   Developer-managed JSON lives in `flea/data/` and mail templates in `mailers/`.
-- Use bare `snip` attributes for new editable regions and let dev extract IDs.
+- Only when browser editing is explicitly requested, use bare `snip` attributes
+  for the requested regions and let dev extract IDs.
   Existing values and route metadata live in `flea/snips.json`; edit that source
   rather than replacing a generated reference. Do not invent IDs or nest snips.
-- Media snips extract image src/alt or video src/poster bindings. Keep classes,
-  dimensions, links and playback behavior in templates. Do not combine a media
-  snip with competing `picture`, `source` or `srcset` bindings.
-- Follow local examples for multisnips. Preserve page-level groups with a single
-  root and named fields; do not nest groups or place them in layouts/partials.
+- When requested, media snips extract image src/alt or video src/poster bindings.
+  Keep classes, dimensions, links and playback behavior in templates. Do not combine
+  a media snip with competing `picture`, `source` or `srcset` bindings.
+- Use multisnips only when requested; follow local examples. Preserve page-level
+  groups with a single root and named fields; do not nest groups or place them in
+  layouts/partials.
 - Use `{icon name}` and the `flea/icons/` cache. Do not introduce another icon or
   component system to follow a design example.
 
@@ -104,9 +115,10 @@ support depends on the site's installed version; do not infer it from this skill
 
 ## Edit and verify safely
 
-Dev rewrites templates during snip extraction. Stop a task-owned dev watcher
-before bulk rewrites, then restart for extraction and icon downloads; coordinate
-with an existing process owner before replacing or stopping their server.
+Dev rewrites templates when snip extraction is needed. Stop a task-owned dev watcher
+before bulk rewrites, then restart for rendering and any required icon downloads
+or explicitly requested snip extraction. Coordinate with an existing process owner
+before replacing or stopping their server.
 `flea status` validates but does not perform extraction or download icons.
 
 Use local email preview for sign-in/contact checks when enabled. Keep preview
@@ -117,5 +129,7 @@ Check rendered HTTP responses, title/copy and unresolved template directives.
 Inspect desktop/mobile rendering and exercise changed interactions, navigation,
 forms and edit Save/Cancel where affected. Review changed CSS for duplication and
 unintended overrides; verify behavior beyond screenshots. Finish with `flea status`
-and a review of templates together with extracted content. Report unrun checks
-and remaining limits; this skill grants no commit or deployment permission.
+and a review of templates together with any changed metadata or content. For new
+sites without requested browser editing, verify there are no snip attributes,
+snip bindings, multisnips or editable entries in `flea/snips.json`. Report unrun
+checks and remaining limits; this skill grants no commit or deployment permission.
