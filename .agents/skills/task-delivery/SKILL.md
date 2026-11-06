@@ -1,6 +1,6 @@
 ---
 name: task-delivery
-description: Deliver a scoped repository change through worktree setup, proportionate verification and authorized Git review/integration. Use for implementation and delivery, not read-only answers.
+description: Deliver authorized repository edits with proportionate verification and scoped Git review/integration. Use when making or delivering changes, not for project questions, planning or read-only reviews.
 ---
 
 # Task delivery
@@ -17,10 +17,12 @@ normally use the existing checkout with scoped edits and commits. Unrelated dirt
 files do not require another worktree when the task's files and staging are clear.
 Do not stage someone else's work or manufacture a branch per copied bundle.
 
-Use a separate task branch/worktree for independent implementation, overlapping
-writers, required project isolation or an explicit review-worktree request. Reuse
-one supplied by the host; never repeat setup on continuation or switch another
-task's checkout. Keep the user's main checkout stable.
+Consider new branch/worktree setup only once scoped edits are authorized. Create
+a separate worktree only when concurrent edits, a project rule or an explicit
+request require an isolated checkout. An independent change may need
+its own branch without needing another checkout. Reuse a suitable branch/worktree
+supplied by the host; never repeat setup on continuation or switch another task's
+checkout. Keep the user's main checkout stable.
 
 Use existing host metadata. Add a coordination record only when concurrency or
 runtime resources need one; a routine edit needs no new tracking system. Report

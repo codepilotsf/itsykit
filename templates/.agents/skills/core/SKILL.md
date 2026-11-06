@@ -11,6 +11,11 @@ revisit changed sections, conflicts or missing evidence rather than whole guides
 
 ## Choose the shortest sufficient workflow
 
+For project questions, explanations, planning and read-only reviews, inspect the
+existing checkout and answer. Do not create branches/worktrees or start
+implementation in anticipation of possible edits. Reassess isolation when edits
+are requested; an implementation request alone does not require a new worktree.
+
 For a clear, routine request, inspect the affected paths, make the scoped update,
 run the checks that establish it worked, then deliver. A mechanical copy across
 many projects does not become application development because the list is long.
