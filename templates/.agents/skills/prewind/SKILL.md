@@ -1,6 +1,6 @@
 ---
 name: prewind
-description: Style sites and applications that use Prewind. Use for theme tokens, utility classes, fluid typography and spacing, layout, and responsive styling. Applies across Flea CMS and Rails; framework-specific forms, components and file locations belong to their authoring skills.
+description: Style Prewind sites and applications using their installed tokens, utilities and responsive conventions. Framework-specific forms and file locations belong to their authoring skills.
 ---
 
 # Prewind styling

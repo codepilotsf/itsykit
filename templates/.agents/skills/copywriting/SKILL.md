@@ -1,6 +1,6 @@
 ---
 name: copywriting
-description: Draft and edit human-sounding copy for websites, product interfaces, emails, proposals and articles. Use for headlines, calls to action, brand voice, rewrites and removing AI writing habits while preserving meaning. Does not apply to code or unrelated routine agent responses.
+description: Draft or edit website, product, email and editorial copy in the project's voice while preserving facts. Use for copy assignments, not code or routine agent responses.
 ---
 
 # Write copy with a recognizable voice

@@ -1,19 +1,23 @@
 # Critique – scoring drafts and making the one fix
 
-Load this at workflow step 5, after the drafts come back. You have vision: **read the PNGs**. Scoring from memory of the prompt defeats the purpose – the whole point is to see what the model actually did, not what you asked for.
+Inspect the generated image itself, including the intended crop. Apply only checks
+relevant to the brief; a deliberately deep-focus product image need not imitate a
+shallow-focus portrait. Scoring the prompt is not evidence about the output.
 
 ---
 
 ## How to run the pass
 
-1. Read both drafts.
-2. Score each against the rubric below. Truth failures first (they disqualify), then merit.
-3. Pick the winner – the frame with the best *bones*, not the most polish. Composition and moment are hard to fix by re-prompting; texture and grade are easy.
-4. Identify the **single worst failure** in the winner.
-5. Make one targeted edit to the prompt using the fix table. **Do not rewrite the prompt** – a rewrite trades one known problem for three unknown ones.
-6. Re-render the winner at quality.
+1. Inspect the candidate. When alternatives were requested, compare them against
+   the same brief and select the strongest composition and moment.
+2. Check applicable truth failures first, then whether the image serves its job.
+3. If it meets the brief, stop. Do not invent a flaw to justify another render.
+4. Otherwise identify its worst material failure and make a targeted correction.
+   Preserve successful details; reconsider the whole prompt only if the concept
+   or physical setup is the underlying failure.
 
-If both fail on the same axis, the prompt is wrong, not the model – fix that block rather than re-rolling.
+When repeated attempts fail on the same axis, revise that physical decision rather
+than repeating the same prompt.
 
 ---
 
@@ -40,8 +44,8 @@ If both fail on the same axis, the prompt is wrong, not the model – fix that b
 | 10 | **A moment is visible.** Can you say what just happened? | A person posed mid-nothing; an activity averaged into no instant |
 | 11 | **Depth in layers.** Is there something in the foreground, midground, and background? | A subject pasted onto a backdrop; two planes where there should be three |
 | 12 | **Palette hierarchy.** Is there a dominant, a support, and an accent – or six colors of equal weight? | Mud. Every hue at the same saturation |
-| 13 | **The punctum survived.** Is the specific odd detail actually in the frame? | Generic scene; nothing you'd describe to someone else |
-| 14 | **Would you keep it in an edit?** Name the one thing you'd change. | If you can't name one thing, you haven't looked hard enough |
+| 13 | **Distinctive detail.** When the brief needs a specific detail, did it survive? | A requested distinguishing feature is absent or changed |
+| 14 | **Fitness for use.** Does the result meet the brief at its intended crop? | A concrete composition, content or quality gap that affects its job |
 
 ---
 
@@ -52,11 +56,11 @@ Change one thing. The right-hand column is the edit, not a rewrite.
 | Symptom | Edit |
 |---|---|
 | Everything equally sharp | Block 4: drop the aperture (f/1.4–f/2.8) and name the focal plane *and* what falls off – "sharp on the near eye, the far shoulder already soft" |
-| Waxy or airbrushed skin | Block 8: add three more skin-specific flaws by name; add "visible pores at cheek and nose, uneven skin tone" to block 7 |
+| Waxy or airbrushed skin | Name plausible skin texture and light response for this subject; preserve reference identity |
 | Flat, no drama | Block 3: state a ratio (4:1 or 8:1) and kill the fill – "no fill from camera right; that side falls to near-black" |
 | Muddy color | Block 10: state the relationship before the tones. "Near-monochrome cool grey with a single sodium-orange break" |
 | Subject lost in background | Block 5: name the separation mechanism – "the pale wall behind him is two stops brighter, silhouetting the shoulder line" |
-| Feels staged | Block 6: add one irrelevant object; block 2: move the moment off the peak |
+| Feels staged | Reconsider action, vantage and the specific moment; add incidental objects only if they belong |
 | Feels generic | Block 9: the punctum was dropped or too vague. Make it a physical object with an implied history |
 | Tangents at the edges | Block 5: "the doorframe clears his head by a hand's width; no line touches the frame edge" |
 | Symmetrical AI face | Block 7: "asymmetrical expression, one brow slightly higher, weight on the left foot, mid-blink" |
@@ -70,4 +74,5 @@ Change one thing. The right-hand column is the edit, not a rewrite.
 
 ## When to stop
 
-Two rounds. If the second targeted fix doesn't land, the problem is the *idea*, not the wording – go back to the look and the moment and choose differently. Endless re-rolling on the same prompt costs money and converges on nothing.
+Stop as soon as the image meets the brief. After two unsuccessful targeted
+correction rounds, reconsider the concept or disclose the unresolved limit.

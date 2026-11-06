@@ -1,12 +1,15 @@
 # Looks – presets, references, stocks, and clichés to avoid
 
-Load this at workflow step 2, before writing prose. Picking a look decides blocks 3 (Light), 4 (Camera) and 10 (Palette/grade) in one move, and – more importantly – keeps them consistent with each other. Inconsistency between those three is what makes an image feel assembled rather than photographed.
+Read when an unresolved lighting, camera or color choice needs examples. A preset
+can keep those choices coherent; an already-specific brief needs no preset pass.
 
 ---
 
 ## 1. Presets
 
-Each preset freezes blocks 3, 4 and 10. Write blocks 1, 2, 5, 6, 7, 8, 9 for the specific scene. If the user says "make it beautiful" without further direction, pick the preset that fits the subject and say which one you picked.
+Each preset groups light, camera and palette choices. Adapt relevant scene details
+without filling a fixed template. When direction is delegated, choose the look
+that fits the subject and state the assumption.
 
 | Preset | Light (block 3) | Camera (block 4) | Palette & grade (block 10) | Best for |
 |---|---|---|---|---|

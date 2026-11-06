@@ -1,12 +1,12 @@
 ---
 name: fleacms-site
-description: Build, import, redesign or maintain a website using Flea CMS. Use for site templates, editable snips, media, theme, navigation, Contact forms and migration redirect inventories. Can crawl an existing site's public URLs and map moved pages into Flea's 301 config; excludes development of the Flea CMS framework itself.
+description: Build or maintain Flea CMS websites, including templates, optional editable snips, Contact forms and migration redirects. Excludes development of the Flea CMS framework itself.
 ---
 
 # Build a Flea CMS website
 
-Read the site's `AGENTS.md` and `README.md`; inspect its installed Flea version,
-custom layouts, content and assets. Local instructions and explicit user choices
+Use the site's already-read `AGENTS.md`; consult relevant README sections and inspect
+the installed Flea version and affected layouts, content and assets. Local instructions and explicit user choices
 take precedence. Keep ordinary HTML/JSON and the existing no-build setup.
 
 ## Load the relevant shared guidance

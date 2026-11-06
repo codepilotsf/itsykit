@@ -82,7 +82,7 @@ confirmed facts and a voice sample if you have one. State any length limit or
 passages that should stay unchanged.
 
 For project installation, use the complete `copywriting` directory as described
-in the [Master Skills installation guide](../../README.md#installation-and-updates).
+in the [Master Skills installation guide](https://gitlab.codepilot.com/sean-schertell/master-skills/-/blob/main/docs/installation.md).
 The working instructions are in [SKILL.md](SKILL.md); the README is an overview.
 
 ## Background

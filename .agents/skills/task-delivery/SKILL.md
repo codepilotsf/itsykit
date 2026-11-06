@@ -1,66 +1,34 @@
 ---
 name: task-delivery
-description: Finish a repository task as a scoped, verified, reviewable change. Use for implementation handoff, committing completed work, and opening, updating or merging a PR or merge request. Uses owner-authorized routine Git delivery without repeated approval; preserves checks, project constraints and unrelated work.
+description: Deliver a scoped repository change through worktree setup, proportionate verification and authorized Git review/integration. Use for implementation and delivery, not read-only answers.
 ---
 
 # Task delivery
 
-Read the project's root `AGENTS.md` and applicable guides. Explicit user instructions
-take precedence. Determine whether the project authorizes local commits, branch pushes,
-PR/MR creation and merging. Existing standing permission covers those steps without
-another approval question. The owner-approved CodePilot default is autonomous routine
-Git delivery after verification; a consuming project records its authorization in root
-instructions. This skill alone grants no permission. Honor explicit stop-at-review requests.
+Use the project's already-read AGENTS.md and relevant guides. Permissions come
+from the owner or project; this skill grants none. Standing permission covers
+routine Git actions without repeated approval. Honor explicit stop-at-review.
 
-## Start and scope
+## Scope and ownership
 
-- Inspect status, the current branch, remotes and `git worktree list`. Identify pre-existing work and the
-  task's files. Preserve other people's changes, staged content and untracked files.
-- Default each new independent feature or implementation task to its own worktree and
-  descriptive task branch. Reuse its existing worktree on continuation. Keep the main
-  checkout available to the user; never switch its branch to start another agent's task.
-  Create worktrees through the host's supported workspace tools or Git, without launching
-  a new top-level conversation merely to obtain an isolated delegated workspace.
-- Record the task ID, owner, absolute worktree path, branch, base commit, scope and runtime
-  resources in the host's task metadata or a local coordination record outside the repo.
-  Report the path so the user can open the correct editor and preview. Give every delegated
-  brief that exact path; require the worker to verify cwd and branch before editing.
-- Start from an explicit agreed base commit, normally the target branch. A new worktree
-  does not include another checkout's uncommitted or ignored files. Do not copy its whole
-  tree, secrets or runtime state; identify required task-owned prerequisites and obtain
-  authorization for any necessary transfer. Do not bypass branch-in-use guards.
-- Existing tasks with uncommitted work may finish in their current checkout; do not move
-  them silently to apply this default. An unborn repository needs an authorized initial
-  commit before normal branch-based worktrees. Tiny read-only or prose tasks may use an
-  existing checkout when no concurrent writer owns it; state the exception.
-- Keep the task's acceptance criteria and required checks explicit. Ask only for an
-  unresolved product, architecture, security or authorization decision.
+Inspect status, branch, remotes and worktrees. Preserve pre-existing edits,
+staged content and untracked files. Reuse the task's existing worktree, including
+one supplied by the host; do not create a nested worktree or repeat setup on
+continuation. New independent implementation tasks default to a task branch and
+worktree based on the target branch. Keep the user's main checkout stable.
 
-## Concurrency and integration
+Keep the task path, branch, base commit, scope, owner and runtime resources in
+host metadata or a lightweight record outside the repo; reuse host-provided
+values. Report the path when it changes or is needed to open the editor/preview.
+A read-only or tiny prose task may use an unowned existing checkout. Do not move
+existing uncommitted work or copy another checkout's secrets and runtime state.
+An unborn repository needs an authorized initial commit before normal worktrees.
 
-- One editing agent owns each task worktree at a time. Agents collaborating on that task
-  hand off sequentially. Review a settled diff with the writer paused; a reviewer sharing
-  the worktree remains read-only. Different authorized feature tasks may run concurrently
-  in different worktrees. Worktree isolation does not itself authorize delegation.
-- Plan overlap before delegating: identify shared APIs, schemas, dependencies and files.
-  Assign a coordinator and integration order when tasks depend on or overlap each other.
-  Keep dependent work sequential or based on an explicitly recorded prerequisite branch.
-  Separate worktrees prevent overwriting working files; they do not prevent merge conflicts
-  or incompatible behavior. Surface newly discovered overlap promptly.
-- Give each task its own dev-server port, writable test data/database and build output
-  paths when applicable. Do not share writable runtime state or restart another task's
-  server. If a tool cannot isolate a resource, serialize that operation through the
-  coordinator. Worktrees share Git objects, refs and usually configuration; coordinate
-  repository-wide Git changes, and never modify another task's branch or worktree.
-- Deliver a scoped change per independent task, using a PR/MR when that is the project's
-  integration workflow. Before merging, inspect target changes since the recorded base.
-  Reconcile overlap in the task worktree and rerun checks invalidated by the combination.
-  Integrate overlapping tasks sequentially. With standing merge permission, continue
-  without asking again; earlier checks on an outdated diff do not verify the combination.
-- Keep worktrees and branches through review. Remove them only after merge or explicit
-  abandonment, with the owner's approval and confirmation that no needed dirty, untracked,
-  ignored or unpushed work remains and task-owned servers have stopped. Never force-remove
-  worktrees, automatically prune other agents' work, or delete another task's branch.
+One editing agent owns a worktree at a time. Reviewers are read-only on a settled
+diff; pause its writer before review or handoff. Give authorized workers the exact
+path, branch, base, scope and required checks; require them to verify their target.
+For overlapping tasks or shared runtime resources, read
+[concurrent task coordination](references/concurrent-tasks.md).
 
 ## Choose proportionate verification
 
@@ -103,53 +71,47 @@ add runtime suites for formatting-only edits, or repeat another agent's checks w
 an evidence gap. Never delete tests, weaken assertions, bypass protected components
 or silently reduce mandatory coverage for speed. Report unverified boundaries plainly.
 
-## Complete and review
+## Conditional preparation
 
-Finish implementation and affected documentation. Run the project's checks appropriate
-to behavior and risk, inspect the final diff, and resolve findings before delivery.
-For delegated work, follow the project's orchestration skill and authorization.
-Reviewers are advisory; their verdict does not authorize Git or external mutations.
+For deployment or host resource pressure, read
+[deployment preparation](references/deployment-preparation.md). Skip it for
+ordinary implementation. A successful build or configured staging destination
+does not authorize a rollout.
 
-Preserve check evidence and state unverified limits. Failed required checks mean the
-task is not ready. Report a blocker or, when authorized and useful, open an explicitly
-incomplete draft for review; never claim it is completed or ready to merge.
+## Review and integrate
 
-## Commit, review and integrate
+Finish implementation and affected documentation, run required checks and review
+the final diff. Resolve material findings. Reuse observed evidence; advisory
+reviewers grant no Git or external-action permission. Failed required checks
+block readiness. When useful and authorized, an incomplete draft may expose the
+blocker, but must not be called ready or complete.
 
-If standing project policy already authorizes these steps, perform them without another
-permission question. Otherwise finish the concrete diff and checks first, then request
-only the missing authorization with the policy's location and reason.
+1. Inspect status and index. Stage only task-owned paths or hunks and review the
+   entire staged diff before a scoped conventional commit. Do not commit or
+   unstage unrelated work to make delivery convenient.
+2. Inspect CI/deployment configuration before push or merge. Standing routine
+   Git permission excludes deployment, releases, production mutations and
+   destructive history operations, including automatic CI side effects. Obtain
+   only a genuinely missing authorization after the diff is reviewable.
+3. Push the task branch and create/update its PR/MR through the project's normal
+   workflow. Avoid duplicates; describe the problem, resulting behavior, checks
+   and limits. Register its full URL with the app's linking tool when available
+   and confirm all review requests worked on are linked. Report linking failures.
+   Use app-native watching only when monitoring was requested.
+4. With standing merge permission, finish required reviews and CI, inspect target
+   changes since the base and reconcile overlap. Repeat only invalidated checks.
+   Integrate overlapping changes sequentially; respect protections and objections.
+   Local integration requires a clean target checkout; prefer fast-forward when
+   possible. Never reset, stash or switch another task's checkout to force a merge.
 
-1. Inspect status and the index again. Stage only task-owned paths or hunks; never use
-   bulk staging to sweep in unrelated files. Inspect the entire staged diff before a
-   scoped conventional commit. If unrelated work is staged, resolve ownership rather
-   than committing or unstaging it silently.
-2. Push only the task branch to the intended remote. Inspect applicable CI/deployment
-   configuration before pushing or merging. If it triggers deployment or another action
-   outside standing permission, obtain that authorization first. Do not force-push,
-   rewrite another person's history, push release tags or publish releases without authorization.
-3. Open or update the task's PR/MR when the project uses that workflow; avoid duplicates.
-   Describe the problem, resulting behavior, checks and limits. Use draft status while
-   incomplete or when requested. Keep secrets and private state out.
-4. Register the full review URL with the app's PR-linking tool when available. Before
-   finishing, verify that every review request worked on is linked. Report a linking
-   failure accurately. Use app-native watching only if the user asks for monitoring.
-
-5. With standing merge permission, finish required reviews and CI and merge the verified
-   task through the project's supported workflow. Do not bypass branch protections,
-   unresolved objections or failing checks. For local integration, use a clean target
-   checkout and prefer fast-forward integration when possible. Preserve unrelated edits;
-   do not reset, stash or switch another task's checkout to force integration.
-
-Stop at review when explicitly requested or when a real blocker prevents integration.
-Deployment, production changes, releases and destructive Git operations still require
-separate authorization. Routine merge permission does not authorize their CI side effects.
-
-For a requested undo, inspect subsequent changes and prefer a scoped revert commit.
-Handle merge reverts with the correct mainline; do not reset or force-push shared history.
+Stop at review when requested or blocked. Keep task worktrees through review;
+remove only after merge or explicit abandonment with owner approval, no needed
+local/unpushed work and task-owned servers stopped. Never force-remove or prune
+another task's work. For undo, prefer a scoped revert preserving later changes;
+handle merge reverts with the correct mainline.
 
 ## Handoff
 
-Report what changed, checks actually run, branch/commit and review URL when created,
-and remaining limits. If pushing or creating a review fails, retain the local commit
-and branch, state the failure and next action, and avoid repeated blind retries.
+Report the result, checks observed, branch/commit, review URL and material limits.
+On a failed push or review operation, retain local work, state the failure and
+next action, and avoid repeated blind retries.

@@ -1,6 +1,6 @@
 ---
 name: art-direct
-description: Turn an article, website, presentation or brief into visual concepts and executable image prompts. Choose photography, illustration, abstract or conceptual imagery, develop a coherent visual direction, or critique whether existing images communicate the content. Use before generation when what to show or how it should feel is unresolved.
+description: Turn content into image concepts and executable prompts, or critique whether imagery communicates it. Use when what to show or its visual direction remains unresolved.
 ---
 
 # Art Direct
