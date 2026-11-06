@@ -11,18 +11,22 @@ routine Git actions without repeated approval. Honor explicit stop-at-review.
 
 ## Scope and ownership
 
-Inspect status, branch, remotes and worktrees. Preserve pre-existing edits,
-staged content and untracked files. Reuse the task's existing worktree, including
-one supplied by the host; do not create a nested worktree or repeat setup on
-continuation. New independent implementation tasks default to a task branch and
-worktree based on the target branch. Keep the user's main checkout stable.
+Inspect status and the affected paths. Preserve pre-existing edits, staged
+content and untracked files. Routine prose, guidance and mechanical skill updates
+normally use the existing checkout with scoped edits and commits. Unrelated dirty
+files do not require another worktree when the task's files and staging are clear.
+Do not stage someone else's work or manufacture a branch per copied bundle.
 
-Keep the task path, branch, base commit, scope, owner and runtime resources in
-host metadata or a lightweight record outside the repo; reuse host-provided
-values. Report the path when it changes or is needed to open the editor/preview.
-A read-only or tiny prose task may use an unowned existing checkout. Do not move
-existing uncommitted work or copy another checkout's secrets and runtime state.
-An unborn repository needs an authorized initial commit before normal worktrees.
+Use a separate task branch/worktree for independent implementation, overlapping
+writers, required project isolation or an explicit review-worktree request. Reuse
+one supplied by the host; never repeat setup on continuation or switch another
+task's checkout. Keep the user's main checkout stable.
+
+Use existing host metadata. Add a coordination record only when concurrency or
+runtime resources need one; a routine edit needs no new tracking system. Report
+the path when it changes or is needed to open the editor/preview. Do not move
+uncommitted work or copy another checkout's secrets/runtime state. An unborn
+repository needs an authorized initial commit before normal worktrees.
 
 One editing agent owns a worktree at a time. Reviewers are read-only on a settled
 diff; pause its writer before review or handoff. Give authorized workers the exact
@@ -93,8 +97,9 @@ blocker, but must not be called ready or complete.
    Git permission excludes deployment, releases, production mutations and
    destructive history operations, including automatic CI side effects. Obtain
    only a genuinely missing authorization after the diff is reviewable.
-3. Push the task branch and create/update its PR/MR through the project's normal
-   workflow. Avoid duplicates; describe the problem, resulting behavior, checks
+3. Push and create/update a PR/MR when requested or required by the project's
+   integration workflow. A completed local maintenance task need not wait for
+   optional publication or administrative cleanup. Avoid duplicates; describe the problem, resulting behavior, checks
    and limits. Register its full URL with the app's linking tool when available
    and confirm all review requests worked on are linked. Report linking failures.
    Use app-native watching only when monitoring was requested.

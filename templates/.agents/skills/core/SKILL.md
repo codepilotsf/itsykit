@@ -9,6 +9,16 @@ Read once at task start when directed by the project's AGENTS.md. Load only
 skills and references relevant to the current task. Reuse context already read;
 revisit changed sections, conflicts or missing evidence rather than whole guides.
 
+## Choose the shortest sufficient workflow
+
+For a clear, routine request, inspect the affected paths, make the scoped update,
+run the checks that establish it worked, then deliver. A mechanical copy across
+many projects does not become application development because the list is long.
+Reuse source validation for identical copies; check each destination for drift.
+Do not add plans, helper frameworks, review branches, PRs or repeated checks merely
+to demonstrate diligence. Honor actual project requirements and concrete risks.
+Do not hold a completed result for optional cleanup or registry bookkeeping.
+
 ## Scope and continuity
 
 Keep the active outcome and unresolved decisions in view. Follow-up corrections
@@ -66,6 +76,8 @@ Use structured input when a required answer is pending and leave the task
 awaiting input, not Done. If the runtime cannot expose that state, say so. A
 consultation remains open while required decisions or actionable work remain.
 At completion, report the result, verification and material limits, then stop.
+Standing Git permission authorizes delivery actions; it does not make every
+local maintenance request a mandatory push/PR/merge exercise.
 
 ## Shared-skill updates
 
