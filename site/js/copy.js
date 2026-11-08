@@ -12,8 +12,22 @@
     field.style.top = '-1000px';
     document.body.appendChild(field);
     field.select();
-    try { document.execCommand('copy'); } catch (error) { /* ignore */ }
+    var copied = false;
+    try { copied = document.execCommand('copy'); } catch (error) { /* use manual selection */ }
     document.body.removeChild(field);
+    return copied;
+  }
+  function tryFallback(text, button, code) {
+    if (fallback(text)) {
+      done(button);
+    } else {
+      var selection = window.getSelection();
+      var range = document.createRange();
+      range.selectNodeContents(code);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      status('Copy is unavailable. The command is selected; copy it using your keyboard or browser menu.');
+    }
   }
   function done(button) {
     button.classList.add('is-copied');
@@ -33,12 +47,10 @@
     var text = code.textContent.trim();
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () { done(button); }, function () {
-        fallback(text);
-        done(button);
+        tryFallback(text, button, code);
       });
     } else {
-      fallback(text);
-      done(button);
+      tryFallback(text, button, code);
     }
   });
 })();

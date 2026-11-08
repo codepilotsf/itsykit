@@ -22,8 +22,8 @@
   .flea-logo { display:block; width:166px; height:40px; max-width:100%; }
   .site-links > a { text-decoration:none; font-size:.85rem; font-weight:600; }
   .ui-brand-1 { background:var(--accent); color:var(--black); border-color:var(--accent); }
-  .ui-button { border-radius:var(--rounded); font-size:.88rem; min-height:46px; padding:12px 20px; gap:20px; }
-  .eyebrow { display:flex; align-items:center; gap:9px; margin:0 0 var(--space-md); font-size:.65rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
+  .ui-button { border-radius:var(--rounded); font-size:.88rem; min-height:48px; padding:13px 22px; gap:20px; }
+  .eyebrow { display:flex; align-items:center; gap:9px; margin:0 0 var(--space-md); font-size:.68rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
   .status-dot { display:inline-block; width:6px; height:6px; flex-shrink:0; border-radius:50%; background:var(--brand-1); }
   .quiet-link { color:var(--black); font-size:.86rem; font-weight:600; text-decoration:none; display:inline-flex; gap:12px; align-items:center; }
   a:hover { text-decoration:underline; text-underline-offset:4px; }
@@ -59,7 +59,7 @@
 
   .copy-code { position:relative; }
   .copy-code pre { padding-right:72px; }
-  .copy-button { position:absolute; top:10px; right:10px; display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; min-height:0; padding:0; gap:0; border:1px solid var(--light); border-radius:var(--rounded); background:var(--white); color:var(--darker); }
+  .copy-button { position:absolute; top:10px; right:10px; display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; min-height:0; padding:0; gap:0; border:1px solid var(--light); border-radius:var(--rounded); background:var(--white); color:var(--darker); }
   .copy-button:hover:not(:disabled) { filter:none; color:var(--brand-1); border-color:var(--brand-1); }
   .copy-button svg { width:18px; height:18px; }
   .copy-icon-done { display:none; }
@@ -87,13 +87,16 @@
     .file-list dd { margin-bottom:10px; }
   }
   @media (max-width:640px) {
-    .copy-code pre { padding-right:60px; }
-    .copy-button { top:8px; right:8px; width:34px; height:34px; }
+    .copy-code pre { padding-right:64px; }
+    .copy-button { top:8px; right:8px; }
   }
   @media (max-width:360px) {
     .site-header .container { --container-padding:0 16px; }
     .site-links { gap:10px; }
     .site-links .ui-button { padding-inline:10px; }
   }
-  @media (prefers-reduced-motion:no-preference) { html { scroll-behavior:smooth; } }
+  @media (prefers-reduced-motion:no-preference) {
+    html { scroll-behavior:smooth; }
+    .ui-button,.quiet-link,.copy-button { transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease; }
+  }
 }
