@@ -1,25 +1,49 @@
 <!doctype html>
 <html lang="en">
+<head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FleaCMS social preview artwork</title>
 <style>
+  @import url("../site/css/theme.css");
   * { box-sizing: border-box; }
   html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
-  body { background: #f5f8f3; color: #152219; font-family: Arial, sans-serif; }
-  .brand { position: absolute; left: 58px; top: 46px; display: flex; align-items: center; gap: 8px; font-size: 32px; font-weight: 700; letter-spacing: -1.4px; }
-  .brand img { width: 233px; height: 56px; }
-  h1 { position: absolute; top: 137px; left: 62px; margin: 0; font-size: 64px; line-height: 1.04; letter-spacing: -3.4px; font-weight: 700; }
-  h1 span { color: #176b36; }
-  .tagline { position: absolute; top: 424px; left: 64px; width: 415px; margin: 0; color: #526052; font-size: 23px; line-height: 1.45; }
-  .domain { position: absolute; left: 64px; bottom: 37px; color: #176b36; font-size: 19px; font-weight: 700; }
-  .window { position: absolute; left: 548px; top: 116px; width: 750px; height: 468px; border: 1px solid #d5dfd1; border-radius: 14px; overflow: hidden; background: white; box-shadow: 0 18px 46px #18382024; }
-  .bar { height: 32px; background: #fff; padding: 11px 14px; display: flex; gap: 6px; }
-  .bar i { height: 9px; width: 9px; border-radius: 50%; background: #d9dfd7; }
-  .window img { width: 750px; display: block; }
+  body { background: var(--brand-2); color: var(--white); font-family: var(--font-heading); }
+  .brand { position: absolute; left: 60px; top: 46px; }
+  .brand img { width: 233px; height: 56px; filter: brightness(0) invert(1); }
+  h1 { position: absolute; top: 152px; left: 60px; margin: 0; font-size: 64px; line-height: 1.06; letter-spacing: -.04em; font-weight: var(--font-bold); }
+  .tagline { position: absolute; top: 452px; left: 64px; margin: 0; color: var(--light); font-size: 23px; line-height: 1.45; }
+  .domain { position: absolute; left: 64px; bottom: 37px; color: var(--accent); font-size: 19px; font-weight: var(--font-bold); }
+  .terminal { position: absolute; left: 565px; top: 152px; width: 575px; border: 1px solid #ffffff33; border-radius: 16px; overflow: hidden; background: var(--black); color: var(--lighter); }
+  .bar { padding: 16px 20px; display: flex; align-items: center; gap: 7px; border-bottom: 1px solid #ffffff1f; }
+  .bar i { height: 10px; width: 10px; border-radius: 50%; background: #ef7a6b; }
+  .bar i:nth-child(2) { background: #e8c86a; }
+  .bar i:nth-child(3) { background: #8ed08a; }
+  .bar span { margin-left: 9px; font: 12px ui-monospace, monospace; color: #a2b2a4; }
+  pre { margin: 0; padding: 24px; font: 14px/1.9 ui-monospace, monospace; }
+  .comment { color: #a2b2a4; }
+  .prompt, .success { color: var(--accent); }
 </style>
+</head>
+<body>
 <div class="brand"><img src="../site/images/logo.svg" alt="FleaCMS"></div>
-<h1>Write plain<br>HTML.<br><span>Flea builds<br>the server.</span></h1>
+<h1>Write plain<br>HTML.<br>Flea builds<br>the server.</h1>
 <p class="tagline">Your own server.<br>Your clients edit the page.</p>
 <div class="domain">fleacms.com</div>
-<div class="window"><div class="bar"><i></i><i></i><i></i></div><img src="../site/images/nursery-editor.jpg" alt="FleaCMS editing a nursery website"></div>
+<div class="terminal">
+  <div class="bar"><i></i><i></i><i></i><span>terminal — blank server to live site</span></div>
+  <pre><code><span class="comment"># install the CLI — no dependencies</span>
+<span class="prompt">$</span> curl -fsSL https://fleacms.com/install.sh | bash
+
+<span class="comment"># create a plain-HTML site</span>
+<span class="prompt">$</span> flea new my-site &amp;&amp; cd my-site
+
+<span class="comment"># build the server over SSH</span>
+<span class="prompt">$</span> flea setup
+
+<span class="comment"># publish with automatic HTTPS</span>
+<span class="prompt">$</span> flea deploy
+<span class="success">✔ deployed · Let's Encrypt HTTPS enabled</span></code></pre>
+</div>
+</body>
 </html>

@@ -15,8 +15,9 @@ The public layout includes Open Graph and large-image card metadata with each
 page's title, description and canonical URL. The shared 1200 by 630 PNG lives at
 `site/images/social-preview.png`; its editable artwork is
 `design/social-preview.html`. Render that HTML in Chrome at 1200 by 630 pixels,
-device scale 1, to regenerate the image. It uses the existing logo and editor
-screenshot, with no frontend build dependency. Keep the image URL absolute.
+device scale 1, to regenerate the image. It uses the existing logo, shared theme
+tokens and terminal workflow from the homepage, with no frontend build dependency.
+Keep the image URL absolute.
 
 Build pages with HTML, style them with CSS, and let site admins edit their own content. FleaCMS builds the server, and serves multiple sites with HTTPS directly.
 

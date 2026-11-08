@@ -2,15 +2,20 @@
    individual alignment and spacing. The hero shows the terminal workflow. */
 @layer styles {
   .hero-grid,.feature-grid,.workflow,.install-command,.closing-grid { display:grid; }
-  .hero { --container-padding:var(--space-xl) var(--space-lg) 0; }
+  .hero { --container-padding:var(--space-xl) var(--space-lg) 0; --hero-muted:var(--light); background:var(--brand-2); color:var(--white); }
+  .hero .hero-green,.hero .quiet-link { color:var(--white); }
+  .hero .status-dot { background:var(--accent); }
+  .hero :focus-visible { outline-color:var(--white); }
+  .hero ::selection { background:var(--accent); color:var(--black); }
+  .hero .terminal { border-color:#ffffff33; box-shadow:none; }
   .hero-grid { grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr); gap:var(--space-lg); padding-block:var(--space-sm) var(--space-xl); }
   .hero-copy { min-width:0; }
-  .hero h1 { font-size:clamp(2.6rem,4.3vw,4rem); line-height:1.06; letter-spacing:-.045em; font-weight:600; margin:0; text-wrap:initial; }
+  .hero h1 { font-size:clamp(2.6rem,4.3vw,4rem); line-height:1.06; letter-spacing:-.04em; font-weight:var(--font-bold); margin:0; text-wrap:initial; }
   .hero-green { color:var(--brand-1); }
   .hero h1 .hero-green { display:inline-block; max-width:12ch; }
-  .hero-description { max-width:39ch; margin:var(--space-md) 0; color:var(--dark); font-size:1.06rem; line-height:1.65; }
+  .hero-description { max-width:39ch; margin:var(--space-md) 0; color:var(--hero-muted); font-size:1.06rem; line-height:1.65; }
   .hero-actions { margin-top:var(--space-md); }
-  .hero-note { font-size:.78rem; color:var(--dark); margin:var(--space-md) 0 0; }
+  .hero-note { font-size:.78rem; color:var(--hero-muted); margin:var(--space-md) 0 0; }
   .hero-visual { min-width:0; }
   .terminal { color:#f4f8f2; background:var(--black); border:1px solid #19241c2e; border-radius:var(--rounded-lg); overflow:hidden; box-shadow:0 14px 34px #19241c14; }
   .terminal-bar { display:flex; align-items:center; gap:7px; padding:13px 18px; border-bottom:1px solid #ffffff1f; }
@@ -23,10 +28,10 @@
   .terminal-body code { font-size:inherit; }
   .t-comment { color:#849683; }
   .t-prompt,.t-ok { color:var(--accent); }
-  .hero-visual figcaption { padding:var(--space-sm) var(--space-2xs) 0; font-size:.72rem; color:var(--dark); }
-  .hero-facts { list-style:none; max-width:none; margin:0; padding:var(--space-md) 0; border-top:1px solid var(--light); border-bottom:1px solid var(--light); gap:var(--space-lg); font-size:.78rem; color:var(--dark); }
+  .hero-visual figcaption { padding:var(--space-sm) var(--space-2xs) 0; font-size:.72rem; color:var(--hero-muted); }
+  .hero-facts { list-style:none; max-width:none; margin:0; padding:var(--space-md) 0; border-top:1px solid #ffffff33; border-bottom:1px solid #ffffff33; gap:var(--space-lg); font-size:.78rem; color:var(--hero-muted); }
   .hero-facts li { display:flex; align-items:center; gap:var(--space-xs); margin:0; }
-  .hero-facts li::before { content:""; width:5px; height:5px; border-radius:50%; background:var(--brand-1); }
+  .hero-facts li::before { content:""; width:5px; height:5px; border-radius:50%; background:var(--accent); }
   .section-head { max-width:62ch; margin-bottom:var(--space-lg); }
   .section-head h2,.agent-copy h2 { font-size:clamp(2rem,3.3vw,2.9rem); line-height:1.12; letter-spacing:-.04em; margin:0 0 var(--space-sm); }
   .section-head .section-intro { margin:0; }

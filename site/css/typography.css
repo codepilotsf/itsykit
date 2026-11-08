@@ -32,7 +32,7 @@
   h5,
   h6 {
     font-family: var(--font-heading);
-    font-weight: var(--font-semibold);
+    font-weight: var(--font-bold);
     line-height: 1.15;
     margin-block: var(--space-lg) var(--space-sm);
     text-wrap: balance;
