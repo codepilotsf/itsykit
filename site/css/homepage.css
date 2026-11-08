@@ -2,12 +2,16 @@
    individual alignment and spacing. Refine the incumbent terminal-led layout. */
 @layer styles {
   .hero-grid,.feature-grid,.workflow,.install-command,.closing-grid { display:grid; }
-  .hero { --container-padding:var(--space-xl) var(--space-lg) 0; --hero-muted:var(--light); background:var(--brand-2); color:var(--white); }
-  .hero .hero-green,.hero .quiet-link { color:var(--white); }
-  .hero .status-dot { background:var(--accent); }
-  .hero :focus-visible { outline-color:var(--white); }
-  .hero ::selection { background:var(--accent); color:var(--black); }
-  .hero .terminal { border:1px solid #ffffff33; box-shadow:none; }
+  .hero { --container-padding:var(--space-xl) var(--space-lg) 0; background:var(--hero-bg); color:var(--hero-ink); }
+  .hero .hero-green,.hero .quiet-link { color:var(--hero-ink); }
+  .hero .status-dot { background:var(--hero-accent); }
+  .hero .ui-brand-1 { background:var(--hero-accent); border-color:var(--hero-accent); color:var(--hero-bg); }
+  .hero :focus-visible { outline-color:var(--hero-ink); }
+  .hero ::selection { background:var(--hero-accent); color:var(--hero-bg); }
+  .hero .terminal { background:var(--hero-terminal); color:var(--hero-ink); border:1px solid #ffffff33; box-shadow:none; }
+  .hero .terminal-title,.hero .t-comment { color:var(--hero-comment); }
+  .hero .t-prompt,.hero .t-ok { color:var(--hero-accent); }
+  .hero .terminal-body { scrollbar-color:var(--hero-comment) var(--hero-terminal); }
   .hero-grid { grid-template-columns:minmax(0,1fr) minmax(0,1.04fr); gap:clamp(32px,4.5vw,64px); padding-block:0 var(--space-xl); }
   .hero-copy { min-width:0; }
   .hero h1 { font-size:clamp(2.75rem,4.65vw,4.25rem); line-height:1.035; letter-spacing:-.04em; font-weight:var(--font-bold); margin:0; text-wrap:initial; }
@@ -31,7 +35,7 @@
   .hero-visual figcaption { padding:var(--space-sm) var(--space-2xs) 0; font-size:.75rem; line-height:1.6; color:var(--hero-muted); }
   .hero-facts { list-style:none; max-width:none; margin:0; padding:var(--space-md) 0; border-top:1px solid #ffffff33; border-bottom:1px solid #ffffff33; column-gap:var(--space-xl); row-gap:var(--space-sm); font-size:.82rem; color:var(--hero-muted); }
   .hero-facts li { display:flex; align-items:center; gap:var(--space-xs); margin:0; }
-  .hero-facts li::before { content:""; width:5px; height:5px; border-radius:50%; background:var(--accent); }
+  .hero-facts li::before { content:""; width:5px; height:5px; border-radius:50%; background:var(--hero-accent); }
   .section-head { max-width:66ch; margin-bottom:var(--space-lg); }
   .section-head h2,.agent-copy h2 { font-size:clamp(2.1rem,3.5vw,3.1rem); line-height:1.1; letter-spacing:-.035em; margin:0 0 var(--space-sm); }
   .section-head .section-intro { margin:0; }

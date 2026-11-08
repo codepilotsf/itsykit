@@ -22,6 +22,13 @@
   --brand-1-light: #eafaeb;
   --brand-2: #104c28;
   --accent: #adf46f;
+  /* Navy & Ice: homepage hero and sharing artwork. */
+  --hero-bg: #142b43;
+  --hero-ink: #f5f9ff;
+  --hero-muted: #c4d5e8;
+  --hero-accent: #a4dbff;
+  --hero-terminal: #0c1c2e;
+  --hero-comment: #a3b9d0;
   --brand-2-light: oklch(90.1% 0.058 230.902); /* Sky 200 */
   --brand-3: oklch(51.1% 0.096 186.391); /* Teal 700 */
   --brand-3-light: oklch(91% 0.096 180.426); /* Teal 200 */
