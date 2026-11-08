@@ -36,6 +36,21 @@ round. Preserve other settings. Explicit user choices and existing project
 preferences win; do not overwrite them or ask an extra execution-mode question.
 Use the toolkit's supported board/toggle workflow for direction decisions.
 
+## Present reviews in the owner's browser
+
+Default to the owner's normal external browser for direction boards, concept
+comps and final review artifacts. Honor an explicit browser/transport preference;
+keep personal machine details in supported owner/environment configuration, not
+shared skills or invented Impeccable config keys. T3 preview is for agent
+inspection and does not establish access from the owner's device.
+
+Before presenting any review, read [browser review](references/browser-review.md).
+Track internal preview and owner review URLs separately. Remote loopback is never
+an owner link without an established forwarding route. Reuse an existing reachable
+route, provide a portable local-file ZIP for standalone concepts, and keep the
+task-owned review available while an answer is pending. Apply the same destination
+to inline board buttons, expanded images, mobile views and downloads.
+
 ## Model and effort
 
 Use GPT-6.1 Sol for substantial Impeccable work and its authorized text/code
@@ -88,6 +103,10 @@ content, desktop/mobile views where useful and alternatives when directions
 meaningfully differ. Agree on consequential direction before implementation;
 revise the same artifacts after feedback. Honor delegated direction and explicit
 instructions to proceed without pauses. Routine refinements need no extra approval.
+External presentation preserves the consultation, question key and re-roll/update
+flow. A standalone export asks for feedback in the conversation and records the
+actual answer; opening or downloading never counts as approval. Unanswered required
+choices remain pending, including when a toolkit timeout suggests proceeding.
 
 ## Verify and hand off
 
@@ -102,4 +121,6 @@ what they liked and fix the underlying composition or product presentation.
 Load [Prewind](../prewind/SKILL.md) only when the project uses it, and the relevant
 authoring skill for forms, components, paths and runtime behavior. Resume the
 active task after consultation unless a required answer is pending. Visual
-approval does not authorize deployment.
+approval does not authorize deployment. Deliver review links and offline artifacts
+through the same [browser-review workflow](references/browser-review.md), with
+client reachability limits and task-owned server lifecycle recorded.
