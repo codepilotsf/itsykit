@@ -130,7 +130,10 @@ edge=max(bounds[2]-bounds[0],bounds[3]-bounds[1])+64
 cx=(bounds[0]+bounds[2])/2; cy=(bounds[1]+bounds[3])/2
 markvb=f'{cx-edge/2:.1f} {cy-edge/2:.1f} {edge:.1f} {edge:.1f}'
 (OUT/'mark.svg').write_text(svg(f'<path fill-rule="evenodd" d="{markpath}"/>',markvb,title='Little Skip, the FleaCMS mascot'))
-favicon=(OUT/'mark.svg').read_text().replace('<g fill=', '<style>@media(prefers-color-scheme:dark){g{fill:#f4f8f2}}</style><g fill=')
+# Icons always use the public header palette, independent of browser chrome.
+x,y,width,height=markvb.split()
+background=f'<rect x="{x}" y="{y}" width="{width}" height="{height}" fill="#142b43"/>'
+favicon=svg(background+f'<g fill="#f5f9ff"><path fill-rule="evenodd" d="{markpath}"/></g>',markvb,title='Little Skip, the FleaCMS mascot')
 (OUT/'favicon.svg').write_text(favicon)
 (OUT/'export.json').write_text(json.dumps({'approved_source':'Filled flea round 2 concept D, accepted by owner 2026-11-09','font':'Nunito 800; outlined through existing FreeType','mascot':'RGB ink silhouette, mean channel threshold 150/255; outline simplification 0.65 source pixels','source_dimensions':[w,h],'source_ink_bounds':bounds,'contours':len(loops),'logo_viewbox':vb,'glyph_advance':pen,'font_units':font_units,'approved_source_sha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),'font_sha256':hashlib.sha256(FONT.read_bytes()).hexdigest()},indent=2)+'\n')
 print({'source':[w,h],'bounds':bounds,'contours':len(loops),'font_units':font_units,'word_width':pen,'bytes':len((OUT/'logo.svg').read_bytes())})

@@ -11,10 +11,12 @@ and spacing remain unchanged. Body typography stays independent.
 - `logo.svg`: full forest-black lockup, with outlined lettering.
 - `logo-light.svg`: the same lockup for dark surfaces.
 - `mark.svg`: standalone mascot. Use it for icons, not as a replacement wordmark.
-- `favicon.svg`: mascot with a light ink variant for dark browser chrome.
+- `favicon.svg`: white mascot on a fixed navy background, matching the public
+  website header in both light and dark browser chrome.
 - `favicon.ico`: 16px and 32px PNG images in an ICO container.
 - `favicon-32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`: browser
-  raster exports from the SVG. Keep alpha and use their native dimensions.
+  raster exports from the favicon SVG, using the same fixed navy and white
+  palette. Use their native dimensions.
 
 `approved-mascot.png` and its prompt sidecar retain the approved raster source.
 The SVG traces the dark ink in the approved RGB source at a mean channel
@@ -28,7 +30,7 @@ images, font downloads, scripts or runtime dependencies.
 existing Linux FreeType library. It is an optional asset-authoring utility, not
 part of site generation or the Go build. Run it from this directory to regenerate
 the vector masters. `export.json` records the conversion settings. Raster icons
-are exported from `mark.svg` through the browser canvas at their stated sizes.
+are exported from `favicon.svg` through the browser canvas at their stated sizes.
 
 The framework copies these assets into the starter and its website source. The
 public website repository uses identical files. Header, footer, docs and admin
