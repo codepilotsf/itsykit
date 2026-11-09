@@ -30,6 +30,9 @@ live content are preserved. Protocols remain 28 and 2.
 Nunito wordmark, site palettes and protocols. See [0.20.3 verification](release-0203-verification.md)
 for native checks, public artifacts, rollout and remaining limits.
 
+0.20.4 fixes browser/touch icons to white on navy in both browser themes. See
+[verification](release-0204-verification.md). The shared executable remains 0.20.3.
+
 ## V1 distribution plan
 
 0.20.0 includes migration redirects and opt-in SEO discovery with deployment

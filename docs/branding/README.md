@@ -23,7 +23,7 @@ The SVG traces the dark ink in the approved RGB source at a mean channel
 threshold of 150/255, then simplifies below one source pixel. This removes
 the white background and slight generated tonal variation without redrawing
 the character. Nunito outlines come from `nunito-800.woff2`; its SIL Open Font
-License is retained in `Nunito-OFL.txt`. SVGs contain paths only, with no external
+License is retained in `Nunito-OFL.txt`. SVGs contain vector geometry only, with no external
 images, font downloads, scripts or runtime dependencies.
 
 `export.py` records the vector export, using Python's standard library and the

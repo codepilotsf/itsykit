@@ -8,6 +8,14 @@ for completed changes, and [README.md](../../README.md) for current usage.
 
 ## Current release status (November 9, 2026)
 
+Public 0.20.4 and normal Kirin/Mac CLIs include the fixed white-on-navy icons.
+Native release and public install/update checks passed on both platforms.
+Website icons match the header in all browser themes; content, host policies and
+other sites are preserved. The compatible shared server remains 0.20.3. See
+[verification](release-0204-verification.md). Existing platform limits remain.
+
+## Previous release status (November 9, 2026)
+
 Public 0.20.3, the shared server and normal Kirin/Mac CLIs use the approved
 filled Little Skip branding. Native Linux/Mac checks and public install/update
 checks passed. All 29 HTTPS hostnames retain their expected responses and
