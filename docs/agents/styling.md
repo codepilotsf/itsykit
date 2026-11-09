@@ -90,7 +90,7 @@ starter with its inline header/footer when making styling changes.
 
 ### FleaCMS identity
 
-The FleaCMS lockup uses the approved Little Skip mascot and outlined Nunito 800.
+The FleaCMS lockup uses the approved filled Little Skip mascot and outlined Nunito 800.
 Use `images/logo.svg` for branded headers and `images/mark.svg` for the mascot.
 The outlined lettering needs no runtime font request. Keep normal site body and
 heading typography unchanged. Canonical masters and export notes live in

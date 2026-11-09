@@ -1,5 +1,12 @@
 # Installation and updates
 
+## 0.20.3 filled branding
+
+The filled Little Skip mascot approved on November 9, 2026 replaces the outline
+artwork in new sites and development diagnostics. The Nunito wordmark and existing
+site palettes are preserved. CLI/server updates retain custom site branding.
+Public website assets are deployed separately; protocols remain 28 and 2.
+
 ## 0.20.2 approved branding
 
 Published November 2, 2026 from immutable `v0.20.2` (`279ec50`). New sites use

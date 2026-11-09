@@ -1,21 +1,21 @@
 {
-  "approved_source": "flea-logo-exploration f5b19f8, accepted by owner",
+  "approved_source": "Filled flea round 2 concept D, accepted by owner 2026-11-09",
   "font": "Nunito 800; outlined through existing FreeType",
-  "mascot": "Alpha silhouette, threshold 128/255; subpixel outline simplification 0.65 source pixels",
+  "mascot": "RGB ink silhouette, mean channel threshold 150/255; outline simplification 0.65 source pixels",
   "source_dimensions": [
     1254,
     1254
   ],
   "source_ink_bounds": [
-    111,
-    101,
-    1066,
-    1051
+    153,
+    123,
+    1091,
+    1121
   ],
-  "contours": 8,
+  "contours": 5,
   "logo_viewbox": "8.622 7.665 393.858 94.909",
   "glyph_advance": 285.47999999999996,
   "font_units": 1000,
-  "approved_source_sha256": "b178d0281ae2c08d047d74511bc4dc6cc81e48c8a56fc4c50194efae151fdcd4",
+  "approved_source_sha256": "7780dedf1e7d99a07045c536fc06077beb5294db241590a96ec21441f81e7010",
   "font_sha256": "2363d3ed037283ebb961e8c4b4917e40a8bc8853cf9965cf1ea7b4daa1df630a"
 }
