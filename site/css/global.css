@@ -16,14 +16,17 @@
   .docs-shell { --container-padding:60px var(--space-lg) 100px; }
   .skip-link { position:fixed; top:8px; left:8px; z-index:100; padding:12px 20px; background:white; transform:translateY(-160%); }
   .skip-link:focus { transform:translateY(0); }
-  .site-header { position:sticky; top:var(--flea-toolbar-height,0px); z-index:10; background:var(--brand-2); color:var(--hero-ink); border-bottom:1px solid transparent; }
-  .site-header.is-scrolled { background:color-mix(in srgb,var(--brand-2) 92%,transparent); border-bottom-color:#ffffff1f; }
-  .site-header .site-links > a:not(.ui-button),.site-header > nav > a { color:var(--hero-ink); }
-  .site-header :focus-visible,.site-footer :focus-visible { outline-color:var(--accent); }
-  .site-header > nav { min-height:76px; }
+  .site-header { position:sticky; top:var(--flea-toolbar-height,0px); z-index:10; background:var(--hero-ink); color:var(--black); border-bottom:1px solid transparent; }
+  .site-header.is-scrolled { background:color-mix(in srgb,var(--hero-ink) 94%,transparent); backdrop-filter:blur(12px); border-bottom-color:var(--light); }
+  .site-header .site-links > a:not(.ui-button),.site-header > nav > a { color:var(--black); }
+  .site-header :focus-visible,.site-footer :focus-visible { outline-color:var(--brand-1); }
+  .site-header .ui-button { background:var(--brand-2); color:var(--hero-ink); border-color:var(--brand-2); }
+  .site-header > nav { min-height:76px; column-gap:16px; }
   .wordmark { display:inline-flex; align-items:center; text-decoration:none; }
   .flea-logo { display:block; width:166px; height:40px; max-width:100%; }
   .site-links > a { text-decoration:none; font-size:.85rem; font-weight:600; }
+  .site-links { flex-shrink:0; }
+  .site-links .ui-button { white-space:nowrap; }
   .ui-brand-1 { background:var(--accent); color:var(--black); border-color:var(--accent); }
   .ui-button { border-radius:var(--rounded); font-size:.88rem; min-height:48px; padding:13px 22px; gap:20px; }
   .eyebrow { display:flex; align-items:center; gap:9px; margin:0 0 var(--space-md); font-size:.68rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase; }
@@ -31,10 +34,10 @@
   .quiet-link { color:var(--black); font-size:.86rem; font-weight:600; text-decoration:none; display:inline-flex; gap:12px; align-items:center; }
   a:hover { text-decoration:underline; text-underline-offset:4px; }
   a.ui-button:hover { text-decoration:none; }
-  .site-footer { background:var(--brand-2); color:var(--hero-ink); border-top:1px solid #ffffff1f; font-size:.78rem; }
+  .site-footer { background:var(--hero-ink); color:var(--black); border-top:1px solid var(--light); font-size:.78rem; }
   .footer-inner { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-md); }
-  .site-footer p { margin:7px 0 0; color:var(--hero-muted); }
-  .site-footer nav a { color:var(--hero-muted); text-decoration:none; }
+  .site-footer p { margin:7px 0 0; color:var(--darker); }
+  .site-footer nav a { color:var(--dark); text-decoration:none; }
   .site-footer .copyright { width:100%; font-size:.7rem; }
   .docs-shell { display:grid; grid-template-columns:220px minmax(0,1fr); gap:75px; padding-block:60px 100px; }
   .docs-sidebar { align-self:start; position:sticky; top:125px; max-height:calc(100dvh - 145px); overflow:auto; }
@@ -95,6 +98,7 @@
     .copy-button { top:8px; right:8px; }
   }
   @media (max-width:360px) {
+    .site-header .flea-logo { width:122px; height:auto; }
     .site-header .container { --container-padding:0 16px; }
     .site-links { gap:10px; }
     .site-links .ui-button { padding-inline:10px; }
