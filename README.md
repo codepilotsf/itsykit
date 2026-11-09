@@ -357,8 +357,8 @@ The starter uses Prewind 1.3.1 from unpkg, without Node or a CSS build step.
 - Use `container` for centered page content.
 
 `global.css` imports the theme, typography, forms, button styles, and navigation
-transitions. The default font is Inter from Google Fonts, with warm off-white
-backgrounds and forest-green accents controlled by theme tokens. Replace
+transitions. This site's font is Inter from Google Fonts, with Navy and Ice
+colors controlled by shared theme tokens. Replace
 `site/images/mark.svg` with your own logo.
 
 The documentation loads a local Prism.js 1.30.0 bundle from `site/js/prism.js`

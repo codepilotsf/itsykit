@@ -18,30 +18,30 @@
   --font-bold: 700;
 
   /* Brand Colors */
-  --brand-1: #176b36;
-  --brand-1-light: #eafaeb;
-  --brand-2: #104c28;
-  --accent: #adf46f;
-  /* Navy & Ice: homepage hero and sharing artwork. */
-  --hero-bg: #142b43;
+  --brand-1: #245f91;
+  --brand-1-light: #eaf4fc;
+  --brand-2: #142b43;
+  --accent: #a4dbff;
+  /* Navy & Ice: shared dark surfaces and sharing artwork. */
+  --hero-bg: var(--brand-2);
   --hero-ink: #f5f9ff;
   --hero-muted: #c4d5e8;
-  --hero-accent: #a4dbff;
+  --hero-accent: var(--accent);
   --hero-terminal: #0c1c2e;
   --hero-comment: #a3b9d0;
-  --brand-2-light: oklch(90.1% 0.058 230.902); /* Sky 200 */
-  --brand-3: oklch(51.1% 0.096 186.391); /* Teal 700 */
-  --brand-3-light: oklch(91% 0.096 180.426); /* Teal 200 */
-  --brand-4: oklch(51.8% 0.253 323.949); /* Fuschia 700 */
-  --brand-4-light: oklch(90.3% 0.076 319.62); /* Fuschia 200 */
+  --brand-2-light: #d8edfc;
+  --brand-3: #347ba5;
+  --brand-3-light: #e6f3fc;
+  --brand-4: #4663a0;
+  --brand-4-light: #edf1fc;
 
   /* Neutral Colors */
-  --black: #19241c;
-  --darker: #354239;
-  --dark: #536258;
-  --midtone: #727a73;
-  --light: #dce5dd;
-  --lighter: #f4f8f2;
+  --black: #142b43;
+  --darker: #304962;
+  --dark: #4f657b;
+  --midtone: #60768b;
+  --light: #d8e3ed;
+  --lighter: #f2f7fc;
   --white: white;
 
   /* Semantic Colors */
@@ -54,7 +54,7 @@
   --error: oklch(50.5% 0.213 27.518); /* Red 700 */
   --error-light: oklch(93.6% 0.032 17.717); /* Red 100 */
   --link: var(--brand-1);
-  --highlight: oklch(94.5% 0.129 101.54); /* Yellow 200 */
+  --highlight: #d8edfc;
 
   /* Border & Outline Widths */
   --border: 1px;
