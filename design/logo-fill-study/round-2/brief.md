@@ -1,0 +1,1 @@
+Round 2: friendly flea redrawn as a cleaner filled icon. User selected this direction after rejecting all first-round variants. Explore segmentation, a compact soft silhouette, and an energetic hopping shape. Built-in image generation, using original-reference.png as identity reference. Concepts only: no website changes. Exact prompts saved beside each candidate.
