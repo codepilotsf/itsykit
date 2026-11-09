@@ -1,5 +1,45 @@
 # Publishing FleaCMS downloads
 
+## 0.20.3 published November 9, 2026
+
+The approved filled Little Skip concept D replaces the outline throughout the
+website, starter, framework website and development diagnostic. Nunito lettering,
+lockup dimensions and existing palettes are preserved. SVG, PNG, ICO, touch icons
+and the social image derive from the same artwork; all eight public assets match
+reviewed source. Customer branding is preserved.
+
+Framework MR !32 merged as `1071144`; immutable `v0.20.3` selects tested source
+`26bc0e8`. Website branding MR !16 merged as `6bce343`, activation
+`20261109-004926-199b26ab9e0c6aff256e0ac1`. Channel MR !17 merged as `577a722`,
+activation `20261109-005527-66744fb1ea339e9e65840e66`.
+
+Native Linux AMD64 (Go 1.26.9) and Mac ARM64 (Go 1.27.1) canonical builds, full
+tests, race tests, vet, exact-artifact/starter checks and public fresh install,
+reinstall, 0.20.2 update and already-current checks passed. Mac ad-hoc signature
+verification passed. Source archive SHA-256 on both machines is
+`dc3c85513b677c8a056bad20daa5e133774fbfe2be13102de2a5cd8745d0bbee`.
+
+```text
+7eb2c7e094ffca80e569261a7657633b81eeda4bf86cc3f51a831dded9bbae33  flea-darwin-arm64
+be70a532a2a86e5be2dd6d4c270d3c45a89a4b0eda425a10791126ac5f1b8308  flea-linux-amd64
+```
+
+The shared server, public channel and normal Kirin/Mac CLIs report 0.20.3.
+Server SHA-256 is
+`4ba946401b91ceb723f30b73b8c44803f8e6e306e5b31d60bae1ef1324ef7f75`.
+All 29 HTTPS hostnames retain expected status, redirects and indexing headers.
+Live content and host policies are preserved; a concurrent Cubitalk deployment
+advanced its own code pointer and was left intact. Other site sources match the
+baseline. The first website activation hit a busy lock without changing the live
+site; retry succeeded after confirming no pending recovery. Old public downloads
+are unchanged. No host policy, TLS, access or customer branding was changed.
+
+Tag pipeline 797 was pending runners; completed native manual checks supplied
+publication evidence. Native ARM64 server, clean-Mac/notarization, installer
+packaging and real email limits remain. Private evidence and previous CLIs are
+in `fleacms-releases/0.20.3` on Kirin and Mac; the remote backup is
+`/var/backups/flea-0203.tC2FUbNf`. Temporary previews stopped.
+
 ## 0.20.2 published November 2, 2026
 
 Framework MR !29 merged as `f00132e`; immutable `v0.20.2` selects tested source
