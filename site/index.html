@@ -63,9 +63,8 @@
 </section>
 
 <section class="system-section" id="system" aria-labelledby="system-title">
-  <div class="container">
+  <div class="system-layout container">
     <div class="section-head">
-      <p class="eyebrow">THE WHOLE SYSTEM</p>
       <h2 id="system-title">Not just a CMS.</h2>
       <p class="section-intro">
         Flea runs the whole trip: the binary on your machine, the server it
@@ -73,9 +72,8 @@
         later.
       </p>
     </div>
-    <ul class="system-grid">
-      <li class="cap-card">
-        <span class="cap-icon" aria-hidden="true">{icon server}</span>
+    <ul class="system-features" role="list">
+      <li class="system-feature">
         <h3>Builds your server</h3>
         <p>
           Point <code>flea setup</code> at a blank Ubuntu box over SSH. Flea
@@ -83,40 +81,35 @@
           install by hand.
         </p>
       </li>
-      <li class="cap-card">
-        <span class="cap-icon" aria-hidden="true">{icon shield-check}</span>
+      <li class="system-feature">
         <h3>HTTPS, handled</h3>
         <p>
           Flea requests and renews Let's Encrypt certificates, redirects
           <code>www</code>, and serves every site over TLS.
         </p>
       </li>
-      <li class="cap-card">
-        <span class="cap-icon" aria-hidden="true">{icon rocket}</span>
+      <li class="system-feature">
         <h3>Deploy over SSH</h3>
         <p>
           Publish a committed Git branch to your own server. One host can serve
           as many sites as you need.
         </p>
       </li>
-      <li class="cap-card">
-        <span class="cap-icon" aria-hidden="true">{icon file-code}</span>
+      <li class="system-feature">
         <h3>No build step</h3>
         <p>
           Plain HTML and CSS with JSON content. No bundler, no database, no Node
           toolchain to keep alive.
         </p>
       </li>
-      <li class="cap-card">
-        <span class="cap-icon" aria-hidden="true">{icon terminal}</span>
+      <li class="system-feature">
         <h3>A real dev server</h3>
         <p>
           Live reload, LAN testing, email previews and
           <code>flea status</code> for local and remote checks.
         </p>
       </li>
-      <li class="cap-card">
-        <span class="cap-icon" aria-hidden="true">{icon history}</span>
+      <li class="system-feature">
         <h3>Backups &amp; rollback</h3>
         <p>
           Download a complete backup, roll code back while keeping live content,
