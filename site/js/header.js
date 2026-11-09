@@ -1,4 +1,4 @@
-// Keep the header joined to the hero until the page scrolls beneath it.
+// Reveal the light header divider and translucency after scrolling.
 (function () {
   var header = document.querySelector('.site-header');
   if (!header) return;
