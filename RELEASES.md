@@ -1,5 +1,37 @@
 # Publishing FleaCMS downloads
 
+## 0.20.5 published November 9, 2026
+
+Adopt the approved navy-on-light flea treatment throughout the primary logos,
+icons, website header/footer/admin wrappers, sharing artwork, starter and
+framework diagnostic branding. Preserve the hero layout, mascot geometry,
+Nunito lettering and customer branding. Sticky-header checks include 320px
+navigation spacing and background blur while scrolling.
+
+Framework MR !36 merged as `5084a26`; immutable `v0.20.5` selects tested source
+`00b2e36`. Source archive SHA-256 on Linux/Mac is
+`55909f2680b71aba8485609e7ce3ad9c0bdec077fc68eb4358b574a98917fbb2`.
+Website MR !22 merged as `53eb18e` and activated
+`20261109-165104-562591a96cda87412e103bef`, including the update channel.
+All live logo/icon/social/CSS bytes match reviewed source. Desktop/mobile/
+320px homepage, docs and admin branding checks passed.
+
+Native Linux/Mac full tests, race tests, vet, canonical builds, exact-artifact/
+starter checks, signature checks and public install/reinstall/update checks passed.
+Normal Kirin/Mac CLIs match the public manifest:
+
+```text
+c3870e6d1605da19674fd8ea84a5d795fa9b5703b8a9118f57e31b59f3a7ef34  flea-darwin-arm64
+6be769f644468f56af9189432facb75b3fb896de463dbf73827357b808f26dbb  flea-linux-amd64
+```
+
+The compatible shared executable stays 0.20.3. Live content, host policy,
+other 19 sites and all 29 HTTPS responses/indexing are preserved. Old downloads
+are unchanged. Private evidence is in `fleacms-releases/0.20.5` on Kirin and Mac.
+Tag pipeline 799 was pending runners; completed native checks supplied evidence.
+Existing ARM64 server, clean-Mac/notarization, packaging and email limits remain.
+Task development preview stopped; no unrelated source work was overwritten.
+
 ## 0.20.4 published November 9, 2026
 
 Browser and touch icons now stay white `#f5f9ff` on header navy `#142b43` in both
