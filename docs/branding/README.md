@@ -8,14 +8,14 @@ curved gaps, friendly face and bent legs come from that exact concept. Preserve
 its contours. The previously approved Nunito 800 lettering, lockup dimensions
 and spacing remain unchanged. Body typography stays independent.
 
-- `logo.svg`: full forest-black lockup, with outlined lettering.
+- `logo.svg`: full navy lockup, with outlined lettering.
 - `logo-light.svg`: the same lockup for dark surfaces.
 - `mark.svg`: standalone mascot. Use it for icons, not as a replacement wordmark.
-- `favicon.svg`: white mascot on a fixed navy background, matching the public
+- `favicon.svg`: navy mascot on a fixed light background, matching the public
   website header in both light and dark browser chrome.
 - `favicon.ico`: 16px and 32px PNG images in an ICO container.
 - `favicon-32.png`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`: browser
-  raster exports from the favicon SVG, using the same fixed navy and white
+  raster exports from the favicon SVG, using the same fixed navy-on-light
   palette. Use their native dimensions.
 
 `approved-mascot.png` and its prompt sidecar retain the approved raster source.

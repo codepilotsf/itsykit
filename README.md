@@ -4,7 +4,7 @@
 
 ## Install
 
-FleaCMS 0.20.4 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
+FleaCMS 0.20.5 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
 setup and installer packaging respect `TMPDIR`, with private scratch directories
 and actionable storage diagnostics. Deployment protocol remains 28; CLI updates
 and server updates are separate operations. App wire protocol

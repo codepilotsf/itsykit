@@ -6,6 +6,11 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.20.5 - 2026-11-09
+
+- Use the approved navy filled mascot on light icon backgrounds, with matching
+  primary logos and development diagnostic branding. Preserve custom site branding.
+
 ## 0.20.4 - 2026-11-09
 
 - Keep browser and touch icons white on a solid navy background, matching the
