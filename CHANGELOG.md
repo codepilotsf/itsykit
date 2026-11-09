@@ -6,6 +6,11 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.20.4 - 2026-11-09
+
+- Keep browser and touch icons white on a solid navy background, matching the
+  public website header in both light and dark browser themes.
+
 ## 0.20.3 - 2026-11-09
 
 - Adopt the approved filled Little Skip mascot across the starter, development
