@@ -119,7 +119,7 @@ ft.FT_Done_Face(faceptr); ft.FT_Done_FreeType(lib)
 factor=90.909/(bounds[3]-bounds[1])
 offset_x=56.3155-(bounds[0]+bounds[2])*factor/2
 offset_y=9.665-bounds[1]*factor
-def svg(body,viewbox,color='#19241c',title='FleaCMS'):
+def svg(body,viewbox,color='#142b43',title='FleaCMS'):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{viewbox}" role="img" aria-labelledby="title"><title id="title">{title}</title><g fill="{color}">{body}</g></svg>\n'
 mascot=f'<path fill-rule="evenodd" transform="translate({offset_x:.6f} {offset_y:.6f}) scale({factor:.9f})" d="{markpath}"/>'
 word=''.join(f'<path d="{p}"/>' for p in paths)
@@ -132,8 +132,8 @@ markvb=f'{cx-edge/2:.1f} {cy-edge/2:.1f} {edge:.1f} {edge:.1f}'
 (OUT/'mark.svg').write_text(svg(f'<path fill-rule="evenodd" d="{markpath}"/>',markvb,title='Little Skip, the FleaCMS mascot'))
 # Icons always use the public header palette, independent of browser chrome.
 x,y,width,height=markvb.split()
-background=f'<rect x="{x}" y="{y}" width="{width}" height="{height}" fill="#142b43"/>'
-favicon=svg(background+f'<g fill="#f5f9ff"><path fill-rule="evenodd" d="{markpath}"/></g>',markvb,title='Little Skip, the FleaCMS mascot')
+background=f'<rect x="{x}" y="{y}" width="{width}" height="{height}" fill="#f5f9ff"/>'
+favicon=svg(background+f'<g fill="#142b43"><path fill-rule="evenodd" d="{markpath}"/></g>',markvb,title='Little Skip, the FleaCMS mascot')
 (OUT/'favicon.svg').write_text(favicon)
 (OUT/'export.json').write_text(json.dumps({'approved_source':'Filled flea round 2 concept D, accepted by owner 2026-11-09','font':'Nunito 800; outlined through existing FreeType','mascot':'RGB ink silhouette, mean channel threshold 150/255; outline simplification 0.65 source pixels','source_dimensions':[w,h],'source_ink_bounds':bounds,'contours':len(loops),'logo_viewbox':vb,'glyph_advance':pen,'font_units':font_units,'approved_source_sha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),'font_sha256':hashlib.sha256(FONT.read_bytes()).hexdigest()},indent=2)+'\n')
 print({'source':[w,h],'bounds':bounds,'contours':len(loops),'font_units':font_units,'word_width':pen,'bytes':len((OUT/'logo.svg').read_bytes())})
