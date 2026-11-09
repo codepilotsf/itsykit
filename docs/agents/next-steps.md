@@ -6,7 +6,17 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
-## Current release status (November 2, 2026)
+## Current release status (November 9, 2026)
+
+Public 0.20.3, the shared server and normal Kirin/Mac CLIs use the approved
+filled Little Skip branding. Native Linux/Mac checks and public install/update
+checks passed. All 29 HTTPS hostnames retain their expected responses and
+indexing headers; live content and host policies are preserved. The independent
+Cubitalk deployment during this rollout was left intact. See
+[verification](release-0203-verification.md). Protocols remain 28 and 2; existing
+native ARM64, clean-Mac/notarization, packaging and real-email limits remain.
+
+## Previous release status (November 2, 2026)
 
 Public 0.20.2, the shared server and normal Kirin/Mac CLIs are updated with the
 approved Little Skip/Nunito branding. Native Linux AMD64 and Mac ARM64 release
