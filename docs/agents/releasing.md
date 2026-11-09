@@ -33,6 +33,10 @@ for native checks, public artifacts, rollout and remaining limits.
 0.20.4 fixes browser/touch icons to white on navy in both browser themes. See
 [verification](release-0204-verification.md). The shared executable remains 0.20.3.
 
+0.20.5 uses the approved navy-on-light branding throughout primary logos and
+icons. See [verification](release-0205-verification.md) for native/public checks
+and the light website rollout. The compatible shared executable stays 0.20.3.
+
 ## V1 distribution plan
 
 0.20.0 includes migration redirects and opt-in SEO discovery with deployment

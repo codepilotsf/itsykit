@@ -8,6 +8,14 @@ for completed changes, and [README.md](../../README.md) for current usage.
 
 ## Current release status (November 9, 2026)
 
+Public 0.20.5 and normal Kirin/Mac CLIs use the approved navy-on-light branding.
+The public website has light header/footer/admin surfaces and matching icons.
+Native Linux/Mac and public install/update checks passed. Content, host policy
+and other sites are preserved. The compatible server remains 0.20.3. See
+[verification](release-0205-verification.md); existing platform limits remain.
+
+## Previous release status (November 9, 2026)
+
 Public 0.20.4 and normal Kirin/Mac CLIs include the fixed white-on-navy icons.
 Native release and public install/update checks passed on both platforms.
 Website icons match the header in all browser themes; content, host policies and
