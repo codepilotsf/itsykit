@@ -5,7 +5,9 @@
 The filled Little Skip mascot approved on November 9, 2026 replaces the outline
 artwork in new sites and development diagnostics. The Nunito wordmark and existing
 site palettes are preserved. CLI/server updates retain custom site branding.
-Public website assets are deployed separately; protocols remain 28 and 2.
+The public channel, shared server and normal Kirin/Mac CLIs are 0.20.3. Native
+Linux/Mac release and public install/update checks passed; protocols remain 28
+and 2. See [verification](agents/release-0203-verification.md) for evidence and limits.
 
 ## 0.20.2 approved branding
 

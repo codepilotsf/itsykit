@@ -26,6 +26,10 @@ public channel, shared server and normal Kirin/Mac CLIs are updated. See
 [0.20.2 verification](release-0202-verification.md). Custom customer branding and
 live content are preserved. Protocols remain 28 and 2.
 
+0.20.3 adopts the approved filled Little Skip treatment while preserving the
+Nunito wordmark, site palettes and protocols. See [0.20.3 verification](release-0203-verification.md)
+for native checks, public artifacts, rollout and remaining limits.
+
 ## V1 distribution plan
 
 0.20.0 includes migration redirects and opt-in SEO discovery with deployment
