@@ -1,10 +1,10 @@
 """One-time, dependency-free vector export of the approved FleaCMS artwork.
 
-PNG alpha outlines are traced without changing the mascot. Nunito outlines are
+The approved RGB PNG ink is traced without changing the mascot. Nunito outlines are
 read through the machine's existing FreeType library. No runtime dependency.
 """
 import ctypes as C
-import json, math, struct, zlib
+import hashlib, json, math, struct, zlib
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parent
@@ -12,25 +12,25 @@ SOURCE = OUT / 'approved-mascot.png'
 FONT = OUT / 'nunito-800.woff2'
 OUT.mkdir(parents=True, exist_ok=True)
 
-def alpha_png(path):
+def ink_png(path):
     data=path.read_bytes(); pos=8; compressed=b''
     while pos<len(data):
         n=struct.unpack_from('>I',data,pos)[0]; kind=data[pos+4:pos+8]; chunk=data[pos+8:pos+8+n]; pos+=12+n
         if kind==b'IHDR': w,h,depth,color,_,_,interlace=struct.unpack('>IIBBBBB',chunk)
         if kind==b'IDAT': compressed+=chunk
-    assert depth==8 and color==6 and interlace==0, (depth,color,interlace)
-    raw=zlib.decompress(compressed); stride=w*4; rows=[]; prev=bytearray(stride); pos=0
+    assert depth==8 and color==2 and interlace==0, (depth,color,interlace)
+    raw=zlib.decompress(compressed); stride=w*3; rows=[]; prev=bytearray(stride); pos=0
     def paeth(a,b,c):
         p=a+b-c; da,db,dc=abs(p-a),abs(p-b),abs(p-c)
         return a if da<=db and da<=dc else b if db<=dc else c
     for y in range(h):
         filt=raw[pos]; pos+=1; row=bytearray(raw[pos:pos+stride]); pos+=stride
         for x in range(stride):
-            a=row[x-4] if x>=4 else 0; b=prev[x]; c=prev[x-4] if x>=4 else 0
+            a=row[x-3] if x>=3 else 0; b=prev[x]; c=prev[x-3] if x>=3 else 0
             predict=(0,a,b,(a+b)//2,paeth(a,b,c))[filt]
             row[x]=(row[x]+predict)&255
         rows.append(row); prev=row
-    return w,h,[{x for x in range(w) if row[x*4+3]>=128} for row in rows]
+    return w,h,[{x for x in range(w) if sum(row[x*3:x*3+3]) < 450} for row in rows]
 
 def simplify(points, tolerance=.65):
     if len(points)<3: return points
@@ -40,7 +40,7 @@ def simplify(points, tolerance=.65):
     if ds[k]>tolerance: return simplify(points[:k+1],tolerance)[:-1]+simplify(points[k:],tolerance)
     return [a,b]
 
-w,h,rows=alpha_png(SOURCE); edges={}
+w,h,rows=ink_png(SOURCE); edges={}
 def add(a,b): edges.setdefault(a,[]).append(b)
 for y,row in enumerate(rows):
     for x in row:
@@ -115,12 +115,15 @@ for char in 'FleaCMS':
 font_units=face.units
 ft.FT_Done_Face(faceptr); ft.FT_Done_FreeType(lib)
 
-factor=120/w; xmin,ymin,xmax,ymax=[v*factor for v in bounds]
+# Fit the selected mascot into the original lockup footprint. Lettering and gap stay fixed.
+factor=90.909/(bounds[3]-bounds[1])
+offset_x=56.3155-(bounds[0]+bounds[2])*factor/2
+offset_y=9.665-bounds[1]*factor
 def svg(body,viewbox,color='#19241c',title='FleaCMS'):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{viewbox}" role="img" aria-labelledby="title"><title id="title">{title}</title><g fill="{color}">{body}</g></svg>\n'
-mascot=f'<path fill-rule="evenodd" transform="scale({factor:.9f})" d="{markpath}"/>'
+mascot=f'<path fill-rule="evenodd" transform="translate({offset_x:.6f} {offset_y:.6f}) scale({factor:.9f})" d="{markpath}"/>'
 word=''.join(f'<path d="{p}"/>' for p in paths)
-vb=f'{xmin-2:.3f} {ymin-2:.3f} {114+pen+5-xmin:.3f} {ymax-ymin+4:.3f}'
+vb='8.622 7.665 393.858 94.909'
 (OUT/'logo.svg').write_text(svg(mascot+word,vb))
 (OUT/'logo-light.svg').write_text(svg(mascot+word,vb,'#f4f8f2'))
 edge=max(bounds[2]-bounds[0],bounds[3]-bounds[1])+64
@@ -129,5 +132,5 @@ markvb=f'{cx-edge/2:.1f} {cy-edge/2:.1f} {edge:.1f} {edge:.1f}'
 (OUT/'mark.svg').write_text(svg(f'<path fill-rule="evenodd" d="{markpath}"/>',markvb,title='Little Skip, the FleaCMS mascot'))
 favicon=(OUT/'mark.svg').read_text().replace('<g fill=', '<style>@media(prefers-color-scheme:dark){g{fill:#f4f8f2}}</style><g fill=')
 (OUT/'favicon.svg').write_text(favicon)
-(OUT/'export.json').write_text(json.dumps({'approved_source':'flea-logo-exploration f5b19f8, accepted by owner','font':'Nunito 800; outlined through existing FreeType','mascot':'Alpha silhouette, threshold 128/255; subpixel outline simplification 0.65 source pixels','source_dimensions':[w,h],'source_ink_bounds':bounds,'contours':len(loops),'logo_viewbox':vb,'glyph_advance':pen,'font_units':font_units},indent=2)+'\n')
+(OUT/'export.json').write_text(json.dumps({'approved_source':'Filled flea round 2 concept D, accepted by owner 2026-11-09','font':'Nunito 800; outlined through existing FreeType','mascot':'RGB ink silhouette, mean channel threshold 150/255; outline simplification 0.65 source pixels','source_dimensions':[w,h],'source_ink_bounds':bounds,'contours':len(loops),'logo_viewbox':vb,'glyph_advance':pen,'font_units':font_units,'approved_source_sha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),'font_sha256':hashlib.sha256(FONT.read_bytes()).hexdigest()},indent=2)+'\n')
 print({'source':[w,h],'bounds':bounds,'contours':len(loops),'font_units':font_units,'word_width':pen,'bytes':len((OUT/'logo.svg').read_bytes())})

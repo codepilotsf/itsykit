@@ -6,6 +6,12 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.20.3 - 2026-11-09
+
+- Adopt the approved filled Little Skip mascot across the starter, development
+  diagnostics and canonical brand assets, including SVG, PNG, ICO and touch icons.
+  Preserve the Nunito wordmark, existing palettes and custom customer branding.
+
 ## 0.20.2 - 2026-11-02
 
 - Adopt the approved heavier Little Skip mascot with Nunito lettering and balanced

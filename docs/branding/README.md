@@ -2,9 +2,11 @@
 
 <img src="logo.svg" alt="FleaCMS" width="332" height="80">
 
-The owner approved this Little Skip mascot, Nunito 800 lettering and spacing on
-November 2, 2026, following the `f5b19f8` Nunito proof. Preserve the character,
-heavier strokes, proportions, spelling and gap. Body typography stays independent.
+The owner approved the filled Little Skip mascot, concept D from the second
+logo exploration round, on November 9, 2026. The three filled shell sections,
+curved gaps, friendly face and bent legs come from that exact concept. Preserve
+its contours. The previously approved Nunito 800 lettering, lockup dimensions
+and spacing remain unchanged. Body typography stays independent.
 
 - `logo.svg`: full forest-black lockup, with outlined lettering.
 - `logo-light.svg`: the same lockup for dark surfaces.
@@ -15,8 +17,10 @@ heavier strokes, proportions, spelling and gap. Body typography stays independen
   raster exports from the SVG. Keep alpha and use their native dimensions.
 
 `approved-mascot.png` and its prompt sidecar retain the approved raster source.
-The SVG traces its alpha outline at source resolution, then simplifies below one
-source pixel. Nunito outlines come from `nunito-800.woff2`; its SIL Open Font
+The SVG traces the dark ink in the approved RGB source at a mean channel
+threshold of 150/255, then simplifies below one source pixel. This removes
+the white background and slight generated tonal variation without redrawing
+the character. Nunito outlines come from `nunito-800.woff2`; its SIL Open Font
 License is retained in `Nunito-OFL.txt`. SVGs contain paths only, with no external
 images, font downloads, scripts or runtime dependencies.
 
