@@ -1,5 +1,13 @@
 # Installation and updates
 
+## 0.20.5 navy-on-light branding
+
+Primary logos and icons use the approved navy foreground on light surfaces.
+New sites and development diagnostics receive the matching brand treatment.
+Native Linux/Mac and public install/update checks passed. The compatible shared
+server remains 0.20.3; protocols stay 28 and 2. See
+[verification](agents/release-0205-verification.md).
+
 ## 0.20.4 fixed icon palette
 
 Browser and touch icons stay white on navy, matching the public header in both
