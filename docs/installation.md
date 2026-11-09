@@ -1,5 +1,12 @@
 # Installation and updates
 
+## 0.20.4 fixed icon palette
+
+Browser and touch icons stay white on navy, matching the public header in both
+browser themes. Native Linux/Mac release and public install/update checks passed.
+The compatible shared server remains 0.20.3; protocols remain 28 and 2. See
+[verification](agents/release-0204-verification.md).
+
 ## 0.20.3 filled branding
 
 The filled Little Skip mascot approved on November 9, 2026 replaces the outline
