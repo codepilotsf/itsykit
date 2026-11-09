@@ -1,5 +1,30 @@
 # Publishing FleaCMS downloads
 
+## 0.20.4 published November 9, 2026
+
+Browser and touch icons now stay white `#f5f9ff` on header navy `#142b43` in both
+browser themes. SVG, PNG, ICO and touch files match the reviewed exports and use
+refreshed URLs. Logo artwork and page design are unchanged. Framework MR !34
+merged as `f6f5430`; immutable `v0.20.4` selects tested source `f0269b2`.
+Website icon MR !19 merged as `59f7ced`, activation
+`20261109-012644-c58945602a2360256d46434d`; channel MR !20 merged as `6694e69`,
+activation `20261109-013053-45656596029f6bb3f0a161bd`.
+
+Native Linux/Mac full tests, race tests, vet, canonical builds, exact/starter
+checks and public install/reinstall/update/already-current checks passed. Normal
+CLIs match the public manifest. The compatible shared executable remains 0.20.3;
+all 29 HTTPS hosts, live content, host policies and other 19 sites are preserved.
+
+```text
+38bec9013fa3c224648b2c84dc63896b5982042efe6d43eecf1420c3dbea8760  flea-darwin-arm64
+05698c04913aca2839ab657a6153ac24dc8410ee41f2bab88786647eea2d256c  flea-linux-amd64
+```
+
+Tag pipeline 798 was pending runners; completed native checks supplied evidence.
+Existing ARM64 server, clean-Mac/notarization, packaging and email limits remain.
+Logs, previous CLIs and source provenance are in `fleacms-releases/0.20.4` on
+Kirin and Mac. Older downloads and customer branding are unchanged.
+
 ## 0.20.3 published November 9, 2026
 
 The approved filled Little Skip concept D replaces the outline throughout the
