@@ -28,6 +28,10 @@ Do not load Rails or Preflight conventions for a Flea site.
 For a new site or substantial redesign, establish the primary visitor action
 from the brief: directions/call, bookings, sales or inquiries. Ask one question
 only if that job is unclear. Do not invent a booking or commerce workflow.
+For an existing-site rebuild or redesign, also follow the design skill's early
+choice between exact current copy and rethinking the messaging. Settle that
+scope before visual directions; a content import or migration alone does not
+authorize rewriting the message.
 
 For a real business, research available first-party materials and supplied assets
 before asking for facts. Distinguish owner-confirmed facts, corroborated facts,

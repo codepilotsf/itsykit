@@ -30,6 +30,13 @@ Do not invent a persona's beliefs or experiences to make the copy feel human.
 
 ## Match the size of the intervention
 
+For existing-website redesigns that may include messaging changes, read
+[website messaging](references/website-messaging.md). Resolve whether the task
+preserves exact copy or reframes the message before drafting. An approved reframe
+may change the original angle and sequence while preserving factual substance;
+that explicit scope overrides the ordinary rewrite default below. A visual
+redesign alone is not permission to change positioning or commercial claims.
+
 - **Draft:** Build an argument from the brief and facts. Choose the structure the
   reader needs, without automatically adding a pain section, FAQ or final pitch.
 - **Rewrite:** Preserve the writer's angle, supported information and distinctive

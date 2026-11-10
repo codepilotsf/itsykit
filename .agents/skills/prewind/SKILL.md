@@ -14,8 +14,10 @@ prefixes, grid utilities or animation utilities exist in the installed version.
   utilities for layout, spacing, sizing, alignment and responsive adjustments.
 - Reuse the theme's fluid type and spacing scale. Change shared tokens in the
   project's theme file rather than scattering competing values through templates.
-- Put content inside `.container`; a full-width band may wrap it. Do not add
-  `max-w-full` as a workaround that defeats the intended content width.
+- Use `.container` for content that follows the site's shared measure. An approved
+  full-bleed image, graphic background, oversized display treatment or asymmetric
+  composition may sit outside it with deliberate responsive bounds. Do not use
+  `max-w-full` to defeat the container; express that composition explicitly.
 - Before adding custom CSS, check existing defaults and utilities. Do not recreate
   a supported utility with a custom selector or add a parallel utility system.
 - Use custom CSS for behavior or visual detail the installed system cannot
@@ -23,6 +25,14 @@ prefixes, grid utilities or animation utilities exist in the installed version.
   layers and approval rules; a reusable component policy is application-specific.
 - Preserve the established header, main, footer and responsive navigation unless
   the task changes them. Keep keyboard focus and reduced-motion behavior usable.
+
+Prewind supplies styling primitives, not an art direction. For new sites and
+approved redesigns, do not treat starter colors, font choices, card examples or
+default scale values as approved brand constraints. Implement the selected visual
+system through theme tokens and supported utilities, using permitted custom CSS
+for authored graphics and motion that utilities cannot reasonably express. Keep
+the stack and project approval rules; report a concrete policy conflict instead
+of quietly reducing the design to the starter's appearance.
 
 Inspect changed markup and selectors for unsupported classes, utility duplication
 and unintended overrides. Verify responsive rendering and interactions in the

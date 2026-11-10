@@ -1,6 +1,6 @@
 ---
 name: design
-description: Apply CodePilot design defaults to new designs and existing UI refinements. Routes relevant work to global Impeccable while preserving the project's visual system and implementation contracts.
+description: Apply CodePilot design defaults to websites, product UI and refinements. Guides visual exploration, reference research and palette quality through global Impeccable while preserving approved identity and implementation contracts.
 ---
 
 # CodePilot design guidance
@@ -11,6 +11,18 @@ context and artifacts there. Preserve the stack, product truth, approved brand,
 design system and security rules. Do not add a framework or build step to follow
 toolkit examples. If the toolkit is missing or cannot run,
 report the limit and continue permitted work from existing context.
+
+## Set the content scope before redesigning an existing website
+
+For an existing-site copy, rebuild or substantial redesign, read
+[website messaging](../copywriting/references/website-messaging.md) before visual
+research or direction selection. Inspect the source, then resolve one early
+choice: redesign with its exact current copy, or rethink the message and content
+organization around the visitor's needs and primary CTA while retaining its
+substantive information. Ask when the brief leaves that choice open; do not
+silently rewrite or assume a redesign requires frozen wording. Honor an explicit
+choice or delegated judgment without asking again. Routine visual refinements
+and technical migrations do not trigger a messaging workshop.
 
 ## Match the workflow to the request
 
@@ -23,18 +35,27 @@ report the limit and continue permitted work from existing context.
 - **New surface or substantial redesign:** use the relevant Impeccable workflow.
   Resolve consequential open direction with visible options and honor choices
   already supplied; a fully specified brief needs no confirmation interview.
-  Default to building the working UI in code rather than
-  reconstructing a generated screenshot.
+  For marketing sites and portfolios, read
+  [website art direction](references/website-art-direction.md) before research
+  and direction selection. Explore visually before building; carry the approved
+  typography, graphics, composition and motion into the working site.
 - **Explicit comp-led work:** when the user requests generated design exploration,
   measured comp fidelity, or the project already pins that path, follow the full
   upstream comp, asset, comparison and review gates. Keep an approved comp's
   authority; never silently downgrade it to bypass a failed gate.
 
-For new work without an established build-path preference, record `buildPath` as
-`code-led` in the project's .impeccable/config.json before starting its direction
-round. Preserve other settings. Explicit user choices and existing project
-preferences win; do not overwrite them or ask an extra execution-mode question.
-Use the toolkit's supported board/toggle workflow for direction decisions.
+For new work without an established build-path preference, default to `comp-led`
+for Persuade/Experience surfaces (marketing, campaigns, portfolios and showcases)
+when image generation is available; default to `code-led` for Operate/Read
+surfaces (app screens, dashboards and documentation). Record the applicable
+`buildPath` in the project's .impeccable/config.json before its direction round,
+preserving other settings. Explicit user choices and existing project preferences
+win; do not overwrite them or ask an extra execution-mode question. A saved
+code-led preference stays binding even on a marketing page. Explain that it skips
+the comp round when that tradeoff matters to the requested exploration.
+Use the toolkit's supported board/toggle workflow for direction decisions. Without
+a generator, use its visual code-led board and disclose that limitation; do not
+skip direction selection or treat an empty CLI key probe as tool discovery.
 
 ## Present reviews in the owner's browser
 
@@ -77,9 +98,14 @@ not as a prerequisite to every refinement. Reuse current inspected references.
 For meaningful external research, inspect rendered pages or screens at the first
 viewport, representative lower content and relevant interaction. Search snippets
 alone are not visual evidence. When Mobbin fits and authorized access is available,
-make at most two focused searches, inspect useful examples and return actual
-screen links with the transferable principles. If access is absent, continue
-with project patterns and available references; it must not block the work.
+read its installed best-practices and search guidance. Use website sections for
+marketing composition, screens for app UI and flows for journeys. Research the
+open decisions rather than imposing a two-search limit on an entire site; stop
+when the evidence supports distinct viable directions. The website reference
+describes a bounded approach. Return actual inspected screen/section links with
+the transferable decisions. If access is absent, disclose it and continue other
+permitted design work with available evidence; never invent Mobbin findings or
+silently substitute another source as Mobbin research.
 
 Translate evidence into a short account of what the design must achieve. Borrow
 principles rather than distinctive branding. Report inspection limits honestly.
@@ -92,11 +118,23 @@ a larger slogan and a generic feature grid do not resolve a generic composition.
 Choose imagery, framing, type and contrast together, with a clear focal moment
 and quieter supporting content. Use generated raster assets when they materially
 improve the result; preserve identity, factual claims and asset provenance.
+Read [art-direct](../art-direct/SKILL.md) when the image concept is unresolved,
+and [photoreal-image](../photoreal-image/SKILL.md) for photographic execution,
+when installed. Use the runtime's imagegen guidance for actual generation.
 
 Give each section a purpose and composition appropriate to its content. Preserve
 native conventions on task-focused screens. Do not turn one site's palette,
 visual device or successful layout into a universal house style, or invent
 capabilities, testimonials and commercial claims for visual richness.
+An FAQ accordion needs actual visitor questions and a reason to hide the answers;
+it is not a required closing section. Starter colors, fonts and component demos
+are implementation defaults, not automatically an approved brand. Distinguish
+them from an established identity before deciding what must be preserved.
+
+Resolve palette relationships and roles before presenting a new visual direction.
+Use the palette checks in the website reference for marketing/portfolio work;
+for app or reading surfaces, use Impeccable's color guidance when colors change.
+Contrast compliance alone does not establish that colors work together.
 
 During a design interview, present rendered HTML or image comps with realistic
 content, desktop/mobile views where useful and alternatives when directions
@@ -114,6 +152,10 @@ Compare the rendered build with approved references and any chosen comp at
 comparable sizes. Check the opening, representative lower content, mobile layout
 and the changed main action. Batch fixes and follow the upstream bounded review
 workflow for the selected path; do not add an open-ended polishing loop.
+For marketing and portfolio work, also judge whether the chosen composition,
+font character, graphic assets, color relationships and promised motion survived
+implementation. A passing detector or a color match on a generic layout is
+insufficient. Fix material losses before calling the chosen direction delivered.
 
 User evidence of a material mismatch outranks an earlier automated pass. Preserve
 what they liked and fix the underlying composition or product presentation.
