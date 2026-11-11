@@ -110,6 +110,14 @@ path or a legacy shell runner to drive delegation.
   and required checks.
 - Keep handoffs concise (about 300 words or fewer): what changed, exact paths, checks run
   and their results, unresolved risks, and anything the lead must decide.
+- Before starting, reconcile required implementation, behavioral review, visual review
+  and documentation obligations with the applicable skills. Combine compatible work
+  and evidence in one brief where allowed; do not add a separate verdict or documenter
+  by habit. Upstream-required roles and gates still apply; name any that must remain
+  separate and their completion criteria. Design helpers follow the design skill's
+  model requirements rather than the general QA default.
+- Before QA, Sol inspects the candidate and its acceptance evidence under
+  `task-delivery`; a worker's completion report or green test count is not the gate.
 - Write logs and evidence outside the repository (for example under `/tmp`) and return
   their paths.
 - Build the canonical required-check set once, when the final diff is settled; during
@@ -143,5 +151,12 @@ messaging the child thread; track it as its own task.
 - Let async completion notifications wake you; do not poll.
 - Call `task_status` only when you need a result mid-turn, and `task_cancel` to stop work
   safely when it is no longer wanted.
+- For a long run, use the host's supported progress or bounded wait mechanism to
+  keep owner-facing updates timely within runtime communication requirements. Name
+  the last verified milestone, remaining acceptance cases and next completion gate;
+  report a stall or missing visibility plainly instead of repeating that a worker
+  is active or inventing an ETA. Request a bounded progress checkpoint in the brief
+  when supported. If the host only resumes on completion, disclose that limit before
+  yielding; do not claim background updates are scheduled or create polling jobs.
 - Link every pull request or merge request you create or work on with the T3 PR-linking
   tools. Watch a PR only when explicitly asked to.

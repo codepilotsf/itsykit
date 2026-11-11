@@ -33,6 +33,9 @@ repository needs an authorized initial commit before normal worktrees.
 One editing agent owns a worktree at a time. Reviewers are read-only on a settled
 diff; pause its writer before review or handoff. Give authorized workers the exact
 path, branch, base, scope and required checks; require them to verify their target.
+Bind review evidence to the candidate commit or recorded working diff. If source
+changes during review, pause the review and explicitly invalidate the affected
+findings, captures and checks; restart that review on the settled replacement.
 For overlapping tasks or shared runtime resources, read
 [concurrent task coordination](references/concurrent-tasks.md).
 
@@ -87,7 +90,16 @@ does not authorize a rollout.
 ## Review and integrate
 
 Finish implementation and affected documentation, run required checks and review
-the final diff. Resolve material findings. Reuse observed evidence; advisory
+the final diff. Before handing a candidate to QA, the lead checks that evidence
+demonstrates the consequential acceptance cases on the actual implementation.
+For cross-cutting behavior, connect each invariant to its entry points and an
+observed check: persisted state versus live readiness, stale/concurrent clients,
+and saved decisions versus current preferences where relevant. Inspect the
+rendered affected shell for UI claims; source rules alone do not prove computed
+styles or interactions. Reuse the brief and existing evidence; routine edits
+need no separate acceptance document. Test counts alone do not establish this.
+
+Resolve material findings. Reuse observed evidence; advisory
 reviewers grant no Git or external-action permission. Failed required checks
 block readiness. When useful and authorized, an incomplete draft may expose the
 blocker, but must not be called ready or complete.

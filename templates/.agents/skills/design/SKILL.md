@@ -157,6 +157,15 @@ font character, graphic assets, color relationships and promised motion survived
 implementation. A passing detector or a color match on a generic layout is
 insufficient. Fix material losses before calling the chosen direction delivered.
 
+Determine that path's finishing obligations before implementation. Routine
+incumbent refinements do not inherit new-work's roles merely because they change
+UI. When new-work applies, its required finish reviewer, correction verdicts and
+documenter remain required, including on the code-led path. Share the settled
+candidate, acceptance evidence and captures with compatible behavioral review
+where allowed; do not replace a mandated separate role with lead self-review or
+merge roles the upstream workflow keeps separate. Any unavailable required
+handoff follows the upstream disclosed fallback, not an implicit waiver.
+
 User evidence of a material mismatch outranks an earlier automated pass. Preserve
 what they liked and fix the underlying composition or product presentation.
 
