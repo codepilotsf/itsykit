@@ -1,11 +1,21 @@
 {
-  "app": {"site_name": "FleaCMS"},
-  "dev": {"email_preview": true},
-  "admin": {"emails": [], "session_idle_days": 30},
+  "app": {
+    "site_name": "Itsy Web"
+  },
+  "dev": {
+    "email_preview": true
+  },
+  "admin": {
+    "emails": [],
+    "session_idle_days": 30
+  },
   "apps": {
     "contact": {
       "mount": "/contact",
-      "email": {"to": "sean@codepilot.com", "from": "sean@fleacms.com"}
+      "email": {
+        "to": "sean@codepilot.com",
+        "from": "sean@fleacms.com"
+      }
     }
   },
   "deploy": {
@@ -18,6 +28,15 @@
         "email": "sean@codepilot.com",
         "agree_tos": true,
         "www_redirect": true
+      },
+      "t3/reframe-flea-html-focus": {
+        "target": "root@fleacms.com",
+        "domain": "itsy.fleacms.com",
+        "name": "itsy-web",
+        "https": true,
+        "email": "sean@codepilot.com",
+        "agree_tos": true,
+        "www_redirect": false
       }
     }
   }

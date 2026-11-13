@@ -5,29 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{page.title} | {app.site_name}</title>
     <meta name="description" content="{page.description}" />
-    <link rel="canonical" href="https://fleacms.com{page.path}" />
+    <link rel="canonical" href="https://itsy.fleacms.com{page.path}" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="FleaCMS" />
-    <meta property="og:title" content="{page.title} | FleaCMS" />
+    <meta property="og:site_name" content="{app.site_name}" />
+    <meta property="og:title" content="{page.title} | {app.site_name}" />
     <meta property="og:description" content="{page.description}" />
-    <meta property="og:url" content="https://fleacms.com{page.path}" />
-    <meta property="og:image" content="https://fleacms.com/images/social-preview.png?v=12e348bebb2b" />
+    <meta property="og:url" content="https://itsy.fleacms.com{page.path}" />
+    <meta property="og:image" content="https://itsy.fleacms.com/images/social-preview.png?v=da9e7d79e11e" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="FleaCMS: Write plain HTML. Flea builds the server. Terminal workflow from installation to HTTPS deployment." />
+    <meta property="og:image:alt" content="Itsy Web: Write HTML. Skip the build pipeline. Layouts, clean URLs, deployment and HTTPS." />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{page.title} | FleaCMS" />
+    <meta name="twitter:title" content="{page.title} | {app.site_name}" />
     <meta name="twitter:description" content="{page.description}" />
-    <meta name="twitter:image" content="https://fleacms.com/images/social-preview.png?v=12e348bebb2b" />
-    <meta name="twitter:image:alt" content="FleaCMS: Write plain HTML. Flea builds the server. Terminal workflow from installation to HTTPS deployment." />
-    <link rel="stylesheet" href="/css/global.css?v=a8505d4cc5f4" />
+    <meta name="twitter:image" content="https://itsy.fleacms.com/images/social-preview.png?v=da9e7d79e11e" />
+    <meta name="twitter:image:alt" content="Itsy Web: Write HTML. Skip the build pipeline. Layouts, clean URLs, deployment and HTTPS." />
+    <link rel="stylesheet" href="/css/global.css?v=b85fa9b6800e" />
     {#if app.current_admin}
     <meta name="csrf-token" content="{app.current_admin.csrf_token}" />
     {/if}
-    <link rel="icon" href="/images/favicon-32.png?v=positive-20261109" type="image/png" sizes="32x32" />
-    <link rel="icon" href="/images/favicon.svg?v=positive-20261109" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png?v=positive-20261109" sizes="180x180" />
+    <link rel="icon" href="/images/favicon-32.png?v=1b09f13306ba" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/images/favicon.svg?v=1b09f13306ba" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png?v=1b09f13306ba" sizes="180x180" />
   </head>
   <body class="flex flex-col min-h-screen m-0 p-0">
     {#if app.current_admin} {render /admin/toolbar} {/if}
@@ -37,7 +37,7 @@
         class="container flex items-center justify-between"
         aria-label="Main navigation"
       >
-        <a class="wordmark" href="/" aria-label="FleaCMS home"><img class="flea-logo" src="/images/logo.svg?v=positive-20261109" width="166" height="40" alt="FleaCMS" /></a>
+        <a class="wordmark" href="/" aria-label="Itsy Web home"><img class="itsy-logo" src="/images/logo.svg?v=152c4e04debc" width="176" height="38" alt="Itsy Web" /></a>
         <div class="site-links flex items-center gap-md">
           {render /navigation}
         </div>
@@ -47,14 +47,14 @@
     <footer class="site-footer">
       <div class="footer-inner container">
         <div>
-          <a class="wordmark" href="/"><img class="flea-logo" src="/images/logo.svg?v=positive-20261109" width="166" height="40" alt="FleaCMS" /></a>
-          <p>Plain HTML. Your own server. One binary.</p>
+          <a class="wordmark" href="/"><img class="itsy-logo" src="/images/logo.svg?v=152c4e04debc" width="176" height="38" alt="Itsy Web" /></a>
+          <p>HTML, shared templates and a server you control.</p>
         </div>
         <nav class="flex flex-wrap gap-md" aria-label="Footer navigation">
           <a href="/docs#release-notes">Release notes</a
-          ><a href="/docs#support">Support</a><a href="/admin">Admin sign-in</a>
+          ><a href="/docs#support">Support</a>
         </nav>
-        <p class="copyright">&copy; 2026 FleaCMS</p>
+        <p class="copyright">&copy; 2026 Itsy Web</p>
       </div>
     </footer>
     <p id="copy-status" class="visually-hidden" role="status" aria-live="polite"></p>

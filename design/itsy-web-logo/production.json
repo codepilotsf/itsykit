@@ -1,0 +1,23 @@
+{
+  "origin": "Owner-approved woven-loop concept with the original rounded Itsy Web wordmark.",
+  "source": ".impeccable/mocks/decision/round-2/loop.png",
+  "method": "Font-independent SVG contours from the approved flat artwork; pixel quantization smoothed and brand inks normalized.",
+  "approved": true,
+  "fullBounds": [
+    92,
+    254,
+    1479,
+    552
+  ],
+  "markBounds": [
+    92,
+    254,
+    441,
+    552
+  ],
+  "wordmark": "Original approved lettering preserved as outlines",
+  "colors": {
+    "navy": "#142b43",
+    "blue": "#a4dbff"
+  }
+}

@@ -23,7 +23,7 @@
   .site-header .ui-button { background:var(--brand-2); color:var(--hero-ink); border-color:var(--brand-2); }
   .site-header > nav { min-height:76px; column-gap:16px; }
   .wordmark { display:inline-flex; align-items:center; text-decoration:none; }
-  .flea-logo { display:block; width:166px; height:40px; max-width:100%; }
+  .itsy-logo { display:block; width:176px; height:auto; max-width:100%; }
   .site-links > a { text-decoration:none; font-size:.85rem; font-weight:600; }
   .site-links { flex-shrink:0; }
   .site-links .ui-button { white-space:nowrap; }
@@ -80,7 +80,7 @@
   }
   @media (max-width:640px) {
     .site-header > nav { min-height:68px; }
-    .flea-logo { width:141px; height:34px; }
+    .itsy-logo { width:141px; height:auto; }
     .site-links { gap:14px; }
     .site-links .ui-button { padding:10px 12px; min-height:42px; font-size:.75rem; gap:8px; }
     .site-links > a { font-size:.78rem; }
@@ -98,7 +98,7 @@
     .copy-button { top:8px; right:8px; }
   }
   @media (max-width:360px) {
-    .site-header .flea-logo { width:122px; height:auto; }
+    .site-header .itsy-logo { width:122px; height:auto; }
     .site-header .container { --container-padding:0 16px; }
     .site-links { gap:10px; }
     .site-links .ui-button { padding-inline:10px; }
