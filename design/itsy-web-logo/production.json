@@ -1,5 +1,5 @@
 {
-  "origin": "Owner-approved woven-loop concept with the original rounded Itsy Web wordmark.",
+  "origin": "Owner-approved woven-loop concept with the original rounded ItsyWeb wordmark.",
   "source": ".impeccable/mocks/decision/round-2/loop.png",
   "method": "Font-independent SVG contours from the approved flat artwork; pixel quantization smoothed and brand inks normalized.",
   "approved": true,
@@ -15,7 +15,12 @@
     441,
     552
   ],
-  "wordmark": "Original approved lettering preserved as outlines",
+  "wordmark": "Original approved lettering preserved as outlines; Web moved left to join ItsyWeb",
+  "wordJoin": {
+    "glyphs": "Web",
+    "xShift": -24
+  },
+  "outputWidth": 1363,
   "colors": {
     "navy": "#142b43",
     "blue": "#a4dbff"

@@ -19,3 +19,7 @@ The user requested three variations on the first mark from round 2: the woven lo
 ## Production approval
 
 The user prefers the original woven loop from round 2, not one of the round-3 refinements. Approved source: `.impeccable/mocks/decision/round-2/loop.png`. Preserve its original rounded lettering. Apply this identity throughout the updated site and deploy it to `https://itsy.fleacms.com`. No further direction choice is pending.
+
+## Joined brand name
+
+The user requested ItsyWeb as one word across the website and logo. Preserve the approved mark and original letterforms; close only the word space between Itsy and Web. Historical candidate images and exact generator prompts remain as provenance.

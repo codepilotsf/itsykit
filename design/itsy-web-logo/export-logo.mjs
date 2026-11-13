@@ -50,7 +50,7 @@ function simplify(points,epsilon=.65) {
   for(let i=1;i<points.length-1;i++){const d=distance(points[i],points[0],points.at(-1));if(d>max){max=d;index=i;}}
   return max>epsilon?[...simplify(points.slice(0,index+1),epsilon).slice(0,-1),...simplify(points.slice(index),epsilon)]:[points[0],points.at(-1)];
 }
-function outline(region,color) {
+function outline(region,color,wordJoin=0) {
   const [left,top,right,bottom]=region, w=right-left,h=bottom-top, base=w+1;
   const at=(x,y)=>x>=0&&x<w&&y>=0&&y<h&&classify(x+left,y+top)===color;
   const edges=new Map();
@@ -75,6 +75,8 @@ function outline(region,color) {
     points=points.map((p,i,a)=>[0,1].map(axis=>[-2,-1,0,1,2].reduce((s,k)=>s+a[(i+k+a.length)%a.length][axis],0)/5));
     let far=1;for(let i=2;i<points.length;i++)if(Math.hypot(points[i][0]-points[0][0],points[i][1]-points[0][1])>Math.hypot(points[far][0]-points[0][0],points[far][1]-points[0][1]))far=i;
     points=[...simplify(points.slice(0,far+1)).slice(0,-1),...simplify([...points.slice(far),points[0]]).slice(0,-1)];
+    // Remove the former word space while preserving every glyph outline.
+    if(wordJoin && points.every(([x])=>x+left>=950)) points=points.map(([x,y])=>[x-wordJoin,y]);
     loops.push(points);
   }
   const n=v=>Math.round(v*100)/100;
@@ -92,12 +94,14 @@ function svg(region,geo,title,foreground=navy){
   const w=region[2]-region[0],h=region[3]-region[1];
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-labelledby="title"><title id="title">${title}</title><path fill="${foreground}" fill-rule="evenodd" d="${geo.navy}"/><path fill="${blue}" fill-rule="evenodd" d="${geo.blue}"/></svg>\n`;
 }
-const fullGeo=geometry(full),markGeo=geometry(mark);
-fs.writeFileSync('site/images/logo.svg',svg(full,fullGeo,'Itsy Web'));
-fs.writeFileSync('site/images/logo-light.svg',svg(full,fullGeo,'Itsy Web','#f5f9ff'));
-fs.writeFileSync('site/images/mark.svg',svg(mark,markGeo,'Itsy Web woven-loop mark'));
+const wordJoin=24;
+const joinedFull=[full[0],full[1],full[2]-wordJoin,full[3]];
+const fullGeo={navy:outline(full,1,wordJoin),blue:outline(full,2)},markGeo=geometry(mark);
+fs.writeFileSync('site/images/logo.svg',svg(joinedFull,fullGeo,'ItsyWeb'));
+fs.writeFileSync('site/images/logo-light.svg',svg(joinedFull,fullGeo,'ItsyWeb','#f5f9ff'));
+fs.writeFileSync('site/images/mark.svg',svg(mark,markGeo,'ItsyWeb woven-loop mark'));
 const mw=mark[2]-mark[0],mh=mark[3]-mark[1],scale=52/Math.max(mw,mh),tx=(64-mw*scale)/2,ty=(64-mh*scale)/2;
-fs.writeFileSync('site/images/favicon.svg',`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><title>Itsy Web</title><rect width="64" height="64" rx="14" fill="#f5f9ff"/><g transform="translate(${tx} ${ty}) scale(${scale})"><path fill="${navy}" fill-rule="evenodd" d="${markGeo.navy}"/><path fill="${blue}" fill-rule="evenodd" d="${markGeo.blue}"/></g></svg>\n`);
-const provenance={origin:'Owner-approved woven-loop concept with the original rounded Itsy Web wordmark.',source,method:'Font-independent SVG contours from the approved flat artwork; pixel quantization smoothed and brand inks normalized.',approved:true};
-fs.writeFileSync('design/itsy-web-logo/production.json',JSON.stringify({...provenance,fullBounds:full,markBounds:mark,wordmark:'Original approved lettering preserved as outlines',colors:{navy,blue},approved:true},null,2)+'\n');
-console.log(JSON.stringify({width:full[2]-full[0],height:full[3]-full[1],markWidth:mw,markHeight:mh,svgBytes:fs.statSync('site/images/logo.svg').size}));
+fs.writeFileSync('site/images/favicon.svg',`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><title>ItsyWeb</title><rect width="64" height="64" rx="14" fill="#f5f9ff"/><g transform="translate(${tx} ${ty}) scale(${scale})"><path fill="${navy}" fill-rule="evenodd" d="${markGeo.navy}"/><path fill="${blue}" fill-rule="evenodd" d="${markGeo.blue}"/></g></svg>\n`);
+const provenance={origin:'Owner-approved woven-loop concept with the original rounded ItsyWeb wordmark.',source,method:'Font-independent SVG contours from the approved flat artwork; pixel quantization smoothed and brand inks normalized.',approved:true};
+fs.writeFileSync('design/itsy-web-logo/production.json',JSON.stringify({...provenance,fullBounds:full,markBounds:mark,wordmark:'Original approved lettering preserved as outlines; Web moved left to join ItsyWeb',wordJoin:{glyphs:'Web',xShift:-wordJoin},outputWidth:joinedFull[2]-joinedFull[0],colors:{navy,blue},approved:true},null,2)+'\n');
+console.log(JSON.stringify({width:joinedFull[2]-joinedFull[0],height:full[3]-full[1],markWidth:mw,markHeight:mh,svgBytes:fs.statSync('site/images/logo.svg').size}));

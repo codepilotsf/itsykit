@@ -1,19 +1,19 @@
-# Itsy Web
+# ItsyWeb
 
-<img src="site/images/logo.svg" alt="Itsy Web" width="233" height="50">
+<img src="site/images/logo.svg" alt="ItsyWeb" width="233" height="50">
 
 Write HTML. Skip the build pipeline.
 
-You wanted to make a website, not maintain a toolchain. Itsy Web adds layouts,
+You wanted to make a website, not maintain a toolchain. ItsyWeb adds layouts,
 partials, variables, loops and clean URLs to HTML files. Its web server assembles
 the shared pieces when it serves the page. You keep writing HTML and CSS.
 
 The same tool gives you local development with live reload, Ubuntu server setup,
 SSH deployment, automatic HTTPS, backups and code rollback. Bring a server you
-control, SSH access and a domain; Itsy Web handles the web server and certificates.
+control, SSH access and a domain; ItsyWeb handles the web server and certificates.
 There is no frontend build step or language runtime to install.
 
-Itsy Web is the working name for the existing Flea software. The current binary
+ItsyWeb is the working name for the existing Flea software. The current binary
 still identifies itself as FleaCMS. Commands remain `flea`, configuration stays
 in `.flea.config.json`, and downloads remain on `fleacms.com`. This repository is
 the website and documentation, not the CLI source.
@@ -264,7 +264,7 @@ Deployment ships committed source; unresolved working-tree changes block it.
 Each branch has its own destination. Use `flea deploy -configure` to change one.
 Email-enabled sites prompt for server-side Resend settings when needed.
 
-With HTTPS enabled, Itsy Web requests and renews Let's Encrypt certificates.
+With HTTPS enabled, ItsyWeb requests and renews Let's Encrypt certificates.
 Setup does not rent a server or create DNS records. One host can serve multiple
 sites; the server and inbound ports must be available before enabling HTTPS.
 
@@ -289,7 +289,7 @@ It makes no commit or remote change.
 
 ## Migration redirects
 
-Itsy Web 0.20.0 adds 301 redirects for old site URLs. Merge a top-level object
+ItsyWeb 0.20.0 adds 301 redirects for old site URLs. Merge a top-level object
 into `.flea.config.json`, preserving other settings:
 
 ```json
@@ -315,7 +315,7 @@ protocol 28 before deploying; public 0.19.0 and earlier ignore these rules. See
 
 ## Search discovery
 
-Itsy Web 0.20.0 can generate a sitemap, advertise it in robots.txt and add missing
+ItsyWeb 0.20.0 can generate a sitemap, advertise it in robots.txt and add missing
 canonical tags. A canonical tag identifies a page's preferred address. Update
 the local CLI with `flea update`; for an older shared server, run
 `flea update-server` from a site with that server saved as the current branch's
@@ -358,7 +358,7 @@ See [the public walkthrough](https://itsy.fleacms.com/docs#seo-discovery).
 
 ## Hostname indexing
 
-Itsy Web 0.19.0 adds exact-host indexing policy with deployment protocol 27.
+ItsyWeb 0.19.0 adds exact-host indexing policy with deployment protocol 27.
 Update the CLI and explicitly upgrade the shared server before using it:
 
 ```sh
@@ -373,7 +373,7 @@ restarts the shared service. Staging receives `X-Robots-Tag: noindex, nofollow`
 without a website app flag or different templates. Policies survive deploy, sync,
 code rollback and site restore. `allow` stops adding the restriction and preserves
 owner-authored restrictions. Keep robots.txt crawlable so crawlers can discover
-noindex; Itsy Web warns about detected static site-wide blocks without rewriting it.
+noindex; ItsyWeb warns about detected static site-wide blocks without rewriting it.
 Site backups exclude policy; removal clears only owned hosts. Verify native
 headers before removing an existing meta fallback. See the
 [public documentation](https://itsy.fleacms.com/docs#indexing) and RELEASES.md for
@@ -398,7 +398,7 @@ Add a bare `snip` attribute to an element whose content admins should edit:
 </section>
 ```
 
-While dev is running, Itsy Web extracts the inner HTML into `flea/snips.json`, removes
+While dev is running, ItsyWeb extracts the inner HTML into `flea/snips.json`, removes
 the attribute, and leaves a generated directive:
 
 ```html
@@ -484,7 +484,7 @@ live photos; `flea pull` retrieves their metadata and files together.
 
 `<video snip src="/videos/intro.mp4" controls></video>` imports a local seed.
 Videos require optimized MP4 files with H.264 video, optional AAC-LC audio,
-and fast-start metadata. Files may be up to 25 MiB; Itsy Web does not convert them.
+and fast-start metadata. Files may be up to 25 MiB; ItsyWeb does not convert them.
 
 Dev generates src/poster snip bindings. Admins click the video in Edit mode to
 replace it or its poster, then Save changes or Cancel with the page. No separate
@@ -586,7 +586,7 @@ removed in 0.14.0; edit CSS in source and publish it with a normal deployment.
 Focused setup skills are available at `flea/skills/add-blog/SKILL.md` and
 `flea/skills/add-contact-form/SKILL.md`. Ask your agent to "add a blog" or "add a
 contact form"; `AGENTS.md` routes it to the supported setup and template values.
-Blog requires Itsy Web 0.15.0 or newer. These skills are bundled with newly generated
+Blog requires ItsyWeb 0.15.0 or newer. These skills are bundled with newly generated
 sites starting in 0.15.1; existing projects can copy them from a fresh site and
 add the matching routes to their own `AGENTS.md`, preserving custom instructions.
 
@@ -632,12 +632,12 @@ Keep the image URL absolute.
 
 ### Temporary packaging storage
 
-Itsy Web 0.20.1 respects `TMPDIR` for local deployment and setup. On Linux with a
+ItsyWeb 0.20.1 respects `TMPDIR` for local deployment and setup. On Linux with a
 small RAM-backed `/tmp`, use a private directory on verified disk-backed storage
 for each job, and keep worktrees and retained review evidence outside scratch.
 The public documentation includes the supported per-deployment command.
 
-The approved Itsy Web woven-loop identity and its outlined wordmark are retained
+The approved ItsyWeb woven-loop identity and its outlined wordmark are retained
 in `site/images/logo.svg`, `logo-light.svg` and `mark.svg`. The selected concept,
 exact generation prompts and production record live under `design/itsy-web-logo/`
 and `.impeccable/mocks/decision/`. Shipped SVGs need no fonts or build step.
