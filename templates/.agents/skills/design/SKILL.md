@@ -1,135 +1,177 @@
 ---
 name: design
-description: Apply CodePilot design preferences when designing, redesigning, critiquing or visually refining a website or application. Coordinates visual research and visible comps with the installed Impeccable toolkit and the project's design system.
+description: Apply CodePilot design defaults to websites, product UI and refinements. Guides visual exploration, reference research and palette quality through global Impeccable while preserving approved identity and implementation contracts.
 ---
 
 # CodePilot design guidance
 
-Use the globally installed Impeccable skill discovered by the agent runtime
-(currently `~/.agents/skills/impeccable/SKILL.md`) for the relevant design workflow,
-alongside these preferences. Never install, vendor, copy or link Impeccable into
-a project or starter template. Run its global launcher with the project as cwd.
-Preserve the consuming project's stack, design system, product context, pinned
-brand assets and security rules. Do not add another framework or build step to
-follow a toolkit example. These instructions grant no Git, deployment, delegation
-or external-action permission.
+Use the runtime-discovered global Impeccable skill and launcher, with the project
+as cwd. Never install, copy, vendor or link Impeccable into a project. Keep project
+context and artifacts there. Preserve the stack, product truth, approved brand,
+design system and security rules. Do not add a framework or build step to follow
+toolkit examples. If the toolkit is missing or cannot run,
+report the limit and continue permitted work from existing context.
 
-If Impeccable is missing or its launcher cannot run, state the limitation and
-continue permitted work from existing project context and these preferences.
-Do not claim toolkit execution or create a project-local fallback. Report a missing
-global installation so it can be resolved at user scope.
+## Set the content scope before redesigning an existing website
 
-## Model selection
+For an existing-site copy, rebuild or substantial redesign, read
+[website messaging](../copywriting/references/website-messaging.md) before visual
+research or direction selection. Inspect the source, then resolve one early
+choice: redesign with its exact current copy, or rethink the message and content
+organization around the visitor's needs and primary CTA while retaining its
+substantive information. Ask when the brief leaves that choice open; do not
+silently rewrite or assume a redesign requires frozen wording. Honor an explicit
+choice or delegated judgment without asking again. Routine visual refinements
+and technical migrations do not trigger a messaging workshop.
 
-Run Impeccable work with GPT-6.1 Sol (`gpt-6.1-sol`) at high reasoning. This includes
-design planning, UI implementation and delegated Impeccable text/code helpers, such as
-the asset producer, manual edit applier, finish reviewer and documenter. Image-generation
-tools use their own image models.
+## Match the workflow to the request
 
-In T3 Code, verify the current turn's effective model and reasoning from explicit
-runtime metadata. When they already match, continue without changing the thread.
-`orchestrator_capabilities` discovers supported provider/model IDs and reasoning
-options for authorized child tasks; catalog defaults are not evidence of the
-current turn's effective settings. Pass the provider, model and reasoning option
-explicitly to those child tasks.
+- **Routine refinement:** inspect the affected UI and nearby patterns, preserve
+  its identity and behavior, make the requested change, then verify its rendering
+  and changed interactions. Use Impeccable's incumbent-refinement guidance. Do not
+  start new-work, an interview, external research, a concept tournament or a
+  separate comp approval just because a UI file changes. Run additional audit or
+  polish workflows only when requested or needed for a concrete unresolved issue.
+- **New surface or substantial redesign:** use the relevant Impeccable workflow.
+  Resolve consequential open direction with visible options and honor choices
+  already supplied; a fully specified brief needs no confirmation interview.
+  For marketing sites and portfolios, read
+  [website art direction](references/website-art-direction.md) before research
+  and direction selection. Explore visually before building; carry the approved
+  typography, graphics, composition and motion into the working site.
+- **Explicit comp-led work:** when the user requests generated design exploration,
+  measured comp fidelity, or the project already pins that path, follow the full
+  upstream comp, asset, comparison and review gates. Keep an approved comp's
+  authority; never silently downgrade it to bypass a failed gate.
 
-Never call `t3_thread_configure` on the thread executing the current turn, including
-same-model or reasoning-only updates. Reconfiguring an active thread can interrupt
-the calling run and appear as "Run interrupted by user." If the required settings
-do not match or cannot be verified, report the limit and leave Impeccable work
-pending until the user selects the required settings in T3 and starts a new turn.
-Continue independent authorized work where useful. Never rely on upstream helper
-metadata or a lower inherited default.
+For new work without an established build-path preference, default to `comp-led`
+for Persuade/Experience surfaces (marketing, campaigns, portfolios and showcases)
+when image generation is available; default to `code-led` for Operate/Read
+surfaces (app screens, dashboards and documentation). Record the applicable
+`buildPath` in the project's .impeccable/config.json before its direction round,
+preserving other settings. Explicit user choices and existing project preferences
+win; do not overwrite them or ask an extra execution-mode question. A saved
+code-led preference stays binding even on a marketing page. Explain that it skips
+the comp round when that tradeoff matters to the requested exploration.
+Use the toolkit's supported board/toggle workflow for direction decisions. Without
+a generator, use its visual code-led board and disclose that limitation; do not
+skip direction selection or treat an empty CLI key probe as tool discovery.
 
-## Visual research
+## Present reviews in the owner's browser
 
-Establish the quality bar from real products before choosing a composition.
-Prioritize references the user supplies, then inspect a few strong examples for
-the same audience and task. Open the rendered pages or screens: inspect the first
-viewport, representative lower content and useful interaction detail. Search
-snippets and a list of URLs do not establish visual evidence. If direct inspection
-is unavailable, state that limit rather than claiming reference parity.
+Default to the owner's normal external browser for direction boards, concept
+comps and final review artifacts. Honor an explicit browser/transport preference;
+keep personal machine details in supported owner/environment configuration, not
+shared skills or invented Impeccable config keys. T3 preview is for agent
+inspection and does not establish access from the owner's device.
 
-Use Mobbin when an authorized connection or browser session is available. Check
-available access before choosing a visual direction. Make at most two focused
-searches for the relevant surface and user goal; inspect useful examples and
-show actual screen links with the transferable principles. Never invent
-references, claim unseen screens were inspected, or copy distinctive branding.
+Before presenting any review, read [browser review](references/browser-review.md).
+Track internal preview and owner review URLs separately. Remote loopback is never
+an owner link without an established forwarding route. Reuse an existing reachable
+route, provide a portable local-file ZIP for standalone concepts, and keep the
+task-owned review available while an answer is pending. Apply the same destination
+to inline board buttons, expanded images, mobile views and downloads.
 
-If Mobbin is unavailable, say so briefly and continue with existing project
-patterns and available references. Its absence must not block presenting comps.
+## Model and effort
 
-Translate references into a short, concrete account of what the incumbent lacks
-and what the new design must achieve. Look at product visibility, composition,
-type hierarchy, imagery, depth, density, scroll pacing and the primary action.
-Borrow the useful design principle, not another product's branding or unsupported
-features. Mobbin patterns supplement this judgment; choosing a familiar pattern
-does not establish a distinctive or commercially convincing design.
+Use GPT-6.1 Sol for substantial Impeccable work and its authorized text/code
+helpers, at high reasoning or higher. Routine refinements use task-appropriate
+effort. Image-generation tools use their own models.
 
-## Product-specific craft
+Verify effective settings from runtime metadata when available. Higher effort
+satisfies the minimum; unavailable metadata is a disclosed limit, not an automatic
+stop. Do not claim settings were verified when they were not. Respect an explicit
+user-selected model and report any concrete capability gap.
 
-For marketing work, aim for the finish of a strong commercial product in its
-category. Make the actual product, its mechanism or the customer's result carry
-the design. A credible app demonstration, carefully directed product photograph
-or useful interactive example can supply both personality and proof. Rearranging
-generic imagery, enlarging a slogan or recoloring the same template is not enough
-to resolve a complaint that the design feels generic.
+Never reconfigure the thread executing the current turn, even for a same-model
+or reasoning-only change; it can interrupt the run. Do not require a new turn
+merely to normalize suitable settings. Discover available IDs/options only when
+needed for authorized child work and pass those choices explicitly. This skill
+grants no delegation, Git or deployment permission.
 
-Treat art direction as part of the work. Choose imagery, framing, lighting,
-materials, typography and contrast together, with one clear focal moment and
-quieter supporting content. Use image generation when authored raster artwork
-would improve the result; supply inspected brand and quality references and say
-what each contributes. Preserve approved identity and native conventions. Do not
-generalize one successful site's palette, device mockup or visual treatment into
-a required style for unrelated products or task-focused application screens.
+## Research when direction needs evidence
 
-Give each section a job and a suitable composition. Avoid letting habitual
-feature-card grids, interchangeable stock scenes or a repeated FAQ layout decide
-the page. Demonstrate important behavior and put useful answers near the decision
-they support. Keep claims, sample states and availability honest; visual richness
-does not justify invented capabilities, testimonials or release details.
+Use supplied references and existing project evidence first. Seek external
+examples when they resolve an actual open composition, UX or quality decision,
+not as a prerequisite to every refinement. Reuse current inspected references.
 
-## Consultation and comps
+For meaningful external research, inspect rendered pages or screens at the first
+viewport, representative lower content and relevant interaction. Search snippets
+alone are not visual evidence. When Mobbin fits and authorized access is available,
+read its installed best-practices and search guidance. Use website sections for
+marketing composition, screens for app UI and flows for journeys. Research the
+open decisions rather than imposing a two-search limit on an entire site; stop
+when the evidence supports distinct viable directions. The website reference
+describes a bounded approach. Return actual inspected screen/section links with
+the transferable decisions. If access is absent, disclose it and continue other
+permitted design work with available evidence; never invent Mobbin findings or
+silently substitute another source as Mobbin research.
 
-Use the project's core conversation defaults, including personal overrides.
-Inspect existing context and honor direction the user has already supplied;
-do not restart an interview for a routine refinement.
+Translate evidence into a short account of what the design must achieve. Borrow
+principles rather than distinctive branding. Report inspection limits honestly.
 
-During a design interview, present visible mockups/comps to establish direction
-before implementation. Use a rendered HTML prototype or image mockup; prose,
-wireframe descriptions and reference links alone do not count. Include useful
-desktop/mobile views and alternatives when directions meaningfully differ.
+## Craft and consultation
 
-Make comps finished enough to test the proposed quality, with realistic content,
-convincing product detail and a clear next action. Carry the intended imagery and
-composition through implementation: produce appropriate assets, retain their
-provenance and keep core page text and controls semantic and usable. Do not turn
-an approved rich comp into a flattened screenshot or a weaker approximation.
+Make the product, its mechanism or the customer's result carry marketing work.
+Use convincing product detail, useful demonstrations or appropriate real imagery;
+a larger slogan and a generic feature grid do not resolve a generic composition.
+Choose imagery, framing, type and contrast together, with a clear focal moment
+and quieter supporting content. Use generated raster assets when they materially
+improve the result; preserve identity, factual claims and asset provenance.
+Read [art-direct](../art-direct/SKILL.md) when the image concept is unresolved,
+and [photoreal-image](../photoreal-image/SKILL.md) for photographic execution,
+when installed. Use the runtime's imagegen guidance for actual generation.
 
-Present comps for feedback and agree on direction before implementing it. Revise
-the same comps when feedback arrives. Honor explicit instructions to delegate
-direction or proceed without pauses. Outside a design interview, use comps when
-they resolve a meaningful design decision; routine UI refinements do not require
-an extra approval checkpoint. Visual approval does not authorize deployment.
+Give each section a purpose and composition appropriate to its content. Preserve
+native conventions on task-focused screens. Do not turn one site's palette,
+visual device or successful layout into a universal house style, or invent
+capabilities, testimonials and commercial claims for visual richness.
+An FAQ accordion needs actual visitor questions and a reason to hide the answers;
+it is not a required closing section. Starter colors, fonts and component demos
+are implementation defaults, not automatically an approved brand. Distinguish
+them from an established identity before deciding what must be preserved.
 
-## Judge the result against the bar
+Resolve palette relationships and roles before presenting a new visual direction.
+Use the palette checks in the website reference for marketing/portfolio work;
+for app or reading surfaces, use Impeccable's color guidance when colors change.
+Contrast compliance alone does not establish that colors work together.
 
-Compare the rendered build with the chosen comp and inspected references at
-comparable viewport sizes. Check the opening, a representative scroll sequence,
-mobile behavior and the main action. Ask whether product clarity, character and
-execution reach the intended standard, not only whether spacing and accessibility
-checks pass. Use Impeccable's bounded inspection and finish-review workflow rather
-than starting another open-ended polishing loop.
+During a design interview, present rendered HTML or image comps with realistic
+content, desktop/mobile views where useful and alternatives when directions
+meaningfully differ. Agree on consequential direction before implementation;
+revise the same artifacts after feedback. Honor delegated direction and explicit
+instructions to proceed without pauses. Routine refinements need no extra approval.
+External presentation preserves the consultation, question key and re-roll/update
+flow. A standalone export asks for feedback in the conversation and records the
+actual answer; opening or downloading never counts as approval. Unanswered required
+choices remain pending, including when a toolkit timeout suggests proceeding.
 
-When the user rejects a result as generic or materially below their references,
-carry that feedback and the reference evidence into the revised direction and
-fresh review. An earlier automated pass or reviewer verdict does not settle the
-user's objection. Preserve what they explicitly liked and fix the underlying
-composition or product presentation before returning to decorative refinements.
+## Verify and hand off
 
-## Implementation handoff
+Compare the rendered build with approved references and any chosen comp at
+comparable sizes. Check the opening, representative lower content, mobile layout
+and the changed main action. Batch fixes and follow the upstream bounded review
+workflow for the selected path; do not add an open-ended polishing loop.
+For marketing and portfolio work, also judge whether the chosen composition,
+font character, graphic assets, color relationships and promised motion survived
+implementation. A passing detector or a color match on a generic layout is
+insufficient. Fix material losses before calling the chosen direction delivered.
 
-Load [Prewind](../prewind/SKILL.md) only for a project using it, and the relevant
-application authoring skill for forms, components, paths and runtime behavior.
-Design preferences do not replace those implementation contracts. Resume the
-active implementation task after consultation unless a needed answer is pending.
+Determine that path's finishing obligations before implementation. Routine
+incumbent refinements do not inherit new-work's roles merely because they change
+UI. When new-work applies, its required finish reviewer, correction verdicts and
+documenter remain required, including on the code-led path. Share the settled
+candidate, acceptance evidence and captures with compatible behavioral review
+where allowed; do not replace a mandated separate role with lead self-review or
+merge roles the upstream workflow keeps separate. Any unavailable required
+handoff follows the upstream disclosed fallback, not an implicit waiver.
+
+User evidence of a material mismatch outranks an earlier automated pass. Preserve
+what they liked and fix the underlying composition or product presentation.
+
+Load [Prewind](../prewind/SKILL.md) only when the project uses it, and the relevant
+authoring skill for forms, components, paths and runtime behavior. Resume the
+active task after consultation unless a required answer is pending. Visual
+approval does not authorize deployment. Deliver review links and offline artifacts
+through the same [browser-review workflow](references/browser-review.md), with
+client reachability limits and task-owned server lifecycle recorded.

@@ -1,6 +1,6 @@
 ---
 name: art-direct
-description: Turn an article, website, presentation or brief into visual concepts and executable image prompts. Choose photography, illustration, abstract or conceptual imagery, develop a coherent visual direction, or critique whether existing images communicate the content. Use before generation when what to show or how it should feel is unresolved.
+description: Turn content into image concepts and executable prompts, or critique whether imagery communicates it. Use when what to show or its visual direction remains unresolved.
 ---
 
 # Art Direct
@@ -21,6 +21,11 @@ Use available document readers and browser tools; report extraction limits hones
 Inspect the existing image and any supplied references. Distinguish a reference's
 subject, composition, medium and mood instead of copying an entire visual identity.
 Identify what works and the specific mismatch the replacement should resolve.
+For website assets, read the selected page direction and intended crop before
+choosing the image's colors or medium. Compose the asset alongside the actual
+headline and surrounding surfaces; a beautiful standalone image can still fight
+the page. Preserve the approved palette's relationships and area of quiet behind
+live text without baking that text or controls into the asset.
 
 ## Choose the direction
 

@@ -1,6 +1,6 @@
 ---
 name: deepseek-orchestrator
-description: Choose direct Sol implementation or bounded, flat DeepSeek delegation in T3 Code. Use for deciding whether to delegate coding work, coordinating up to three independent developer/QA workstreams, reviewing worker results, or routing child tasks to the configured provider and model. Covers live model discovery, reasoning levels, worktree ownership, risk-based review and authorized delivery.
+description: Choose direct Sol work or authorized DeepSeek delegation in T3 Code. Use when delegation or independent review is useful, with bounded workstreams, task-appropriate effort and clear ownership.
 ---
 
 # DeepSeek orchestrator
@@ -19,8 +19,9 @@ schema copied here; those tool descriptions have priority when they differ.
   sequential within its workstream. Sol retains final scrutiny; a DeepSeek review never
   replaces the lead's.
 
-Discover the actual IDs at runtime with `orchestrator_capabilities` and use the returned
-provider instance and model. Never assume every environment matches the defaults below.
+When delegation is needed, discover actual IDs with `orchestrator_capabilities` and
+reuse that catalog for the turn unless it becomes stale. Direct work needs no model
+catalog probe. Never assume every environment matches the defaults below.
 
 - Lead default currently: `codex` / `gpt-6.1-sol`.
 - Worker default currently: provider instance `opencode`, model
@@ -28,7 +29,8 @@ provider instance and model. Never assume every environment matches the defaults
 
 Use the Go subscription route **only**. Never substitute `opencode/deepseek-v4.1-flash` or
 another pay-as-you-go route for the worker. If the configured model is unavailable, report
-it and stop; do not silently switch models, providers, or routes.
+it and stop that delegation attempt; do not silently switch worker models, providers
+or routes. The authorized Sol lead may continue directly when practical.
 
 ## Choose the smallest useful team
 
@@ -54,11 +56,12 @@ Within the project's delegation authorization:
 
 ## Reasoning levels
 
-Choose effort from the task, not from a low runtime default. Sol uses at least
-`medium` for coding, investigation, planning and final diff review, and `high` for
+Choose effort from the task. Sol normally uses `medium` for coding, investigation,
+planning and final diff review, and `high` for
 substantial, ambiguous, cross-cutting, architectural or high-risk work. Reserve
 `low` for narrow, deterministic routine tasks with clear acceptance criteria and no
-meaningful design or debugging decisions. Raise effort when scope or uncertainty grows.
+meaningful design or debugging decisions. Raise effort when scope or uncertainty grows;
+do not default every task to maximum effort.
 
 The DeepSeek Go Flash route offers `low`, `high` and `max`, with no `medium`.
 Use `low` only for routine implementation tasks; use `high` whenever medium or higher
@@ -66,11 +69,11 @@ would be justified on Sol. Use `high` for independent QA and substantial review.
 Reserve `max` for a high-effort pass that still cannot resolve material uncertainty.
 Never run independent QA at low effort.
 
-Discover the available options with `orchestrator_capabilities` and pass the chosen
-option explicitly to every `delegate_task`. Set and verify the lead's effective option
-in the runtime too. If the required level cannot be selected or verified, disclose that
-limit instead of implying it was used. Impeccable always follows the separate Sol 6.1 /
-high requirement in the design skill.
+For authorized delegation, discover available options and pass the chosen option
+explicitly to every `delegate_task`. Read the lead's effective setting from runtime
+metadata when available; never reconfigure its active thread to normalize it. Higher
+effort satisfies a minimum. Disclose unverifiable settings without inventing a hard
+stop. Impeccable follows the design skill's task-specific Sol/effort guidance.
 
 Use `delegate_task` for T3-owned child work and cross-provider work. Do not launch top-level
 threads (`t3_thread_launch`, `create_threads`) merely to run a subagent. Do not use a macOS
@@ -107,6 +110,14 @@ path or a legacy shell runner to drive delegation.
   and required checks.
 - Keep handoffs concise (about 300 words or fewer): what changed, exact paths, checks run
   and their results, unresolved risks, and anything the lead must decide.
+- Before starting, reconcile required implementation, behavioral review, visual review
+  and documentation obligations with the applicable skills. Combine compatible work
+  and evidence in one brief where allowed; do not add a separate verdict or documenter
+  by habit. Upstream-required roles and gates still apply; name any that must remain
+  separate and their completion criteria. Design helpers follow the design skill's
+  model requirements rather than the general QA default.
+- Before QA, Sol inspects the candidate and its acceptance evidence under
+  `task-delivery`; a worker's completion report or green test count is not the gate.
 - Write logs and evidence outside the repository (for example under `/tmp`) and return
   their paths.
 - Build the canonical required-check set once, when the final diff is settled; during
@@ -140,5 +151,12 @@ messaging the child thread; track it as its own task.
 - Let async completion notifications wake you; do not poll.
 - Call `task_status` only when you need a result mid-turn, and `task_cancel` to stop work
   safely when it is no longer wanted.
+- For a long run, use the host's supported progress or bounded wait mechanism to
+  keep owner-facing updates timely within runtime communication requirements. Name
+  the last verified milestone, remaining acceptance cases and next completion gate;
+  report a stall or missing visibility plainly instead of repeating that a worker
+  is active or inventing an ETA. Request a bounded progress checkpoint in the brief
+  when supported. If the host only resumes on completion, disclose that limit before
+  yielding; do not claim background updates are scheduled or create polling jobs.
 - Link every pull request or merge request you create or work on with the T3 PR-linking
   tools. Watch a PR only when explicitly asked to.

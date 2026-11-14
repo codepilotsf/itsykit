@@ -1,6 +1,22 @@
 # Craft Reference – vocabulary banks and a worked example
 
-Load this when you need concrete wording for a block, or a model of the finished form.
+Read when the brief needs more concrete physical detail or a worked prompt example.
+Use only applicable elements; the examples are not a mandatory prompt template.
+
+## Physical detail checklist
+
+| # | Element | Useful detail |
+|---|-------|--------------|
+| 1 | **Frame** | Medium + subject + action + where the camera is standing. Then one clause on what the eye does: where it enters the frame and what it lands on. |
+| 2 | **Moment** | The *instant*, not the activity. Name what just happened and what is about to. Prefer the beat before or after peak action – that is where photographs live. "He has just stopped turning the wrench and tilted his head toward the compressor; his hand is still on the tool." |
+| 3 | **Light** | Hour, season and weather as one physical fact. Then every source and its quality (key, fill, practicals, bounce), the **key-to-fill ratio in stops**, and the *light idea* in one clause – what light is doing in this frame. Mixed color temperatures read as real. |
+| 4 | **Camera** | Height, distance, angle. Body class + focal length + aperture. **Rendering character** – diffusion, flare, bokeh shape, grain, vignetting. Exactly which plane is sharp and how fast it falls off. Shutter if anything moves. |
+| 5 | **Composition** | Layering across foreground / midground / background. How the subject separates from the ground – by tone, by color, or by focus; name which. Subject scale ("the figure fills about a third of the frame height"), negative space, lookroom. **Edge discipline: nothing tangent to the frame edge or to a background line.** |
+| 6 | **Environment** | Specific objects that belong in the location and support its intended presentation. Use incidental clutter only when the scene calls for it. |
+| 7 | **Subject truth** | Exact garments, fit, condition, drape. Then the human physics: an asymmetrical micro-expression, where the gaze is aimed *and at what*, what the hands are doing, where the weight sits. If no person is in frame, replace with **Materials & surfaces** – substrate, finish, age, and how light behaves on each. |
+| 8 | **Imperfections** | Plausible scene-specific texture in skin, fabric, air, surfaces or optics. Preserve clean materials when required; avoid a flaw quota. |
+| 9 | **Distinctive detail** | A small detail that makes this frame specific, when useful to the brief. Do not invent brand facts or alter a reference product to create a story. |
+| 10 | **Palette, grade & reference** | A color *relationship* – complementary, analogous, near-monochrome with one saturated break, or split-tone – expressed in 4–6 real tones. A named film stock or grade. What tradition the frame belongs to. Then the negative list, last: no CGI look, no plastic or waxy skin, no beauty retouching, no over-sharpening, no HDR halos, no artificial symmetry beyond the intended composition, no malformed hands, no watermark or text unless requested. |
 
 ---
 
@@ -103,7 +119,7 @@ Distribute across planes. Include at least one thing that does not serve the pic
 - **Skin physics:** subsurface scattering through ears, nostrils and fingers held near light; sebum on the T-zone; specular sheen versus diffuse cheek
 - **No person in frame → Materials & surfaces:** substrate, finish, age, and how light behaves on each – anisotropic streaks on brushed metal, Fresnel falloff at grazing angles, contact shadow where objects touch, caustics through glass, weave and drape under gravity
 
-### Imperfections (block 8 – pull 5+, from three or more categories)
+### Imperfections (element 8 – use scene-appropriate texture)
 
 - **Skin:** visible pores, fine lines, uneven tone, stubble, flyaway hairs, chapped lips, sweat sheen at the hairline, sunburn on the neck
 - **Fabric:** wrinkles at the elbow, pilling, a loose thread, faded knees, a stain near the cuff, a collar sitting slightly wrong
@@ -112,7 +128,7 @@ Distribute across planes. Include at least one thing that does not serve the pic
 - **Optical:** slight motion blur on a moving hand, one blown highlight, chromatic fringing, sensor noise in the shadows, a smudge on the lens
 - **Environmental:** cable clutter, a coffee cup out of place, a wear pattern on the floor, mismatched chairs, a sticker peeling off a panel
 
-### Punctum (block 9 – exactly one)
+### Distinctive detail (element 9 – when it serves the brief)
 
 Not a flaw – a fact with a history. A child's drawing taped inside a service panel · a wedding ring over a work glove · one mismatched sock · a rosary on the rear-view mirror · a name scratched into a tool handle · a bandage on the wrong hand · a birthday card still standing on the shelf in March. It should be describable to someone else in one sentence, and it should be the thing they remember.
 

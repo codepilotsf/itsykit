@@ -1,6 +1,6 @@
 ---
 name: efficient-collaboration
-description: Run focused planning interviews and multi-step development collaboration with prepared question rounds, one clickable question at a time, batched documentation, and a clear finish line. Use when gathering requirements or coordinating sustained work; do not add an interview to a straightforward task.
+description: Run sustained requirements interviews with focused question rounds and batched documentation. Do not add an interview to a clear implementation request.
 ---
 
 # Efficient collaboration
@@ -20,7 +20,7 @@ Explicit user preferences and project requirements take precedence over these de
 - Ask only questions whose answers change the next meaningful decision. There is
   no question quota. A clear task needs no interview; a consequential unresolved
   product, creative or integration direction needs a choice before implementation.
-  Follow the decision rule in [core](../core/SKILL.md#ask-about-consequential-direction).
+  Follow the decision rule in [core](../core/SKILL.md#decisions-and-conversation).
 
 ## Prepare rounds, deliver one question at a time
 
