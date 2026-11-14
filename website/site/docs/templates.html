@@ -62,19 +62,7 @@ layout: /shop.layout.html
 
 <section id="page-details">
   <h2>Page titles and descriptions</h2>
-<p>Give each page a title for the browser tab and a description for search results and link previews. Put them in an ItsyWeb page settings comment at the very top of the HTML file, before any markup:</p>
-<pre tabindex="0" aria-label="Page settings in site/visit.html"><code class="language-markup">&lt;!-- itsy
-title: Visit the bookshop
-description: Find our opening hours and plan a visit to Little Bookshop.
---&gt;
-&lt;section&gt;
-  &lt;h1&gt;Visit the bookshop&lt;/h1&gt;
-&lt;/section&gt;</code></pre>
-<p>Write each setting as a single line of plain text, without quotation marks. You can include <code>layout</code> in the same comment when the page uses a custom layout.</p>
-<p>In <code>site/main.layout.html</code>, use these values in the document head:</p>
-<pre tabindex="0" aria-label="Use page metadata in a layout"><code class="language-markup">&lt;title&gt;&#123;page.title&#125; | &#123;app.site_name&#125;&lt;/title&gt;
-&lt;meta name="description" content="&#123;page.description&#125;"&gt;</code></pre>
-<p>The comment supplies the page's defaults. Titles and descriptions saved through on-page editing live in <code>itsy/snips.json</code> and take precedence when nonempty. If no title is set, ItsyWeb uses the page's URL to make one.</p>
+<p>Each route has a record under <code>pages</code> in <code>itsy/snips.json</code>. Set its <code>title</code> and <code>description</code>. Layouts read them with <code>&#123;page.title&#125;</code> and <code>&#123;page.description&#125;</code>.</p>
 <p>Ordinary page text can stay in HTML. Use <a href="/docs/editing">on-page editing</a> for content an admin should change.</p>
 </section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/styling">Continue to CSS and icons</a></nav>

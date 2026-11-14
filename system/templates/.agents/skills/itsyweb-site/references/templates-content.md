@@ -22,10 +22,7 @@ layout: /custom.layout.html
 ```
 
 Legacy `<!-- flea` blocks still work. Paths are site-relative `*.layout.html`
-files. The same comment supports single-line plain text `title` and `description`
-defaults without quotes. Nonempty route metadata in `itsy/snips.json` overrides
-these defaults; they are not extracted into JSON. Page metadata is not allowed
-in layouts or partials. Duplicate/unknown settings, nested layouts,
+files. Only `layout` is supported; duplicate/unknown settings, nested layouts,
 settings in partials and unsafe/missing layout paths fail validation.
 
 Partials are underscore-prefixed HTML files anywhere in `site/`.
@@ -37,9 +34,8 @@ missing/recursive includes fail even in unused partials. Preserve existing share
 markup; the starter keeps header/footer directly in its main layout.
 
 Public config globals use `{app.site_name}`. Developer-managed
-`itsy/data/home.json` uses `{data.home.title}`. Page settings and route metadata in
-`itsy/snips.json` supply `{page.title}` and `{page.description}`; `{page.path}`
-is the canonical route.
+`itsy/data/home.json` uses `{data.home.title}`. Route metadata in
+`itsy/snips.json` supplies `{page.title}`, `{page.description}` and `{page.path}`.
 This metadata works without editable snips. Values are contextually escaped.
 
 ```html

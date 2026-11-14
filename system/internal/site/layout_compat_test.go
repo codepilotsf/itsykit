@@ -102,9 +102,9 @@ func TestCurrentAndLegacySiteLayouts(t *testing.T) {
 
 func TestCurrentAndLegacyLayoutComments(t *testing.T) {
 	for _, name := range []string{"itsy", "flea"} {
-		body, options, err := pageSettings("index.html", "<!-- "+name+"\nlayout: /admin.layout.html\n-->\n<p>Body</p>")
-		if err != nil || options.Layout != "admin.layout.html" || !strings.Contains(body, "<p>Body</p>") {
-			t.Fatal(name, body, options, err)
+		body, layout, err := pageSettings("index.html", "<!-- "+name+"\nlayout: /admin.layout.html\n-->\n<p>Body</p>")
+		if err != nil || layout != "admin.layout.html" || !strings.Contains(body, "<p>Body</p>") {
+			t.Fatal(name, body, layout, err)
 		}
 	}
 }

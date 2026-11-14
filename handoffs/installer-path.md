@@ -5,7 +5,7 @@
 Make first-time setup as close as possible to one install command followed by
 `itsy new my-site`, without a separate `itsy version` step or routine manual
 PATH instructions in Getting Started. The owner asked to handle the installer
-fix in a separate thread. No installer change has been made in this docs task.
+fix in a separate thread. No installer change has been made in this docs task. Keep implementation in the separate framework thread.
 
 ## Confirmed current behavior
 
