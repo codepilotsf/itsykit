@@ -1,4 +1,4 @@
-# FleaCMS V1 final sprint
+# ItsyWeb V1 final sprint
 
 Agreed September 28, 2026. V1 is ready for other developers to download and use
 without Sean's help. Release when the checks pass, with no fixed deadline.
@@ -6,18 +6,28 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
-## Pending ItsyWeb rename release
+## ItsyWeb 0.21.0 rollout (November 14, 2026)
 
-The CLI uses `itsy`, with `flea update` as the only working old command. New sites
-use `itsy.config.json` and `itsy/`; old names remain supported without conversion.
-Before publication, assign the next minor version, sync the new installer to the
-website, and verify fresh installs and both updater steps on native Mac ARM64 and
-Linux AMD64. Verify protocol-28-to-29 server updates with existing site content,
-sessions and app storage preserved, then new-layout deployments and old-layout
-backup/pull/restore. Keep download URLs/artifact names and installed service paths
-stable. See [installation](../installation.md) and [release guidance](releasing.md).
+The Kirin CLI and shared server now run 0.21.0, with deployment protocol 29.
+The native Linux tests, race checks, vet, browser checks and bundled builds passed.
+Local projects use `itsy.config.json` and `itsy/`; existing names remain supported.
+Live content, recorded runtime/session state and host policies are preserved.
+See [the rollout receipt](release-0210-verification.md) for exact source, sites,
+checks and outstanding blockers.
 
-## Current release status (November 9, 2026)
+Finish native Mac ARM64 release verification before public publication. SSH to
+the online Mac currently times out; the public channel remains 0.20.5. Stage
+canonical `itsy-*` artifacts with byte-identical `flea-*` updater aliases, enable
+the canonical hosts' verified download catalogue, then deploy both website
+branches' installer/channel changes. Verify fresh install, reinstall, both old
+updater steps and already-current behavior on both native supported platforms.
+Do not overwrite historical version directories or rename installed services.
+
+Finish held site deployments after resolving Atlas's DNS mismatch, the owner's
+choice about unpublished local designs, Kent's differing admin config and Naves's
+missing source. Preserve current published behavior and access while pending.
+
+## Previous release status (November 9, 2026)
 
 Public 0.20.5 and normal Kirin/Mac CLIs use the approved navy-on-light branding.
 The public website has light header/footer/admin surfaces and matching icons.

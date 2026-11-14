@@ -11,6 +11,10 @@ run `itsy update-server` before deploying to an older server.
 
 ## Install
 
+The Kirin CLI and shared host run 0.21.0. Public publication is pending native Mac
+verification; the public channel still selects 0.20.5. See the
+[rollout status](docs/agents/release-0210-verification.md).
+
 ItsyWeb 0.21.0 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
 setup and installer packaging respect `TMPDIR`, with private scratch directories
 and actionable storage diagnostics. This version uses deployment protocol 29. CLI updates

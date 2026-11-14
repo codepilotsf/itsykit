@@ -2,6 +2,10 @@
 
 ## ItsyWeb 0.21.0 rename
 
+Kirin and the shared server are updated. Public 0.21.0 downloads and installer
+activation await native Mac verification. The public channel remains 0.20.5; see
+[rollout status](agents/release-0210-verification.md).
+
 Flea is now ItsyWeb, and the command is `itsy`. In the renamed CLI,
 `flea update` is the only working old command: it displays a prominent notice,
 verifies the update and installs `itsy` beside the old command. It also installs

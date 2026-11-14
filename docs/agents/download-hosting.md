@@ -31,7 +31,8 @@ The root is administrator-owned and read-only to the service. Use directories
 0755 and files 0644, no symlinks or hardlinked files. Group/world-writable
 directories and files are rejected. Never change published bytes in place.
 
-Limits: 128 versions, four platform binaries per version, 128 MiB per binary,
+Limits: 128 versions, eight distinct permitted binary names per version (four
+platform combinations under either prefix), 128 MiB per binary,
 8 KiB per manifest. These bound catalogue size and open handles without buffering
 binary contents. SHA-256 is verified with streaming reads at load. GET, HEAD and
 Range are supported through pinned handles; directories and unknown paths return

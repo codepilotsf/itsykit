@@ -2,6 +2,9 @@
 
 ## ItsyWeb 0.21.0 rollout
 
+The Kirin CLI and shared server are updated. Public publication is pending native
+Mac checks; see [the rollout receipt](release-0210-verification.md).
+
 Development builds produce `bin/itsy` and a retired `bin/flea` link. Canonical
 public artifacts are `itsy-darwin-arm64` and `itsy-linux-amd64`, hosted at
 `https://itsyweb.dev/releases/`. Stage byte-identical `flea-*` aliases alongside
