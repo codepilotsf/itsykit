@@ -1,6 +1,6 @@
 /* A focused introduction, with source / development / publishing on demand. */
 @layer styles {
-  .hero { background:var(--hero-bg); color:var(--hero-ink); padding-top:clamp(48px,7.5vw,112px); }
+  .hero { background:var(--hero-bg); background-image:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--brand-1) 65%,var(--hero-bg)) 0%,var(--hero-bg) 58%,var(--hero-terminal) 100%); color:var(--hero-ink); padding-top:clamp(48px,7.5vw,112px); }
   .hero-inner { --container-max:1200px; --container-padding:0 var(--page-gutter) clamp(56px,7.5vw,112px); margin-inline:auto; }
   .hero-copy { max-width:880px; margin-inline:auto; text-align:center; }
   .hero h1 { max-width:20ch; margin:0 auto; font-size:clamp(2.25rem,1.6rem + 3vw,4.5rem); font-weight:700; line-height:1.1; letter-spacing:-.035em; text-wrap:balance; }

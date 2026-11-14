@@ -64,7 +64,7 @@ The approved design uses the existing vector logo, Inter typography and navy/ice
 
 ## Colors
 
-Ice identifies the primary action on dark surfaces and the active project view. Navy supplies headings on pale and white grounds. Blue supplies reading links. Dark code uses the code surface, pane headers and code-border tokens; secondary text on navy uses `--hero-muted`. Use the existing CSS semantic tokens for forms and feedback.
+Ice identifies the primary action on dark surfaces and the active project view. Navy supplies headings on pale and white grounds. Blue supplies reading links. The hero has a static radial gradient: a blue/navy blend at the top center, easing through navy into the darker code color at the edges and bottom. Dark code uses the code surface, pane headers and code-border tokens; secondary text on navy uses `--hero-muted`. Use the existing CSS semantic tokens for forms and feedback.
 
 ## Typography
 
