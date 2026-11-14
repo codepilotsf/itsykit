@@ -50,6 +50,14 @@ srcset/picture/source elements for a media snip. Local JPEG/PNG and optimized
 H.264 MP4 seeds are imported by dev. Do not invent IDs. Admins click media in
 Edit mode and use the same page Save/Cancel. No Photos/Videos library buttons.
 
+At task start, read [.agents/skills/core/SKILL.md](.agents/skills/core/SKILL.md) once.
+For site authoring, read [itsyweb-site](.agents/skills/itsyweb-site/SKILL.md).
+Read [Prewind](.agents/skills/prewind/SKILL.md) for styling,
+[design](.agents/skills/design/SKILL.md) for visual/UX work,
+[copywriting](.agents/skills/copywriting/SKILL.md) for copy and
+[task-delivery](.agents/skills/task-delivery/SKILL.md) for checks and Git delivery.
+Use only runtime-discovered global Impeccable; keep its installation outside this site.
+
 ## Available skills
 
 For requests like "add a blog" or "let's create a blog", read

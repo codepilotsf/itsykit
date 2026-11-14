@@ -39,5 +39,5 @@ and unintended overrides. Verify responsive rendering and interactions in the
 browser; source inspection alone does not establish visual correctness.
 
 This skill does not choose Simple Form, Zjax, a frontend build step or stylesheet
-paths. Load the installed Flea CMS or Preflight authoring skill when applicable;
+paths. Load the installed ItsyWeb or Preflight authoring skill when applicable;
 use the design skill when visual direction or UX decisions are part of the task.
