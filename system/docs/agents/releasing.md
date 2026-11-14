@@ -8,6 +8,16 @@ CP Git hosts source and has no automatic release pipeline; native release checks
 and explicit publication remain required. Historical release tags retain their
 original layouts and must not be moved or recreated.
 
+## ItsyWeb 0.22.0 rollout
+
+Version 0.22.0 removes the page CMS and adds comment metadata, requiring deployment
+protocol 30. Existing page-CMS sites are incompatible: back up and explicitly
+convert their saved content into ordinary HTML/JSON and comment metadata before
+upgrading. Preserve Blog posts/media, runtime state and host policies. The normal
+upgrader rejects incompatible sites; it does not migrate them. Shared hosts need
+a coordinated, validated cutover with paired executable/configuration rollback.
+See [the 0.22.0 receipt](release-0220-verification.md) for actual release evidence.
+
 ## ItsyWeb 0.21.0 rollout
 
 Public 0.21.0, both native CLIs and the shared server are updated. All native
@@ -25,10 +35,9 @@ From a pre-rename CLI, the first `flea update` installs the transition binary;
 a second `flea update` installs `itsy`. Verify both steps, installer aliases,
 and the strong notice on both native supported platforms before publication.
 
-New sites use `itsy.config.json` and `itsy/`, with explicit legacy aliases;
-protocol 29 is required. Validate the protocol-28 server upgrade against old
-site files, sessions, custom-app storage and both toolbar initializers. Upgrade
-the server before deploying renamed sites or enabling canonical downloads.
+The 0.21.0 rollout introduced `itsy.config.json` and `itsy/` with explicit legacy
+aliases and protocol 29. Its historical validation covered old site files, sessions,
+custom-app storage and the then-supported toolbar initializers.
 Publish verified artifacts before advancing either website's latest.txt or
 installer. Native Mac checks remain required even when the Linux server and
 local site conversions are ready. Existing release receipts below retain

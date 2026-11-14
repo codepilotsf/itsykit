@@ -6,6 +6,8 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+## 0.22.0 - 2026-11-14
+
 - Remove the page CMS, snips/extraction, collections and page media/metadata editing.
   Keep Blog posts, rich admin editing, cover uploads and content preservation.
 - Add title/description defaults in leading HTML settings comments; comments own

@@ -7,10 +7,10 @@ Flea is now ItsyWeb. Use `itsy` for all commands. Existing Flea users can run
 commands show the rename notice and stop.
 New sites use `itsy.config.json` and `itsy/`. Existing `.flea.config.json`
 and `flea/` continue working, with no conversion. Installed server paths stay
-compatible. This source candidate removes the page CMS and adds comment metadata;
-those changes require protocol 30 and are unreleased. Published installations need
-a separately authorized release/server upgrade and explicit source conversion.
-The installer and published release receipts are unchanged.
+compatible. Version 0.22.0 removes the page CMS and adds comment metadata.
+It requires protocol 30. Existing page-CMS sites must be explicitly converted
+with verified backups before upgrading their shared server; there is no automatic
+conversion. Blog posts, cover photos and ordinary source CSS remain supported.
 
 ## Source layout
 
@@ -21,12 +21,13 @@ The parent [README](../README.md) describes the repository layout and CP Git rem
 
 ## Install
 
-ItsyWeb 0.21.0 is published. Native Mac/Linux installation and update checks
-passed; see [release verification](docs/agents/release-0210-verification.md).
+ItsyWeb 0.22.0 is the current release. See
+[release verification](docs/agents/release-0220-verification.md) for publication
+and native Mac/Linux checks.
 
-ItsyWeb 0.21.0 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
+ItsyWeb 0.22.0 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
 setup and installer packaging respect `TMPDIR`, with private scratch directories
-and actionable storage diagnostics. This version uses deployment protocol 29. CLI updates
+and actionable storage diagnostics. This version uses deployment protocol 30. CLI updates
 and server updates are separate operations. App wire protocol
 remains 2. The Mac binary is ad-hoc signed, not notarized; clean-Mac and real-email
 acceptance remain unverified. Both CLIs bundle x86-64 and cross-compiled ARM64
