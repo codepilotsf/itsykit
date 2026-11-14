@@ -48,7 +48,7 @@ func serverIndexing(ctx context.Context, target, domain, mode string, in io.Read
 		if mode == "noindex" {
 			fmt.Fprintln(out, "Responses will send X-Robots-Tag: noindex, nofollow. Keep robots.txt crawlable so crawlers can discover it.")
 		} else {
-			fmt.Fprintln(out, "Flea will add no indexing restriction. Owner-authored headers and meta tags still apply.")
+			fmt.Fprintln(out, "ItsyWeb will add no indexing restriction. Owner-authored headers and meta tags still apply.")
 		}
 		fmt.Fprintln(out, "This restarts the shared service; other sites are briefly unavailable.")
 		answer, err := ask(ctx, in, out, "Type the hostname to confirm", "")
@@ -68,7 +68,7 @@ func serverIndexing(ctx context.Context, target, domain, mode string, in io.Read
 		// Fetch the new effective policy and any crawl-block diagnostic.
 		updated, err := fetchSites(ctx, r)
 		if err != nil {
-			return fmt.Errorf("policy updated, but inspection failed: %w; run flea server list", err)
+			return fmt.Errorf("policy updated, but inspection failed: %w; run itsy server list", err)
 		}
 		for _, item := range updated {
 			if item.Name == info.Name {

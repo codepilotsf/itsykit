@@ -10,7 +10,7 @@ case "$VERSION_ID" in 22.04|24.04|26.04) ;; *) echo "Unsupported Ubuntu release.
 test -d /run/systemd/system
 command -v ss >/dev/null || { echo "The ss command (iproute2) is required for the port check." >&2; exit 1; }
 # Check every IPv4/IPv6 TCP and UDP listener, including HTTPS/QUIC. Only the
-# systemd main process with the installed FleaCMS executable may be exempted.
+# systemd main process with the installed ItsyWeb executable may be exempted.
 check_web_ports() {
   allowed_pid=0
   if test "${1:-}" = --reinstall; then
@@ -35,7 +35,7 @@ check_web_ports() {
       fi
       for pid in $pids; do
         if test "$allowed_pid" = 0 || test "$pid" != "$allowed_pid"; then
-          echo "Another service is using port 80 or 443. Stop it before running FleaCMS setup." >&2
+          echo "Another service is using port 80 or 443. Stop it before running ItsyWeb setup." >&2
           exit 1
         fi
       done
@@ -71,7 +71,7 @@ if test "${2:-}" = --reinstall; then
   systemctl daemon-reload
   reuse_account=1
 fi
-# Recheck after stopping FleaCMS, before installing replacement files.
+# Recheck after stopping ItsyWeb, before installing replacement files.
 check_web_ports
 
 # Setup is deliberately a first-install operation. Never replace existing data,
@@ -141,4 +141,4 @@ until /usr/local/bin/flea-server -config /etc/flea/server.json -check >/dev/null
 done
 systemctl is-active --quiet flea.service
 success=1
-echo "FleaCMS service installed and ready."
+echo "ItsyWeb service installed and ready."

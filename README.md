@@ -1,10 +1,14 @@
-# FleaCMS
+# ItsyWeb
 
-<img src="docs/branding/logo.svg" alt="FleaCMS" width="249" height="60">
+<img src="docs/branding/logo.svg" alt="ItsyWeb" width="249" height="54">
+
+Flea is now ItsyWeb. Use `itsy` for all commands. Run `flea update` to
+install the new command; other `flea` commands show the rename notice and stop.
+Existing site files and server installations keep their current paths.
 
 ## Install
 
-FleaCMS 0.20.5 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
+ItsyWeb 0.20.5 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
 setup and installer packaging respect `TMPDIR`, with private scratch directories
 and actionable storage diagnostics. Deployment protocol remains 28; CLI updates
 and server updates are separate operations. App wire protocol
@@ -31,18 +35,18 @@ PATH instructions. See [installation and updates](docs/installation.md).
 ## Create your first site
 
 ```sh
-flea new foobar
+itsy new foobar
 cd foobar
-flea dev
+itsy dev
 ```
 
-To create a site in the current empty directory, run `flea new .`. You can also
-pass a relative or absolute directory path, such as `flea new ./foobar`. Flea
+To create a site in the current empty directory, run `itsy new .`. You can also
+pass a relative or absolute directory path, such as `itsy new ./foobar`. ItsyWeb
 creates the directory if missing; an existing directory must be completely empty,
 including hidden files. The folder name still supplies the default site name,
-which you can change when `flea dev` first asks for it.
+which you can change when `itsy dev` first asks for it.
 
-FleaCMS is a small website server for people who like HTML and CSS. Sites stay in
+ItsyWeb is a small website server for people who like HTML and CSS. Sites stay in
 ordinary files, with browser-editable content and Git-based deployment to Ubuntu.
 No Node, Docker, database, or separate web server is needed.
 
@@ -52,8 +56,8 @@ styling, and admin/email support files. No demo pages or contact configuration.
 Want examples to work from?
 
 ```sh
-flea new --starter foobar
-# Short form: flea new -s foobar
+itsy new --starter foobar
+# Short form: itsy new -s foobar
 ```
 
 The starter adds Team and Contact navigation, six fictional team members with
@@ -65,10 +69,10 @@ page keeps its own minimal styles so it works without site assets.
 
 ## Start fresh
 
-Run `flea reset` from a site folder to return to the clean default. It asks before
+Run `itsy reset` from a site folder to return to the clean default. It asks before
 replacing **all local files and settings except `.git`**, including uploads,
 custom pages, `.env`, admin access, theme changes and deployment destinations.
-Stop `flea dev` first. Git history is retained, but reset does not create a commit.
+Stop `itsy dev` first. Git history is retained, but reset does not create a commit.
 
 Old files are moved to a private `.flea-reset-backup-*` folder beside the site;
 the command prints its location. Keep it safe: it may contain credentials and
@@ -78,27 +82,27 @@ printed backup before trying again; some original files may still be in the site
 
 ## Develop locally
 
-On first startup in a terminal, Flea asks for the site name and an optional admin
+On first startup in a terminal, ItsyWeb asks for the site name and an optional admin
 email. Press Enter to skip the admin. New sites enable `dev.email_preview` in
 `.flea.config.json`: sign-in and contact emails open in your browser instead of
 being sent. No Resend setup is needed. The preview shows the sender, recipient,
 subject, date/time and actual message, including a usable sign-in code.
-Automated runs never prompt. Use `flea admin` to add an admin later.
+Automated runs never prompt. Use `itsy admin` to add an admin later.
 
-Running `flea dev` again gracefully replaces this site's existing dev server,
+Running `itsy dev` again gracefully replaces this site's existing dev server,
 including when switching to `--lan` / `-l` or changing ports. The new command
 waits for the old server to stop before opening the site. Pull and reset still
 block dev while they work. Dev servers started with an older binary need to be
 stopped in their terminal once before using automatic replacement.
 
 Set `"dev": {"email_preview": false}` and restart dev to test real delivery;
-configure it explicitly with `flea email`. Production always uses real delivery
+configure it explicitly with `itsy email`. Production always uses real delivery
 and ignores this toggle. See [email previews](docs/email-templates.md) for details.
 
 Open the Website URL printed in the console, edit `site/index.html`, and save.
-Dev starts at port 3000. If another process occupies it, Flea explains the
+Dev starts at port 3000. If another process occupies it, ItsyWeb explains the
 conflict and tries 3001, 3002 and so on until it binds an available port.
-Use `flea dev --port 4000` to require a specific port, or `--port 0` to let the
+Use `itsy dev --port 4000` to require a specific port, or `--port 0` to let the
 operating system choose one. Your browser reloads
 automatically. Change the welcome text in `flea/snips.json`, or give the site
 your own colors and fonts in `site/css/theme.css`. Press Ctrl-C to stop the server.
@@ -108,11 +112,11 @@ mode when there are no unsaved changes. Drafts and open dialogs
 pause reloads so they are not lost. Cancel a draft to accept pending source changes.
 
 To test from a phone or another computer on the same trusted network, run
-`flea dev --lan` (or `flea dev -l`). Open a printed Network or Hostname URL on that device, such as
+`itsy dev --lan` (or `itsy dev -l`). Open a printed Network or Hostname URL on that device, such as
 `http://devbox:3000` or `http://devbox.local:3000` when that name resolves to this
 computer. Sign-in, editing, uploads, forms, reloads and dev diagnostics work
 there too. Each device signs in separately. Email previews still open on the
-computer running Flea; enter that code on your other device. To share a private
+computer running ItsyWeb; enter that code on your other device. To share a private
 preview, replace its `127.0.0.1` host with a printed network IP, keeping the port
 and random path. Never share preview links with anyone you do not trust.
 
@@ -130,17 +134,17 @@ Run these from your site's folder:
 
 | Command | What it does |
 | --- | --- |
-| `flea dev` | Preview your site with browser reloads, starting at port 3000. |
-| `flea dev -port 8080` | Preview on a different port. |
-| `flea status` | Show local validation and Git state, then compare the current branch with its saved deployment. |
-| `flea reset` | Reset the local site to the clean default after confirmation, keeping a private backup. |
-| `flea deploy` | Configure the current branch's destination, then publish its committed files. |
-| `flea deploy -configure` | Change that branch's saved deployment settings and deploy. |
-| `flea https` | Enable HTTPS for an already deployed site. |
-| `flea version` | Show the installed version. |
+| `itsy dev` | Preview your site with browser reloads, starting at port 3000. |
+| `itsy dev -port 8080` | Preview on a different port. |
+| `itsy status` | Show local validation and Git state, then compare the current branch with its saved deployment. |
+| `itsy reset` | Reset the local site to the clean default after confirmation, keeping a private backup. |
+| `itsy deploy` | Configure the current branch's destination, then publish its committed files. |
+| `itsy deploy -configure` | Change that branch's saved deployment settings and deploy. |
+| `itsy https` | Enable HTTPS for an already deployed site. |
+| `itsy version` | Show the installed version. |
 
 The preview server is local to your machine. Use `-port 0` to choose an available
-port automatically. `flea status` prints local validation, page/asset/editable-area
+port automatically. `itsy status` prints local validation, page/asset/editable-area
 counts and Git state first. If the current branch has a saved destination, it then
 checks the remote over native SSH automatically. There is no remote flag. It shows
 website reachability, deployed commit, editable content separately; styles travel with code.
@@ -148,7 +152,7 @@ A terminal shows a spinner while checking; redirected output uses a plain progre
 line. Remote checks have a one-minute deadline and use the usual SSH/sudo credentials.
 
 Content changes are classified as local, remote or conflicting only
-when a previous `flea pull` recorded a baseline for that exact destination and
+when a previous `itsy pull` recorded a baseline for that exact destination and
 scope. Otherwise, status reports differences with unknown direction. Content
 comparison includes active editable areas, page metadata, collections and media
 libraries; developer labels and retained archives are excluded. Status never
@@ -175,11 +179,11 @@ Deployment
   Code         Matches latest local commit
   Content      0 local, 3 remote, 0 conflicting changes
 
-Next: run flea pull to review content differences.
+Next: run itsy pull to review content differences.
 ```
 
-`flea new my-site` creates a Git repository on `main` with an `Initial site`
-commit, ready to push. Use `flea new my-site --skip-git` if the site belongs in
+`itsy new my-site` creates a Git repository on `main` with an `Initial site`
+commit, ready to push. Use `itsy new my-site --skip-git` if the site belongs in
 an existing repository. Git isn't required for local previews, but it is required to deploy.
 
 Start with [project structure](#project-structure) and [templates](#templates)
@@ -299,7 +303,7 @@ disable the effect. Browsers without cross-document transitions navigate normall
 The starter links `css/navigation.css` directly in the layout head, before the
 general stylesheet. A small native-CSS opt-in in each layout head makes it
 available before external styles finish loading, including the reduced-motion
-opt-out. Animation styling stays in ordinary editable site CSS; Flea does not
+opt-out. Animation styling stays in ordinary editable site CSS; ItsyWeb does not
 inject transitions or require npm.
 This affects link navigation, not the automatic dev refresh after saving a file.
 
@@ -325,11 +329,11 @@ Values and conditions accept dotted paths only. Missing values render empty. Mis
 
 `{snip a7Km2pQ9xB}` renders sanitized rich HTML from `flea/snips.json`, only in HTML element content. Ordinary dotted-path values remain contextually escaped, including attributes and URLs. Legacy `{snip notice}` still reads the escaped `text` field from `flea/snips/notice.json`; legacy structured snips remain supported during migration. JSON content is never parsed as template syntax. There is no unrestricted raw-HTML directive.
 
-There are no expressions, comparisons, functions, filters, array indexes, or arbitrary code execution. Ordinary literal braces and JSON are preserved; see the recognition rules below. Script/style bodies and their opening tags are left untouched by the FleaCMS parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; snip JSON is treated as data.
+There are no expressions, comparisons, functions, filters, array indexes, or arbitrary code execution. Ordinary literal braces and JSON are preserved; see the recognition rules below. Script/style bodies and their opening tags are left untouched by the ItsyWeb parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; snip JSON is treated as data.
 
 ### Literal braces and syntax recognition
 
-Flea recognizes exact command words (`snip`, `icon`, `render`, `slot`, `csrf`,
+ItsyWeb recognizes exact command words (`snip`, `icon`, `render`, `slot`, `csrf`,
 `#if`, `#unless`, `#each`, `#multisnip`, `:else` and their closing commands),
 followed by whitespace, a brace or the end of input. Recognizable commands retain
 argument, nesting and file/line validation. The retired `flea` command remains
@@ -347,9 +351,9 @@ Unclosed dotted paths, active aliases and recognized commands are errors; an unc
 bare word is literal.
 
 Other brace groups remain literal in ordinary template text and attributes:
-`Use { and } to group items.`, `{}`, `{not a Flea expression}`, `{1, 2, {3, 4}}`
+`Use { and } to group items.`, `{}`, `{not a ItsyWeb expression}`, `{1, 2, {3, 4}}`
 and raw JSON need no brace encoding. A balanced literal group is copied as a
-whole, with nested braces, quoted strings and backslash escapes; Flea-looking
+whole, with nested braces, quoted strings and backslash escapes; ItsyWeb-looking
 sequences inside it are inert. For example,
 `data-params='{"value":"{app.site_name}"}'` keeps that JSON string unchanged.
 Single/double quotes and HTML-encoded quotes protect braces inside strings.
@@ -359,7 +363,7 @@ A balanced outer literal group takes precedence over any directives inside it.
 Square brackets alone do not form a literal brace group: `["{app.site_name}"]`
 contains a standalone expression. Encode its braces if that exact string is data.
 
-To display exact Flea syntax literally, use HTML entities:
+To display exact ItsyWeb syntax literally, use HTML entities:
 `&#123;app.site_name&#125;`. Entities are never decoded and recompiled as commands.
 Literal source is copied without changing bytes; Go `html/template` retains its
 normal contextual escaping and HTML normalization. JSON/content values are never
@@ -407,10 +411,10 @@ Ordinary pages do not create visitor cookies.
 The bundled Contact app uses this directive. Configure its mount under
 `apps.contact`; form values and feedback use `contact.data.*`,
 `contact.invalid.*`, `contact.error` and `contact.flash.*`. Admin CSRF fields
-remain unchanged. Flea is not a general form handler, but you can register a
+remain unchanged. ItsyWeb is not a general form handler, but you can register a
 managed local app under `apps.<name>` with a validated package at
 `flea/apps/<name>/`; it can own its own sessions. See
-[Flea apps](docs/apps.md) for the model, the exact request and response JSON,
+[ItsyWeb apps](docs/apps.md) for the model, the exact request and response JSON,
 custom packages and app-owned sessions, and
 [Contact](apps/contact/README.md) for the included app's operational contract.
 
@@ -436,10 +440,10 @@ renamed explicitly; there is no compatibility layer. Keep IDs and saved content
 unchanged. The CLI, `flea.config.json`, and `<!-- flea` settings comments retain
 their names.
 
-While `flea dev` is running, add an editable region to a template:
+While `itsy dev` is running, add an editable region to a template:
 
 ```html
-<h1 snip>Welcome to <em>FleaCMS</em></h1>
+<h1 snip>Welcome to <em>ItsyWeb</em></h1>
 ```
 
 On save, dev extracts the inner HTML and rewrites only that region:
@@ -487,7 +491,7 @@ Private `flea/snips.json` stores rich content, typed media and page metadata:
       "description": "Welcome to our site.",
       "snips": {
         "a7Km2pQ9xB": {
-          "content": "Welcome to <em>FleaCMS</em>"
+          "content": "Welcome to <em>ItsyWeb</em>"
         }
       }
     }
@@ -505,7 +509,7 @@ cannot appear in attributes, script/style interpolation, textarea, title, or
 select contexts. Ordinary `{data.name.field}` values remain escaped text.
 
 New text regions must have explicit balanced closing tags, cannot nest, and cannot
-contain FleaCMS directives. Use HTML entities for literal braces during initial
+contain ItsyWeb directives. Use HTML entities for literal braces during initial
 extraction. Existing JSON content can contain braces: it is never template code.
 Snip files are limited to 5 MiB and each rich content value to 1 MiB.
 
@@ -542,7 +546,7 @@ structure described above; no old filename or directory fallback is supported.
 ```json
 {
   "app": {
-    "site_name": "FleaCMS",
+    "site_name": "ItsyWeb",
     "email": "hello@example.com"
   }
 }
@@ -559,7 +563,7 @@ structured files stay in `data.*`; admin configuration is not exposed through `a
 
 New sites start with an empty `app` object. Until a name is saved, the folder name
 supplies its title-cased default (`my-project` becomes `My Project`). The first
-interactive `flea dev` asks `Site name [My Project]:`; Enter accepts the default.
+interactive `itsy dev` asks `Site name [My Project]:`; Enter accepts the default.
 It saves `app.site_name` and does not ask again. Noninteractive dev uses the default
 without writing or prompting. Set and commit a nonempty name before deployment.
 There is no `site.*` alias or old-configuration fallback.
@@ -583,7 +587,7 @@ bar to change the current page. Page details edits its title and description,
 including pages with no editable text. There is no sidebar or page dropdown.
 
 New sites include editable `admin/index.html`, `code.html`,
-`setup.html`, and `error.html`. These are ordinary Flea HTML templates using
+`setup.html`, and `error.html`. These are ordinary ItsyWeb HTML templates using
 `admin.layout.html`, with a full-width header, no footer, and independently
 styled sign-in forms. Your public `main.layout.html` is separate.
 Existing sites need the admin templates, admin layout, and updated styles copied
@@ -600,10 +604,10 @@ Layout navigation that requires JavaScript will not run on admin pages.
 Use `Referrer-Policy: same-origin` for admin forms; `no-referrer` can cause
 browsers to omit their origin and fail the exact-origin security check.
 
-From your site's folder, run `flea admin` and enter an email, or provide it directly:
+From your site's folder, run `itsy admin` and enter an email, or provide it directly:
 
 ```sh
-flea admin admin@example.com
+itsy admin admin@example.com
 ```
 
 This creates or appends to `admin.emails` in `.flea.config.json`, preserves other
@@ -634,7 +638,7 @@ list automatically. Removed admins lose access; other admins stay signed in.
 Access or email-setting changes clear pending codes, not valid sessions.
 Commit and deploy for the live site.
 
-After login, Flea returns you to the homepage with an admin bar. Choose **Edit**
+After login, ItsyWeb returns you to the homepage with an admin bar. Choose **Edit**
 to change the page's existing `snip` regions. Prose containers support
 H1–H4, bold, italic, underline, strikethrough, links, lists, and left/center/right
 alignment; individual headings and paragraphs support inline marks and links,
@@ -658,7 +662,7 @@ Reusable toggle styling is in `css/ui.css`: use a native checkbox with
 need no JavaScript.
 
 After deploying, share your site's URL with `/admin` added, along with the email
-address you approved. Flea does not send invitations. Admins do not create a
+address you approved. ItsyWeb does not send invitations. Admins do not create a
 separate account: they enter that email and request a sign-in code. If no email
 arrives, they should check spam and ask you to check access and delivery settings.
 
@@ -682,7 +686,7 @@ hidden tab does not keep a session alive. Each browser/device has its own sessio
 Changing this setting applies automatically in dev and on deployment in production;
 a shorter window also applies to existing sessions.
 
-Flea manages one private JSON file per site:
+ItsyWeb manages one private JSON file per site:
 
 - Development: `<project>/flea/runtime/sessions.json`
 - Production: `/var/lib/flea/sites/<site>/flea/runtime/sessions.json`, outside releases
@@ -690,7 +694,7 @@ Flea manages one private JSON file per site:
 These are independent local and live sessions, not files to copy between environments.
 The file contains hashed session tokens, admin addresses, host binding, CSRF values,
 and activity/expiration timestamps. Raw login tokens stay in browser cookies.
-Flea creates it on first sign-in with owner-only permissions, locks updates, and
+ItsyWeb creates it on first sign-in with owner-only permissions, locks updates, and
 saves atomically. Expired or revoked entries are removed during use/startup.
 Malformed or unwritable session storage blocks sign-in rather than resetting it.
 Pending email codes are held only in memory and expire on restart.
@@ -748,7 +752,7 @@ the external editor script; other site scripts and inline scripts remain blocked
 
 Existing sites must add these blocks and copy `admin/_toolbar.html` from the
 starter. For transitions, copy `css/navigation.css` and link it in your layout head.
-Flea never rewrites your customized layout or provides an implicit fallback.
+ItsyWeb never rewrites your customized layout or provides an implicit fallback.
 
 Edit content directly on the page. Spans and CSS classes on supported content tags
 are preserved, including `<span class="text-brand-one">Brand text</span>`.
@@ -771,11 +775,11 @@ Resend is the only implemented provider. The code uses its
 small provider-neutral `mailer.Sender` interface, without adding a provider SDK.
 Use a sending API key and a sender address from a verified domain in your Resend account.
 
-On deployment of an admin-enabled or contact-enabled site, FleaCMS checks the
+On deployment of an admin-enabled or contact-enabled site, ItsyWeb checks the
 server's mail settings. If missing, it uses local `.env` settings, with shell
 variables taking precedence, and prompts for any missing key or address. The
 sender name is included when configured. Existing server mail settings are not
-overwritten by `flea email`. Subsequent
+overwritten by `itsy email`. Subsequent
 deployments reuse them. Settings are shared across sites on that server and stored
 in `/etc/flea/mail.env` (root-owned, mode 0600), outside site archives and Git.
 systemd reads that file and passes the values to the unprivileged service. The key
@@ -786,7 +790,7 @@ leave a mode-0600 file in its mode-0700 `/tmp/flea-mail.*` directory.
 From your site folder, run:
 
 ```sh
-flea email
+itsy email
 ```
 
 The wizard asks for a masked Resend API key, a sender name (such as MySite
@@ -861,18 +865,18 @@ An optional `email.from` overrides the server's default sender. Visitor email
 is Reply-To only. Remove the app entry to disable it.
 
 Local `dev.email_preview` opens messages without sending. For real local mail,
-disable preview and run `flea email`. Restart dev after app/email changes.
+disable preview and run `itsy email`. Restart dev after app/email changes.
 Production requires HTTPS and Resend. Site-owned HTML/text email templates
 remain private in `mailers/`. Provider acceptance is not a delivery guarantee.
 
-Flea bundles and starts Contact on a private OS-assigned port; no compiler or
+ItsyWeb bundles and starts Contact on a private OS-assigned port; no compiler or
 port configuration is needed on the VPS. Ordinary form submissions are converted
-to authenticated JSON requests. Email credentials stay in Flea, not the child
+to authenticated JSON requests. Email credentials stay in ItsyWeb, not the child
 or browser. Contact has no database, queue, uploads or automatic replies.
 Invalid requests, delivery failures and unavailable apps do not retry a POST.
 
 See the [Contact README](apps/contact/README.md) for form markup, field rules,
-JSON responses, flash, limits and process behavior, [Flea apps](docs/apps.md)
+JSON responses, flash, limits and process behavior, [ItsyWeb apps](docs/apps.md)
 for the general model, the full app JSON contract, custom managed packages and
 app-owned sessions, and
 [email templates](docs/email-templates.md) for message customization.
@@ -914,8 +918,8 @@ embedded from `templates/site/css/` into the executable when built.
 The full starter lives in `templates/`, mirroring a generated site's structure:
 edit `templates/site/*.html` for markup, `templates/site/css/` for styles,
 `templates/site/images/` for assets, and `templates/flea/` for JSON defaults.
-`templates/README.md` is the generated site's readme. Rebuild FleaCMS after
-editing these files. They are embedded in the executable, so `flea new`
+`templates/README.md` is the generated site's readme. Rebuild ItsyWeb after
+editing these files. They are embedded in the executable, so `itsy new`
 works from any directory without access to this repository. The embedding
 includes private *.layout.html files, error pages, and root .flea.config.json.
 
@@ -932,7 +936,7 @@ Use literal lowercase Lucide names directly in templates, layouts, and partials:
 {/each}
 ```
 
-Before serving, `flea dev` downloads the icons you've used from the pinned
+Before serving, `itsy dev` downloads the icons you've used from the pinned
 `lucide-static@1.47.0` package
 on unpkg. It stores them directly as `flea/icons/search.svg`, for example.
 New sites include `.keep` so the directory stays in Git. Each SVG contains the
@@ -943,7 +947,7 @@ the server renders cached geometry as inline SVG. Keep the cached SVG files
 in version control for reproducible, offline use. Unused cached files are retained.
 Deploy uses the same resolver before packaging; no standalone site build command exists.
 
-`flea status` remains read-only. It checks the branch's configured remote but
+`itsy status` remains read-only. It checks the branch's configured remote but
 never fetches missing icons. Missing icons are warnings, not local validation
 failures; unavailable configured remotes still produce a failed status check.
 Missing icons and failed downloads render nothing in their place;
@@ -1022,7 +1026,7 @@ query-specific rules. POST and other mutation requests are never redirected by
 these rules.
 
 Destinations must be existing public pages or assets on this site, including
-published Blog posts. They may include a query or fragment. Flea preserves the
+published Blog posts. They may include a query or fragment. ItsyWeb preserves the
 incoming query unless the destination supplies one; a destination ending in `?`
 explicitly clears it. External URLs, private/internal paths, self redirects,
 chains, loops and sources that shadow existing pages/assets or managed app
@@ -1030,7 +1034,7 @@ subtrees fail validation. Former Blog slugs may be explicit sources; slug change
 do not add rules automatically. Removing a destination requires updating its
 redirects in the same change.
 
-Run `flea status`, then check each old URL locally without following redirects
+Run `itsy status`, then check each old URL locally without following redirects
 and confirm its `Location` leads directly to the intended content. The shared
 `fleacms-site` skill can inventory the original website and prepare these mappings;
 the bundled `import-brochure` skill includes this step for imports. A crawl cannot
@@ -1047,10 +1051,10 @@ host-level 308 responses.
 
 ## Search discovery and SEO
 
-FleaCMS 0.20.0 can generate a sitemap, advertise it in robots.txt and add missing
+ItsyWeb 0.20.0 can generate a sitemap, advertise it in robots.txt and add missing
 canonical tags. A canonical tag identifies the preferred address of a page.
-Update your local CLI with `flea update`. If an existing server runs an older
-version, run `flea update-server` from a site with that server saved as its current
+Update your local CLI with `itsy update`. If an existing server runs an older
+version, run `itsy update-server` from a site with that server saved as its current
 branch's destination. Server updates briefly restart every site on that host;
 deploying website files alone does not update the server software.
 
@@ -1068,13 +1072,13 @@ address even during local development or staging. `exclude` is optional; replace
 `/receipt` with an existing page you want kept out of search. Each entry matches
 one exact path, without a wildcard, query or trailing slash.
 
-Run `flea status`, then `flea dev`. At the address printed by dev, open
+Run `itsy status`, then `itsy dev`. At the address printed by dev, open
 `/sitemap.xml` and `/robots.txt`. View a public page's source to check its canonical
 tag; an excluded page should still load and return `X-Robots-Tag: noindex`.
-Commit the reviewed configuration and run `flea deploy` from the intended branch,
+Commit the reviewed configuration and run `itsy deploy` from the intended branch,
 then repeat those checks on the production domain.
 
-Flea generates
+ItsyWeb generates
 `/sitemap.xml` from public pages and published blog posts, advertises it in a
 generated `/robots.txt`, and adds missing canonical tags to public HTML responses.
 HTML fragments use an HTTP canonical Link header. Excluded pages stay accessible,
@@ -1127,7 +1131,7 @@ are intended for small local sites, not large media libraries.
 ## Deploy a site
 
 Local deployment and setup scratch directories follow Go's standard temporary
-directory selection, including `TMPDIR` on Linux and macOS. Flea creates a private,
+directory selection, including `TMPDIR` on Linux and macOS. ItsyWeb creates a private,
 unique directory for each invocation and removes it on completion, ordinary
 failure and handled cancellation. An invalid explicit `TMPDIR` fails without
 falling back elsewhere.
@@ -1141,7 +1145,7 @@ disk-backed scratch space (check that `/var/tmp` is disk-backed first):
   trap 'rm -rf -- "$scratch"' EXIT
   trap 'exit 130' INT
   trap 'exit 143' TERM
-  TMPDIR="$scratch" flea deploy
+  TMPDIR="$scratch" itsy deploy
 )
 ```
 
@@ -1151,7 +1155,7 @@ for builds, persistent artifacts and cleanup limits.
 ### Snip synchronization
 
 Commit `flea/snips.json` with your site. It seeds the first deployment. Subsequent
-plain `flea deploy` preserves existing live snips and page metadata while publishing
+plain `itsy deploy` preserves existing live snips and page metadata while publishing
 committed templates, assets, configuration and CSS, including `site/css/theme.css`.
 Keep snip IDs stable. Removed IDs are archived; incompatible rich content fails
 validation rather than being stripped.
@@ -1159,7 +1163,7 @@ validation rather than being stripped.
 Before local content work, stop dev and run:
 
 ```sh
-flea pull
+itsy pull
 ```
 
 Pull retrieves snips and referenced media from the current branch's destination.
@@ -1170,7 +1174,7 @@ result afterward. Dev and pull cannot run together on the same project.
 To intentionally publish local snip/metadata changes:
 
 ```sh
-flea deploy --with-snips
+itsy deploy --with-snips
 ```
 
 Existing deployments require a pull baseline, stored privately in Git metadata
@@ -1199,10 +1203,10 @@ to include the bundled servers needed by setup.
 From your site's folder, on the branch you want to publish, run:
 
 ```sh
-flea deploy
+itsy deploy
 ```
 
-On first use for each branch, FleaCMS asks for the target server, SSH username
+On first use for each branch, ItsyWeb asks for the target server, SSH username
 (default `root`), domain/IP,
 WWW-to-primary redirect, and HTTPS (default yes). Deployments use the actual
 branch name, with no separate environment label or question. The internal site
@@ -1217,7 +1221,7 @@ Supplying `user@host` skips the username question. Bare targets saved by older
 versions ask for the username once and save it; commit that config change before
 retrying. Deployment never silently chooses your Mac username.
 
-After connecting, deploy checks whether FleaCMS is installed. If it is missing,
+After connecting, deploy checks whether ItsyWeb is installed. If it is missing,
 it offers to run setup on that same server, then continues deploying. The existing
 SSH connection is reused, including the same verified bundled-server extraction.
 Failed SSH authentication does not trigger setup,
@@ -1254,7 +1258,7 @@ attempting deployment, preserving app/admin/contact and other fields:
 }
 ```
 
-FleaCMS offers to commit pending changes, including the new configuration, then
+ItsyWeb offers to commit pending changes, including the new configuration, then
 continues deploying. It lists every changed file, asks for confirmation and a
 commit message (`init` for the first commit; otherwise required with no default), and uses normal Git
 hooks and signing settings. Declining or a failed commit stops deployment.
@@ -1270,7 +1274,7 @@ never uploaded and contain no credentials. You can explicitly ignore the file
 if you prefer local-only settings. Otherwise commit and share the branch map
 across the branches that should know about it.
 
-Use `flea deploy -configure` to change a saved mapping. Flags such as
+Use `itsy deploy -configure` to change a saved mapping. Flags such as
 `-target`, `-domain`, `-name`, `-https`, `-www-redirect`, `-email`, `-agree-tos`,
 and `-expected-ips` seed the questions on first use or with `-configure`.
 They cannot silently override an existing branch destination. Flat settings from
@@ -1318,7 +1322,7 @@ Omitting a previous alias does not delete it. Changing aliases/removing sites is
 currently a manual host configuration task.
 
 There is a brief interruption while the single service restarts. If activation
-or certificate verification fails, FleaCMS restores the previous configuration
+or certificate verification fails, ItsyWeb restores the previous configuration
 and restarts it. Concurrent operations are locked. Prior releases are retained,
 and the previous successful configuration is saved as
 `/etc/flea/server.previous.json`. Failed staged releases are retained too;
@@ -1358,20 +1362,20 @@ content edits require a service restart and must not run concurrently with deplo
 
 Deployment settings are saved without a final save-confirmation prompt. Deployment
 shows the branch and domain with a Ctrl-C cancellation notice, and prints the
-site URL after successful activation. A `flea rollback` command is not yet
+site URL after successful activation. A `itsy rollback` command is not yet
 available.
 
 After deploying a domain, run:
 
 ```sh
-flea https
+itsy https
 ```
 
 The first-deploy wizard enables HTTPS by default, so you normally won't need a
 separate step. To change an existing HTTP-only branch mapping and deploy it, run:
 
 ```sh
-flea deploy -configure -https
+itsy deploy -configure -https
 ```
 
 Confirm the settings and use the offered commit step, or commit them yourself
@@ -1386,7 +1390,7 @@ consent are required explicitly. They are saved within the selected branch's
 settings. WWW redirect adds both hostnames to the certificate allowlist, and
 redirects to the primary domain over HTTP or HTTPS while preserving path/query.
 
-FleaCMS uses pinned `golang.org/x/crypto/acme/autocert` for certificate issuance,
+ItsyWeb uses pinned `golang.org/x/crypto/acme/autocert` for certificate issuance,
 caching, and automatic renewal. The daemon handles both ports without a proxy.
 Only explicitly enabled site domains can obtain or use certificates. TLS uses
 version 1.2 or newer and checks that the request Host matches its TLS hostname.
@@ -1436,19 +1440,19 @@ server or live Let's Encrypt account was provisioned during implementation.
 
 ## Set up an Ubuntu server from your Mac
 
-From any directory, run `flea setup`:
+From any directory, run `itsy setup`:
 
 ```sh
-flea setup
+itsy setup
 ```
 
 Enter your server's hostname, IP, or SSH config alias. Standalone setup always
 connects as root, even if you supply another username. Custom ports and keys
 belong in `~/.ssh/config`.
-FleaCMS uses the installed `ssh` and `scp`: keys, agents, passphrases, normal
+ItsyWeb uses the installed `ssh` and `scp`: keys, agents, passphrases, normal
 host-key checks, and interactive password authentication are handled by SSH.
 If you use a password, password login must be enabled on the server. Passwords are never stored by
-FleaCMS, and host-key verification is not disabled. Non-root installation uses
+ItsyWeb, and host-key verification is not disabled. Non-root installation uses
 `sudo` with a remote terminal for its password prompt. A temporary SSH control
 connection reuses authentication and is closed when setup finishes.
 
@@ -1461,7 +1465,7 @@ architecture, then uploads it. Extraction is limited to 100 MiB. No server downl
 compiler or registry is needed during setup. Verification happens before upload
 or reset confirmation. There is no download or compiler fallback.
 
-`flea version` prints the CLI version; `flea-server -version` prints the
+`itsy version` prints the CLI version; `flea-server -version` prints the
 server version. The current version is recorded in `internal/buildinfo/version.go`;
 see [CHANGELOG.md](CHANGELOG.md) for release notes. `bash scripts/build.sh`
 produces a build of that version with both
@@ -1474,7 +1478,7 @@ account and `/var/lib/flea`. The service starts at boot and restarts on failure.
 Setup verifies systemd activity and HTTP readiness before reporting success.
 Before changing the server, the installer checks TCP and UDP ports 80 and 443
 on IPv4 and IPv6. It refuses occupied ports unless every listener is verified as
-the existing FleaCMS systemd main process during a confirmed reinstall. Unknown
+the existing ItsyWeb systemd main process during a confirmed reinstall. Unknown
 process owners or failed port checks also stop installation; other services are never stopped.
 
 Setup connects as root; enter just the hostname or IP. When the server binary
@@ -1487,7 +1491,7 @@ root-only `/var/backups/flea.*` directory, including certificates and releases.
 Setup and deploy automatically trust and save previously unseen SSH host keys.
 Changed or revoked keys stop the connection with a friendly explanation.
 Verify a changed fingerprint with your server provider before updating your
-known_hosts entry; FleaCMS never removes saved keys automatically.
+known_hosts entry; ItsyWeb never removes saved keys automatically.
 Restoration is manual; this is a reset, not an upgrade. Unexpected partial
 installations and symlinked installation paths are refused. It does not modify firewalls,
 SSH settings, packages, or existing sites. If installation fails, its newly
@@ -1514,7 +1518,7 @@ site key. `/_flea/health` publicly reports only the service name and readiness.
 The empty listen address binds all available interfaces; explicit IPv4/IPv6
 addresses and numeric ports 1-65535 are also accepted. The service remains
 non-root, with only `CAP_NET_BIND_SERVICE` granted for binding low ports.
-Local `flea dev` remains loopback-only.
+Local `itsy dev` remains loopback-only.
 
 Allow inbound TCP 80 in your server and cloud firewalls. Setup does not change
 either firewall, and its local readiness check does not prove public reachability.
@@ -1543,18 +1547,18 @@ lock; filesystem ownership still protects releases and site parents. Preserve
 content directories (flea-owned 0750) and create each managed site's private
 `flea/` directory (flea-owned 0700) before starting the new server. Reload systemd and restart
 after replacing the unit. For executable-only updates on a current installation,
-use `flea update-server`; it does not migrate service units or configuration.
+use `itsy update-server`; it does not migrate service units or configuration.
 After confirmation, a terminal spinner shows that the update is running; redirected
 output uses a plain progress line. Animation stops before SSH diagnostics or
 interactive sudo prompts, and successful updates print a completion message.
 
 ### Hostname indexing policy
 
-FleaCMS 0.19.0 with matching protocol-27 clients and servers supports exact-host staging protection:
+ItsyWeb 0.19.0 with matching protocol-27 clients and servers supports exact-host staging protection:
 
 ```sh
-flea server indexing root@server staging.example.com noindex
-flea server list root@server
+itsy server indexing root@server staging.example.com noindex
+itsy server list root@server
 ```
 
 This sends `X-Robots-Tag: noindex, nofollow` on that registered hostname while
@@ -1575,15 +1579,15 @@ deployment settings. Omit the target to be asked for the server login, for
 example `root@fleacms.com`:
 
 ```sh
-flea server list root@server
-flea server remove root@server example
+itsy server list root@server
+itsy server remove root@server example
 ```
 
-`flea server list` shows each site's name and branch, then its HTTPS domains,
+`itsy server list` shows each site's name and branch, then its HTTPS domains,
 then its HTTP-only domains, indexing policies and any redirects. It omits the
 release and never repeats the domains as plain lines, and is read-only.
 
-`flea server remove` unregisters one site's hostnames after showing the exact
+`itsy server remove` unregisters one site's hostnames after showing the exact
 affected domains and asking you to type the site name. Omit the site name to see
 the managed sites installed on the server and enter one by its exact name.
 It only stops routing:
@@ -1596,7 +1600,7 @@ files are not restored automatically: re-deploying the same site name starts fro
 the current project and cannot recover content left behind, so back up or pull
 the site first if a later deployment must keep its current content. An interrupted
 removal is recovered with `sudo flea-server -recover`. Both commands reject
-servers running an older FleaCMS protocol; update the server first.
+servers running an older ItsyWeb protocol; update the server first.
 
 ## Local installation details
 
@@ -1605,7 +1609,8 @@ For a persistent local installation, from the repository:
 ```sh
 mkdir -p "$HOME/.local/bin"
 bash scripts/build.sh
-cp bin/flea "$HOME/.local/bin/flea"
+cp bin/itsy "$HOME/.local/bin/itsy"
+ln -sf itsy "$HOME/.local/bin/flea"
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
@@ -1615,8 +1620,8 @@ For framework development in this checkout, create the global link once (this
 does not overwrite an existing command):
 
 ```sh
-sudo ln -s /Users/sean/Projects/flea/bin/flea /usr/local/bin/flea
-flea version
+sudo ln -s /Users/sean/Projects/flea/bin/itsy /usr/local/bin/itsy
+itsy version
 ```
 
 Replace your old build alias in `~/.zshrc` with:
@@ -1629,14 +1634,14 @@ Run `source ~/.zshrc`, then `flea-build` from any directory. The script finds
 Go on PATH or at `/usr/local/go/bin/go`; `GO_BINARY` overrides that location.
 Contributors need Go, Bash, gzip and shasum; installed users do not need them.
 
-`new` accepts a directory path, including `.` for the current directory. The parent directory must exist. Quote paths containing spaces, for example `flea new "my project"`. Existing directories must be empty, including hidden files and `.git`; directory symlinks and file targets are refused. An interrupted creation may leave partial generated files for inspection. `status` validates configuration, routes, templates, and current content without listening on a port. Exit codes are 0 for success, 1 for project or runtime failures, and 2 for invalid CLI usage.
+`new` accepts a directory path, including `.` for the current directory. The parent directory must exist. Quote paths containing spaces, for example `itsy new "my project"`. Existing directories must be empty, including hidden files and `.git`; directory symlinks and file targets are refused. An interrupted creation may leave partial generated files for inspection. `status` validates configuration, routes, templates, and current content without listening on a port. Exit codes are 0 for success, 1 for project or runtime failures, and 2 for invalid CLI usage.
 
-`flea new my-site` also initializes Git on `main`, stages the generated files
+`itsy new my-site` also initializes Git on `main`, stages the generated files
 and creates an `Initial site` commit using your normal Git identity, hooks and
-signing settings. If the commit fails, the site remains usable and Flea prints
+signing settings. If the commit fails, the site remains usable and ItsyWeb prints
 the Git diagnostic and commands to retry. The starter includes a `.gitignore`
 for macOS metadata, temporary editor files, and local environment secrets. To use a parent repository instead, run
-`flea new my-site --skip-git` (the flag also works before the name).
+`itsy new my-site --skip-git` (the flag also works before the name).
 If Git is not installed, the site is still created with instructions for setting
 up Git before deployment.
 
@@ -1681,7 +1686,7 @@ Routine HTTPS deployments report "Checking site health and HTTPS...". The server
 shows DNS/ports and certificate setup guidance only when enabling HTTPS for a
 domain not already configured; all readiness and certificate checks still run.
 
-For hosting Flea's own release binaries independently of website deployments,
+For hosting ItsyWeb's own release binaries independently of website deployments,
 see [disk-backed download hosting](docs/agents/download-hosting.md). This optional host
 setting does not change ordinary site assets or the 256 MiB site archive limit.
 
@@ -1701,7 +1706,7 @@ deployment, and archived orphan pruning are implemented. Deployment protocol 27
 requires an updated server binary; older servers are refused before upload.
 Local extraction preserves unreferenced content until deployment. There is no
 Markdown renderer or schema migration engine. Inline rich-text editing and
-explicit `flea pull` synchronization are supported. Keep backups before manual edits.
+explicit `itsy pull` synchronization are supported. Keep backups before manual edits.
 
 This release provides local development, SSH setup/deployment, automatic HTTPS,
 email-code authentication, inline editing, multisnips, developer-managed styles and a JPEG/PNG

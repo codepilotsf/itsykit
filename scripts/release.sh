@@ -38,10 +38,11 @@ elif [[ "$kind" == client ]]; then
   FLEA_REQUIRE_BUNDLE=1 go test ./internal/serverbundle -count=1
   file="dist/flea-$system-$arch"
   CGO_ENABLED=0 go build -trimpath -ldflags "$flags" -o "$file" ./cmd/flea
-  "$file" version
   smoke=$(mktemp -d)
   trap 'rm -rf -- "$smoke"' EXIT
-  executable="$PWD/$file"
+  executable="$smoke/itsy"
+  ln -s "$PWD/$file" "$executable"
+  "$executable" version
   (cd "$smoke"; "$executable" new demo --skip-git; cd demo; "$executable" status)
 else
   echo 'Expected server or client.' >&2

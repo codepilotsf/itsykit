@@ -19,7 +19,7 @@ func resetSite(root string, in io.Reader, out io.Writer) error {
 		return err
 	}
 	if root == filepath.Dir(root) {
-		return fmt.Errorf("run flea reset from a site folder")
+		return fmt.Errorf("run itsy reset from a site folder")
 	}
 	if home, _ := os.UserHomeDir(); root == home {
 		return fmt.Errorf("refusing to reset your home folder")
@@ -37,7 +37,7 @@ func resetSite(root string, in io.Reader, out io.Writer) error {
 	for _, name := range []string{".flea.config.json", "site/main.layout.html", "site/index.html"} {
 		info, err := os.Lstat(filepath.Join(root, name))
 		if err != nil || !info.Mode().IsRegular() {
-			return fmt.Errorf("run flea reset from a site with config, layout and index files")
+			return fmt.Errorf("run itsy reset from a site with config, layout and index files")
 		}
 	}
 	if info, err := os.Lstat(filepath.Join(root, ".git")); err == nil && !info.IsDir() {
@@ -114,6 +114,6 @@ func resetSite(root string, in io.Reader, out io.Writer) error {
 		}
 		published = append(published, entry.Name())
 	}
-	fmt.Fprintln(out, "Your site is reset. Run flea dev to get started.\nGit history was kept. No commit or deployment was made.")
+	fmt.Fprintln(out, "Your site is reset. Run itsy dev to get started.\nGit history was kept. No commit or deployment was made.")
 	return nil
 }

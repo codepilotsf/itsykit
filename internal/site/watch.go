@@ -44,7 +44,7 @@ func (s *Server) Watch(ctx context.Context, root string, logger *log.Logger) err
 			return nil
 		case event, ok := <-watcher.Events:
 			if !ok {
-				return fmt.Errorf("Project watching stopped. Restart flea dev.")
+				return fmt.Errorf("Project watching stopped. Restart itsy dev.")
 			}
 			rel, err := filepath.Rel(root, event.Name)
 			if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
@@ -64,7 +64,7 @@ func (s *Server) Watch(ctx context.Context, root string, logger *log.Logger) err
 			timer.Reset(watchDebounce)
 		case err, ok := <-watcher.Errors:
 			if !ok {
-				return fmt.Errorf("Project watching stopped. Restart flea dev.")
+				return fmt.Errorf("Project watching stopped. Restart itsy dev.")
 			}
 			if !errors.Is(err, fsnotify.ErrEventOverflow) {
 				return fmt.Errorf("Could not watch the project folder: %w", err)
@@ -165,7 +165,7 @@ func syncWatches(w *fsnotify.Watcher, root string) error {
 		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("Could not watch the project folder. Check its permissions and restart flea dev: %w", err)
+		return fmt.Errorf("Could not watch the project folder. Check its permissions and restart itsy dev: %w", err)
 	}
 	for name := range watched {
 		if !seen[name] {

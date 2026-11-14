@@ -131,7 +131,7 @@ func SelectDeployment(ctx context.Context, root string, overrides DeploySettings
 			return s, fmt.Errorf("branch %s has a saved destination; use -configure to confirm and save changes", state.Branch)
 		}
 		if httpsOnly && !s.HTTPS {
-			return s, fmt.Errorf("HTTPS is disabled for branch %s; use flea https -configure", state.Branch)
+			return s, fmt.Errorf("HTTPS is disabled for branch %s; use itsy https -configure", state.Branch)
 		}
 		if err = validateMapping(state.Branch, s, c); err != nil {
 			return s, err
@@ -149,7 +149,7 @@ func SelectDeployment(ctx context.Context, root string, overrides DeploySettings
 			if err = saveDeploymentConfig(root, c); err != nil {
 				return s, err
 			}
-			fmt.Fprintln(out, "\nSaved your SSH username in .flea.config.json.\nFleaCMS will offer to commit this change before deploying.")
+			fmt.Fprintln(out, "\nSaved your SSH username in .flea.config.json.\nItsyWeb will offer to commit this change before deploying.")
 		}
 		s.Branch = state.Branch
 		return s, nil

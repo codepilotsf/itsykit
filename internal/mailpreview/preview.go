@@ -54,7 +54,7 @@ func New(origin, name, address string, logger *log.Logger) (*Preview, error) {
 		return nil, fmt.Errorf("email previews require a loopback HTTP address")
 	}
 	if name == "" {
-		name = "FleaCMS"
+		name = "ItsyWeb"
 	}
 	if address == "" {
 		address = "preview@localhost"

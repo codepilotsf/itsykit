@@ -13,7 +13,7 @@ var sessionIgnoreRules = []string{"/flea/runtime/", "/flea/media/*.mp4"}
 // out of ordinary Git adds. The CLI first checks for already tracked files.
 //
 // It appends only the rules that are not already present, so repeated runs (for
-// example every `flea dev` start) never duplicate existing entries.
+// example every `itsy dev` start) never duplicate existing entries.
 func IgnoreSessionFiles(directory string) error {
 	root, err := os.OpenRoot(directory)
 	if err != nil {

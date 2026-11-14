@@ -56,7 +56,7 @@ func prepareDevOwner(ctx context.Context, p *site.Project, in io.Reader, out io.
 			return false, offered, err
 		}
 		if address == "" {
-			fmt.Fprintln(out, "No problem. Add an admin whenever you're ready with: flea admin")
+			fmt.Fprintln(out, "No problem. Add an admin whenever you're ready with: itsy admin")
 			return changed, offered, nil
 		}
 		if err := ctx.Err(); err != nil {

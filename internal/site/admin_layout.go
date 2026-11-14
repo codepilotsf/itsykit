@@ -53,7 +53,7 @@ func (s *Server) RenderAdmin(mode string, data map[string]any) ([]byte, error) {
 	}
 	t := p.adminTemplates[name]
 	if t == nil {
-		return nil, fmt.Errorf("missing admin/%s.html; copy the admin directory from a fresh Flea site", name)
+		return nil, fmt.Errorf("missing admin/%s.html; copy the admin directory from a fresh ItsyWeb site", name)
 	}
 	return p.renderWithBody(t, "/admin", data)
 }

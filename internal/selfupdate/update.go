@@ -35,11 +35,11 @@ type updater struct {
 func Run(ctx context.Context, current string, out io.Writer) error {
 	path, err := os.Executable()
 	if err != nil {
-		return fmt.Errorf("could not locate this FleaCMS executable")
+		return fmt.Errorf("could not locate this ItsyWeb executable")
 	}
 	path, err = filepath.EvalSymlinks(path)
 	if err != nil {
-		return fmt.Errorf("could not resolve this FleaCMS executable")
+		return fmt.Errorf("could not resolve this ItsyWeb executable")
 	}
 	client := &http.Client{Timeout: 2 * time.Minute, CheckRedirect: func(r *http.Request, via []*http.Request) error {
 		if r.URL.Scheme != "https" || len(via) >= 5 {
@@ -131,27 +131,6 @@ func (u updater) run(ctx context.Context, current string, out io.Writer) error {
 	if !(u.system == "darwin" && u.arch == "arm64" || u.system == "linux" && u.arch == "amd64") {
 		return fmt.Errorf("automatic updates support Apple Silicon macOS and x86-64 Linux")
 	}
-	var latest, manifest strings.Builder
-	if err := u.download(ctx, "latest.txt", &latest, 128); err != nil {
-		return err
-	}
-	version := strings.TrimSpace(latest.String())
-	update, err := newer(version, current)
-	if err != nil {
-		return err
-	}
-	if !update {
-		fmt.Fprintf(out, "FleaCMS %s is already up to date.\n", current)
-		return nil
-	}
-	name := "flea-" + u.system + "-" + u.arch
-	if err := u.download(ctx, version+"/SHA256SUMS", &manifest, 8192); err != nil {
-		return err
-	}
-	want, err := checksum(manifest.String(), name)
-	if err != nil {
-		return err
-	}
 	root, err := os.OpenRoot(filepath.Dir(u.executable))
 	if err != nil {
 		return fmt.Errorf("could not open the installation directory")
@@ -182,18 +161,54 @@ func (u updater) run(ctx context.Context, current string, out io.Writer) error {
 	if err != nil {
 		return err
 	}
+	if base == "flea" {
+		if info, err := root.Lstat("itsy"); err == nil {
+			if !info.Mode().IsRegular() || !os.SameFile(original, info) {
+				return fmt.Errorf("itsy already exists in this directory; use itsy update or choose another installation directory")
+			}
+		} else if !os.IsNotExist(err) {
+			return fmt.Errorf("could not inspect the itsy installation: %w", err)
+		}
+	}
+	var latest, manifest strings.Builder
+	if err := u.download(ctx, "latest.txt", &latest, 128); err != nil {
+		return err
+	}
+	version := strings.TrimSpace(latest.String())
+	update, err := newer(version, current)
+	if err != nil {
+		return err
+	}
+	if !update {
+		if err := installItsyName(root, base, base, original, oldHash, original); err != nil {
+			return err
+		}
+		if err := syncInstallation(root); err != nil {
+			return err
+		}
+		fmt.Fprintf(out, "ItsyWeb %s is already up to date.\nUse itsy for all commands from now on.\n", current)
+		return nil
+	}
+	name := "flea-" + u.system + "-" + u.arch
+	if err := u.download(ctx, version+"/SHA256SUMS", &manifest, 8192); err != nil {
+		return err
+	}
+	want, err := checksum(manifest.String(), name)
+	if err != nil {
+		return err
+	}
 	var token [16]byte
 	if _, err := rand.Read(token[:]); err != nil {
 		return err
 	}
-	temp := ".flea-update-" + hex.EncodeToString(token[:])
+	temp := ".itsy-update-" + hex.EncodeToString(token[:])
 	f, err := root.OpenFile(temp, os.O_CREATE|os.O_EXCL|os.O_RDWR, 0600)
 	if err != nil {
 		return fmt.Errorf("installation directory is not writable; reinstall in a user-owned directory")
 	}
 	defer root.Remove(temp)
 	defer f.Close()
-	fmt.Fprintf(out, "Downloading FleaCMS %s…\n", version)
+	fmt.Fprintf(out, "Downloading ItsyWeb %s…\n", version)
 	if err := u.download(ctx, version+"/"+name, f, maxBinary); err != nil {
 		return err
 	}
@@ -247,18 +262,86 @@ func (u updater) run(ctx context.Context, current string, out io.Writer) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if err := root.Rename(temp, base); err != nil {
+	if base == "flea" {
+		if err := installItsyName(root, base, temp, candidateInfo, want, original); err != nil {
+			return err
+		}
+	} else if err := root.Rename(temp, base); err != nil {
 		return fmt.Errorf("could not replace the executable; the previous version is intact")
 	}
+	if err := syncInstallation(root); err != nil {
+		return err
+	}
+	fmt.Fprintf(out, "Updated to ItsyWeb %s.\n\nRemote servers were not changed. From a site folder, run itsy update-server when ready.\n", version)
+	return nil
+}
+
+func syncInstallation(root *os.Root) error {
 	dir, err := root.Open(".")
 	if err == nil {
 		err = dir.Sync()
 		dir.Close()
 	}
 	if err != nil {
-		return fmt.Errorf("CLI updated, but could not sync the installation directory: %w", err)
+		return fmt.Errorf("CLI installed, but could not sync the installation directory: %w", err)
 	}
-	fmt.Fprintf(out, "Updated to FleaCMS %s.\n\nRemote servers were not changed. From a site folder, run flea update-server when ready.\n", version)
+	return nil
+}
+
+// installItsyName promotes an old regular flea installation without replacing
+// an independently installed itsy. A hard link keeps a runnable CLI at both
+// names if publishing the retired-command symlink fails partway through.
+func installItsyName(root *os.Root, base, source string, expected os.FileInfo, want string, original os.FileInfo) error {
+	if base != "flea" {
+		return nil
+	}
+	f, err := root.Open(source)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	info, err := f.Stat()
+	if err != nil || !os.SameFile(expected, info) {
+		return fmt.Errorf("installed executable changed; run flea update again")
+	}
+	hash, err := fileHash(f)
+	if err != nil || hash != want {
+		return fmt.Errorf("installed executable changed; run flea update again")
+	}
+	if err := root.Link(source, "itsy"); err != nil {
+		if !os.IsExist(err) {
+			return fmt.Errorf("could not install the itsy command: %w", err)
+		}
+		previous, statErr := root.Lstat("itsy")
+		if statErr != nil || !previous.Mode().IsRegular() || !os.SameFile(original, previous) {
+			return fmt.Errorf("itsy changed during installation; no existing command was replaced")
+		}
+		if source != base {
+			if err := root.Rename(source, "itsy"); err != nil {
+				return fmt.Errorf("could not update itsy: %w", err)
+			}
+		}
+	}
+	canonical, err := root.Lstat("itsy")
+	if err != nil || !canonical.Mode().IsRegular() || !os.SameFile(expected, canonical) {
+		return fmt.Errorf("itsy changed during installation; no existing command was replaced")
+	}
+	var token [16]byte
+	if _, err := rand.Read(token[:]); err != nil {
+		return err
+	}
+	alias := ".itsy-alias-" + hex.EncodeToString(token[:])
+	if err := root.Symlink("itsy", alias); err != nil {
+		return fmt.Errorf("itsy is installed, but could not prepare the retired flea command: %w", err)
+	}
+	defer root.Remove(alias)
+	now, err := root.Lstat(base)
+	if err != nil || !os.SameFile(original, now) {
+		return fmt.Errorf("itsy is installed, but flea changed during installation; it was not replaced")
+	}
+	if err := root.Rename(alias, base); err != nil {
+		return fmt.Errorf("itsy is installed, but could not replace the retired flea command: %w", err)
+	}
 	return nil
 }
 
@@ -293,7 +376,7 @@ func verifyVersion(ctx context.Context, path, version string) error {
 	var output versionOutput
 	cmd.Stdout = &output
 	cmd.Stderr = io.Discard
-	if err := cmd.Run(); err != nil || strings.TrimSpace(output.String()) != "FleaCMS "+version {
+	if err := cmd.Run(); err != nil || strings.TrimSpace(output.String()) != "ItsyWeb "+version {
 		return fmt.Errorf("downloaded CLI could not verify its version; nothing was changed")
 	}
 	return nil

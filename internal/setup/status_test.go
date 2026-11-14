@@ -253,7 +253,7 @@ func TestStatusDifferencesWithAndWithoutBaseline(t *testing.T) {
 			if known {
 				want = "0 local, 1 remote, 0 conflicting changes"
 			}
-			if err == nil || strings.Count(out.String(), want) != 1 || !strings.Contains(out.String(), "Connection   Unavailable") || !strings.Contains(out.String(), "flea pull") {
+			if err == nil || strings.Count(out.String(), want) != 1 || !strings.Contains(out.String(), "Connection   Unavailable") || !strings.Contains(out.String(), "itsy pull") {
 				t.Fatal(err, out.String())
 			}
 		})

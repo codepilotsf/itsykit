@@ -25,16 +25,17 @@ done
 bash scripts/bundle.sh "$stage"
 FLEA_REQUIRE_BUNDLE=1 "$GO_BINARY" test ./internal/serverbundle -count=1
 mkdir -p bin
-echo 'Building FleaCMS with both servers bundled...'
+echo 'Building ItsyWeb with both servers bundled...'
 GO_BINARY="$GO_BINARY" bash scripts/bundle-app.sh "$("$GO_BINARY" env GOOS)" "$("$GO_BINARY" env GOARCH)"
 FLEA_REQUIRE_APP_BUNDLE=1 "$GO_BINARY" test ./internal/appmanager ./internal/site -run 'TestManaged' -count=1
-"$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/flea" ./cmd/flea
-"$stage/flea" version
+"$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/itsy" ./cmd/flea
+"$stage/itsy" version
 # A fresh inode avoids macOS retaining the previous executable's code signature.
 # Rename within bin/ also leaves the last working executable intact until ready.
-cli_stage=$(mktemp bin/.flea.XXXXXX)
+cli_stage=$(mktemp bin/.itsy.XXXXXX)
 trap 'rm -f -- "$cli_stage"; rm -rf -- "$stage"' EXIT
-cp "$stage/flea" "$cli_stage"
+cp "$stage/itsy" "$cli_stage"
 chmod 755 "$cli_stage"
-mv -f "$cli_stage" bin/flea
-echo 'Built bin/flea. Setup is ready without server downloads.'
+mv -f "$cli_stage" bin/itsy
+ln -sfn itsy bin/flea
+echo 'Built bin/itsy (with the retired flea command). Setup is ready without server downloads.'

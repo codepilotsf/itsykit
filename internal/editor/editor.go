@@ -96,7 +96,7 @@ func New(o Options) *Handler {
 	return h
 }
 func emailMessage(email, code, host string) mailer.Message {
-	return mailer.Message{To: email, Subject: "Your FleaCMS sign-in code", Text: fmt.Sprintf("Your sign-in code for %s is:\n\n%s\n\nIt expires in 10 minutes and can only be used once.\nIf you did not request it, ignore this email.", host, code), HTML: fmt.Sprintf(`<div style="font-family:Arial,sans-serif;font-size:16px;line-height:1.5"><p>Your sign-in code for %s is:</p><p style="font-family:monospace;font-size:36px;font-weight:700;letter-spacing:6px">%s</p><p>It expires in 10 minutes and can only be used once.</p><p>If you did not request it, ignore this email.</p></div>`, html.EscapeString(host), html.EscapeString(code))}
+	return mailer.Message{To: email, Subject: "Your ItsyWeb sign-in code", Text: fmt.Sprintf("Your sign-in code for %s is:\n\n%s\n\nIt expires in 10 minutes and can only be used once.\nIf you did not request it, ignore this email.", host, code), HTML: fmt.Sprintf(`<div style="font-family:Arial,sans-serif;font-size:16px;line-height:1.5"><p>Your sign-in code for %s is:</p><p style="font-family:monospace;font-size:36px;font-weight:700;letter-spacing:6px">%s</p><p>It expires in 10 minutes and can only be used once.</p><p>If you did not request it, ignore this email.</p></div>`, html.EscapeString(host), html.EscapeString(code))}
 }
 func IsPath(path string) bool { return path == "/admin" || strings.HasPrefix(path, "/admin/") }
 
@@ -192,7 +192,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(h.allowed) == 0 {
 		w.WriteHeader(http.StatusServiceUnavailable)
-		h.page(w, view{Mode: "setup", Instructions: "Add the first admin from your site's folder:\n\nflea admin admin@example.com\n\nThe command sets up email if needed. Then return here to sign in."})
+		h.page(w, view{Mode: "setup", Instructions: "Add the first admin from your site's folder:\n\nitsy admin admin@example.com\n\nThe command sets up email if needed. Then return here to sign in."})
 		return
 	}
 	s, logged, err := h.current(r)
@@ -203,7 +203,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if h.options.Sender == nil && (!logged || r.URL.Path == "/admin/code" || r.URL.Path == "/admin/verify") {
 		message := "Sign-in emails are not set up for this site.\n\nAsk the person who manages this site's server to configure email delivery."
 		if h.options.Local {
-			message = "Email is not configured yet.\n\nRun this from your site's folder:\n\nflea email\n\nThen return to /admin."
+			message = "Email is not configured yet.\n\nRun this from your site's folder:\n\nitsy email\n\nThen return to /admin."
 		}
 		w.WriteHeader(http.StatusServiceUnavailable)
 		h.page(w, view{Mode: "setup", Instructions: message})

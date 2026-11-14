@@ -30,7 +30,7 @@ func TestNewInitializesGitWithCommit(t *testing.T) {
 	if code := Run(context.Background(), []string{"new", "demo"}, &out, io.Discard); code != 0 {
 		t.Fatal(code, out.String())
 	}
-	if !strings.HasSuffix(out.String(), "Start developing:\n  cd demo\n  flea dev\n\n") || strings.Contains(out.String(), "flea deploy") || strings.Contains(out.String(), "offer to commit") {
+	if !strings.HasSuffix(out.String(), "Start developing:\n  cd demo\n  itsy dev\n\n") || strings.Contains(out.String(), "itsy deploy") || strings.Contains(out.String(), "offer to commit") {
 		t.Fatal("new should finish with local development instructions", out.String())
 	}
 	branch, err := exec.Command("git", "-C", "demo", "symbolic-ref", "--short", "HEAD").Output()
@@ -218,10 +218,10 @@ func TestNewDirectoryPaths(t *testing.T) {
 				t.Fatalf("folder-derived name: %v, %v", p.App["site_name"], err)
 			}
 			if kind == "current" {
-				if !strings.HasSuffix(out.String(), "Start developing:\n  flea dev\n\n") {
+				if !strings.HasSuffix(out.String(), "Start developing:\n  itsy dev\n\n") {
 					t.Fatal(out.String())
 				}
-			} else if !strings.Contains(out.String(), "  "+wantCD+"\n  flea dev\n") {
+			} else if !strings.Contains(out.String(), "  "+wantCD+"\n  itsy dev\n") {
 				t.Fatal("incorrect directory instructions", out.String())
 			}
 			if _, err := os.Stat(filepath.Join(target, ".git")); !os.IsNotExist(err) {

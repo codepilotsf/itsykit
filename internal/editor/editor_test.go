@@ -50,11 +50,11 @@ func TestFirstOwnerSetupIsLocalOnly(t *testing.T) {
 		h := testEditor(t, Options{Name: "New site", Local: local})
 		w := request(h, "GET", "/admin", "localhost", nil)
 		if local {
-			if w.Code != 503 || !strings.Contains(w.Body.String(), "flea admin admin@example.com") || strings.Contains(w.Body.String(), "restart flea dev") {
+			if w.Code != 503 || !strings.Contains(w.Body.String(), "itsy admin admin@example.com") || strings.Contains(w.Body.String(), "restart itsy dev") {
 				t.Fatal(w.Code, w.Body.String())
 			}
 			w = request(h, "GET", "/admin", "external.test", nil)
-			if w.Code != 403 || strings.Contains(w.Body.String(), "flea admin") {
+			if w.Code != 403 || strings.Contains(w.Body.String(), "itsy admin") {
 				t.Fatal("local setup instructions exposed to an external host")
 			}
 		} else if w.Code != 404 {
@@ -94,7 +94,7 @@ func TestMissingEmailSettingsInstructions(t *testing.T) {
 		if w.Code != http.StatusServiceUnavailable || !strings.HasPrefix(w.Header().Get("Content-Type"), "text/html") {
 			t.Fatal(w.Code, w.Header())
 		}
-		for _, text := range []string{"flea email", "site&#39;s folder"} {
+		for _, text := range []string{"itsy email", "site&#39;s folder"} {
 			if strings.Contains(w.Body.String(), text) != local {
 				t.Fatalf("local=%v, unexpected instructions for %q: %s", local, text, w.Body.String())
 			}

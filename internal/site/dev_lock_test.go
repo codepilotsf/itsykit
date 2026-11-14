@@ -16,7 +16,7 @@ func TestLockDevelopmentReportsConcurrentUse(t *testing.T) {
 		t.Fatal("second development lock succeeded")
 	}
 	message := err.Error()
-	if !strings.Contains(message, "another running flea dev, pull or reset") {
+	if !strings.Contains(message, "another running itsy dev, pull or reset") {
 		t.Fatalf("unclear busy message: %q", message)
 	}
 	if strings.Contains(message, "Content or deployment") {

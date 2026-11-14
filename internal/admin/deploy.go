@@ -135,7 +135,7 @@ func (m Manager) lock() (func(), error) {
 	}
 	if _, err = os.Lstat(upgradePending(m.ConfigPath)); !os.IsNotExist(err) {
 		unlock()
-		return nil, fmt.Errorf("server upgrade recovery pending; run flea update-server --recover")
+		return nil, fmt.Errorf("server upgrade recovery pending; run itsy update-server --recover")
 	}
 	return unlock, nil
 }

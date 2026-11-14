@@ -59,7 +59,7 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `internal/site/icons_test.go`: offline icon resolution, escaping, and security tests.
 - `internal/site/server.go`: HTTP serving, reload watching, and URL validation.
 - `internal/site/site_test.go`: rendering, routing, isolation, and reload tests.
-- `bin/flea`: local build output; rebuilding is necessary for CLI changes to take effect.
+- `bin/itsy`: local build output; rebuilding is necessary for CLI changes to take effect.
 
 Source CSS is loaded from the immutable release. `internal/site/managed.go`
 provides confined fixed-path file helpers. Theme editor/overlay/sync code has

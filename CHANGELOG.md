@@ -6,6 +6,12 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Rename the product to ItsyWeb and the CLI to `itsy`. Retired `flea` commands
+  display the rename notice and stop; `flea update` remains available to install
+  `itsy` with a prominent explanation, including when already up to date.
+- Use the approved ItsyWeb logo and icons in new sites and development diagnostics.
+  Preserve existing site content, configuration paths, server services and protocols.
+
 ## 0.20.5 - 2026-11-09
 
 - Use the approved navy filled mascot on light icon backgrounds, with matching

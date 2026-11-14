@@ -77,7 +77,7 @@ func Extract(input io.Reader, dest string) (Manifest, error) {
 	header := make([]byte, len(magic))
 	_, err := io.ReadFull(r, header)
 	if err != nil || string(header) != magic {
-		return m, fmt.Errorf("not a Flea backup")
+		return m, fmt.Errorf("not an ItsyWeb backup")
 	}
 	// ReadSlice bounds an untrusted manifest before allocating a JSON document.
 	raw, err := r.ReadSlice('\n')

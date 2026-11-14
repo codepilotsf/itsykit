@@ -1,5 +1,5 @@
 [Unit]
-Description=FleaCMS server
+Description=ItsyWeb server
 After=network.target
 
 [Service]

@@ -4,25 +4,32 @@ Implementation requirements linked from [AGENTS.md](../../AGENTS.md).
 Read this when the task touches this subsystem. Paths in prose and code are
 relative to the repository root unless stated otherwise.
 
-Core commands include `flea new <directory>`, `flea status`,
-`flea dev [-port 3000]`, `flea setup`, `flea version`,
-`flea deploy`, `flea admin [email]`, and `flea https`.
-`flea server list [ssh-target]` and `flea server remove [ssh-target] [site-name]`
+The command is `itsy`. Invoking the retired name `flea` prints the rename notice
+and returns usage status 2 without dispatching. Only exact `flea update` remains
+active: show the prominent rename notice, verify the update and install `itsy`,
+even when already current. A private `.flea-update-* version` probe retains the
+exact old version response required by released updaters; it performs no writes.
+See [installation](../installation.md) for the two-step path from old binaries.
+
+Core commands include `itsy new <directory>`, `itsy status`,
+`itsy dev [-port 3000]`, `itsy setup`, `itsy version`,
+`itsy deploy`, `itsy admin [email]`, and `itsy https`.
+`itsy server list [ssh-target]` and `itsy server remove [ssh-target] [site-name]`
 administer sites on a server directly, without a local site, Git repository or
 saved deployment settings. An omitted target is prompted for (the server login,
 for example root@fleacms.com); an omitted site name lists the managed sites and
 asks for one by its exact name.
 See README.md for pull, synchronization, recovery and the complete command list.
-`flea server indexing [ssh-target] <hostname> <noindex|allow>` sets one exact
+`itsy server indexing [ssh-target] <hostname> <noindex|allow>` sets one exact
 registered host policy through SSH with hostname confirmation and shared-service
 restart. List/status show effective policies and static robots.txt warnings.
 Policy enforcement belongs outside cached site handlers, at writes and flushes,
 including downloads/errors and host redirects. Never buffer response bodies or
 trust forwarding headers for selection. Keep readiness and TLS rejection unchanged.
 See [host indexing](../host-indexing.md); this requires protocol 27.
-`flea email` configures local Resend delivery interactively.
+`itsy email` configures local Resend delivery interactively.
 Run status/dev from a generated site. Setup uses native SSH.
-`flea status` prints local validation, counts and Git state before automatically
+`itsy status` prints local validation, counts and Git state before automatically
 checking the current named branch's saved deployment. Do not add a remote flag,
 prompt for deployment setup, or select another branch's destination. Without a
 mapping it finishes locally. Terminal output animates Checking remote; redirected
@@ -33,18 +40,18 @@ Use the existing SSH/protocol and bounded snapshot/history/inventory readers;
 compare exact active release/branch/domain identity before reporting code state.
 Website HEAD probes validate normal TLS and do not follow redirects. Unavailable
 remote checks exit 1 while preserving the local summary; differences exit 0.
-Bare `flea`, `flea help`, `flea -h`, and `flea --help` show the grouped command
+Bare `itsy`, `itsy help`, `itsy -h`, and `itsy --help` show the grouped command
 overview on stdout and exit successfully. Each command supports `--help` and
 `-h` without requiring a site or starting work. Keep the overview spacious;
 put flags and deployment requirements in command-specific help.
-`flea new <directory>` accepts relative or absolute paths, including `.` for the
+`itsy new <directory>` accepts relative or absolute paths, including `.` for the
 current directory. Create a missing final directory; its parent must exist.
 Existing targets must be real, completely empty directories, including hidden
 entries and `.git`. Reject file targets and directory symlinks before writing.
 Do not prompt to merge or overwrite files. Confine scaffold writes with os.Root
 and retain exclusive file creation. Use the actual destination folder for naming
-defaults. For `.` end with `flea dev`; otherwise show a shell-quoted `cd` when needed.
-`flea new` initializes Git on main and creates an `Initial site` commit of the
+defaults. For `.` end with `itsy dev`; otherwise show a shell-quoted `cd` when needed.
+`itsy new` initializes Git on main and creates an `Initial site` commit of the
 generated files, respecting Git identity, hooks and signing. Keep inherited Git
 location overrides out of every Git subprocess so another repository is untouched.
 Commit failure preserves the site and prints diagnostics plus manual retry commands;
@@ -93,7 +100,7 @@ the HTML layout has one {slot}. Keep recipient, subject, sender and Reply-To out
 templates. Both renderers use a capped writer, not a post-allocation size check.
 Site runtime always wires RenderEmail; missing templates fail delivery without a
 compatibility fallback. The optional nil renderer in low-level auth tests
-is not a site-level fallback. flea email preview emits fake-data HTML without sending.
+is not a site-level fallback. itsy email preview emits fake-data HTML without sending.
 Contact's success destination is fixed as mount-relative `thank-you`, never visitor-selected.
 
 New sites enable dev.email_preview. Only the dev CLI wires internal/mailpreview

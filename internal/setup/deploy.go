@@ -107,7 +107,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			return err
 		}
 		if !p.SiteNameConfigured {
-			return fmt.Errorf("Set app.site_name in .flea.config.json, or run flea dev to choose a site name, then commit it before deploying.")
+			return fmt.Errorf("Set app.site_name in .flea.config.json, or run itsy dev to choose a site name, then commit it before deploying.")
 		}
 		localProject = p
 		// Admin login, Contact forms and every session-owning custom app require
@@ -125,7 +125,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			}
 		}
 		if needsForms && !opts.HTTPS {
-			return fmt.Errorf("This site requires HTTPS for admin login and app forms. Enable it with flea deploy -configure before deploying this site.")
+			return fmt.Errorf("This site requires HTTPS for admin login and app forms. Enable it with itsy deploy -configure before deploying this site.")
 		}
 		for _, warning := range p.Warnings {
 			fmt.Fprintln(errOut, "Warning:", warning)
@@ -203,7 +203,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		if errors.Is(err, errHostKeyChanged) {
 			return err
 		}
-		return fmt.Errorf("Could not connect to or check %s.\n\nCheck your SSH username and key, then try again.\nTo change the saved username, run flea deploy -configure.", target)
+		return fmt.Errorf("Could not connect to or check %s.\n\nCheck your SSH username and key, then try again.\nTo change the saved username, run itsy deploy -configure.", target)
 	}
 	arch, isRoot, err := parseProbe(output.String())
 	if err != nil {
@@ -219,13 +219,13 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		}
 	}
 	if strings.Contains(output.String(), "FLEA_MISSING=1\n") {
-		fmt.Fprint(out, "\nFleaCMS isn't installed on this server yet.\nSetup will install the server and start its service.\n\n")
+		fmt.Fprint(out, "\nItsyWeb isn't installed on this server yet.\nSetup will install the server and start its service.\n\n")
 		confirmed, err := confirmSetup(ctx, in, out)
 		if err != nil {
 			return err
 		}
 		if !confirmed {
-			return fmt.Errorf("Deployment stopped. You can install the server later with flea setup.")
+			return fmt.Errorf("Deployment stopped. You can install the server later with itsy setup.")
 		}
 		if err = install(ctx, target); err != nil {
 			return fmt.Errorf("Server setup did not finish.\n\n%w", err)
@@ -234,7 +234,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			if errors.Is(err, errHostKeyChanged) {
 				return err
 			}
-			return fmt.Errorf("FleaCMS was installed, but the server check failed.\nPlease check the service before deploying again.")
+			return fmt.Errorf("ItsyWeb was installed, but the server check failed.\nPlease check the service before deploying again.")
 		}
 		_, isRoot, err = parseProbe(output.String())
 		if err != nil {
@@ -242,11 +242,11 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		}
 	}
 	if !strings.Contains(output.String(), release.Protocol+"\n") {
-		return fmt.Errorf("This server has an older or incomplete FleaCMS installation.\nPlease update the server before deploying.")
+		return fmt.Errorf("This server has an older or incomplete ItsyWeb installation.\nPlease update the server before deploying.")
 	}
 	if s.WithSnips {
 		if httpsOnly {
-			return fmt.Errorf("content options require flea deploy")
+			return fmt.Errorf("content options require itsy deploy")
 		}
 		s.Branch = state.Branch
 		base, e := readBaseline(ctx, root, s)

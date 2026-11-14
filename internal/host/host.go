@@ -324,7 +324,7 @@ func serve(ctx context.Context, config Config, handler http.Handler, logger *log
 	}
 	go func() { done <- server.Serve(listener) }()
 	if logger != nil {
-		logger.Printf("FleaCMS server listening on %s", listener.Addr())
+		logger.Printf("ItsyWeb server listening on %s", listener.Addr())
 	}
 	var result error
 	remaining := len(servers)
@@ -417,7 +417,7 @@ func Probe(ctx context.Context, config Config, domain string, secure bool) error
 		return err
 	}
 	if response.StatusCode != 200 || string(body) != `{"service":"flea","status":"ready"}` {
-		return fmt.Errorf("FleaCMS server readiness check failed")
+		return fmt.Errorf("ItsyWeb server readiness check failed")
 	}
 	if response.Header.Get("X-Flea-Revision") != config.Revision || (domain != "" && response.Header.Get("X-Flea-Site") != domain) {
 		return fmt.Errorf("server is not serving the expected release/hostname")

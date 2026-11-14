@@ -1,6 +1,6 @@
 ---
 name: add-contact-form
-description: Add, enable or repair FleaCMS's bundled Contact form on an existing Flea site. Use for requests such as "add a contact form", "create a contact page", "let visitors email us", or connecting a form to Resend. Covers configuration, exact field names, CSRF, feedback tokens and mail templates. Does not apply to arbitrary forms, uploads, newsletters or a contact page that only displays an address.
+description: Add, enable or repair ItsyWeb's bundled Contact form on an existing Flea site. Use for requests such as "add a contact form", "create a contact page", "let visitors email us", or connecting a form to Resend. Covers configuration, exact field names, CSRF, feedback tokens and mail templates. Does not apply to arbitrary forms, uploads, newsletters or a contact page that only displays an address.
 ---
 
 # Add a Flea Contact form
@@ -107,7 +107,7 @@ the existing mail layout and add these files from a disposable matching-version
 starter if missing. They do not control recipients, sender, subject or Reply-To.
 Never put them under public `site/`.
 
-Run `flea status`. With `dev.email_preview` enabled, verify in local dev: form and
+Run `itsy status`. With `dev.email_preview` enabled, verify in local dev: form and
 navigation, invalid-field feedback, preserved inputs and a valid submission to
 the thank-you route with a private email preview. Use synthetic data. A local
 preview sends no real email and proves no production delivery. Do not write
@@ -116,6 +116,6 @@ servers before handoff.
 
 Production requires HTTPS, configured Resend credentials and an authorized
 sender. For authorized real local delivery, disable email preview, use
-`flea email` and restart dev; production ignores the preview setting. Ask only
+`itsy email` and restart dev; production ignores the preview setting. Ask only
 for missing recipient/setup decisions and report any unverified real delivery.
 Do not add dependencies or an alternate mail API to make the bundled form work.

@@ -24,7 +24,7 @@ func testGit(t *testing.T, root string, args ...string) string {
 func initRepo(t *testing.T, root string) {
 	t.Helper()
 	testGit(t, root, "init", "-b", "main")
-	testGit(t, root, "config", "user.name", "FleaCMS Test")
+	testGit(t, root, "config", "user.name", "ItsyWeb Test")
 	testGit(t, root, "config", "user.email", "test@example.test")
 	testGit(t, root, "add", ".")
 	testGit(t, root, "commit", "--allow-empty", "-m", "fixture")

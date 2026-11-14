@@ -88,10 +88,11 @@ The theme and general styles are adapted from `../preflight/lib/templates/app/as
 The library matches `../prewind/prewind.css` at version 1.3.1. Preserve the simple
 starter with its inline header/footer when making styling changes.
 
-### FleaCMS identity
+### ItsyWeb identity
 
-The FleaCMS lockup uses the approved filled Little Skip mascot and outlined Nunito 800.
-Use `images/logo.svg` for branded headers and `images/mark.svg` for the mascot.
-The outlined lettering needs no runtime font request. Keep normal site body and
-heading typography unchanged. Canonical masters and export notes live in
-[branding](../branding/README.md); do not redraw the mascot or retune its spacing.
+Use the approved ItsyWeb woven-loop mark and outlined wordmark copied from the
+website project. `images/logo.svg` is the full lockup; `images/mark.svg` is the
+standalone mark. Preserve the SVG viewBox proportions with automatic CSS height.
+Keep normal site typography and theme tokens unchanged. See
+[brand assets](../branding/README.md) for provenance and icon exports. Updates
+never replace existing custom website branding.

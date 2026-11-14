@@ -28,12 +28,12 @@ import (
 )
 
 const usage = `_________
- FleaCMS
+ ItsyWeb
 ‾‾‾‾‾‾‾‾‾
 Small websites. Plain HTML. Editable content.
 
 Usage
-  flea <command>
+  itsy <command>
 
 Build your site
   new <directory>  Create a new site
@@ -45,7 +45,7 @@ Build your site
 
 Publish your site
   pull             Bring live snips and media into your local site
-  setup            Install Flea on your server
+  setup            Install ItsyWeb on your server
   deploy           Publish the current Git branch
   rollback         Restore previous code, keeping live content
   backup           Download a complete site backup
@@ -60,20 +60,20 @@ Other commands
   help             Show this help
 
 Get started
-  flea new my-site
+  itsy new my-site
   cd my-site
-  flea dev
+  itsy dev
 
 Command details
-  flea <command> --help
+  itsy <command> --help
 
 `
 
-const serverUsage = `Usage: flea server list [ssh-target]
-       flea server remove [ssh-target] [site-name]
-       flea server indexing [ssh-target] <hostname> <noindex|allow>
+const serverUsage = `Usage: itsy server list [ssh-target]
+       itsy server remove [ssh-target] [site-name]
+       itsy server indexing [ssh-target] <hostname> <noindex|allow>
 
-Inspect or configure sites installed on a FleaCMS server over SSH. No local site,
+Inspect or configure sites installed on an ItsyWeb server over SSH. No local site,
 Git repository or saved deployment settings are required. Omit the SSH target to
 be asked for the server login.
 
@@ -92,7 +92,7 @@ be asked for the server login.
            Keeps website files unchanged. Requires typing the exact hostname and
            restarts the shared service. Policies survive deploy, sync and rollback.
 
-All commands reject servers running an older FleaCMS protocol; update the
+All commands reject servers running an older ItsyWeb protocol; update the
 server first. Nothing is deleted or pruned.
 
 `
@@ -103,15 +103,15 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		fmt.Fprint(out, usage)
 		return 0
 	}
-	fail := func(err error) int { fmt.Fprintln(errOut, "flea:", err); return 1 }
+	fail := func(err error) int { fmt.Fprintln(errOut, "itsy:", err); return 1 }
 	switch args[0] {
 	case "update":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprint(out, "Usage: flea update\n\nDownload and verify the latest CLI from fleacms.com.\nUpdates this executable and its bundled servers, without changing remote servers.\nNo site folder is required.\n\n")
+			fmt.Fprint(out, "Usage: itsy update\n\nDownload and verify the latest CLI from fleacms.com.\nUpdates this executable and its bundled servers, without changing remote servers.\nNo site folder is required.\n\n")
 			return 0
 		}
 		if len(args) != 1 {
-			fmt.Fprintln(errOut, "Usage: flea update")
+			fmt.Fprintln(errOut, "Usage: itsy update")
 			return 2
 		}
 		if err := selfupdate.Run(ctx, buildinfo.Version, out); err != nil {
@@ -123,7 +123,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags.SetOutput(errOut)
 		recover := flags.Bool("recover", false, "restore executable after an interrupted upgrade")
 		flags.Usage = func() {
-			fmt.Fprint(out, "Usage: flea update-server [--recover]\n\nUpdate this branch's server using the bundled executable. All its sites\nrestart briefly. Configuration, credentials and site data are preserved.\nNo automatic format migration or service-unit changes.\n\n")
+			fmt.Fprint(out, "Usage: itsy update-server [--recover]\n\nUpdate this branch's server using the bundled executable. All its sites\nrestart briefly. Configuration, credentials and site data are preserved.\nNo automatic format migration or service-unit changes.\n\n")
 		}
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
@@ -144,11 +144,11 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "backup", "restore":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintf(out, "Usage: flea %s <backup-file>\n\nUse this branch's saved destination. Backups include code, snips and theme,\nnot credentials, certificates or sessions. Restore replaces live site data\nafter confirmation. Backup refuses to overwrite an existing file.\n\n", args[0])
+			fmt.Fprintf(out, "Usage: itsy %s <backup-file>\n\nUse this branch's saved destination. Backups include code, snips and theme,\nnot credentials, certificates or sessions. Restore replaces live site data\nafter confirmation. Backup refuses to overwrite an existing file.\n\n", args[0])
 			return 0
 		}
 		if len(args) != 2 || strings.HasPrefix(args[1], "-") {
-			fmt.Fprintf(errOut, "Usage: flea %s <backup-file>\n", args[0])
+			fmt.Fprintf(errOut, "Usage: itsy %s <backup-file>\n", args[0])
 			return 2
 		}
 		var err error
@@ -166,7 +166,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags.SetOutput(errOut)
 		list := flags.Bool("list", false, "list retained releases")
 		flags.Usage = func() {
-			fmt.Fprint(out, "Usage: flea rollback [--list] [release-id]\n\nRestore previous code for this branch. Keep live snips. Styles come from the selected release.\nWithout an ID, use the preceding release. Confirmation is required.\n\n")
+			fmt.Fprint(out, "Usage: itsy rollback [--list] [release-id]\n\nRestore previous code for this branch. Keep live snips. Styles come from the selected release.\nWithout an ID, use the preceding release. Confirmation is required.\n\n")
 		}
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
@@ -188,7 +188,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	case "email":
 		if len(args) >= 2 && args[1] == "preview" {
 			if len(args) != 3 || (args[2] != "sign-in" && args[2] != "contact") {
-				fmt.Fprintln(errOut, "Usage: flea email preview <sign-in|contact>")
+				fmt.Fprintln(errOut, "Usage: itsy email preview <sign-in|contact>")
 				return 2
 			}
 			p, err := site.Load(".")
@@ -203,12 +203,12 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return 0
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea email\n       flea email preview <sign-in|contact>\n\nSet up Resend delivery, or print a sample HTML email without sending it.\nTemplates live in mailers/. Setup saves credentials in .env.\nContact settings need a dev restart.")
+			fmt.Fprintln(out, "Usage: itsy email\n       itsy email preview <sign-in|contact>\n\nSet up Resend delivery, or print a sample HTML email without sending it.\nTemplates live in mailers/. Setup saves credentials in .env.\nContact settings need a dev restart.")
 			fmt.Fprintln(out)
 			return 0
 		}
 		if len(args) != 1 {
-			fmt.Fprintln(errOut, "Usage: flea email")
+			fmt.Fprintln(errOut, "Usage: itsy email")
 			return 2
 		}
 		if err := setup.Email(ctx, ".", os.Stdin, out); err != nil {
@@ -217,12 +217,12 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "admin":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea admin [email]\n\nAdd an admin and set up email if needed. Local access updates automatically.\nView or remove admins in admin.emails in .flea.config.json.\nCommit and deploy to apply live changes. No invitation is sent.")
+			fmt.Fprintln(out, "Usage: itsy admin [email]\n\nAdd an admin and set up email if needed. Local access updates automatically.\nView or remove admins in admin.emails in .flea.config.json.\nCommit and deploy to apply live changes. No invitation is sent.")
 			fmt.Fprintln(out)
 			return 0
 		}
 		if len(args) > 2 || (len(args) == 2 && strings.HasPrefix(args[1], "-")) {
-			fmt.Fprintln(errOut, "Usage: flea admin [email]")
+			fmt.Fprintln(errOut, "Usage: itsy admin [email]")
 			return 2
 		}
 		email := ""
@@ -261,21 +261,21 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				return fail(err)
 			}
 		}
-		fmt.Fprintln(out, "\nSign in at /admin. Local access updates automatically.\nFor the live site, commit and run flea deploy.")
+		fmt.Fprintln(out, "\nSign in at /admin. Local access updates automatically.\nFor the live site, commit and run itsy deploy.")
 		return 0
 	case "version", "--version":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea version\n\nShow the installed version.")
+			fmt.Fprintln(out, "Usage: itsy version\n\nShow the installed version.")
 			fmt.Fprintln(out)
 			return 0
 		}
-		fmt.Fprintln(out, "FleaCMS "+buildinfo.Version)
+		fmt.Fprintln(out, "ItsyWeb "+buildinfo.Version)
 		return 0
 	case "pull":
 		flags := flag.NewFlagSet("pull", flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintln(flags.Output(), "Usage: flea pull\n\nPull live snips and media into your local site. Stop dev first.\nReview and commit changes afterwards. Configuration and sessions stay local.")
+			fmt.Fprintln(flags.Output(), "Usage: itsy pull\n\nPull live snips and media into your local site. Stop dev first.\nReview and commit changes afterwards. Configuration and sessions stay local.")
 			fmt.Fprintln(flags.Output())
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
@@ -299,7 +299,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintf(flags.Output(), "Usage: flea %s [options]\n\nConfigure the current Git branch's destination and publish it.\nUse -configure to edit saved settings in .flea.config.json.\nDeployment requires a clean, committed Git repository.\n\nOptions\n", args[0])
+			fmt.Fprintf(flags.Output(), "Usage: itsy %s [options]\n\nConfigure the current Git branch's destination and publish it.\nUse -configure to edit saved settings in .flea.config.json.\nDeployment requires a clean, committed Git repository.\n\nOptions\n", args[0])
 			flags.PrintDefaults()
 			fmt.Fprintln(flags.Output())
 		}
@@ -343,7 +343,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		}
 		s.WithSnips = *withSnips
 		if args[0] == "https" && *withSnips {
-			return fail(fmt.Errorf("use these options with flea deploy"))
+			return fail(fmt.Errorf("use these options with itsy deploy"))
 		}
 		if err := setup.Deploy(ctx, ".", s, args[0] == "https", os.Stdin, out, errOut); err != nil {
 			return fail(err)
@@ -353,7 +353,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet("setup", flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintln(flags.Output(), "Usage: flea setup\n\nInstall Flea on your server over SSH.\nYou will be asked for the server address.")
+			fmt.Fprintln(flags.Output(), "Usage: itsy setup\n\nInstall ItsyWeb on your server over SSH.\nYou will be asked for the server address.")
 			fmt.Fprintln(flags.Output())
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
@@ -396,12 +396,12 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			case "--skip-git", "-skip-git":
 				skipGit = true
 			case "-h", "--help":
-				fmt.Fprintln(out, "Usage: flea new [--starter|-s] <directory> [--skip-git]\n\nCreates a clean site with an initial Git commit on main.\nUse . for the current directory. Existing directories must be empty.\nUse --starter or -s for example pages and team content.\nUse --skip-git to leave Git setup to you.")
+				fmt.Fprintln(out, "Usage: itsy new [--starter|-s] <directory> [--skip-git]\n\nCreates a clean site with an initial Git commit on main.\nUse . for the current directory. Existing directories must be empty.\nUse --starter or -s for example pages and team content.\nUse --skip-git to leave Git setup to you.")
 				fmt.Fprintln(out)
 				return 0
 			default:
 				if strings.HasPrefix(arg, "-") {
-					fmt.Fprintf(errOut, "Unknown option: %s\nRun flea new --help for usage.\n", arg)
+					fmt.Fprintf(errOut, "Unknown option: %s\nRun itsy new --help for usage.\n", arg)
 					return 2
 				}
 				names = append(names, arg)
@@ -453,7 +453,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			}
 		}
 		if name == "." {
-			fmt.Fprint(out, "\nStart developing:\n  flea dev\n\n")
+			fmt.Fprint(out, "\nStart developing:\n  itsy dev\n\n")
 		} else {
 			// Quote paths containing spaces or shell metacharacters for copying.
 			cdPath := name
@@ -463,12 +463,12 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 				}
 				cdPath = "'" + strings.ReplaceAll(cdPath, "'", "'\"'\"'") + "'"
 			}
-			fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  flea dev\n\n", cdPath)
+			fmt.Fprintf(out, "\nStart developing:\n  cd %s\n  itsy dev\n\n", cdPath)
 		}
 		return 0
 	case "reset":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea reset\n\nReset this local site to a clean layout and homepage.\nReplaces content, uploads, customizations and settings after confirmation.\nKeeps Git history and a private sibling backup. Never changes the remote site.")
+			fmt.Fprintln(out, "Usage: itsy reset\n\nReset this local site to a clean layout and homepage.\nReplaces content, uploads, customizations and settings after confirmation.\nKeeps Git history and a private sibling backup. Never changes the remote site.")
 			fmt.Fprintln(out)
 			return 0
 		}
@@ -485,7 +485,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "status":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: flea status\n\nShow local validation and Git state, then check this branch's saved remote.\nCompares deployed code, editable content and theme over SSH.\nRun this command from your site folder.")
+			fmt.Fprintln(out, "Usage: itsy status\n\nShow local validation and Git state, then check this branch's saved remote.\nCompares deployed code, editable content and theme over SSH.\nRun this command from your site folder.")
 			fmt.Fprintln(out)
 			return 0
 		}
@@ -509,7 +509,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet("dev", flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintln(flags.Output(), "Usage: flea dev [options]\n\nStart the local development server from your site folder.\nAsks for a site name once, then offers optional admin setup.\nNew sites preview email in your browser without sending.\nChanges reload automatically.\nStarts at port 3000 and tries the next port if it is occupied.\n\nOptions")
+			fmt.Fprintln(flags.Output(), "Usage: itsy dev [options]\n\nStart the local development server from your site folder.\nAsks for a site name once, then offers optional admin setup.\nNew sites preview email in your browser without sending.\nChanges reload automatically.\nStarts at port 3000 and tries the next port if it is occupied.\n\nOptions")
 			flags.PrintDefaults()
 			fmt.Fprintln(flags.Output())
 		}
@@ -615,14 +615,14 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		{
 			httpHandler = devAdmin(p.Root, fmt.Sprint(p.App["site_name"]), handler, logger, previewSender)
 			if len(p.Admin.Emails) == 0 && !offered {
-				logger.Print("Admin sign-in isn't set up. Run flea admin when you're ready.")
+				logger.Print("Admin sign-in isn't set up. Run itsy admin when you're ready.")
 			}
 			if len(p.Admin.Emails) > 0 && sender == nil {
-				logger.Print("Admin sign-in needs email setup. Run flea email.")
+				logger.Print("Admin sign-in needs email setup. Run itsy email.")
 			}
 		}
 		if _, contactEnabled := p.Apps["contact"]; contactEnabled && sender == nil {
-			logger.Print("Contact forms need email setup. Run flea email, then restart dev.")
+			logger.Print("Contact forms need email setup. Run itsy email, then restart dev.")
 		}
 		if preview != nil {
 			next := httpHandler
@@ -712,7 +712,7 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 			return 0
 		}
 		if len(args) != 3 && len(args) != 4 {
-			fmt.Fprintln(errOut, "Usage: flea server indexing [ssh-target] <hostname> <noindex|allow>")
+			fmt.Fprintln(errOut, "Usage: itsy server indexing [ssh-target] <hostname> <noindex|allow>")
 			return 2
 		}
 		target := ""
@@ -720,7 +720,7 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 			target = args[1]
 		}
 		if err := setup.ServerIndexing(ctx, target, args[len(args)-2], args[len(args)-1], in, out, errOut); err != nil {
-			fmt.Fprintln(errOut, "flea:", err)
+			fmt.Fprintln(errOut, "itsy:", err)
 			return 1
 		}
 		return 0
@@ -730,7 +730,7 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 			return 0
 		}
 		if len(args) > 2 || (len(args) == 2 && strings.HasPrefix(args[1], "-")) {
-			fmt.Fprintln(errOut, "Usage: flea server list [ssh-target]")
+			fmt.Fprintln(errOut, "Usage: itsy server list [ssh-target]")
 			return 2
 		}
 		target := ""
@@ -738,7 +738,7 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 			target = args[1]
 		}
 		if err := setup.ServerList(ctx, target, in, out, errOut); err != nil {
-			fmt.Fprintln(errOut, "flea:", err)
+			fmt.Fprintln(errOut, "itsy:", err)
 			return 1
 		}
 		return 0
@@ -752,7 +752,7 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 			return 0
 		}
 		if len(args) > 3 || (len(args) >= 2 && strings.HasPrefix(args[1], "-")) || (len(args) == 3 && strings.HasPrefix(args[2], "-")) {
-			fmt.Fprintln(errOut, "Usage: flea server remove [ssh-target] [site-name]")
+			fmt.Fprintln(errOut, "Usage: itsy server remove [ssh-target] [site-name]")
 			return 2
 		}
 		target, name := "", ""
@@ -763,7 +763,7 @@ func runServer(ctx context.Context, args []string, in io.Reader, out, errOut io.
 			name = args[2]
 		}
 		if err := setup.ServerRemove(ctx, target, name, in, out, errOut); err != nil {
-			fmt.Fprintln(errOut, "flea:", err)
+			fmt.Fprintln(errOut, "itsy:", err)
 			return 1
 		}
 		return 0

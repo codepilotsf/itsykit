@@ -1,5 +1,18 @@
 # Publishing FleaCMS
 
+## Pending ItsyWeb rename
+
+Development builds now produce `bin/itsy` and a retired `bin/flea` link. Stage
+the renamed installer with the first renamed release. Keep public artifact names
+`flea-darwin-arm64` and `flea-linux-amd64`: released updaters and the host download
+catalogue require those names. Invoke downloaded artifacts through an `itsy`
+name for CLI smoke checks; old `.flea-update-* version` verification is retained
+only for the transition. From a pre-rename CLI, the first `flea update` installs
+the transition binary; a second `flea update` installs the canonical `itsy` name.
+Verify both steps and the strong notice on native supported platforms before
+publication. No release, website installer sync or server rollout is performed by
+this local rename task. Existing release receipts below retain historical names.
+
 For the manual public release workflow, SemVer rules, low-memory host safeguards
 and recovery steps, follow the [deployment runbook](deployment-runbook.md).
 Since 0.7.0, versioned binaries live in the host's separate
@@ -96,7 +109,7 @@ Resolve this on the signing runner and verify a clean payload before release;
 installation, signing and notarization have not been verified.
 
 After building release binaries, set RELEASE_BASE_URL to the HTTPS release
-directory and run `bash scripts/homebrew.sh` to generate dist/flea.rb with real
+directory and run `bash scripts/homebrew.sh` to generate dist/itsy.rb with real
 checksums. Review and publish it to a Homebrew tap separately. These scripts do
 not publish artifacts, create a tap, or modify a user's installation.
 
@@ -180,7 +193,7 @@ per-job `TMPDIR` pattern in [development storage](../development-storage.md).
 The script locates Go on PATH or /usr/local/go/bin/go (GO_BINARY overrides it).
 It cross-compiles both Linux servers with CGO disabled, compresses them with
 deterministic gzip headers, stores checksums, tests extraction, and builds the
-native CLI at bin/flea. The default version comes from internal/buildinfo/version.go.
+native CLI at bin/itsy. The default version comes from internal/buildinfo/version.go.
 Use VERSION=0.2.0-rc.1 for an explicit local build override. Values must be valid
 SemVer without a leading v; prerelease and build metadata suffixes are supported.
 Release and publish scripts require CI_COMMIT_TAG to match v plus the recorded

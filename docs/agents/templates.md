@@ -116,11 +116,11 @@ separate from the site/ template boundary: logical template names remain site-re
 while extraction journal edit paths begin with site/. No old-directory fallback or
 automatic migration. Protocol 25 prevents old servers receiving this structure.
 
-`flea new <directory>` creates a site in a new or completely empty directory;
+`itsy new <directory>` creates a site in a new or completely empty directory;
 `.` selects the current directory. Count hidden entries and `.git` as content,
 reject directory symlinks, and never merge or overwrite existing files. The
 actual folder name supplies the existing display-name and deployment defaults.
-`flea new` initializes Git on main and commits the generated files as
+`itsy new` initializes Git on main and commits the generated files as
 `Initial site`, respecting normal identity, hooks and signing. Commit failure
 keeps the site with recovery instructions; no remote is configured automatically.
 Default creation is minimal: layout, navigation, index, styles/logo, error pages,
@@ -130,7 +130,7 @@ are embedded separately and never copied as a public directory. Navigation links
 live in site/_navigation.html, shared by desktop and native mobile popover.
 Keep both Admin links labelled Admin and wrapped in `{#unless app.current_admin}`;
 signed-in owners use the existing toolbar instead.
-`flea reset` resets all local files except .git after explicit confirmation, under
+`itsy reset` resets all local files except .git after explicit confirmation, under
 the dev/pull lock. Validate the fresh tree first, then move originals into a private
 sibling backup. No automatic commit, deployment, remote purge or clean alias.
 Refuse non-sites, filesystem/home roots, linked site roots and Git worktrees.
@@ -158,9 +158,9 @@ settings and icon caches in version control by default.
   editable headings/body copy on Home, Team, Contact and Thank you, plus the
   shared footer. Keep snips outside form controls and navigation. Contact uses
   a responsive two-column introduction/form layout that stacks on narrow screens.
-  Its approved logo pairs the filled Little Skip mascot with outlined Nunito 800
+  Its approved logo pairs the ItsyWeb woven-loop mark with outlined
   lettering. `templates/site/images/logo.svg` is the full lockup; `mark.svg` is
-  the standalone mascot. Layouts use `favicon.svg`, a 32px PNG and an Apple touch
+  the standalone mark. Layouts use `favicon.svg`, a 32px PNG and an Apple touch
   icon; the root ICO includes 16px and 32px images. Keep the approved proportions
   and spacing. See [brand assets](../branding/README.md). Existing custom site
   branding is never replaced by CLI or server updates.

@@ -130,7 +130,7 @@ func ValidateAppManifest(manifest AppManifest, name string, protocol int) (map[s
 		return nil, fmt.Errorf("app package name %q must match the configured name %q", manifest.Name, name)
 	}
 	if manifest.Protocol != protocol {
-		return nil, fmt.Errorf("app %q declares protocol %d; this Flea supports protocol %d", name, manifest.Protocol, protocol)
+		return nil, fmt.Errorf("app %q declares protocol %d; this ItsyWeb supports protocol %d", name, manifest.Protocol, protocol)
 	}
 	if manifest.Version == "" || len(manifest.Version) > 64 || strings.IndexFunc(manifest.Version, func(r rune) bool { return r < 0x20 || r > 0x7e }) >= 0 {
 		return nil, fmt.Errorf("app %q needs a printable version of at most 64 bytes", name)

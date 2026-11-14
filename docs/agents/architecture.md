@@ -2,7 +2,14 @@
 
 `internal/selfupdate` updates only the local CLI, separate from SSH server updates.
 It trusts bounded HTTPS metadata from fleacms.com, checks checksum/platform/version,
-and replaces the executable under the shared installer lock. Checksums are not
+and replaces the executable under the shared installer lock. The canonical command
+is `itsy`; only `flea update` dispatches through the retired command entry point.
+When converting a regular `flea`, the updater exclusively links the verified
+executable to `itsy`, then atomically replaces `flea` with a relative symlink.
+An unrelated existing `itsy` is never replaced during conversion. The installer
+installs `itsy` and the same retired-command link. Existing paths, protocols and
+release artifact names retain their spelling. Already released updaters have a
+narrow read-only version probe; see docs/installation.md. Checksums are not
 independent signatures. Public-host and clean-machine verification remain pending.
 
 Project files have explicit boundaries: `site/` supplies templates and public
@@ -25,7 +32,7 @@ policy retains them for watching, deployment and backups; the email renderer
 loads them separately from web pages and snip extraction. Protocol 26 requires
 this location, with no old-directory fallback.
 
-FleaCMS has a developer CLI and persistent website server sharing the site loader
+ItsyWeb has a developer CLI and persistent website server sharing the site loader
 and renderer. The bundled Contact mini app is a separate child executable. Blog is a built-in
 content application using the existing snapshot/editor, not a child process. There is no database, background job queue or
 public deployment administration API.
@@ -99,7 +106,7 @@ See [SEO](../seo.md) for eligibility and custom app boundaries.
 
 Local site creation composes the canonical starter with embedded minimal content
 overrides by default; `--starter` opts into the examples. Creation accepts a new
-or empty directory, including the current directory via `flea new .`; the CLI
+or empty directory, including the current directory via `itsy new .`; the CLI
 checks emptiness before scaffold writes confined by os.Root with exclusive file
 creation. It refuses nonempty directories and linked targets. `cli/reset.go` validates
 a fresh minimal tree before confirmation, takes the dev/pull lock, and moves old
@@ -241,7 +248,7 @@ Error pages escape details and allow only their hash-pinned reload script. Reque
 failures and failed custom error rendering log quoted details in both modes;
 production HTTP stays generic/custom. Startup validation remains terminal-only.
 
-The template compiler translates FleaCMS directives into Go `html/template`.
+The template compiler translates ItsyWeb directives into Go `html/template`.
 `{snip ID}` becomes a sanitized rich-content call. The HTML region scanner
 recognizes the same unquoted markers for extraction, editor access and deployment
 pruning. Quoted markers are rejected. HTML comments and script/style contents
@@ -450,7 +457,7 @@ Before serving, interactive CLI startup asks for the site name and optionally
 reuses AddAdmin; it never prompts for Resend setup. It reloads after writes so session setup and
 the first request see the new owner. Nonterminal startup never reads prompt input.
 The editor enforces loopback host checks before showing local instructions,
-unless devaccess has authorized an explicit LAN request. `flea dev --lan`/`-l`
+unless devaccess has authorized an explicit LAN request. `itsy dev --lan`/`-l`
 binds IPv4 interfaces and snapshots detected private IPv4 addresses at startup.
 The outer middleware checks exact listener Host/port against detected interface
 addresses and OS hostname/local aliases, along with actual private, shared-address-space
@@ -566,7 +573,7 @@ they may render partials but cannot select another layout. Only the layout
 compiler accepts slots. Unknown/duplicate settings and invalid targets fail load.
 The admin starter selects admin.layout.html; public main.layout.html is independent.
 
-`flea email` uses the setup-only mailer.Checker interface for a non-sending
+`itsy email` uses the setup-only mailer.Checker interface for a non-sending
 connection check. Resend implements both Checker and Sender; auth/contact code
 depends only on Sender. Future provider adapters should use these boundaries.
 The localenv package handles bounded, literal .env reads and owner-only writes,
@@ -596,7 +603,7 @@ Remaining work and limits, not claims of completed sign-off:
 
 - Exercise real Ubuntu/systemd installation, interrupted activation, and live
   certificate issuance/renewal. Local tests and simulated SSH cannot establish these.
-- Exercise executable-only `flea update-server` and its recovery path on a real server.
+- Exercise executable-only `itsy update-server` and its recovery path on a real server.
   Setup reset is not an upgrade. Publishing artifacts remains operational work.
 - Local dev uses pinned fsnotify directory notifications, registering included
   subdirectories and reconciling new/moved/deleted directories after a 100 ms

@@ -1,5 +1,28 @@
 # Installation and updates
 
+## ItsyWeb rename (unreleased)
+
+Flea is now ItsyWeb, and the command is `itsy`. In the renamed CLI,
+`flea update` is the only working old command: it displays a prominent notice,
+verifies the update and installs `itsy` beside the old command. It also installs
+`itsy` when the version is already current. All other `flea` commands print
+“Flea is now ItsyWeb. From now on, please use itsy.” and exit with status 2.
+Use `itsy update` and `itsy update-server` for subsequent updates.
+
+The installer places `itsy` in `~/.local/bin` and retains `flea` as a relative
+symlink to it for the notice and update exception. The updater will not replace
+an unrelated existing `itsy` during conversion. Config filenames, content paths,
+server services, protocol identifiers, release URLs and downloadable artifact
+names retain their existing spelling. Local updates do not modify servers.
+
+Already released Flea binaries cannot display new notices themselves. Their first
+`flea update` installs the renamed binary under the old name, using the preserved
+private version probe. Run `flea update` once more to see the notice and install
+`itsy`, or use the new installer. Publishing the renamed CLI and installer is a
+separate release step; the public channel has not changed in this task.
+
+Earlier release notes below retain their historical command names.
+
 ## 0.20.5 navy-on-light branding
 
 Primary logos and icons use the approved navy foreground on light surfaces.

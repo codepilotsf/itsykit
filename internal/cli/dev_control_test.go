@@ -166,7 +166,7 @@ func TestDevControlRejectsInvalidRequest(t *testing.T) {
 }
 
 func TestDevExecutableReplacesServer(t *testing.T) {
-	binary := filepath.Join(t.TempDir(), "flea")
+	binary := filepath.Join(t.TempDir(), "itsy")
 	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/flea")
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build: %v\n%s", err, output)

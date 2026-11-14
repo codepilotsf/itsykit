@@ -11,13 +11,13 @@ import (
 func TestServerCommandOutsideSite(t *testing.T) {
 	t.Chdir(t.TempDir())
 	var out, errOut bytes.Buffer
-	if code := Run(context.Background(), []string{"server"}, &out, &errOut); code != 0 || !strings.Contains(out.String(), "Usage: flea server list [ssh-target]") || !strings.HasSuffix(out.String(), "\n\n") || errOut.Len() != 0 {
+	if code := Run(context.Background(), []string{"server"}, &out, &errOut); code != 0 || !strings.Contains(out.String(), "Usage: itsy server list [ssh-target]") || !strings.HasSuffix(out.String(), "\n\n") || errOut.Len() != 0 {
 		t.Fatalf("server help: code=%d out=%q err=%q", code, out.String(), errOut.String())
 	}
 	// Help for each subcommand prints usage without connecting or prompting.
 	for _, args := range [][]string{{"server", "indexing", "--help"}, {"server", "indexing", "-h"}, {"server", "list", "--help"}, {"server", "list", "-h"}, {"server", "remove", "--help"}, {"server", "remove", "-h"}} {
 		var stdout, stderr bytes.Buffer
-		if code := Run(context.Background(), args, &stdout, &stderr); code != 0 || stderr.Len() != 0 || !strings.Contains(stdout.String(), "Usage: flea server list [ssh-target]") {
+		if code := Run(context.Background(), args, &stdout, &stderr); code != 0 || stderr.Len() != 0 || !strings.Contains(stdout.String(), "Usage: itsy server list [ssh-target]") {
 			t.Fatalf("%v: code=%d out=%q err=%q", args, code, stdout.String(), stderr.String())
 		}
 	}

@@ -121,7 +121,7 @@ func TestDeployOffersSetupOnlyForMissingServer(t *testing.T) {
 				if mode != "setup-failed" && installs != 0 {
 					t.Fatal("installed without consent or verified absence")
 				}
-				if mode == "auth-failed" && (strings.Contains(err.Error(), "255") || strings.Contains(out.String(), "Install FleaCMS")) {
+				if mode == "auth-failed" && (strings.Contains(err.Error(), "255") || strings.Contains(out.String(), "Install ItsyWeb")) {
 					t.Fatal(err, out.String())
 				}
 			}

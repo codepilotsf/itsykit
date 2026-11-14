@@ -89,7 +89,7 @@ func TestHelpWithoutSite(t *testing.T) {
 	for _, command := range []string{"new", "dev", "status", "admin", "email", "setup", "deploy", "https", "version", "pull", "update", "update-server", "server"} {
 		for _, flag := range []string{"--help", "-h"} {
 			var out, errOut bytes.Buffer
-			if code := Run(context.Background(), []string{command, flag}, &out, &errOut); code != 0 || errOut.Len() != 0 || !strings.Contains(out.String(), "Usage: flea "+command) || !strings.HasSuffix(out.String(), "\n\n") {
+			if code := Run(context.Background(), []string{command, flag}, &out, &errOut); code != 0 || errOut.Len() != 0 || !strings.Contains(out.String(), "Usage: itsy "+command) || !strings.HasSuffix(out.String(), "\n\n") {
 				t.Fatalf("%s %s: code=%d stdout=%q stderr=%q", command, flag, code, out.String(), errOut.String())
 			}
 		}
@@ -164,7 +164,7 @@ func TestStatusWarnsForMissingIcon(t *testing.T) {
 // HTTP requests, edits, invalid state, recovery, and graceful shutdown.
 func TestExecutableWorkflow(t *testing.T) {
 	temp := t.TempDir()
-	binary := filepath.Join(temp, "flea")
+	binary := filepath.Join(temp, "itsy")
 	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/flea")
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build: %v\n%s", err, output)
@@ -281,7 +281,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	edit("flea/snips.json", strings.Replace(string(seedContent), "Welcome to FleaCMS.", "Smoke test changed", 1))
+	edit("flea/snips.json", strings.Replace(string(seedContent), "Welcome to ItsyWeb.", "Smoke test changed", 1))
 	wait("/", 200, "Smoke test changed")
 	edit("test.html", `<section snip="intro"><p>Extracted <em>live</em></p></section>`)
 	wait("/test", 200, "Extracted <em>live</em>")

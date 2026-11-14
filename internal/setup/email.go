@@ -27,7 +27,7 @@ func EmailOptional(ctx context.Context, directory string, in io.Reader, out io.W
 
 func configureEmailFlow(ctx context.Context, directory string, in io.Reader, out io.Writer, checker func(mailer.Settings) mailer.Checker, optional bool) error {
 	if _, err := os.Stat(filepath.Join(directory, ".flea.config.json")); err != nil {
-		return fmt.Errorf("Run flea email from your site's folder.")
+		return fmt.Errorf("Run itsy email from your site's folder.")
 	}
 	// If Git is present, fail closed on inspection errors and tracked secrets.
 	if _, err := exec.LookPath("git"); err == nil {
@@ -50,7 +50,7 @@ func configureEmailFlow(ctx context.Context, directory string, in io.Reader, out
 				return fmt.Errorf("Could not check whether .env is tracked by Git. Nothing was saved.")
 			}
 			if len(tracked) != 0 {
-				return fmt.Errorf(".env is tracked by Git. Remove it from Git tracking before running flea email. Nothing was saved.")
+				return fmt.Errorf(".env is tracked by Git. Remove it from Git tracking before running itsy email. Nothing was saved.")
 			}
 		} else if !strings.Contains(string(output), "not a git repository") {
 			return fmt.Errorf("Could not check this site's Git repository. Nothing was saved.")

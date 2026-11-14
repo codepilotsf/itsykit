@@ -43,8 +43,8 @@ type devErrorView struct {
 }
 
 func serveDevError(w http.ResponseWriter, r *http.Request, p *Project, code int, revision uint64, cause error) {
-	v := devErrorView{Code: code, Title: "Application error", Summary: "Flea found a problem in your site.", Path: r.URL.EscapedPath(), Method: r.Method,
-		Hint: "Check the error below and the dev terminal. Fix the template or configuration, then save. Flea will validate the site again automatically."}
+	v := devErrorView{Code: code, Title: "Application error", Summary: "ItsyWeb found a problem in your site.", Path: r.URL.EscapedPath(), Method: r.Method,
+		Hint: "Check the error below and the dev terminal. Fix the template or configuration, then save. ItsyWeb will validate the site again automatically."}
 	if r.Method == "HEAD" {
 		v.Method = "GET"
 	}
@@ -73,7 +73,7 @@ func serveDevError(w http.ResponseWriter, r *http.Request, p *Project, code int,
 		case strings.Contains(v.Detail, "snip") && (strings.Contains(v.Detail, "nested") || strings.Contains(v.Detail, "closing") || strings.Contains(v.Detail, "unclosed")):
 			v.Hint = "Editable snip regions cannot be nested. Give each region balanced opening and closing tags, then save the HTML file."
 		case strings.Contains(v.Detail, "expression") || strings.Contains(v.Detail, "directive"):
-			v.Hint = "Check the template expression. Flea uses dotted names such as {app.site_name}, {render footer} for partials, and balanced {#if} or {#each} blocks."
+			v.Hint = "Check the template expression. ItsyWeb uses dotted names such as {app.site_name}, {render footer} for partials, and balanced {#if} or {#each} blocks."
 		}
 	}
 	if code == 405 {

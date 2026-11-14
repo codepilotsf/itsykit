@@ -21,7 +21,7 @@ func TestAdminCommand(t *testing.T) {
 	if code := Run(context.Background(), []string{"admin", "owner@example.com"}, &out, &out); code != 0 || !strings.Contains(out.String(), "Added owner@example.com") {
 		t.Fatal(code, out.String())
 	}
-	for _, text := range []string{"Sign in at /admin", "updates automatically", "flea deploy"} {
+	for _, text := range []string{"Sign in at /admin", "updates automatically", "itsy deploy"} {
 		if !strings.Contains(out.String(), text) {
 			t.Fatalf("missing login setup instruction %q", text)
 		}

@@ -54,7 +54,7 @@ func ReadFields(w http.ResponseWriter, r *http.Request) (map[string]any, error) 
 			return nil, fmt.Errorf("field values must be strings")
 		}
 		if name == "_csrf" {
-			return nil, fmt.Errorf("CSRF belongs to Flea")
+			return nil, fmt.Errorf("CSRF belongs to ItsyWeb")
 		}
 	}
 	return fields, nil

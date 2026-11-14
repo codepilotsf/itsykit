@@ -23,6 +23,7 @@ func TestInstallerOffline(t *testing.T) {
 		{"linux amd64", "Linux", "x86_64", "flea-linux-amd64", false, false, false},
 		{"linux arm64", "Linux", "aarch64", "flea-linux-arm64", false, false, true},
 		{"linux arm64 alias", "Linux", "arm64", "flea-linux-arm64", false, false, true},
+		{"wrong version", "Linux", "x86_64", "flea-linux-amd64", false, false, false},
 		{"bad checksum", "Linux", "x86_64", "flea-linux-amd64", true, false, false},
 		{"missing linux amd64", "Linux", "x86_64", "flea-linux-amd64", false, true, false},
 	} {
@@ -36,7 +37,10 @@ func TestInstallerOffline(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			payload := []byte("#!/bin/sh\nprintf 'FleaCMS 1.0.1\\n'\n")
+			payload := []byte("#!/bin/sh\nprintf 'ItsyWeb 1.0.1\\n'\n")
+			if scenario.name == "wrong version" {
+				payload = []byte("#!/bin/sh\nprintf 'ItsyWeb 0.0.0\\n'\n")
+			}
 			name := scenario.artifact
 			hash := fmt.Sprintf("%x", sha256.Sum256(payload))
 			if scenario.bad {
@@ -76,23 +80,28 @@ if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/
 			cmd := exec.Command("bash", installer)
 			cmd.Env = append(os.Environ(), "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
 			out, err := cmd.CombinedOutput()
-			if (err != nil) != (scenario.bad || scenario.missing || scenario.unsupported) {
+			if (err != nil) != (scenario.bad || scenario.missing || scenario.unsupported || scenario.name == "wrong version") {
 				t.Fatal(err, string(out))
 			}
 			got, _ := os.ReadFile(target)
-			if scenario.bad || scenario.missing || scenario.unsupported {
+			if scenario.bad || scenario.missing || scenario.unsupported || scenario.name == "wrong version" {
 				if string(got) != "old installation" {
 					t.Fatal("installer replaced before checksum validation")
 				}
 				if scenario.unsupported && !strings.Contains(string(out), "Linux ARM64 CLI downloads are no longer supported") {
 					t.Fatal("missing platform diagnostic", string(out))
 				}
-				if scenario.missing && !strings.Contains(string(out), "FleaCMS 1.0.1 has no verified download for linux/amd64") {
+				if scenario.missing && !strings.Contains(string(out), "ItsyWeb 1.0.1 has no verified download for linux/amd64") {
 					t.Fatal("missing platform diagnostic", string(out))
 				}
 			} else {
 				if string(got) != string(payload) || !strings.Contains(string(out), "export PATH=") {
 					t.Fatal("install/PATH instructions failed", string(out))
+				}
+				link, linkErr := os.Readlink(target)
+				canonical, canonicalErr := os.ReadFile(filepath.Join(destination, "itsy"))
+				if linkErr != nil || link != "itsy" || canonicalErr != nil || string(canonical) != string(payload) {
+					t.Fatal("missing canonical itsy installation", link, linkErr, canonicalErr)
 				}
 				// Reinstalling is also safe and leaves no staging directories.
 				cmd = exec.Command("bash", installer)
@@ -102,7 +111,11 @@ if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/
 				}
 			}
 			entries, _ := os.ReadDir(destination)
-			if len(entries) != 1 || entries[0].Name() != "flea" {
+			wantEntries := 2
+			if scenario.bad || scenario.missing || scenario.unsupported || scenario.name == "wrong version" {
+				wantEntries = 1
+			}
+			if len(entries) != wantEntries {
 				t.Fatal("installer left staging files", entries)
 			}
 		})

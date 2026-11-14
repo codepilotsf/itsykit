@@ -35,7 +35,7 @@ func withRemoteAdminProtocol(ctx context.Context, root string, in io.Reader, out
 	}
 	s, ok := config.Branches[g.Branch]
 	if !ok {
-		return fmt.Errorf("configure this branch with flea deploy -configure first")
+		return fmt.Errorf("configure this branch with itsy deploy -configure first")
 	}
 	s.Branch = g.Branch
 	if err = validateMapping(g.Branch, s, config); err != nil {
@@ -121,7 +121,7 @@ func rollback(ctx context.Context, root, target string, list bool, in io.Reader,
 			}
 		}
 		if !found {
-			return fmt.Errorf("choose a release from flea rollback --list")
+			return fmt.Errorf("choose a release from itsy rollback --list")
 		}
 		fmt.Fprintf(out, "Rollback %s to %s. Live snips will be kept. Styles come from the selected release.\n", r.settings.Domain, target)
 		answer, err := ask(ctx, in, out, "Continue? (y/N)", "n")

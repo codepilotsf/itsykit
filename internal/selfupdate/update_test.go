@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -24,12 +25,20 @@ func TestUpdateVerifiedReplacementAndFailures(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, scenario := range []string{"success", "checksum mismatch", "invalid executable", "wrong version", "interrupted download", "changed target", "changed candidate", "busy", "already current", "newer local", "duplicate checksum"} {
+	for _, scenario := range []string{"success", "canonical success", "retry linked migration", "checksum mismatch", "invalid executable", "wrong version", "interrupted download", "changed target", "changed candidate", "busy", "already current", "newer local", "duplicate checksum"} {
 		t.Run(scenario, func(t *testing.T) {
 			dir := t.TempDir()
 			target := filepath.Join(dir, "flea")
+			if scenario == "canonical success" {
+				target = filepath.Join(dir, "itsy")
+			}
 			if err := os.WriteFile(target, []byte("original CLI"), 0755); err != nil {
 				t.Fatal(err)
+			}
+			if scenario == "retry linked migration" {
+				if err := os.Link(target, filepath.Join(dir, "itsy")); err != nil {
+					t.Fatal(err)
+				}
 			}
 			payload := binary
 			if scenario == "invalid executable" {
@@ -90,7 +99,7 @@ func TestUpdateVerifiedReplacementAndFailures(t *testing.T) {
 			}
 			var out bytes.Buffer
 			err := u.run(context.Background(), current, &out)
-			wantSuccess := scenario == "success" || scenario == "already current" || scenario == "newer local"
+			wantSuccess := scenario == "success" || scenario == "canonical success" || scenario == "retry linked migration" || scenario == "already current" || scenario == "newer local"
 			if (err == nil) != wantSuccess {
 				t.Fatalf("unexpected result: %v %s", err, out.String())
 			}
@@ -99,9 +108,25 @@ func TestUpdateVerifiedReplacementAndFailures(t *testing.T) {
 				t.Fatal(readErr)
 			}
 			switch scenario {
-			case "success":
-				if !verified || !bytes.Equal(got, payload) || !strings.Contains(out.String(), "flea update-server") {
+			case "success", "retry linked migration":
+				link, linkErr := os.Readlink(target)
+				canonical, canonicalErr := os.ReadFile(filepath.Join(dir, "itsy"))
+				if linkErr != nil || link != "itsy" || canonicalErr != nil || !bytes.Equal(canonical, payload) {
+					t.Fatal("itsy migration failed", link, linkErr, canonicalErr)
+				}
+				if !verified || !bytes.Equal(got, payload) || !strings.Contains(out.String(), "itsy update-server") {
 					t.Fatal("replacement not verified")
+				}
+			case "canonical success":
+				if !verified || !bytes.Equal(got, payload) {
+					t.Fatal("canonical update failed")
+				}
+			case "already current", "newer local":
+				if string(got) != "original CLI" {
+					t.Fatal("changed current bytes")
+				}
+				if link, err := os.Readlink(target); err != nil || link != "itsy" {
+					t.Fatal("missing already-current conversion", link, err)
 				}
 			case "changed target":
 				if string(got) != "independent change" {
@@ -114,8 +139,45 @@ func TestUpdateVerifiedReplacementAndFailures(t *testing.T) {
 			}
 			entries, _ := os.ReadDir(dir)
 			for _, e := range entries {
-				if e.Name() != "flea" && !(scenario == "busy" && e.Name() == ".flea-install.lock") {
+				if e.Name() != "flea" && !(wantSuccess && e.Name() == "itsy") && !(scenario == "busy" && e.Name() == ".flea-install.lock") {
 					t.Fatal("left temporary data", e.Name())
+				}
+			}
+		})
+	}
+}
+
+func TestMigrationPreservesUnrelatedItsy(t *testing.T) {
+	for _, linked := range []bool{false, true} {
+		t.Run(fmt.Sprint("symlink=", linked), func(t *testing.T) {
+			dir := t.TempDir()
+			target := filepath.Join(dir, "flea")
+			canonical := filepath.Join(dir, "itsy")
+			if err := os.WriteFile(target, []byte("old Flea"), 0755); err != nil {
+				t.Fatal(err)
+			}
+			other := canonical
+			if linked {
+				other = filepath.Join(dir, "other")
+			}
+			if err := os.WriteFile(other, []byte("independent command"), 0755); err != nil {
+				t.Fatal(err)
+			}
+			if linked {
+				if err := os.Symlink("other", canonical); err != nil {
+					t.Fatal(err)
+				}
+			}
+			u := updater{system: runtime.GOOS, arch: runtime.GOARCH, executable: target}
+			// A nil client proves conflict detection happens before any download.
+			err := u.run(context.Background(), "1.0.0", io.Discard)
+			if err == nil || !strings.Contains(err.Error(), "itsy already exists") {
+				t.Fatal(err)
+			}
+			for name, want := range map[string]string{target: "old Flea", canonical: "independent command"} {
+				got, err := os.ReadFile(name)
+				if err != nil || string(got) != want {
+					t.Fatal("overwrote independent file", name, err)
 				}
 			}
 		})
@@ -170,5 +232,65 @@ func TestUpdateRejectsUnsupportedPlatformsBeforeDownloading(t *testing.T) {
 				t.Fatal("changed existing CLI", string(data), err)
 			}
 		})
+	}
+}
+
+// This exercises the actual executable's argv handling and production version
+// verifier together; fixture-only replacement tests cannot catch that boundary.
+func TestRenamedExecutableMigration(t *testing.T) {
+	dir := t.TempDir()
+	candidate := filepath.Join(dir, "release", "itsy")
+	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", candidate, "../../cmd/flea")
+	if output, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build: %v\n%s", err, output)
+	}
+	payload, err := os.ReadFile(candidate)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Read the recorded version rather than couple this regression to a release.
+	versionBytes, err := exec.Command(candidate, "version").Output()
+	if err != nil {
+		t.Fatal(err)
+	}
+	releaseVersion := strings.TrimSpace(strings.TrimPrefix(string(versionBytes), "ItsyWeb "))
+	probe := filepath.Join(dir, ".flea-update-old-client")
+	if err := os.WriteFile(probe, payload, 0755); err != nil {
+		t.Fatal(err)
+	}
+	probeOut, err := exec.Command(probe, "version").Output()
+	if err != nil || string(probeOut) != "FleaCMS "+releaseVersion+"\n" {
+		t.Fatal("released updater cannot verify candidate", string(probeOut), err)
+	}
+	target := filepath.Join(dir, "flea")
+	if err := os.WriteFile(target, payload, 0755); err != nil {
+		t.Fatal(err)
+	}
+	name := "flea-" + runtime.GOOS + "-" + runtime.GOARCH
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/latest.txt":
+			fmt.Fprintln(w, releaseVersion)
+		case "/" + releaseVersion + "/SHA256SUMS":
+			fmt.Fprintf(w, "%x  %s\n", sha256.Sum256(payload), name)
+		case "/" + releaseVersion + "/" + name:
+			w.Write(payload)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer server.Close()
+	u := updater{base: server.URL, system: runtime.GOOS, arch: runtime.GOARCH, executable: target, client: server.Client(), verify: verifyVersion}
+	if err := u.run(context.Background(), "0.0.0", io.Discard); err != nil {
+		t.Fatal(err)
+	}
+	installed := filepath.Join(dir, "itsy")
+	got, err := exec.Command(installed, "version").Output()
+	if err != nil || string(got) != string(versionBytes) {
+		t.Fatal("installed command failed", string(got), err)
+	}
+	stopped, err := exec.Command(target, "deploy").CombinedOutput()
+	if exit, ok := err.(*exec.ExitError); !ok || exit.ExitCode() != 2 || !strings.Contains(string(stopped), "From now on, please use itsy.") {
+		t.Fatal("retired command dispatched", string(stopped), err)
 	}
 }

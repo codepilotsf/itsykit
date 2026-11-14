@@ -119,7 +119,7 @@ Dev rewrites templates when snip extraction is needed. Stop a task-owned dev wat
 before bulk rewrites, then restart for rendering and any required icon downloads
 or explicitly requested snip extraction. Coordinate with an existing process owner
 before replacing or stopping their server.
-`flea status` validates but does not perform extraction or download icons.
+`itsy status` validates but does not perform extraction or download icons.
 
 Use local email preview for sign-in/contact checks when enabled. Keep preview
 messages and codes out of site files. Do not run reset, pull, restore or deployment
@@ -128,7 +128,7 @@ as incidental cleanup. Follow the site's authorization and process-lifecycle rul
 Check rendered HTTP responses, title/copy and unresolved template directives.
 Inspect desktop/mobile rendering and exercise changed interactions, navigation,
 forms and edit Save/Cancel where affected. Review changed CSS for duplication and
-unintended overrides; verify behavior beyond screenshots. Finish with `flea status`
+unintended overrides; verify behavior beyond screenshots. Finish with `itsy status`
 and a review of templates together with any changed metadata or content. For new
 sites without requested browser editing, verify there are no snip attributes,
 snip bindings, multisnips or editable entries in `flea/snips.json`. Report unrun

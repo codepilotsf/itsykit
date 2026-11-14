@@ -46,7 +46,7 @@ func WrapLAN(next http.Handler, addresses, names []string, port int) http.Handle
 		ip := net.ParseIP(peer)
 		if err != nil || ip == nil || ip.To4() == nil || !IsLANIPv4(ip) || !hosts[strings.ToLower(r.Host)] {
 			w.Header().Set("Cache-Control", "no-store")
-			http.Error(w, "Use a network address or hostname shown by flea dev.", http.StatusForbidden)
+			http.Error(w, "Use a network address or hostname shown by itsy dev.", http.StatusForbidden)
 			return
 		}
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), lanKey{}, true)))

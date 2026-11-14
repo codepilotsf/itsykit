@@ -16,7 +16,7 @@ func prepareCommit(ctx context.Context, root, branch string, in io.Reader, out, 
 		return err
 	}
 	if branch != "" && branch != state.Branch {
-		return fmt.Errorf("Your branch changed. Please run flea deploy again.")
+		return fmt.Errorf("Your branch changed. Please run itsy deploy again.")
 	}
 	statusArgs := []string{"status", "--porcelain=v1", "--untracked-files=all", "--ignore-submodules=none"}
 	status, err := git(ctx, root, statusArgs...)
@@ -73,7 +73,7 @@ func prepareCommit(ctx context.Context, root, branch string, in io.Reader, out, 
 		return err
 	}
 	if latest != state || again != status {
-		return fmt.Errorf("Your repository changed while you were answering. Please run flea deploy again.")
+		return fmt.Errorf("Your repository changed while you were answering. Please run itsy deploy again.")
 	}
 	run := func(args ...string) error {
 		cmd := exec.CommandContext(ctx, "git", append([]string{"-C", root}, args...)...)

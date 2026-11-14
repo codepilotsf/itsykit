@@ -38,7 +38,7 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 		if commit, e := git(ctx, p.Root, "rev-parse", "--verify", "HEAD^{commit}"); e == nil {
 			label = "Detached HEAD, " + shortCommit(strings.TrimSpace(commit))
 		}
-		fmt.Fprintf(out, "  Git          %s\n\nDeployment\n  No named branch; remote check skipped.\n\nNext: run flea dev to preview your site.\n", label)
+		fmt.Fprintf(out, "  Git          %s\n\nDeployment\n  No named branch; remote check skipped.\n\nNext: run itsy dev to preview your site.\n", label)
 		return ctx.Err()
 	}
 	dirty, err := git(ctx, p.Root, "--no-optional-locks", "status", "--porcelain=v1", "-z", "--untracked-files=all", "--ignore-submodules=none")
@@ -60,7 +60,7 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 	}
 	settings, exists := config.Branches[state.Branch]
 	if !exists {
-		fmt.Fprintf(out, "\nDeployment\n  No remote site configured for %s.\n\nNext: run flea dev to preview your site.\n", display(state.Branch))
+		fmt.Fprintf(out, "\nDeployment\n  No remote site configured for %s.\n\nNext: run itsy dev to preview your site.\n", display(state.Branch))
 		return ctx.Err()
 	}
 	if err = validateMapping(state.Branch, settings, config); err != nil {
@@ -132,7 +132,7 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 				return fmt.Errorf("could not read deployment history")
 			}
 			if len(records) == 0 || records[0].ID != filepath.Base(remote.Revision) || records[0].Branch != state.Branch || !regexp.MustCompile(`^([0-9a-f]{40}|[0-9a-f]{64})$`).MatchString(records[0].Commit) {
-				return fmt.Errorf("deployment history does not match the live snapshot; run flea status again")
+				return fmt.Errorf("deployment history does not match the live snapshot; run itsy status again")
 			}
 			record = records[0]
 			for _, url := range statusURLs(settings) {
@@ -151,7 +151,7 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 		return err
 	}
 	if !remote.Exists {
-		fmt.Fprintln(out, "  State        Not deployed\n\nNext: run flea deploy to publish this branch.")
+		fmt.Fprintln(out, "  State        Not deployed\n\nNext: run itsy deploy to publish this branch.")
 		return nil
 	}
 	printIndexing(out, liveInfo)
@@ -174,9 +174,9 @@ func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 	fmt.Fprintf(out, "  Content      %s\n", content.String())
 	switch {
 	case content.Different > 0:
-		fmt.Fprintln(out, "\nNext: run flea pull to review content differences.")
+		fmt.Fprintln(out, "\nNext: run itsy pull to review content differences.")
 	case changes > 0 || state.Commit != record.Commit:
-		fmt.Fprintln(out, "\nNext: review your local changes, then run flea deploy to publish code.")
+		fmt.Fprintln(out, "\nNext: review your local changes, then run itsy deploy to publish code.")
 	default:
 		fmt.Fprintln(out, "\nCode and content match. Styles are part of the code release.")
 	}

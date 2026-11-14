@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-var ErrDevelopmentBusy = errors.New("another running flea dev, pull or reset is using this site; stop that command, then try again")
+var ErrDevelopmentBusy = errors.New("another running itsy dev, pull or reset is using this site; stop that command, then try again")
 
 // LockDevelopment prevents a pull from racing a running dev watcher or another
 // pull. The OS releases it on crash; the empty lock file carries no site data.

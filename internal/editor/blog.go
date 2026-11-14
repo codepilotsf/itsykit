@@ -86,7 +86,7 @@ func (h *Handler) showBlog(w http.ResponseWriter, r *http.Request, s session) {
 	data := map[string]any{"email": s.email, "csrf": s.csrf, "version": d.Version, "posts": posts, "photos": photos, "post": map[string]any{"id": post.ID, "title": post.Title, "slug": post.Slug, "excerpt": post.Excerpt, "body": post.Body, "status": post.Status, "published_at": post.PublishedAt, "cover": post.Cover}}
 	rendered, err := h.options.Render(mode, data)
 	if err != nil {
-		http.Error(w, "Could not show this page. Copy the blog admin templates from a fresh Flea site.", 500)
+		http.Error(w, "Could not show this page. Copy the blog admin templates from a fresh ItsyWeb site.", 500)
 		return
 	}
 	// Script policy is scoped to the bundled editor, not arbitrary site scripts.

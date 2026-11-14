@@ -134,7 +134,7 @@ func (u Upgrader) Upgrade(ctx context.Context, candidate, expected string) error
 		recovery, stop := context.WithTimeout(context.Background(), 120*time.Second)
 		defer stop()
 		if restoreErr := u.recoverLocked(recovery); restoreErr != nil {
-			return fmt.Errorf("upgrade failed: %w; recovery failed: %v; run flea update-server --recover", err, restoreErr)
+			return fmt.Errorf("upgrade failed: %w; recovery failed: %v; run itsy update-server --recover", err, restoreErr)
 		}
 		return fmt.Errorf("upgrade failed; previous server restored: %w", err)
 	}

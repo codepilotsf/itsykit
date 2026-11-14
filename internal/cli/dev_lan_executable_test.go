@@ -23,7 +23,7 @@ func TestLANExecutableFlags(t *testing.T) {
 	if err != nil {
 		t.Skip("requires a private IPv4 interface: ", err)
 	}
-	binary := filepath.Join(t.TempDir(), "flea")
+	binary := filepath.Join(t.TempDir(), "itsy")
 	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/flea")
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build: %v\n%s", err, output)

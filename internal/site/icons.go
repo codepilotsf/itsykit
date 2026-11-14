@@ -37,7 +37,7 @@ func (e *invalidIconError) Error() string { return e.err.Error() }
 func (e *invalidIconError) Unwrap() error { return e.err }
 
 func (e *missingIconError) Error() string {
-	return fmt.Sprintf("icon %q is not cached; run flea dev to download it into %s/", e.name, iconCacheDir)
+	return fmt.Sprintf("icon %q is not cached; run itsy dev to download it into %s/", e.name, iconCacheDir)
 }
 
 // LoadDev resolves missing icons before publishing a project. Load (used by

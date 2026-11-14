@@ -83,7 +83,7 @@ Changing a Blog slug does not automatically create a redirect.
 
 ## Verify and hand off
 
-Run `flea status` and resolve validation errors. Using a task-owned local dev
+Run `itsy status` and resolve validation errors. Using a task-owned local dev
 server, request each old path without following redirects: GET and HEAD must
 return 301 with the expected `Location`, and HEAD must have no body. Follow each
 destination and confirm it serves the intended content in one hop. Check incoming

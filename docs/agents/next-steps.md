@@ -6,6 +6,16 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
+## Pending ItsyWeb rename release
+
+The local CLI rename uses `itsy`, with `flea update` as the only working old
+command. Before publication, assign the next minor version, sync the new installer
+to the website, and verify fresh installs, both steps from a released Flea CLI,
+reinstalls and already-current conversion on native Mac ARM64 and Linux AMD64.
+Keep download artifact names and URLs stable for existing updaters. Existing
+site/config/server paths and protocols remain unchanged. See
+[installation](../installation.md) and [release guidance](releasing.md).
+
 ## Current release status (November 9, 2026)
 
 Public 0.20.5 and normal Kirin/Mac CLIs use the approved navy-on-light branding.

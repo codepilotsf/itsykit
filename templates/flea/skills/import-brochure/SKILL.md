@@ -1,6 +1,6 @@
 ---
 name: import-brochure
-description: Import or redesign an existing small brochure, portfolio or artist website into a FleaCMS site, preserving content and navigation with local assets and editable snips. Use for a requested site import or visual redesign of one small site. Work it interactively — the owner chooses the direction and approves a sample page before you build everything.
+description: Import or redesign an existing small brochure, portfolio or artist website into a ItsyWeb site, preserving content and navigation with local assets and editable snips. Use for a requested site import or visual redesign of one small site. Work it interactively — the owner chooses the direction and approves a sample page before you build everything.
 ---
 
 # Import or redesign a brochure site
@@ -74,7 +74,7 @@ matches what was approved.
 ### 3. One sample page before the whole site
 
 Build one representative page — usually the home page — or a static mock, and show
-it (a rendered screenshot and/or `flea dev`). This proves the type scale, palette,
+it (a rendered screenshot and/or `itsy dev`). This proves the type scale, palette,
 header/nav, hero and one content pattern before mass-producing. Iterate here; it is
 cheap now and expensive after twenty pages.
 
@@ -96,7 +96,7 @@ discard legal pages, accessibility text, downloads or form destinations.
 
 - Pages live in `site/`; use `site/about.html` or `site/about/index.html` for
   `/about`, never both. Links omit `.html`. Check route and asset-path collisions
-  with `flea status` before treating the route map as complete.
+  with `itsy status` before treating the route map as complete.
 - `site/main.layout.html` wraps pages through `{slot}`. Keep header/footer inline
   unless reuse justifies a partial. Keep the `app.current_admin` blocks, the CSRF
   meta and the toolbar include intact.
@@ -139,8 +139,8 @@ hundreds of images cannot be image snips. For large galleries:
 
 ## Verify the result
 
-- Run one `flea dev` process to extract authoring regions and download icons, then
-  stop it. Run `flea status` and fix what it reports.
+- Run one `itsy dev` process to extract authoring regions and download icons, then
+  stop it. Run `itsy status` and fix what it reports.
 - Sweep every route: expect HTTP 200, the right `<title>`, exactly one `<h1>`, and
   **zero** unresolved `{snip}`/`{data}`/`{app}`/`{page}`/`{icon}` tokens.
 - Check each configured old URL without following redirects: GET/HEAD return 301

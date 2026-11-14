@@ -207,7 +207,7 @@ func pull(ctx context.Context, root string, in io.Reader, out, errOut io.Writer,
 	}
 	s, ok := c.Branches[g.Branch]
 	if !ok {
-		return fmt.Errorf("configure this branch with flea deploy -configure first")
+		return fmt.Errorf("configure this branch with itsy deploy -configure first")
 	}
 	s.Branch = g.Branch
 	if e = validateMapping(g.Branch, s, c); e != nil {

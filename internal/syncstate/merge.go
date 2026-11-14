@@ -64,7 +64,7 @@ func choose(key, base, local, remote string, resolve Resolve) (string, error) {
 // ownership belong to templates. Missing local IDs are not deletion requests.
 func MergeSnips(base, local, remote *snips.Store, resolve Resolve) (*snips.Store, error) {
 	if base == nil || local == nil || remote == nil {
-		return nil, fmt.Errorf("run flea pull before publishing existing snips")
+		return nil, fmt.Errorf("run itsy pull before publishing existing snips")
 	}
 	bytes, err := remote.Bytes()
 	if err != nil {

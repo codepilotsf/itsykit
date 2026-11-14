@@ -1,6 +1,6 @@
-# Working on FleaCMS
+# Working on ItsyWeb
 
-FleaCMS is a small Go website server using plain HTML, local assets and JSON.
+ItsyWeb (formerly FleaCMS) is a small Go website server using plain HTML, local assets and JSON.
 This is the framework repository; `templates/` is the canonical starter.
 
 ## Start here
@@ -24,7 +24,7 @@ This is the framework repository; `templates/` is the canonical starter.
   support is not permission to add more.
 - Keep Go 1.26+, minimal dependencies and ordinary HTML/JSON. No npm/frontend
   build step. Do not add dependencies without a concrete need.
-- Preserve custom site layouts and the approved Little Skip mark and Nunito logo
+- Preserve custom site layouts and the approved ItsyWeb mark and logo
   (`templates/site/images/mark.svg` and `logo.svg`). Framework fixes belong here.
   Ask for the current test site's path before modifying it; do not assume
   `../bookworm` is the site in scope.
@@ -64,6 +64,14 @@ dependencies, trust boundaries, loading, transactions or publication.
 | Owner toolbar, authentication, sessions, onboarding, mail configuration, editor prototype | [Editor](docs/agents/editor.md); media guide for those modes |
 | Versions, packaging and releases | [RELEASING.md](docs/agents/releasing.md) and version rules below |
 
+## CLI rename
+
+Use `itsy` for all commands. The retired `flea` command prints the rename notice
+and exits without dispatch, except `flea update`, which installs `itsy`. Preserve
+the narrow read-only version probe required by already released Flea updaters.
+Existing `.flea.config.json`, `flea/`, protocol names, server paths and release
+artifact names remain unchanged; this rename does not migrate site or server data.
+
 ## Site and UI essentials
 
 Generated sites use `site/` for public templates/assets, `mailers/` for private
@@ -86,7 +94,7 @@ committed, and excluded from serving/deployment. Impeccable stays globally insta
 and must never be copied or linked into a site or template. Personal conversation preferences
 override the shared defaults; project requirements and permissions still apply.
 
-New sites enable `dev.email_preview`. Only `flea dev` opens actual outgoing mail
+New sites enable `dev.email_preview`. Only `itsy dev` opens actual outgoing mail
 in private browser previews; production ignores this setting. Keep the first-run
 prompts limited to site name and optional admin email, asked once on first run.
 User-facing copy says "admin"; code and DOM identifiers keep "owner". See the
@@ -99,12 +107,12 @@ the development lock. See the runtime guide.
 `--lan`/`-l` explicitly enables full trusted-network development over HTTP;
 preserve the shared exact Host/port and private/Tailscale peer gate, including
 detected hostname/local aliases, and ordinary auth/CSRF.
-`flea new <directory>` accepts paths, including `.` for the current directory.
+`itsy new <directory>` accepts paths, including `.` for the current directory.
 Existing directories must be completely empty, including hidden files and `.git`;
 reject file targets and directory symlinks without writing or prompting to overwrite.
-`flea new` creates an initial Git commit on main unless `--skip-git` is used;
+`itsy new` creates an initial Git commit on main unless `--skip-git` is used;
 see the runtime guide for failure recovery and remote setup. It defaults to a
-clean layout/index. `--starter`/`-s` adds demo pages and a six-person fictional team. `flea reset` confirms before resetting all local files
+clean layout/index. `--starter`/`-s` adds demo pages and a six-person fictional team. `itsy reset` confirms before resetting all local files
 except `.git`, with a private sibling recovery copy; it never deploys.
 Starter navigation links Team and Contact, with editable page copy and footer.
 Keep form controls developer-managed; see the templates guide for starter scope.
@@ -145,7 +153,7 @@ remain crawlable with noindex. Preserve custom discovery files and canonical
 markup, omit non-public routes and never derive production URLs from requests.
 Read [SEO](docs/seo.md) before changing this behavior; host indexing stays separate.
 
-`flea status` shows local validation first, then automatically checks the current
+`itsy status` shows local validation first, then automatically checks the current
 branch's saved remote. Keep it read-only; see the runtime and sync guides.
 
 ## Verification
@@ -200,10 +208,10 @@ record native ARM64 server acceptance separately rather than requiring an ARM64
 Linux runner for every release. Preserve historical published downloads.
 When a build is required, use `scripts/build.sh`: it refreshes
 the matching Contact child before each parent, then both embedded Linux servers
-before building `bin/flea`. Plain `go build` can
+before building `bin/itsy`. Plain `go build` can
 embed stale bundles. Do not overlap this build with tests compiling the bundles.
 For starter, packaging, loading or site-creation changes, generate a fresh
-temporary site, compare relevant starter files, and finish with `flea status`
+temporary site, compare relevant starter files, and finish with `itsy status`
 there. This smoke test is not required for unrelated CLI tweaks. Exclude local agent guidance
 from comparisons unless deliberately changing it. Restart dev after rebuilding;
 site-file reloads do not reload Go code. Verify installed binary paths before

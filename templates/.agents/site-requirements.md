@@ -2,8 +2,8 @@
 
 Read README.md before changing templates. Preserve existing custom layouts,
 content and assets. There is no frontend build step or Node requirement.
-`flea new` is minimal; `--starter`/`-s` adds example pages. The shared navigation
-partial drives desktop links and the native mobile popover. `flea reset` replaces
+`itsy new` is minimal; `--starter`/`-s` adds example pages. The shared navigation
+partial drives desktop links and the native mobile popover. `itsy reset` replaces
 all local files/settings except Git history after confirmation and keeps a private
 sibling backup. Never run it as an incidental cleanup step or deploy automatically.
 
@@ -15,7 +15,7 @@ New sites enable dev.email_preview in .flea.config.json. Local sign-in/contact
 mail opens in the browser without Resend credentials. Preview mode and sender
 details require a dev restart after changes; production ignores the toggle.
 Do not write preview messages or sign-in codes into site files.
-`flea dev --lan`/`-l` enables full HTTP development on a trusted private IPv4
+`itsy dev --lan`/`-l` enables full HTTP development on a trusted private IPv4
 network or shared address space (100.64.0.0/10, including Tailscale). Hostnames
 must match a detected interface address, computer name or local alias at the
 selected port. Default dev remains loopback-only. Email previews open on the host
@@ -108,8 +108,8 @@ custom CSS with its reason and approval. Verify the preserved layout behavior
 in the browser, not only in screenshots.
 
 Styles are developer-managed in `site/css/theme.css` using Prewind. Ordinary
-`flea deploy` publishes committed CSS. There is no browser Theme editor or CSS
-synchronization; `flea pull` retrieves snips and media only.
+`itsy deploy` publishes committed CSS. There is no browser Theme editor or CSS
+synchronization; `itsy pull` retrieves snips and media only.
 
 ## Optional Blog
 

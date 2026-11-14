@@ -10,10 +10,10 @@ obtain authorization before applying host changes or publishing.
 
 ## Recovery
 
-`flea update` changes only the local CLI and bundled servers using bounded HTTPS
+`itsy update` changes only the local CLI and bundled servers using bounded HTTPS
 downloads, checksum/platform/version checks and same-directory replacement.
 It shares `.flea-install.lock` with the installer. Preserve the old executable on
-failed validation. `flea update-server` explicitly updates the remote executable;
+failed validation. `itsy update-server` explicitly updates the remote executable;
 never add an `upgrade` alias or trigger remote updates from local updates.
 After confirmation, update/recovery shows a simple terminal spinner through
 upload and execution; redirected output uses plain progress text. Clear animation
@@ -65,7 +65,7 @@ paths and retain the service account. This is not an in-place upgrade.
 Before any reset/install changes, check TCP/UDP 80 and 443 on IPv4/IPv6.
 Only confirmed reinstall may exempt the systemd MainPID whose /proc executable
 is /usr/local/bin/flea-server. Reject unknown owners, other PIDs, and failed
-checks. Never stop another service. Recheck after stopping FleaCMS.
+checks. Never stop another service. Recheck after stopping ItsyWeb.
 
 The initial persistent host binds :80, uses /etc/flea/server.json,
 and has no sites by default. Config maps hostnames to absolute site roots.
@@ -83,7 +83,7 @@ Do not claim real Ubuntu/password/systemd installation was tested without a targ
 
 Read [hostname indexing](../host-indexing.md). Optional server `indexing` maps
 exact registered hosts to `noindex` or `allow`; omission adds no restriction.
-Use `flea server indexing [ssh-target] <hostname> <noindex|allow>` for explicit,
+Use `itsy server indexing [ssh-target] <hostname> <noindex|allow>` for explicit,
 reviewed changes. It shares the deployment lock, candidate validation, journal,
 restart and recovery transaction with removal. A fresh revision prevents stale
 readiness. Site/removal review digests include every owned indexing entry.
@@ -180,7 +180,7 @@ matching Contact executable before its parent. Verify child launch/cleanup under
 the real systemd unit separately; local tests do not establish native Linux or
 email acceptance.
 Setup does not upgrade existing installations.
-If an authenticated server probe confirms that FleaCMS is absent, offer setup
+If an authenticated server probe confirms that ItsyWeb is absent, offer setup
 and continue deployment after a successful install and fresh server check. Reuse
 the deployment SSH connection and target. Do not offer installation after failed
 SSH authentication or when an old/incomplete server executable already exists.
@@ -227,11 +227,11 @@ Never include keys in archives or logs.
 
 ### Server-wide site administration
 
-`flea server list [ssh-target]` lists installed sites without a local project:
+`itsy server list [ssh-target]` lists installed sites without a local project:
 each site's name and branch, then HTTPS domains, then HTTP-only domains, then
 redirects, in deterministic name order, without the release or repeated plain
 domain lines. It is read-only and may inspect a server with a pending recovery
-journal. `flea server remove [ssh-target] [site-name]` unregisters one site after
+journal. `itsy server remove [ssh-target] [site-name]` unregisters one site after
 typing the exact name; when the site name is omitted, it lists the managed sites
 and asks for one by its exact name.
 
@@ -244,7 +244,7 @@ Back up or pull the site before removal if a later deployment must keep its
 current content. Removal restarts the shared service, so other sites are briefly
 unavailable. No restore feature is added.
 
-`flea server` connects only over native SSH. Give the target explicitly, or omit
+`itsy server` connects only over native SSH. Give the target explicitly, or omit
 it to be prompted for the server login; an SSH alias or bare host is kept as-is.
 It never needs a local config, Git repository or site. The target must run the current
 deployment protocol; an older or incomplete server is reported and no remote

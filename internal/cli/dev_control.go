@@ -72,11 +72,11 @@ func beginDevelopment(ctx context.Context, root string, out io.Writer) (context.
 			if requested {
 				fmt.Fprintln(out, "Stopping the previous dev server for this site...")
 			} else if time.Now().After(discoveryDeadline) {
-				return nil, nil, fmt.Errorf("this site is busy with pull, reset, or a dev server that cannot be restarted automatically; let that command finish or stop it in its terminal, then run flea dev again")
+				return nil, nil, fmt.Errorf("this site is busy with pull, reset, or a dev server that cannot be restarted automatically; let that command finish or stop it in its terminal, then run itsy dev again")
 			}
 		}
 		if time.Now().After(deadline) {
-			return nil, nil, fmt.Errorf("the previous dev server has not finished stopping; wait a moment, then run flea dev again")
+			return nil, nil, fmt.Errorf("the previous dev server has not finished stopping; wait a moment, then run itsy dev again")
 		}
 		select {
 		case <-ctx.Done():

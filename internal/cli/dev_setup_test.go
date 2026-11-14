@@ -85,7 +85,7 @@ func TestDevOnboardingDoesNotRepeat(t *testing.T) {
 	if err != nil || !changed || !offered {
 		t.Fatalf("first run: changed=%v offered=%v err=%v out=%q", changed, offered, err, out.String())
 	}
-	if !strings.Contains(out.String(), "Add an admin") || !strings.Contains(out.String(), "flea admin") {
+	if !strings.Contains(out.String(), "Add an admin") || !strings.Contains(out.String(), "itsy admin") {
 		t.Fatalf("skip guidance missing: %q", out.String())
 	}
 	p, err = site.Load(root)

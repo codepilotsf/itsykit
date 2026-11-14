@@ -316,7 +316,7 @@ func (p *Project) CheckExtractedSnips() error {
 		if blocks, err := authorMultisnips(file, source); err != nil {
 			return err
 		} else if len(blocks) > 0 {
-			return fmt.Errorf("%s: run flea dev to extract multisnips before deploying", file)
+			return fmt.Errorf("%s: run itsy dev to extract multisnips before deploying", file)
 		}
 		regions, _, err := scanRegions(file, source, legacy)
 		if err != nil {
@@ -331,7 +331,7 @@ func (p *Project) CheckExtractedSnips() error {
 		}
 		for _, b := range bindings {
 			if b.author {
-				return fmt.Errorf("%s: run flea dev to extract media snips before deploying", file)
+				return fmt.Errorf("%s: run itsy dev to extract media snips before deploying", file)
 			}
 		}
 	}
