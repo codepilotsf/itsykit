@@ -79,7 +79,9 @@ are the owner-approved exception to the general no-compatibility rule.
 Installed server paths/accounts, wire identifiers, development/install locks,
 release URLs and public artifact names retain their spelling for compatibility.
 Protocol 30 is required before deploying the new site layout; an explicit
-`itsy update-server` can upgrade the server while preserving old sites.
+`itsy update-server` validates every installed site before upgrading. Old page-CMS
+sites require an explicitly approved, backed-up source/content conversion first;
+there is no automatic migration.
 
 ## Site and UI essentials
 
