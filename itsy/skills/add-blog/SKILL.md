@@ -1,9 +1,9 @@
 ---
 name: add-blog
-description: Add, enable or customize FleaCMS's built-in Blog on an existing Flea site. Use for requests such as "add a blog", "let's create a blog", "set up a blog", or authoring blog posts and templates. Covers app configuration, post JSON, available template values and the admin editor. Does not apply to a static article page or a full-site redesign.
+description: Add, enable or customize ItsyWeb's built-in Blog on an existing Itsy site. Use for requests such as "add a blog", "let's create a blog", "set up a blog", or authoring blog posts and templates. Covers app configuration, post JSON, available template values and the admin editor. Does not apply to a static article page or a full-site redesign.
 ---
 
-# Add a Flea Blog
+# Add a Itsy Blog
 
 Read the site's [README](../../../README.md) and [AGENTS](../../../AGENTS.md).
 Inspect Git status, configuration, templates and content before editing. Preserve
@@ -14,10 +14,10 @@ require a full-site design interview.
 
 ## Enable and connect
 
-Blog requires Flea 0.15.0 or newer and a matching server. Check `flea version`;
+Blog requires Itsy 0.15.0 or newer and a matching server. Check `itsy version`;
 do not assume the public download channel includes Blog yet.
 
-Merge this fragment into `.flea.config.json`, preserving all other fields:
+Merge this fragment into `itsy.config.json`, preserving all other fields:
 
 ```json
 {"apps":{"blog":{"mount":"/blog"}}}
@@ -30,9 +30,9 @@ routes `/blog` and `/blog/slug` use **private** `site/blog/_index.html` and
 
 Fresh matching-version sites include these templates and the authenticated
 `site/admin/blog.html` and `site/admin/blog-edit.html`. For an older site, generate
-a disposable matching-version site with `flea new NAME --skip-git` outside the
+a disposable matching-version site with `itsy new NAME --skip-git` outside the
 working project. Copy only the missing Blog/admin templates and incorporate their
-Blog CSS; the matching Flea runtime supplies `/admin/assets/blog.js`. Preserve
+Blog CSS; the matching Itsy runtime supplies `/admin/assets/blog.js`. Preserve
 the template's script reference, the site's layout and existing admin
 authentication/CSRF/version controls. Never reset the existing site or
 replace its entire layout/styles. Add the listing link to the existing navigation
@@ -96,7 +96,7 @@ Admins sign in at `/admin`, then use `/admin/blog`: New post, Save draft, explic
 Publish/Unpublish. Saving a published post updates it immediately. Keep posts as
 drafts unless publication is requested. A future date does not schedule publishing.
 
-Agents may edit the top-level `blog` array in `flea/snips.json`. Merge records,
+Agents may edit the top-level `blog` array in `itsy/snips.json`. Merge records,
 preserving `pages`, `shared`, `archive`, `media`, videos and other posts. For a new
 post generate a unique, secure-random ten-character case-sensitive alphanumeric
 ID; check existing IDs and keep it stable through edits. This differs from snip
@@ -129,7 +129,7 @@ Unpublish retains the record; omission from source never deletes a live post.
 
 ## Verify and hand off
 
-Run `flea status`. In local dev, check the listing, a published post, empty state,
+Run `itsy status`. In local dev, check the listing, a published post, empty state,
 optional cover and navigation. Verify a draft URL returns 404 and the admin editor
 still uses normal login. If testing publication, use disposable local content.
 Review the JSON and diff, and stop any task-owned dev server before handoff.
@@ -137,7 +137,7 @@ Review the JSON and diff, and stop any task-owned dev server before handoff.
 Normal deploy preserves existing live posts by ID and seeds new IDs. When an
 existing live post must be changed in source, pull the intended destination first
 (with dev stopped), retain other live content, and use reviewed
-`flea deploy --with-snips` only when deployment is authorized. The flag includes
+`itsy deploy --with-snips` only when deployment is authorized. The flag includes
 Blog and media; whole-record conflicts require resolution. A plain Git merge and
 normal deploy do not replace existing live posts. Report setup and checks, and
 whether any posts were actually published.

@@ -1,6 +1,6 @@
 ---
 name: import-brochure
-description: Convert an existing small brochure website into a FleaCMS site with preserved content and navigation, editable snips, local assets and basic Prewind styling. Use for a requested site import, not unrelated redesigns or application migrations.
+description: Convert an existing small brochure website into a ItsyWeb site with preserved content and navigation, editable snips, local assets and basic Prewind styling. Use for a requested site import, not unrelated redesigns or application migrations.
 ---
 
 # Import a brochure website
@@ -23,17 +23,17 @@ Download approved images to site/images/ instead of hotlinking. Retain alt text 
 intrinsic dimensions. Check links against the route mapping. Do not silently
 discard legal pages, accessibility text, downloads or form destinations.
 
-## Use Flea conventions
+## Use Itsy conventions
 
 - Pages live in site/: site/index.html is `/`, site/about.html is `/about`.
   Do not create both about.html and about/index.html. Links omit `.html`.
 - `site/main.layout.html` wraps pages through `{slot}`. Keep header/footer inline unless
   reuse justifies a partial. `{render card}` resolves `_card.html` beside its caller.
 - Site-wide public values use `{app.site_name}` and other `app.*` configuration.
-  Configuration is `.flea.config.json`; credentials belong in ignored `.env`.
+  Configuration is `itsy.config.json`; credentials belong in ignored `.env`.
 - Mark editable text with bare `snip`, e.g. `<div snip><p>About us.</p></div>`.
   Do not nest editable regions or mark navigation text, buttons or layout wrappers.
-  Dev replaces attributes with `{snip ID}` and writes `flea/snips.json`; do not invent IDs.
+  Dev replaces attributes with `{snip ID}` and writes `itsy/snips.json`; do not invent IDs.
 - For repeatable cards, seed complete adjacent elements such as
   `<article multisnip="team"><h2 snip="name">Joe</h2><p snip="role">Founder</p></article>`.
   Repeat the wrapper for each source item, with identical markup outside the
@@ -64,7 +64,7 @@ discard legal pages, accessibility text, downloads or form destinations.
 
 ## Verify the result
 
-Run one `flea dev` process to extract authoring regions, then `flea status`.
+Run one `itsy dev` process to extract authoring regions, then `itsy status`.
 Review rewritten templates and snips together. Confirm imported page count, all
 source items, headings, navigation, images, form behavior and private-path handling.
 Check rendered pages at narrow and desktop widths, keyboard navigation and admin

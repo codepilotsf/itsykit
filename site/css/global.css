@@ -16,7 +16,7 @@
   .docs-shell { --container-padding:60px var(--space-lg) 100px; }
   .skip-link { position:fixed; top:8px; left:8px; z-index:100; padding:12px 20px; background:white; transform:translateY(-160%); }
   .skip-link:focus { transform:translateY(0); }
-  .site-header { position:sticky; top:var(--flea-toolbar-height,0px); z-index:10; background:var(--hero-ink); color:var(--black); border-bottom:1px solid transparent; }
+  .site-header { position:sticky; top:var(--itsy-toolbar-height,0px); z-index:10; background:var(--hero-ink); color:var(--black); border-bottom:1px solid transparent; }
   .site-header.is-scrolled { background:color-mix(in srgb,var(--hero-ink) 94%,transparent); backdrop-filter:blur(12px); border-bottom-color:var(--light); }
   .site-header .site-links > a:not(.ui-button),.site-header > nav > a { color:var(--black); }
   .site-header :focus-visible,.site-footer :focus-visible { outline-color:var(--brand-1); }

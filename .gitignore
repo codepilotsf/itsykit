@@ -11,10 +11,10 @@
 .env
 .env.*
 !.env.example
-/flea/runtime/
-/flea/media/*.mp4
+/itsy/runtime/
+/itsy/media/*.mp4
 
 # Private release source snapshots and verification records; never deploy.
 /release-work/
-/flea/runtime/
-/flea/media/*.mp4
+/itsy/runtime/
+/itsy/media/*.mp4

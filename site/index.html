@@ -18,19 +18,19 @@
             <span class="terminal-title">terminal — your files to your server</span>
           </div>
           <pre class="terminal-body" tabindex="0" aria-label="Example terminal workflow"><code><span class="t-comment"># install the CLI</span>
-<span class="t-prompt">$</span> curl -fsSL https://fleacms.com/install.sh | bash
+<span class="t-prompt">$</span> curl -fsSL https://itsyweb.dev/install.sh | bash
 
 <span class="t-comment"># start a site and edit your HTML</span>
-<span class="t-prompt">$</span> flea new my-site &amp;&amp; cd my-site
-<span class="t-prompt">$</span> flea dev
+<span class="t-prompt">$</span> itsy new my-site &amp;&amp; cd my-site
+<span class="t-prompt">$</span> itsy dev
 
 <span class="t-comment"># stop dev, then prepare your Ubuntu server</span>
-<span class="t-prompt">$</span> flea setup
+<span class="t-prompt">$</span> itsy setup
 
 <span class="t-comment"># deploy committed files with automatic HTTPS</span>
-<span class="t-prompt">$</span> flea deploy</code></pre>
+<span class="t-prompt">$</span> itsy deploy</code></pre>
         </div>
-        <figcaption>Bring an Ubuntu server, SSH access and a domain. ItsyWeb sets up the web server and handles HTTPS. The command is still <code>flea</code>.</figcaption>
+        <figcaption>Bring an Ubuntu server, SSH access and a domain. ItsyWeb sets up the web server and handles HTTPS.</figcaption>
       </figure>
     </div>
     <ul class="hero-facts flex flex-wrap items-center">
@@ -74,9 +74,9 @@
     </div>
     <ul class="system-features" role="list">
       <li class="system-feature"><h3>No frontend build step</h3><p>Edit HTML and CSS directly. No bundler, generated output directory or Node toolchain between your files and the website.</p></li>
-      <li class="system-feature"><h3>Preview as you work</h3><p><code>flea dev</code> serves the site locally and reloads the browser when you save. Use LAN mode to check it on your phone.</p></li>
-      <li class="system-feature"><h3>Set up the server</h3><p>Point <code>flea setup</code> at a blank Ubuntu host over SSH. It installs the bundled web server. No runtime or database to install by hand.</p></li>
-      <li class="system-feature"><h3>Deploy over SSH</h3><p>Publish a committed Git branch with <code>flea deploy</code>. Different branches can have different destinations, and one server can host multiple sites.</p></li>
+      <li class="system-feature"><h3>Preview as you work</h3><p><code>itsy dev</code> serves the site locally and reloads the browser when you save. Use LAN mode to check it on your phone.</p></li>
+      <li class="system-feature"><h3>Set up the server</h3><p>Point <code>itsy setup</code> at a blank Ubuntu host over SSH. It installs the bundled web server. No runtime or database to install by hand.</p></li>
+      <li class="system-feature"><h3>Deploy over SSH</h3><p>Publish a committed Git branch with <code>itsy deploy</code>. Different branches can have different destinations, and one server can host multiple sites.</p></li>
       <li class="system-feature"><h3>HTTPS without the chores</h3><p>With your domain pointing at the server and ports 80 and 443 open, ItsyWeb requests and renews Let's Encrypt certificates and can redirect <code>www</code>.</p></li>
       <li class="system-feature"><h3>Back up and roll back</h3><p>Download a site backup or return to an earlier code release. Recovery commands are part of the same tool.</p></li>
     </ul>
@@ -97,34 +97,34 @@
       <li>
         <span class="step-number">01</span><h3>Install</h3>
         <p>One executable. No language runtime to install first.</p>
-        <div class="copy-code"><pre><code>curl -fsSL https://fleacms.com/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
+        <div class="copy-code"><pre><code>curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
       </li>
       <li>
         <span class="step-number">02</span><h3>Create a site</h3>
         <p>Start with HTML and CSS files you can open and understand.</p>
-        <pre><code>flea new my-site
+        <pre><code>itsy new my-site
 cd my-site</code></pre>
       </li>
       <li>
         <span class="step-number">03</span><h3>Write and preview</h3>
         <p>Edit a page or layout. Save and see the browser reload.</p>
-        <pre><code>flea dev</code></pre>
+        <pre><code>itsy dev</code></pre>
       </li>
       <li>
         <span class="step-number">04</span><h3>Set up your server</h3>
         <p>Install the bundled server on your Ubuntu host over SSH.</p>
-        <pre><code>flea setup</code></pre>
+        <pre><code>itsy setup</code></pre>
       </li>
       <li>
         <span class="step-number">05</span><h3>Deploy</h3>
         <p>Commit your changes, publish the branch and enable HTTPS.</p>
-        <pre><code>flea deploy</code></pre>
+        <pre><code>itsy deploy</code></pre>
       </li>
     </ol>
     <div class="install-command items-center">
       <div><h3>Try ItsyWeb</h3><p>0.20.5 · Apple Silicon Mac &amp; x86-64 Linux</p></div>
       <div>
-        <div class="copy-code"><pre><code>curl -fsSL https://fleacms.com/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
+        <div class="copy-code"><pre><code>curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
         <a href="/docs#installation">Installation notes <span aria-hidden="true">↗</span></a>
       </div>
     </div>

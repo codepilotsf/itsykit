@@ -1,24 +1,24 @@
-# Working on this FleaCMS site
+# Working on this ItsyWeb site
 
 Read README.md before changing templates. Preserve existing custom layouts,
 content and assets. There is no frontend build step or Node requirement.
-`flea new` is minimal; `--starter`/`-s` adds example pages. The shared navigation
-partial drives desktop links and the native mobile popover. `flea reset` replaces
+`itsy new` is minimal; `--starter`/`-s` adds example pages. The shared navigation
+partial drives desktop links and the native mobile popover. `itsy reset` replaces
 all local files/settings except Git history after confirmation and keeps a private
 sibling backup. Never run it as an incidental cleanup step or deploy automatically.
 
 Starting dev again replaces this site's existing dev server;
 pull/reset remain exclusive. Stop previews you start before handing control back
 unless the user asks to leave them running.
-New sites enable dev.email_preview in .flea.config.json. Local sign-in/contact
+New sites enable dev.email_preview in itsy.config.json. Local sign-in/contact
 mail opens in the browser without Resend credentials. Preview mode and sender
 details require a dev restart after changes; production ignores the toggle.
 Do not write preview messages or sign-in codes into site files.
 
 Public pages, partials, layouts and assets belong in site/. Use main.layout.html
-as the default wrapper and *.layout.html for custom layouts. Root .flea.config.json
+as the default wrapper and *.layout.html for custom layouts. Root itsy.config.json
 holds configuration and deploy.branches; never put secrets there. Editable content
-lives in flea/snips.json, uploads in flea/media/, and ignored runtime in flea/runtime/.
+lives in itsy/snips.json, uploads in itsy/media/, and ignored runtime in itsy/runtime/.
 Mail templates live in root mailers/, named *.email.html and *.email.txt with
 main.layout.html. Keep public URLs site-relative; never expose private directories.
 
@@ -45,13 +45,13 @@ Edit mode and use the same page Save/Cancel. No Photos/Videos library buttons.
 ## Available skills
 
 For requests like "add a blog" or "let's create a blog", read
-`flea/skills/add-blog/SKILL.md`. For "add a contact form" or an email-enabled
-contact page, read `flea/skills/add-contact-form/SKILL.md`. These focused additions
+`itsy/skills/add-blog/SKILL.md`. For "add a contact form" or an email-enabled
+contact page, read `itsy/skills/add-contact-form/SKILL.md`. These focused additions
 use the existing site's design and do not require a full-site consultation.
 
 - **import-brochure**: import an existing small brochure website into this site,
   preserving its content and navigation with basic Prewind styling. Read
-  `flea/skills/import-brochure/SKILL.md` when doing that work. This is a portable
+  `itsy/skills/import-brochure/SKILL.md` when doing that work. This is a portable
   instruction file, not an automatically installed agent plugin.
 
 Agent guidance stays in Git, but is excluded from public serving and deployment.
