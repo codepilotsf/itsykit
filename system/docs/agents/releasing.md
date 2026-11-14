@@ -16,6 +16,8 @@ convert their saved content into ordinary HTML/JSON and comment metadata before
 upgrading. Preserve Blog posts/media, runtime state and host policies. The normal
 upgrader rejects incompatible sites; it does not migrate them. Shared hosts need
 a coordinated, validated cutover with paired executable/configuration rollback.
+Both native CLIs and the shared server are published/upgraded. All 22 sites were
+explicitly converted with verified backups and rendered-content comparisons.
 See [the 0.22.0 receipt](release-0220-verification.md) for actual release evidence.
 
 ## ItsyWeb 0.21.0 rollout
