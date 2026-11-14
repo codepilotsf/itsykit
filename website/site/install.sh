@@ -65,8 +65,8 @@ itsy_install() (
   mv -f -- "$stage/flea" "$destination/flea" || fail 'itsy is installed, but the retired flea command could not be replaced.'
   printf '\nInstalled ItsyWeb %s in %s/itsy\n' "$version" "$destination"
 
-  # This Bash child cannot change the invoking shell's PATH. The documented
-  # command exports it there; these guarded entries configure future terminals.
+  # This Bash child cannot change the invoking shell's PATH. These guarded
+  # entries configure future terminals; print an optional current-shell export.
   local profile login_profile quoted block marker
   local profiles=()
   path_failure() {
@@ -112,7 +112,7 @@ itsy_install() (
   printf 'PATH is configured for future %s terminals.\n' "${SHELL##*/}"
   case ":$PATH:" in
     *":$destination:"*) printf '\nGet started: itsy new my-site\n' ;;
-    *) printf '\nFor this terminal, finish the export in the install command or run:\n  export PATH=%s:"$PATH"\n\nGet started: itsy new my-site\n' "$quoted" ;;
+    *) printf '\nOpen a new terminal, then run: itsy new my-site\n\nTo keep using this terminal instead, run:\n  export PATH=%s:"$PATH"\n' "$quoted" ;;
   esac
 )
 itsy_install
