@@ -38,3 +38,7 @@ Final source validation, actual desktop/mobile rendering, native interactions, l
 ## Candidate integration
 
 Integrated the owner-supplied page-editing-removal handoff at 9d85679. The approved hero copy now lives directly in HTML with a leading metadata settings comment. The visual direction is unchanged. Removed feature links follow the approved removal; the remaining three optional features share one row. Documentation keeps the new link-based guide titles and scroll-based chapter selection alongside the approved colors and panels. This source requires the unreleased protocol-30 candidate; it is not a public-release or deployment receipt.
+
+## Owner refinement: quieter opening
+
+The owner requested removal of Coding agents from the navbar and found the upper homepage busy and too wide. This refinement supersedes the original comp’s first-viewport density: use a 960px demonstration, a narrow two-line headline, one description and action, restrained underlined tabs and adjoining panes. Remove the five workflow cards and redundant bold audience line. Installation remains linked in Develop; setup/deployment and their prerequisites remain in Publish and the hosting section. Put the HTML explanation before the coding-agent section and cap both at 1120px. Keep the approved palette, logo, factual claims and accessible demonstrations.

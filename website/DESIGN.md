@@ -17,7 +17,7 @@ colors:
 typography:
   display:
     fontFamily: "Inter, system-ui, sans-serif"
-    fontSize: "clamp(2.25rem, 3.93vw, 3.9rem)"
+    fontSize: "clamp(2.25rem, 4.4vw, 3.75rem)"
     fontWeight: 700
     lineHeight: 1.1
     letterSpacing: "-0.035em"
@@ -72,9 +72,9 @@ Inter supplies both headings and reading text. Monospace belongs to source, file
 
 ## Layout
 
-The shared header and upper homepage use a 1600px container and fluid page gutters. Lower reading sections keep the 1280px container. Source and result share two equal columns; at 520px they stack. The five-step workflow uses a single connected row, changes to three plus two at 800px, then a full-width installer above two columns at 520px. Step numbers express an actual sequence.
+The shared header uses a 1200px container. The upper homepage and agent section use 1120px containers with fluid page gutters; the hero demonstration caps at 960px. The headline and description have narrower centered measures and generous separation. Source and result share two equal columns; at 520px they stack. The earlier five-step card row is removed: Develop links to installation, while Develop and Publish reveal the commands on demand. The HTML explanation precedes the coding-agent section. Lower sections retain their 1280px container.
 
-The agent demonstration puts the file tree beside the file content; at 520px it becomes horizontal file tabs above the content. At 800px the surrounding heading and explanation stack. Documentation retains its sidebar and reading column, with the native Guides disclosure below 640px. The extra header agent link is hidden below 640px; the homepage and documentation still provide the guide link.
+The agent demonstration puts the file tree beside the file content; at 520px it becomes horizontal file tabs above the content. At 800px the surrounding heading and explanation stack. Documentation retains its sidebar and reading column, with the native Guides disclosure below 640px. The shared header offers Docs and Get started; the homepage agent section and documentation retain access to the coding-agent guide.
 
 Documentation uses the shared page gutter. Its pale sidebar has the large radius and a thin border; the sticky offset accounts for the admin toolbar. Below 640px the Guides disclosure takes the same pale surface and gently curved panel treatment.
 
@@ -88,11 +88,11 @@ Actions and tabs use the default radius. Large demonstrations use the large radi
 
 ## Components
 
-**Actions:** ice on navy; the shared header action reverses to navy on pale. Keep visible focus and a generous target. The homepage hero enlarges the action to a minimum 54px height, or 50px on phones.
+**Actions:** ice on navy; the shared header action reverses to navy on pale. Keep visible focus and a generous target. The homepage hero action has a minimum 50px height.
 
-**Project tabs:** semantic links work as section anchors without JavaScript. Enhancement supplies tab roles, selection, arrow/Home/End keys and focus management. Selected views use ice with dark text. Inactive panels are hidden only after enhancement.
+**Project tabs:** semantic links work as section anchors without JavaScript. Enhancement supplies tab roles, selection, arrow/Home/End keys and focus management. Hero views use an ice underline and text; file tabs keep the pale blue selection. Inactive panels are hidden only after enhancement.
 
-**Code panes:** scrollable source with a filename or terminal label. Syntax accents are restrained and line numbers are decorative. Copy controls use a 44px target and announce success through the shared copy script.
+**Code panes:** the hero demonstration uses a single outer frame with adjoining source and result panes, without nested card borders or decorative window dots. Source remains scrollable with a filename or terminal label. Syntax accents are restrained and line numbers are decorative. Copy controls use a 44px target and announce success through the shared copy script.
 
 **Example preview:** native HTML, clearly labeled as an example. Its local buttons change authored example content without navigating the visitor away. The displayed port follows ItsyWeb's actual default.
 

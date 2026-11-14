@@ -7,7 +7,6 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
     <div class="hero-copy">
       <h1 id="hero-title">Plain HTML. Superpowers included.</h1>
       <p class="hero-description">Build simple websites in familiar HTML and CSS. One tool covers local development, server setup, deployment and automatic HTTPS.</p>
-      <p class="hero-audience">Write it yourself or with your coding agent.</p>
       <a class="ui-button ui-brand-1 hero-action" href="/docs">Build your first site {icon arrow-up-right}</a>
     </div>
 
@@ -20,11 +19,11 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
       <section class="demo-stage" id="example-html" aria-labelledby="view-html" data-tab-panel>
         <div class="demo-pane source-pane">
           <div class="pane-bar">{icon file}<span data-example-file>site/index.html</span></div>
-          <pre class="source-code" tabindex="0" aria-label="Example page HTML"><code><span class="source-line"><span class="line-number" aria-hidden="true">1</span><span class="syntax-tag">&lt;h1&gt;</span><span data-example-source>Hello, web.</span><span class="syntax-tag">&lt;/h1&gt;</span></span>
-<span class="source-line"><span class="line-number" aria-hidden="true">2</span>&#123;render /navigation&#125;</span></code></pre>
+          <pre class="source-code" tabindex="0" aria-label="Example page HTML"><code><span class="source-line"><span class="syntax-tag">&lt;h1&gt;</span><span data-example-source>Hello, web.</span><span class="syntax-tag">&lt;/h1&gt;</span></span>
+<span class="source-line">&#123;render /navigation&#125;</span></code></pre>
         </div>
         <div class="demo-pane preview-pane" aria-label="Example rendered website">
-          <div class="pane-bar preview-bar"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="preview-address" data-example-address>http://localhost:3000</span></div>
+          <div class="pane-bar preview-bar"><span class="preview-address" data-example-address>http://localhost:3000</span></div>
           <div class="example-page">
             <p class="example-title" data-example-title>Hello, web.</p>
             <nav class="example-links" aria-label="Example website pages">
@@ -45,7 +44,7 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
         <div class="demo-pane demo-explanation">
           <p class="demo-view-title">Save a file. See the change.</p>
           <p>The local server reloads your browser when you save. Edit the HTML and CSS directly, or let your coding agent work in the same files.</p>
-          <a href="/docs/development">Local development guide {icon arrow-up-right}</a>
+          <p class="demo-install"><a href="/docs/installation">Install ItsyWeb {icon arrow-up-right}</a> for Apple Silicon Mac or x86-64 Linux, then create your site.</p>
         </div>
       </section>
       <section class="demo-stage" id="example-publish" aria-labelledby="view-publish" data-tab-panel>
@@ -63,24 +62,27 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
         </div>
       </section>
     </div>
-
-    <ol class="workflow" aria-label="The complete ItsyWeb workflow">
-      <li class="workflow-install">
-        <h2><span class="step-number" aria-hidden="true">1</span>Install</h2>
-        <div class="copy-code"><pre tabindex="0" aria-label="Install ItsyWeb"><code>curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
-        <p>Apple Silicon Mac and x86-64 Linux<br />Follow the printed PATH instructions.</p><span class="step-connector" aria-hidden="true">{icon arrow-right}</span>
-      </li>
-      <li><h2><span class="step-number" aria-hidden="true">2</span>Create</h2><pre><code>itsy new my-site</code></pre><span class="step-connector" aria-hidden="true">{icon arrow-right}</span></li>
-      <li><h2><span class="step-number" aria-hidden="true">3</span>Develop</h2><pre><code>itsy dev</code></pre><span class="step-connector" aria-hidden="true">{icon arrow-right}</span></li>
-      <li><h2><span class="step-number" aria-hidden="true">4</span>Set up server</h2><pre><code>itsy setup</code></pre><p>Bring an Ubuntu server, SSH access and a domain.</p><span class="step-connector" aria-hidden="true">{icon arrow-right}</span></li>
-      <li><h2><span class="step-number" aria-hidden="true">5</span>Deploy + HTTPS</h2><pre><code>itsy deploy</code></pre><p>Deploy committed files.</p></li>
-    </ol>
   </div>
+</section>
+
+<section class="html-section container" id="templates" aria-labelledby="html-title">
+  <div class="section-heading"><h2 id="html-title">Skip the build pipeline.<br />Keep the HTML.</h2><p>You wanted to make a website, not maintain a toolchain. Write ordinary HTML and CSS, then add the shared pieces a small site needs.</p></div>
+  <div class="template-example">
+    <div class="template-source"><div class="pane-bar">{icon file}<span>site/main.layout.html</span></div><pre tabindex="0" aria-label="Shared layout example"><code>&lt;header&gt;<span class="syntax-tag">&#123;render /navigation&#125;</span>&lt;/header&gt;
+&lt;main&gt;<span class="syntax-tag">&#123;slot&#125;</span>&lt;/main&gt;
+&lt;footer&gt;Made by our studio.&lt;/footer&gt;</code></pre></div>
+    <div class="template-description"><h3>A shared header shouldn’t require a framework.</h3><p>Put shared markup in a layout or partial and change it once. Each page fills the layout’s <code>&#123;slot&#125;</code>. The server puts it together when someone visits; there is no static site to generate first.</p><a class="quiet-link" href="/docs/templates">Pages, layouts and data {icon arrow-up-right}</a></div>
+  </div>
+  <dl class="html-benefits">
+    <div><dt>Files become URLs</dt><dd>Create <code>site/about.html</code>. Link to <code>/about</code>. Clean URLs follow your files.</dd></div>
+    <div><dt>Bring in your data</dt><dd>Use JSON data, variables, loops and conditions in the HTML you already understand.</dd></div>
+    <div><dt>Keep your CSS</dt><dd>Style directly, with optional Prewind utilities and icons. No bundler or frontend build step.</dd></div>
+  </dl>
 </section>
 
 <section class="agent-section" aria-labelledby="agent-title">
   <div class="agent-grid container">
-    <h2 id="agent-title">Familiar files. Ready<br class="desktop-break" /> for your coding agent.</h2>
+    <h2 id="agent-title">Familiar files. Ready for your coding agent.</h2>
     <div class="agent-project tab-group" data-tabs data-tab-orientation="vertical">
       <nav class="project-files" aria-label="Example project files" data-tab-list>
         <p class="project-root">{icon folder}<span>my-site</span></p>
@@ -107,21 +109,6 @@ Edit the HTML and CSS in `site/`.</code></pre>
       <div><p>The files stay ordinary HTML, CSS and JSON. The instructions stay in Git, outside the public website. No plugin or account is needed to read them.</p><a class="quiet-link" href="/docs/agents">Work with your coding agent {icon arrow-up-right}</a></div>
     </div>
   </div>
-</section>
-
-<section class="html-section container" id="templates" aria-labelledby="html-title">
-  <div class="section-heading"><h2 id="html-title">Skip the build pipeline.<br />Keep the HTML.</h2><p>You wanted to make a website, not maintain a toolchain. Write ordinary HTML and CSS, then add the shared pieces a small site needs.</p></div>
-  <div class="template-example">
-    <div class="template-source"><div class="pane-bar">{icon file}<span>site/main.layout.html</span></div><pre tabindex="0" aria-label="Shared layout example"><code>&lt;header&gt;<span class="syntax-tag">&#123;render /navigation&#125;</span>&lt;/header&gt;
-&lt;main&gt;<span class="syntax-tag">&#123;slot&#125;</span>&lt;/main&gt;
-&lt;footer&gt;Made by our studio.&lt;/footer&gt;</code></pre></div>
-    <div class="template-description"><h3>A shared header shouldn’t require a framework.</h3><p>Put shared markup in a layout or partial and change it once. Each page fills the layout’s <code>&#123;slot&#125;</code>. The server puts it together when someone visits; there is no static site to generate first.</p><a class="quiet-link" href="/docs/templates">Pages, layouts and data {icon arrow-up-right}</a></div>
-  </div>
-  <dl class="html-benefits">
-    <div><dt>Files become URLs</dt><dd>Create <code>site/about.html</code>. Link to <code>/about</code>. Clean URLs follow your files.</dd></div>
-    <div><dt>Bring in your data</dt><dd>Use JSON data, variables, loops and conditions in the HTML you already understand.</dd></div>
-    <div><dt>Keep your CSS</dt><dd>Style directly, with optional Prewind utilities and icons. No bundler or frontend build step.</dd></div>
-  </dl>
 </section>
 
 <section class="hosting-section" id="system" aria-labelledby="hosting-title">
