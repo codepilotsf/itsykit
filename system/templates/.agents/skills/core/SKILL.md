@@ -88,7 +88,7 @@ local maintenance request a mandatory push/PR/merge exercise.
 
 In the canonical repository identified by sync/consumers.json, finish deliberate
 skills/ changes and checks before consumer updates. Continue already-authorized
-sync scope; otherwise offer the local workflow for the configured Flea CMS and
+sync scope; otherwise offer the local workflow for the configured ItsyWeb and
 Preflight templates. Editing a shared skill does not authorize consumer changes.
 Documentation-only edits, consumer-local changes and global Impeccable do not
 trigger this offer. Generated sites/apps need separate enrollment and scope.

@@ -2,9 +2,11 @@
 
 Use this for requests such as "index the old site and add migration redirects"
 or "find which URLs need 301s". Read the destination's local requirements and
-inspect `.flea.config.json`, public routes, existing redirects and installed Flea
-version. Confirm the source website and destination project if context does not
-identify them. A crawl is read-only; it does not authorize publishing a site.
+inspect the selected `itsy.config.json` (or existing `.flea.config.json`), public
+routes, existing redirects and installed ItsyWeb version. Keep writes in the
+selected config; never rename it during a migration. Confirm the source website
+and destination project if context does not identify them. A crawl is read-only;
+it does not authorize publishing a site.
 
 ## Discover the old URLs
 
@@ -40,7 +42,7 @@ Ask about ambiguous content decisions; do not send every removed page to `/` or
 guess replacements. Leave unrelated missing pages as 404s. Flatten existing
 redirect chains to their final replacement.
 
-Flea's supported config is a top-level JSON object mapping old paths to local
+ItsyWeb's supported config is a top-level JSON object mapping old paths to local
 destination URLs, alongside `app`, never inside it:
 
 ```json
@@ -56,9 +58,11 @@ destination URLs, alongside `app`, never inside it:
 
 Check the installed README/runtime, rather than assuming support from this shared
 skill. The redirect feature requires deployment protocol 28; public 0.19.0 /
-protocol 27 and earlier ignore these site rules. If unavailable, save the mapping
-as a clearly labelled proposal and report the required runtime update. Do not
-claim working redirects or change installed binaries without authorization.
+protocol 27 and earlier ignore these site rules. New-layout sites additionally
+require protocol 29; upgrade the shared server explicitly before deployment.
+If unavailable, save the mapping as a clearly labelled proposal and report the
+required runtime update. Do not claim working redirects or change installed
+binaries without authorization.
 
 For a supporting runtime:
 
@@ -83,7 +87,7 @@ Changing a Blog slug does not automatically create a redirect.
 
 ## Verify and hand off
 
-Run `flea status` and resolve validation errors. Using a task-owned local dev
+Run `itsy status` and resolve validation errors. Using a task-owned local dev
 server, request each old path without following redirects: GET and HEAD must
 return 301 with the expected `Location`, and HEAD must have no body. Follow each
 destination and confirm it serves the intended content in one hop. Check incoming
