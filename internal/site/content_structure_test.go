@@ -1,7 +1,7 @@
 package site
 
 import (
-	"flea/internal/snips"
+	"itsy/internal/snips"
 	"strings"
 	"testing"
 )

@@ -15,9 +15,9 @@ import (
 	"sync"
 	"time"
 
-	"flea/internal/formguard"
-	"flea/internal/sitefiles"
-	"flea/internal/viewer"
+	"itsy/internal/formguard"
+	"itsy/internal/sitefiles"
+	"itsy/internal/viewer"
 )
 
 // Server publishes complete validated snapshots. Failed edits produce a 500

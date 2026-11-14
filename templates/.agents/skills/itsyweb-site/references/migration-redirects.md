@@ -2,7 +2,7 @@
 
 Use this for requests such as "index the old site and add migration redirects"
 or "find which URLs need 301s". Read the destination's local requirements and
-inspect `.flea.config.json`, public routes, existing redirects and installed Flea
+inspect `.itsy.config.json`, public routes, existing redirects and installed ItsyWeb
 version. Confirm the source website and destination project if context does not
 identify them. A crawl is read-only; it does not authorize publishing a site.
 
@@ -40,7 +40,7 @@ Ask about ambiguous content decisions; do not send every removed page to `/` or
 guess replacements. Leave unrelated missing pages as 404s. Flatten existing
 redirect chains to their final replacement.
 
-Flea's supported config is a top-level JSON object mapping old paths to local
+ItsyWeb's supported config is a top-level JSON object mapping old paths to local
 destination URLs, alongside `app`, never inside it:
 
 ```json

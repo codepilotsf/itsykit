@@ -1,9 +1,9 @@
 package snips
 
 import (
-	"flea/internal/media"
-	"flea/internal/video"
 	"fmt"
+	"itsy/internal/media"
+	"itsy/internal/video"
 )
 
 func validateEntry(e Entry) error {

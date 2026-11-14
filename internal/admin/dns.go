@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/host"
+	"itsy/internal/host"
 )
 
 func CheckDNS(ctx context.Context, domains, expected []string, out io.Writer) error {

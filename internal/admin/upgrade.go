@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"flea/internal/host"
-	"flea/internal/state"
+	"itsy/internal/host"
+	"itsy/internal/state"
 )
 
 // Upgrader swaps only the executable, not service policy or site data. The new

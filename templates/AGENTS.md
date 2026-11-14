@@ -1,4 +1,4 @@
-# Working on this Flea CMS site
+# Working on this ItsyWeb site
 
 Use only the global Impeccable installation discovered by the agent runtime.
 Never install, vendor, copy or link Impeccable into this project or its templates.
@@ -10,15 +10,15 @@ Its conversation preferences are defaults; personal preferences and explicit
 user requests override them. Keep personal instructions/configuration intact.
 
 Before site edits, read [site requirements](.agents/site-requirements.md),
-[README.md](README.md) and [Flea authoring](.agents/skills/fleacms-site/SKILL.md).
+[README.md](README.md) and [ItsyWeb authoring](.agents/skills/itsyweb-site/SKILL.md).
 Load [Prewind](.agents/skills/prewind/SKILL.md) for styling and
 [design](.agents/skills/design/SKILL.md) for visual/UX work.
 For coding delegation or independent review, read
 [orchestration](.agents/skills/deepseek-orchestrator/SKILL.md).
 For focused Blog, Contact or site import work, read the matching skill in
-`flea/skills/` without restarting a full-site consultation.
+`itsy/skills/` without restarting a full-site consultation.
 For old-site URL discovery and 301 mapping without a redesign, use the migration
-reference in `fleacms-site`.
+reference in `itsyweb-site`.
 
 - Preserve content, custom layouts, assets, authentication and CSRF contracts.
   Keep secrets and agent guidance out of public assets and deployment.

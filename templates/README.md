@@ -1,5 +1,11 @@
 # ItsyWeb
 
+New sites use `.itsy.config.json`, `itsy/`, and `<!-- itsy` layout settings.
+Existing `.flea.config.json`, `flea/`, and `<!-- flea` projects remain supported
+without conversion. Keep using an existing site's selected files rather than
+creating a second layout. New-layout deployment requires server protocol 29;
+run `itsy update-server` explicitly before deploying to an older server.
+
 Build pages with HTML, style them with CSS, and let site admins edit their own content. ItsyWeb builds the server, and serves multiple sites with HTTPS directly.
 
 ## Getting started
@@ -25,7 +31,7 @@ This generated folder already is a site, so you can skip directly to `itsy dev`.
 
 Use `itsy new .` to create a site in the current empty directory. Named paths
 also accept existing empty directories. Hidden files and `.git` count as content;
-Flea refuses nonempty directories.
+ItsyWeb refuses nonempty directories.
 
 `itsy new` creates a clean layout and editable homepage. Use `itsy new --starter
 foobar` (or `-s`) for example pages, a six-person fictional team and a contact form.
@@ -54,7 +60,7 @@ itsy dev
 ```
 
 On the first run, enter your site name and an optional admin email. New sites
-enable `dev.email_preview` in `.flea.config.json`: sign-in and contact emails
+enable `dev.email_preview` in `.itsy.config.json`: sign-in and contact emails
 open in your browser without sending or needing Resend credentials. The preview
 looks like an opened email, with sender, recipient, subject and date/time.
 Use its sign-in code normally. Previews expire after 10 minutes and stay only in
@@ -76,21 +82,21 @@ reset remain protected while running. Stop older dev binaries manually once.
 For another device on the same trusted network, use `itsy dev --lan` (or `-l`)
 and open a printed Network or Hostname URL. Named URLs work when they resolve to
 the dev machine; Tailscale IPv4 connections are supported. Sign-in, editing, media, forms and reloads
-work there too. Email previews open on the computer running Flea; enter that code
+work there too. Email previews open on the computer running ItsyWeb; enter that code
 on the other device. LAN mode uses unencrypted HTTP on private IPv4 networks.
 Do not forward the port. Allow it through your firewall if needed and restart dev
 after changing networks. Without the flag, access stays on this computer.
 
 ### 2. Make your first change
 
-Open `site/index.html` to change the homepage structure. Edit `flea/snips.json`
+Open `site/index.html` to change the homepage structure. Edit `itsy/snips.json`
 for existing welcome text and page metadata, or add a new editable heading:
 
 ```html
 <h1 snip>Welcome to our site</h1>
 ```
 
-Dev moves the text into `flea/snips.json` and replaces it with a generated snip
+Dev moves the text into `itsy/snips.json` and replaces it with a generated snip
 directive. See [editable content](#editable-content) for details.
 
 ### 3. Check and save your work
@@ -104,7 +110,7 @@ the templates and extracted content together.
 
 New sites have an `Initial site` commit on `main`, unless created with
 `--skip-git`, without Git installed, or with a Git error reported during creation.
-Flea respects your Git identity, hooks and signing settings. To connect a blank
+ItsyWeb respects your Git identity, hooks and signing settings. To connect a blank
 remote project, run:
 
 ```sh
@@ -123,16 +129,16 @@ No remote is configured automatically. There is no existing `origin` to rename.
 | `site/admin.layout.html` | Sign-in layout |
 | `site/css/` | Stylesheets and theme tokens |
 | `site/images/` | Developer-managed images and logo |
-| `.flea.config.json` | Site settings and branch deployment destinations |
-| `flea/snips.json` | Editable content, page metadata, and media records |
-| `flea/data/` | Optional developer-managed JSON data |
-| `flea/media/` | Managed photos and videos |
-| `flea/icons/` | Downloaded icon cache |
-| `flea/runtime/` | Private, Git-ignored sessions and recovery files |
+| `.itsy.config.json` | Site settings and branch deployment destinations |
+| `itsy/snips.json` | Editable content, page metadata, and media records |
+| `itsy/data/` | Optional developer-managed JSON data |
+| `itsy/media/` | Managed photos and videos |
+| `itsy/icons/` | Downloaded icon cache |
+| `itsy/runtime/` | Private, Git-ignored sessions and recovery files |
 | `mailers/` | Private email templates |
-| `.agents/skills/` | Shared core, design, Prewind and Flea authoring skills |
+| `.agents/skills/` | Shared core, design, Prewind and ItsyWeb authoring skills |
 | `.agents/site-requirements.md` | Version-specific site requirements |
-| `flea/skills/` | Focused Blog, Contact and import guides |
+| `itsy/skills/` | Focused Blog, Contact and import guides |
 
 Public URLs omit `site/`. Configuration, mailers, runtime files, and agent skills
 are never served as public assets. Keep secrets out of configuration and Git.
@@ -149,7 +155,7 @@ unless listed as migration redirects.
 
 ### Migration redirects
 
-Add a top-level `redirects` object in `.flea.config.json`, alongside `app`:
+Add a top-level `redirects` object in `.itsy.config.json`, alongside `app`:
 
 ```json
 "redirects": {
@@ -166,8 +172,8 @@ Private/internal paths, duplicate decoded sources, chains, loops and conflicts
 with active routes or managed app subtrees fail validation. Former Blog slugs
 can be listed explicitly. Update redirects when removing their destination.
 
-Ask the `fleacms-site` skill to inventory the old website and prepare redirects,
-or use `flea/skills/import-brochure/SKILL.md` during a full import. Preserve old URL
+Ask the `itsyweb-site` skill to inventory the old website and prepare redirects,
+or use `itsy/skills/import-brochure/SKILL.md` during a full import. Preserve old URL
 spellings and report URLs the crawl cannot discover or map. Run `itsy status`
 and verify each 301 and its final destination on a local server. This requires
 deployment protocol 28; public 0.19.0 / protocol 27 and earlier ignore these rules.
@@ -183,7 +189,7 @@ the starter keeps the header and footer directly in this file.
 To select a custom layout, put a settings comment before the page markup:
 
 ```html
-<!-- flea
+<!-- itsy
 layout: /custom.layout.html
 -->
 <main class="container">Your page content</main>
@@ -205,7 +211,7 @@ Relative paths resolve from the calling template. Use `{render /shared/card}` fo
 
 ### Site settings
 
-Store public site-wide values in the `app` object in `.flea.config.json`:
+Store public site-wide values in the `app` object in `.itsy.config.json`:
 
 ```json
 {
@@ -222,7 +228,7 @@ name here; commit it before deploying.
 
 ### Search discovery and SEO
 
-Add a top-level `seo` object alongside `app` in `.flea.config.json` when the
+Add a top-level `seo` object alongside `app` in `.itsy.config.json` when the
 production address is known:
 
 ```json
@@ -233,7 +239,7 @@ production address is known:
 ```
 
 `url` must be an HTTPS origin without credentials, a subdirectory, query or
-fragment. Flea generates `/sitemap.xml` from public pages and published blog
+fragment. ItsyWeb generates `/sitemap.xml` from public pages and published blog
 posts, plus `/robots.txt` with a production Sitemap line. Missing canonical tags
 are inserted into public responses without changing template files; HTML
 fragments use a canonical HTTP Link header. No external service is needed.
@@ -248,12 +254,12 @@ or googlebot noindex metadata also excludes a page from the sitemap.
 Custom `site/robots.txt`, `site/sitemap.xml` and canonical tags are preserved.
 Add the Sitemap line and manage exclusions yourself in custom discovery files.
 A page with a custom canonical enters the generated sitemap only when that
-canonical exactly matches its absolute production URL. Flea does not invent
+canonical exactly matches its absolute production URL. ItsyWeb does not invent
 modification dates; beyond 50,000 URLs or 50 MiB, provide a custom sitemap index.
 
 Without `seo`, automatic SEO behavior is disabled. Setting a production URL does
 not register hosts, configure TLS or protect staging: keep the separate server
-indexing policy described above. A supporting Flea server executable is required;
+indexing policy described above. A supporting ItsyWeb server executable is required;
 deploying this site's configuration alone does not upgrade it.
 
 ### Editable content
@@ -267,7 +273,7 @@ Add a bare `snip` attribute to an element whose content admins should edit:
 </section>
 ```
 
-While dev is running, Flea extracts the inner HTML into `flea/snips.json`, removes
+While dev is running, ItsyWeb extracts the inner HTML into `itsy/snips.json`, removes
 the attribute, and leaves a generated directive:
 
 ```html
@@ -304,7 +310,7 @@ Do not nest groups or place them in layouts, partials, or other loops.
 
 ### Structured data and conditions
 
-Put developer-managed data in `flea/data/`. For example, `flea/data/team.json`
+Put developer-managed data in `itsy/data/`. For example, `itsy/data/team.json`
 containing a `members` array is available as `data.team.members`:
 
 ```html
@@ -349,7 +355,7 @@ Reference Lucide icons directly in HTML:
 {icon search size="20" aria-label="Search"}
 ```
 
-Dev downloads only referenced icons as `flea/icons/name.svg`. The directory
+Dev downloads only referenced icons as `itsy/icons/name.svg`. The directory
 includes `.keep`; each SVG includes its license notice as a comment. Commit
 these files for offline use. Deploy also resolves missing icons;
 `itsy status` never downloads them.
@@ -395,9 +401,9 @@ publishes committed CSS, and rollback restores the selected release's CSS.
 
 Designate an editable image with `<img snip src="/images/team.jpg" alt="Our team">`.
 Dev imports the local JPEG/PNG and generates `src="{snip ID.src}"` and
-`alt="{snip ID.alt}"`. The typed entry in `flea/snips.json` owns those values;
+`alt="{snip ID.alt}"`. The typed entry in `itsy/snips.json` owns those values;
 classes, layout and links stay in the template. Admins click the image in Edit
-mode, then use the page Save/Cancel. Files live in `flea/media/`; commit processed
+mode, then use the page Save/Cancel. Files live in `itsy/media/`; commit processed
 photos and JSON as seeds. Images cannot be nested inside text snips.
 
 To add an admin-selectable photo to a multisnip, use a named image field:
@@ -416,12 +422,12 @@ live photos; `itsy pull` retrieves their metadata and files together.
 
 `<video snip src="/videos/intro.mp4" controls></video>` imports a local seed.
 Videos require optimized MP4 files with H.264 video, optional AAC-LC audio,
-and fast-start metadata. Files may be up to 25 MiB; Flea does not convert them.
+and fast-start metadata. Files may be up to 25 MiB; ItsyWeb does not convert them.
 
 Dev generates src/poster snip bindings. Admins click the video in Edit mode to
 replace it or its poster, then Save changes or Cancel with the page. No separate
-Photos/Videos buttons. Metadata lives in `flea/snips.json`; MP4 files in
-`flea/media/` are Git-ignored.
+Photos/Videos buttons. Metadata lives in `itsy/snips.json`; MP4 files in
+`itsy/media/` are Git-ignored.
 Deployment stages referenced local files and preserves live replacements.
 
 Pulls and backups include video files. On a fresh clone, restore missing video
@@ -433,7 +439,7 @@ automatic deletion. Video fields in multisnips are not supported.
 
 The starter includes `site/contact/index.html` and `site/contact/thank-you.html`.
 Merge `"apps": {"contact": {"mount": "/contact", "email": {"to": "owner@example.com"}}}`
-into `.flea.config.json`, preserving other settings. Local preview mode needs no
+into `.itsy.config.json`, preserving other settings. Local preview mode needs no
 provider credentials. For real delivery, configure email with `itsy email`.
 Restart dev after changing contact settings.
 
@@ -484,13 +490,13 @@ supplies the signed-in identity; never configure `app.current_admin` yourself.
 
 ### Agent-assisted work
 
-Shared core, delivery, design, Prewind, Flea authoring and upstream Impeccable
+Shared core, delivery, design, Prewind, ItsyWeb authoring and upstream Impeccable
 skills ship in `.agents/skills/`. Root `AGENTS.md` explicitly loads core and routes
 other work on demand. Conversation defaults yield to personal preferences;
 project requirements and permissions still apply. No personal instruction files
 or global tool settings are changed.
 
-Focused guides ship in `flea/skills/`:
+Focused guides ship in `itsy/skills/`:
 
 - **add-blog**: requests like "add a blog" or "let's create a blog"; setup,
   post JSON, Blog template values and admin publishing.
@@ -499,7 +505,7 @@ Focused guides ship in `flea/skills/`:
 - **import-brochure**: import or redesign an existing brochure/portfolio site,
   preserving its content and navigation. Interactive: choose a direction (two mood
   boards or references) and approve a sample page before the full build.
-The shared **fleacms-site** skill covers general authoring, real business
+The shared **itsyweb-site** skill covers general authoring, real business
 content and verification, loading the same **prewind** and **design** skills used
 by other projects. Ongoing synchronization is not configured; installed source
 information is recorded in `.agents/skills-source.md`.
@@ -525,7 +531,7 @@ itsy deploy
 
 The first run asks for the branch's server, domain, WWW redirect, and HTTPS
 preferences, then saves the destination under `deploy.branches` in
-`.flea.config.json`. It can run before your first commit and offers to commit
+`.itsy.config.json`. It can run before your first commit and offers to commit
 reviewed changes before deploying.
 
 Deployment ships committed source; unresolved working-tree changes block it.
@@ -591,7 +597,7 @@ Merge `"blog": {"mount": "/blog"}` into the configuration’s `apps` object.
 The private `site/blog/_index.html` and `_post.html` templates supply the listing
 and posts. Sign in, then open `/admin/blog` for drafts, rich text, cover selection
 and explicit Publish/Unpublish. Posts use the top-level `blog` array in
-`flea/snips.json`. Normal deploy preserves live posts; pull before publishing
+`itsy/snips.json`. Normal deploy preserves live posts; pull before publishing
 source edits with `--with-snips`. Draft text is private; uploaded photos are public.
 See https://gitlab.codepilot.com/sean-schertell/flea/-/blob/main/docs/blog.md for
 the JSON/token contract.

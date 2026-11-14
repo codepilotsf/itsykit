@@ -16,8 +16,8 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/site"
-	"flea/templates"
+	"itsy/internal/site"
+	"itsy/templates"
 )
 
 func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
@@ -55,7 +55,7 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			for _, name := range []string{".flea.config.json", "flea/snips.json", "site/main.layout.html", "site/_404.html", "site/_500.html"} {
+			for _, name := range []string{".itsy.config.json", "itsy/snips.json", "site/main.layout.html", "site/_404.html", "site/_500.html"} {
 				if _, err := os.Stat(filepath.Join(root, name)); err != nil {
 					t.Fatal(err)
 				}
@@ -63,7 +63,7 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 			if _, err := os.Stat(filepath.Join(root, "embed.go")); !os.IsNotExist(err) {
 				t.Fatal("embedding code must not be scaffolded")
 			}
-			for _, skill := range []string{"core", "task-delivery", "deepseek-orchestrator", "design", "prewind", "fleacms-site"} {
+			for _, skill := range []string{"core", "task-delivery", "deepseek-orchestrator", "design", "prewind", "itsyweb-site"} {
 				if _, err := os.Stat(filepath.Join(root, ".agents/skills", skill, "SKILL.md")); err != nil {
 					t.Fatalf("generated site missing shared skill %s: %v", skill, err)
 				}
@@ -155,7 +155,7 @@ func TestStatusWarnsForMissingIcon(t *testing.T) {
 	if !strings.Contains(warnings.String(), "Warning: index.html:1:") || !strings.Contains(warnings.String(), "icon omitted") {
 		t.Fatal(warnings.String())
 	}
-	if _, err := os.Stat("flea/icons/unknown-icon.svg"); !os.IsNotExist(err) {
+	if _, err := os.Stat("itsy/icons/unknown-icon.svg"); !os.IsNotExist(err) {
 		t.Fatal("status wrote cache")
 	}
 }
@@ -165,7 +165,7 @@ func TestStatusWarnsForMissingIcon(t *testing.T) {
 func TestExecutableWorkflow(t *testing.T) {
 	temp := t.TempDir()
 	binary := filepath.Join(temp, "itsy")
-	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/flea")
+	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/itsy")
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build: %v\n%s", err, output)
 	}
@@ -244,7 +244,7 @@ func TestExecutableWorkflow(t *testing.T) {
 		}
 		return response.StatusCode, string(b)
 	}
-	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/global.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/.flea.config.json": 404, "/_header.html": 404, "/%2e%2e/.flea.config.json": 404} {
+	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/global.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/.itsy.config.json": 404, "/_header.html": 404, "/%2e%2e/.itsy.config.json": 404} {
 		if code, _ := get(url); code != want {
 			t.Errorf("%s: %d", url, code)
 		}
@@ -277,11 +277,11 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	// Ensure the watcher has begun before the first edit.
 	time.Sleep(100 * time.Millisecond)
-	seedContent, err := os.ReadFile(filepath.Join(root, "flea", "snips.json"))
+	seedContent, err := os.ReadFile(filepath.Join(root, "itsy", "snips.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	edit("flea/snips.json", strings.Replace(string(seedContent), "Welcome to ItsyWeb.", "Smoke test changed", 1))
+	edit("itsy/snips.json", strings.Replace(string(seedContent), "Welcome to ItsyWeb.", "Smoke test changed", 1))
 	wait("/", 200, "Smoke test changed")
 	edit("test.html", `<section snip="intro"><p>Extracted <em>live</em></p></section>`)
 	wait("/test", 200, "Extracted <em>live</em>")
@@ -292,18 +292,18 @@ func TestExecutableWorkflow(t *testing.T) {
 	// Removal is reconciled on save, and undo restores the archived content.
 	edit("test.html", `<h1>Region removed</h1>`)
 	wait("/test", 200, "Region removed")
-	saved, err := os.ReadFile(filepath.Join(root, "flea", "snips.json"))
+	saved, err := os.ReadFile(filepath.Join(root, "itsy", "snips.json"))
 	if err != nil || !strings.Contains(string(saved), `"archive"`) {
 		t.Fatal("missing archive after removal", err)
 	}
 	edit("test.html", string(extracted))
 	wait("/test", 200, "Extracted <em>live</em>")
-	if _, err := os.Stat(filepath.Join(root, "flea", ".snips.lock")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "itsy", ".snips.lock")); !os.IsNotExist(err) {
 		t.Fatal("dev created lock file", err)
 	}
 	edit("css/global.css", "/* updated asset */")
 	wait("/css/global.css", 200, "updated asset")
-	edit(".flea.config.json", `{"app":{"site_name":"Changed config"}}`)
+	edit(".itsy.config.json", `{"app":{"site_name":"Changed config"}}`)
 	wait("/", 200, "Changed config")
 	edit("index.html", `{render missing-secret-name}`)
 	wait("/", 500, "")
@@ -335,12 +335,12 @@ func TestExecutableWorkflow(t *testing.T) {
 	if !strings.Contains(stderr.String(), "missing partial") || !strings.Contains(stderr.String(), "Site valid again") {
 		t.Fatalf("missing error/recovery diagnostics: %s", stderr.String())
 	}
-	for _, line := range []string{"GET /\n", "404 GET /about\n", "500 GET /\n", "Snips updated in flea/snips.json.\n"} {
+	for _, line := range []string{"GET /\n", "404 GET /about\n", "500 GET /\n", "Snips updated in itsy/snips.json.\n"} {
 		if !strings.Contains(stderr.String(), line) {
 			t.Errorf("missing request log %q", line)
 		}
 	}
-	t.Log("Executable smoke passed: scaffold, validation, HTTP, private paths, flea/config/asset/template reloads, invalid state, recovery, shutdown")
+	t.Log("Executable smoke passed: scaffold, validation, HTTP, private paths, itsy/config/asset/template reloads, invalid state, recovery, shutdown")
 }
 
 func TestRemovedThemeAndPullScopeFlagsAreRejected(t *testing.T) {

@@ -1,10 +1,10 @@
 package editstore
 
 import (
-	"flea/internal/editor"
-	"flea/internal/site"
-	"flea/internal/snips"
 	"fmt"
+	"itsy/internal/editor"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 	"strings"
 )
 

@@ -1,13 +1,18 @@
 ---
-name: fleacms-site
-description: Build, import, redesign or maintain a website using Flea CMS. Use for site templates, editable snips, media, theme, navigation, Contact forms and migration redirect inventories. Can crawl an existing site's public URLs and map moved pages into Flea's 301 config; excludes development of the Flea CMS framework itself.
+name: itsyweb-site
+description: Build, import, redesign or maintain a website using ItsyWeb. Use for site templates, editable snips, media, theme, navigation, Contact forms and migration redirect inventories. Can crawl an existing site's public URLs and map moved pages into ItsyWeb's 301 config; excludes development of the ItsyWeb framework itself.
 ---
 
-# Build a Flea CMS website
+# Build a ItsyWeb website
 
-Read the site's `AGENTS.md` and `README.md`; inspect its installed Flea version,
+Read the site's `AGENTS.md` and `README.md`; inspect its installed ItsyWeb version,
 custom layouts, content and assets. Local instructions and explicit user choices
 take precedence. Keep ordinary HTML/JSON and the existing no-build setup.
+
+For existing projects, keep the selected `.flea.config.json` and `flea/` names
+when present. The runtime accepts them alongside the new `.itsy.config.json`
+and `itsy/` naming. Do not rename content, sessions or configuration just to
+rebrand a site. New-layout deployments require server protocol 29.
 
 ## Load the relevant shared guidance
 
@@ -16,12 +21,12 @@ take precedence. Keep ordinary HTML/JSON and the existing no-build setup.
 - Styling, layout, theme or markup: read [prewind](../prewind/SKILL.md).
 - Visual direction, UX, redesign or polish: also read
   [design](../design/SKILL.md), which routes to Impeccable.
-- Read local task-specific guides, such as `flea/skills/import-brochure/SKILL.md`,
+- Read local task-specific guides, such as `itsy/skills/import-brochure/SKILL.md`,
   when the task requires their import workflow.
 
 Read installed files explicitly; this is not an automatic dependency loader. If
 a shared skill is missing, report it and continue from available project guidance.
-Do not load Rails or Preflight conventions for a Flea site.
+Do not load Rails or Preflight conventions for a ItsyWeb site.
 
 ## Content and direction
 
@@ -48,14 +53,14 @@ Routine maintenance does not require restarting this process.
 
 ## Templates and content
 
-Build agent-managed Flea websites without snips by default. Write copy directly
-in HTML templates, keep media in `site/`, and use `flea/data/` for structured lists
+Build agent-managed ItsyWeb websites without snips by default. Write copy directly
+in HTML templates, keep media in `site/`, and use `itsy/data/` for structured lists
 when useful. Do not add text, image or video snips, `snip` attributes, generated
 snip bindings or multisnips unless the user explicitly requests browser-editable
 content. A request to build, import or redesign a site is not such a request.
 Preserve existing snips unless their conversion is requested; do not silently
 remove a client's editing workflow. Route titles and descriptions may still live
-in `flea/snips.json` without any editable snip entries.
+in `itsy/snips.json` without any editable snip entries.
 
 - Public pages and assets live in `site/`. `site/index.html` maps to `/` and
   `site/about.html` to `/about`; use site-relative public URLs. Keep private
@@ -66,11 +71,11 @@ in `flea/snips.json` without any editable snip entries.
   `{render /admin/toolbar}` directly inside `<body>`. Preserve the toolbar's
   version attributes, declarative shadow-root shell and external script.
   `app.current_admin` is request-supplied, not a JSON setting.
-- Public settings belong under `app` in `.flea.config.json`; secrets do not.
-  Developer-managed JSON lives in `flea/data/` and mail templates in `mailers/`.
+- Public settings belong under `app` in `.itsy.config.json`; secrets do not.
+  Developer-managed JSON lives in `itsy/data/` and mail templates in `mailers/`.
 - Only when browser editing is explicitly requested, use bare `snip` attributes
   for the requested regions and let dev extract IDs.
-  Existing values and route metadata live in `flea/snips.json`; edit that source
+  Existing values and route metadata live in `itsy/snips.json`; edit that source
   rather than replacing a generated reference. Do not invent IDs or nest snips.
 - When requested, media snips extract image src/alt or video src/poster bindings.
   Keep classes, dimensions, links and playback behavior in templates. Do not combine
@@ -78,7 +83,7 @@ in `flea/snips.json` without any editable snip entries.
 - Use multisnips only when requested; follow local examples. Preserve page-level
   groups with a single root and named fields; do not nest groups or place them in
   layouts/partials.
-- Use `{icon name}` and the `flea/icons/` cache. Do not introduce another icon or
+- Use `{icon name}` and the `itsy/icons/` cache. Do not introduce another icon or
   component system to follow a design example.
 
 ## Migrations and permanent redirects
@@ -87,9 +92,9 @@ For an existing-site migration, URL inventory or redirect request, read
 [migration redirects](references/migration-redirects.md). This workflow can run
 on its own without a redesign consultation: discover public URLs from the current
 website, map them to the new site's pages, and update the top-level `redirects`
-object in `.flea.config.json`. Preserve existing rules and verify actual 301
+object in `.itsy.config.json`. Preserve existing rules and verify actual 301
 responses locally. Check installed runtime support before relying on the config;
-older Flea versions silently ignore it. Do not deploy or upgrade as an incidental
+older ItsyWeb versions silently ignore it. Do not deploy or upgrade as an incidental
 part of an inventory.
 
 ## Styling and Contact
@@ -108,7 +113,7 @@ the site's Contact documentation and example before changing it: enable
 `contact.error` and `contact.flash.*`. Do not replace admin CSRF contracts or
 assume arbitrary app installation support. Restart dev after app config changes.
 
-For an installed optional Blog, read the site's `flea/skills/add-blog/SKILL.md`
+For an installed optional Blog, read the site's `itsy/skills/add-blog/SKILL.md`
 and current Blog guide before editing post records, templates or publishing.
 Preserve stable IDs, draft visibility and explicit Publish/Unpublish. Other app
 support depends on the site's installed version; do not infer it from this skill.
@@ -131,5 +136,5 @@ forms and edit Save/Cancel where affected. Review changed CSS for duplication an
 unintended overrides; verify behavior beyond screenshots. Finish with `itsy status`
 and a review of templates together with any changed metadata or content. For new
 sites without requested browser editing, verify there are no snip attributes,
-snip bindings, multisnips or editable entries in `flea/snips.json`. Report unrun
+snip bindings, multisnips or editable entries in `itsy/snips.json`. Report unrun
 checks and remaining limits; this skill grants no commit or deployment permission.

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/devaccess"
+	"itsy/internal/devaccess"
 )
 
 func post(cookie *http.Cookie, token string) (*http.Request, url.Values) {

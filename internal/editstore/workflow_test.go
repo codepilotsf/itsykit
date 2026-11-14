@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/editor"
-	"flea/internal/mailer"
+	"itsy/internal/editor"
+	"itsy/internal/mailer"
 )
 
 type testSender chan mailer.Message
@@ -26,7 +26,7 @@ func (s testSender) Send(_ context.Context, m mailer.Message) error { s <- m; re
 func TestHTTPSLoginEditAndPublicSnapshot(t *testing.T) {
 	store, public := fixture(t, true)
 	inbox := make(testSender, 1)
-	dashboard := editor.New(editor.Options{Emails: store.Emails, SessionPath: filepath.Join(store.Root, "flea", "runtime", "sessions.json"), Name: "Test", Sender: inbox, Backend: store, Render: public.RenderAdmin, Public: public.ServeOwner})
+	dashboard := editor.New(editor.Options{Emails: store.Emails, SessionPath: filepath.Join(store.Root, "itsy", "runtime", "sessions.json"), Name: "Test", Sender: inbox, Backend: store, Render: public.RenderAdmin, Public: public.ServeOwner})
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if editor.IsPath(r.URL.Path) {
 			dashboard.ServeHTTP(w, r)

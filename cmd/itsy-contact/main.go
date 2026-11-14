@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"flea/internal/appruntime"
+	"itsy/internal/appruntime"
 )
 
 func main() {

@@ -1,6 +1,6 @@
 # Video test fixtures
 
-These tiny synthetic fixtures were generated offline with ffmpeg. Flea does not
+These tiny synthetic fixtures were generated offline with ffmpeg. ItsyWeb does not
 require or invoke ffmpeg at runtime.
 
 - `valid.mp4`: 32×24 blue video, 0.3 seconds, H.264/yuv420p and AAC, faststart.

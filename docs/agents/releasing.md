@@ -1,4 +1,4 @@
-# Publishing FleaCMS
+# Publishing ItsyWeb
 
 ## Pending ItsyWeb rename
 
@@ -10,8 +10,10 @@ name for CLI smoke checks; old `.flea-update-* version` verification is retained
 only for the transition. From a pre-rename CLI, the first `flea update` installs
 the transition binary; a second `flea update` installs the canonical `itsy` name.
 Verify both steps and the strong notice on native supported platforms before
-publication. No release, website installer sync or server rollout is performed by
-this local rename task. Existing release receipts below retain historical names.
+publication. New sites use `.itsy.config.json` and `itsy/`, with explicit legacy
+aliases; protocol 29 is required. Verify a protocol-28 server update against old
+site files, sessions and custom-app storage before publishing. No release,
+website installer sync or server rollout is performed by this local rename task. Existing release receipts below retain historical names.
 
 For the manual public release workflow, SemVer rules, low-memory host safeguards
 and recovery steps, follow the [deployment runbook](deployment-runbook.md).

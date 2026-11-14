@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 
-	"flea/internal/devaccess"
+	"itsy/internal/devaccess"
 )
 
 func devLANAddresses() ([]string, error) {

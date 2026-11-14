@@ -14,9 +14,9 @@ func TestAppSettings(t *testing.T) {
 		}
 	}
 	root := fixture(t)
-	put(t, root, ".flea.config.json", `{"app":{"phone":"<123>","number":9007199254740993},"admin":{"emails":[]},"custom":{"keep":true}}`)
+	put(t, root, ".itsy.config.json", `{"app":{"phone":"<123>","number":9007199254740993},"admin":{"emails":[]},"custom":{"keep":true}}`)
 	put(t, root, "index.html", `{app.site_name} {app.phone} {site.name} {#each snip.team.members as member}{app.phone}{/each}`)
-	before, _ := os.ReadFile(filepath.Join(root, ".flea.config.json"))
+	before, _ := os.ReadFile(filepath.Join(root, ".itsy.config.json"))
 	p, err := Load(root)
 	if err != nil {
 		t.Fatal(err)
@@ -24,7 +24,7 @@ func TestAppSettings(t *testing.T) {
 	if p.SiteNameConfigured || p.App["site_name"] != DefaultSiteName(root) {
 		t.Fatal("default", p.App)
 	}
-	after, _ := os.ReadFile(filepath.Join(root, ".flea.config.json"))
+	after, _ := os.ReadFile(filepath.Join(root, ".itsy.config.json"))
 	if string(before) != string(after) {
 		t.Fatal("load wrote config")
 	}
@@ -45,12 +45,12 @@ func TestAppSettings(t *testing.T) {
 	if !strings.Contains(string(body), "My &lt;Studio&gt; &lt;123&gt;") {
 		t.Fatal(string(body))
 	}
-	saved, _ := os.ReadFile(filepath.Join(root, ".flea.config.json"))
+	saved, _ := os.ReadFile(filepath.Join(root, ".itsy.config.json"))
 	if !strings.Contains(string(saved), "9007199254740993") || !strings.Contains(string(saved), `"keep": true`) {
 		t.Fatal(string(saved))
 	}
 	for _, bad := range []string{`{"site":{"name":"Old"}}`, `{"app":null}`, `{"app":{"site_name":false}}`, `{"app":{"site_name":""}}`} {
-		put(t, root, ".flea.config.json", bad)
+		put(t, root, ".itsy.config.json", bad)
 		if _, err := Load(root); err == nil {
 			t.Fatal("accepted", bad)
 		}

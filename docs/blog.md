@@ -1,6 +1,6 @@
 # Blog
 
-Blog is an optional built-in content application. It uses Flea's current admin
+Blog is an optional built-in content application. It uses ItsyWeb's current admin
 login, rich-text editor, photo library and atomic content snapshot. No database,
 external service or frontend build is needed.
 
@@ -8,7 +8,7 @@ external service or frontend build is needed.
 
 Fresh sites include private example templates at `site/blog/_index.html` and
 `site/blog/_post.html`, plus `site/admin/blog.html` and `blog-edit.html`. Merge this
-into `.flea.config.json`, preserving other apps and settings:
+into `.itsy.config.json`, preserving other apps and settings:
 
 ```json
 {"apps":{"blog":{"mount":"/blog"}}}
@@ -43,7 +43,7 @@ stable IDs to break ties. Changing a slug changes the URL; no redirect is create
 
 ## Agent and developer format
 
-Posts live in the optional top-level `blog` array in `flea/snips.json`, alongside
+Posts live in the optional top-level `blog` array in `itsy/snips.json`, alongside
 existing pages, shared snips, archive and media. Preserve those other fields.
 The existing single-file transaction keeps posts and cover metadata together.
 

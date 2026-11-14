@@ -9,8 +9,8 @@ import (
 	"os"
 	"strings"
 
-	"flea/internal/sitefiles"
-	"flea/internal/snips"
+	"itsy/internal/sitefiles"
+	"itsy/internal/snips"
 )
 
 // LoadEditing extracts new regions only for the local dev server.
@@ -100,8 +100,8 @@ func extractSnips(directory string, updated *bool) error {
 		}
 	}
 	legacy := map[string]bool{}
-	for _, directory := range []string{"flea/snips", "flea/data"} {
-		entries, e := fs.ReadDir(root.FS(), directory)
+	for _, directory := range []string{"itsy/snips", "itsy/data"} {
+		entries, e := fs.ReadDir(root.FS(), sitefiles.Resolve(root, directory))
 		if e != nil && !os.IsNotExist(e) {
 			return e
 		}
@@ -117,7 +117,7 @@ func extractSnips(directory string, updated *bool) error {
 	}
 	tx := snipTransaction{Edits: map[string]snipEdit{}}
 	mediaSources := map[string]string{}
-	previous, previousErr := readFile(root, "flea/snips.json")
+	previous, previousErr := readFile(root, "itsy/snips.json")
 	if previousErr != nil && !os.IsNotExist(previousErr) {
 		return previousErr
 	}
@@ -232,7 +232,7 @@ func extractSnips(directory string, updated *bool) error {
 			entry, ok = store.Archive[id]
 		}
 		if !ok {
-			return fmt.Errorf("missing snip %s in flea/snips.json", id)
+			return fmt.Errorf("missing snip %s in itsy/snips.json", id)
 		}
 		delete(store.Shared.Snips, id)
 		for _, page := range store.Pages {
@@ -287,7 +287,7 @@ func extractSnips(directory string, updated *bool) error {
 	if err != nil {
 		return err
 	}
-	if err = root.MkdirAll("flea/runtime", 0700); err != nil {
+	if err = root.MkdirAll(sitefiles.Resolve(root, "itsy/runtime"), 0700); err != nil {
 		return err
 	}
 	if err = writeSiteFile(root, transactionFile, data); err != nil {

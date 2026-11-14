@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/snips"
+	"itsy/internal/snips"
 )
 
 func TestExtractionRemovesOnlyAuthoringAttribute(t *testing.T) {

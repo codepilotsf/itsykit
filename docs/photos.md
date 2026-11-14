@@ -65,9 +65,9 @@ discards its new preview without changing the page draft.
 
 ## Files and deployment
 
-Standalone image metadata lives in typed snip entries in `flea/snips.json`;
+Standalone image metadata lives in typed snip entries in `itsy/snips.json`;
 multisnip photo choices use its `media` map. Local processed files live in
-`flea/media/`, named by their SHA-256 hash. Commit both. Original developer seed images
+`itsy/media/`, named by their SHA-256 hash. Commit both. Original developer seed images
 are not removed. Production uploads live in the site's managed content directory,
 outside immutable code releases. Validated photos stream from pinned file handles,
 not permanent Go-heap buffers. Never modify hash-named files in place: detected

@@ -12,8 +12,8 @@ import (
 	"os"
 	"time"
 
-	contactapp "flea/apps/contact"
-	"flea/internal/appapi"
+	contactapp "itsy/apps/contact"
+	"itsy/internal/appapi"
 )
 
 const CapabilityPath = "/_flea/capabilities/contact-email"

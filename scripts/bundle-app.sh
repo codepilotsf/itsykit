@@ -10,7 +10,7 @@ case "$app_os-$app_arch" in
 esac
 app_stage=$(mktemp -d)
 trap 'rm -rf -- "$app_stage"' EXIT
-CGO_ENABLED=0 GOOS="$app_os" GOARCH="$app_arch" "${GO_BINARY:-go}" build -trimpath -ldflags='-s -w' -o "$app_stage/contact" ./cmd/flea-contact
+CGO_ENABLED=0 GOOS="$app_os" GOARCH="$app_arch" "${GO_BINARY:-go}" build -trimpath -ldflags='-s -w' -o "$app_stage/contact" ./cmd/itsy-contact
 app_destination="internal/appbundle/assets/$app_os-$app_arch"
 gzip -n -c "$app_stage/contact" > "$app_destination/contact.gz"
 shasum -a 256 "$app_stage/contact" | awk '{print $1}' > "$app_destination/contact.sha256"

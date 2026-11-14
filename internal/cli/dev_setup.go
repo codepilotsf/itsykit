@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"os"
 	"os/exec"
 
-	"flea/internal/setup"
-	"flea/internal/site"
+	"itsy/internal/setup"
+	"itsy/internal/site"
 )
 
 func devTerminal(ctx context.Context, in *os.File) bool {
@@ -68,7 +69,7 @@ func prepareDevOwner(ctx context.Context, p *site.Project, in io.Reader, out io.
 		}
 		if added {
 			changed = true
-			fmt.Fprintf(out, "Added %s to .flea.config.json.\n", email)
+			fmt.Fprintf(out, "Added %s to %s.\n", email, sitefiles.ResolveAt(p.Root, sitefiles.ConfigName))
 		} else {
 			fmt.Fprintf(out, "%s already has admin access in this site's configuration. Nothing changed.\n", email)
 		}

@@ -81,7 +81,7 @@ When working in the canonical shared-skills repository identified by its
 `sync/consumers.json`, if the task deliberately changes an authored skill under
 `skills/`, finish the change and its checks. If the user already requested sync,
 continue that scope without asking again. Otherwise offer the local sync workflow
-for the configured Flea CMS and Preflight template repositories. This is opt-in;
+for the configured ItsyWeb and Preflight template repositories. This is opt-in;
 a shared-skill edit alone does not authorize consumer modifications. When authorized,
 follow that repository's local skill synchronization instructions, use the
 user-selected pinned source revision and preserve drift checks. If the change
@@ -90,7 +90,7 @@ otherwise explain why the pinned workflow needs a source commit and request only
 that missing permission. Never treat missing standing permission as already granted.
 
 This offer applies to authored shared skills, not documentation-only changes,
-consumer-local edits or Impeccable. The configured consumers are the Flea and
+consumer-local edits or Impeccable. The configured consumers are the ItsyWeb and
 Preflight templates; generated sites and applications are not enrolled unless
 they are separately added to the consumer configuration.
 

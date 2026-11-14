@@ -66,7 +66,7 @@ func run(server, root string) error {
 	for n := 0; n < 30; n++ {
 		dir := filepath.Join(base, fmt.Sprintf("site-%02d", n))
 		config := fmt.Sprintf(`{"app":{"site_name":"Capacity site %02d"}}`, n)
-		if err := write(filepath.Join(dir, ".flea.config.json"), []byte(config)); err != nil {
+		if err := write(filepath.Join(dir, ".itsy.config.json"), []byte(config)); err != nil {
 			return err
 		}
 		items := make([]map[string]string, 20)
@@ -74,7 +74,7 @@ func run(server, root string) error {
 			items[i] = map[string]string{"title": fmt.Sprintf("Article %d", i), "body": strings.Repeat("Sample website content. ", 12)}
 		}
 		data, _ := json.Marshal(map[string]any{"items": items})
-		if err := write(filepath.Join(dir, "flea/data/articles.json"), data); err != nil {
+		if err := write(filepath.Join(dir, "itsy/data/articles.json"), data); err != nil {
 			return err
 		}
 		for i := 0; i < 5; i++ {

@@ -14,10 +14,10 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/mailer"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/templates"
+	"itsy/internal/mailer"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/templates"
 )
 
 type inbox chan mailer.Message
@@ -40,7 +40,7 @@ func testEditor(t *testing.T, options Options) *Handler {
 	}
 	options.Render = site.NewServer(p).RenderAdmin
 	if options.SessionPath == "" {
-		options.SessionPath = filepath.Join(root, "flea", "runtime", "sessions.json")
+		options.SessionPath = filepath.Join(root, "itsy", "runtime", "sessions.json")
 	}
 	return New(options)
 }

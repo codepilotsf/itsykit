@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 
-	"flea/internal/localenv"
-	"flea/internal/mailer"
+	"itsy/internal/localenv"
+	"itsy/internal/mailer"
 )
 
 func Email(ctx context.Context, directory string, in io.Reader, out io.Writer) error {
@@ -26,7 +26,7 @@ func EmailOptional(ctx context.Context, directory string, in io.Reader, out io.W
 }
 
 func configureEmailFlow(ctx context.Context, directory string, in io.Reader, out io.Writer, checker func(mailer.Settings) mailer.Checker, optional bool) error {
-	if _, err := os.Stat(filepath.Join(directory, ".flea.config.json")); err != nil {
+	if _, err := os.Stat(sitefiles.Path(directory, ".itsy.config.json")); err != nil {
 		return fmt.Errorf("Run itsy email from your site's folder.")
 	}
 	// If Git is present, fail closed on inspection errors and tracked secrets.

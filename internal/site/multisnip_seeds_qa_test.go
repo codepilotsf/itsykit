@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/snips"
+	"itsy/internal/snips"
 )
 
 const qaJoe = `<article multisnip="team"><h2 snip="name">Joe</h2><p snip="role">Founder</p></article>`
@@ -29,11 +29,11 @@ func TestQAAdjacentMultisnipSeedsOrderAndIdempotence(t *testing.T) {
 	if strings.Count(string(source), "{#multisnip team}") != 1 {
 		t.Fatal("multiple generated loops")
 	}
-	before, _ := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	before, _ := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	if e := ExtractSnips(root); e != nil {
 		t.Fatal(e)
 	}
-	after, _ := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	after, _ := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	if !bytes.Equal(before, after) {
 		t.Fatal("not idempotent")
 	}
@@ -42,7 +42,7 @@ func TestQAMultisnipSeedMismatchLeavesSourceAndContent(t *testing.T) {
 	for _, source := range []string{qaJoe + `<hr>` + qaJane, qaJoe + strings.Replace(qaJane, "<article ", `<article class="different" `, 1)} {
 		root := fixture(t)
 		put(t, root, "index.html", source)
-		before, e := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+		before, e := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 		missing := os.IsNotExist(e)
 		if e := ExtractSnips(root); e == nil {
 			t.Fatal("accepted incompatible repeated seed")
@@ -51,7 +51,7 @@ func TestQAMultisnipSeedMismatchLeavesSourceAndContent(t *testing.T) {
 		if string(after) != source {
 			t.Fatal("rewrote rejected source")
 		}
-		content, e := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+		content, e := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 		if missing {
 			if !os.IsNotExist(e) {
 				t.Fatal("created content on failed extraction")

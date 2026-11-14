@@ -2,10 +2,10 @@ package editstore
 
 import (
 	"bytes"
-	"flea/internal/editor"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/video"
+	"itsy/internal/editor"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/video"
 	"net/http/httptest"
 	"os"
 	"path/filepath"

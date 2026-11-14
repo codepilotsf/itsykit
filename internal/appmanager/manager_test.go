@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/appbundle"
+	"itsy/internal/appbundle"
 )
 
 func TestManagedLifecycle(t *testing.T) {
@@ -117,7 +117,7 @@ func TestFreezeExecutableIdentity(t *testing.T) {
 
 func TestPrepareStorageIsPrivate(t *testing.T) {
 	anchor := t.TempDir()
-	runtimeRoot := filepath.Join(anchor, "flea", "runtime")
+	runtimeRoot := filepath.Join(anchor, "itsy", "runtime")
 	storage := filepath.Join(runtimeRoot, "apps", "demo")
 	if err := prepareStorage(Spec{Name: "demo", RuntimeRoot: runtimeRoot, Storage: storage}); err != nil {
 		t.Fatal(err)
@@ -135,10 +135,10 @@ func TestPrepareStorageIsPrivate(t *testing.T) {
 func TestPrepareStorageRejectsSymlinkedAncestor(t *testing.T) {
 	anchor := t.TempDir()
 	outside := t.TempDir()
-	if err := os.Symlink(outside, filepath.Join(anchor, "flea")); err != nil {
+	if err := os.Symlink(outside, filepath.Join(anchor, "itsy")); err != nil {
 		t.Skipf("symlinks unavailable: %v", err)
 	}
-	runtimeRoot := filepath.Join(anchor, "flea", "runtime")
+	runtimeRoot := filepath.Join(anchor, "itsy", "runtime")
 	storage := filepath.Join(runtimeRoot, "apps", "demo")
 	if err := prepareStorage(Spec{Name: "demo", RuntimeRoot: runtimeRoot, Storage: storage}); err == nil {
 		t.Fatal("symlinked ancestor accepted")
@@ -152,7 +152,7 @@ func TestPrepareStorageRejectsSymlinkedAncestor(t *testing.T) {
 // directory that is accessible to other users is rejected rather than chmodded.
 func TestPrepareStorageRejectsPermissiveDirs(t *testing.T) {
 	anchor := t.TempDir()
-	runtimeRoot := filepath.Join(anchor, "flea", "runtime")
+	runtimeRoot := filepath.Join(anchor, "itsy", "runtime")
 	storage := filepath.Join(runtimeRoot, "apps", "demo")
 	if err := os.MkdirAll(storage, 0755); err != nil {
 		t.Fatal(err)
@@ -172,13 +172,13 @@ func TestPrepareStorageRejectsPermissiveDirs(t *testing.T) {
 // container directory must not be writable by other users.
 func TestPrepareStorageRejectsWritableContainer(t *testing.T) {
 	anchor := t.TempDir()
-	if err := os.Mkdir(filepath.Join(anchor, "flea"), 0777); err != nil {
+	if err := os.Mkdir(filepath.Join(anchor, "itsy"), 0777); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Chmod(filepath.Join(anchor, "flea"), 0777); err != nil {
+	if err := os.Chmod(filepath.Join(anchor, "itsy"), 0777); err != nil {
 		t.Fatal(err)
 	}
-	runtimeRoot := filepath.Join(anchor, "flea", "runtime")
+	runtimeRoot := filepath.Join(anchor, "itsy", "runtime")
 	storage := filepath.Join(runtimeRoot, "apps", "demo")
 	if err := prepareStorage(Spec{Name: "demo", RuntimeRoot: runtimeRoot, Storage: storage}); err == nil {
 		t.Fatal("world-writable container accepted")

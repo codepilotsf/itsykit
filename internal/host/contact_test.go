@@ -3,9 +3,9 @@ package host
 import (
 	"context"
 	"encoding/json"
-	"flea/internal/appbundle"
-	"flea/internal/mailer"
-	"flea/templates"
+	"itsy/internal/appbundle"
+	"itsy/internal/mailer"
+	"itsy/templates"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -53,7 +53,7 @@ func TestContactSiteIsolation(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		for path, body := range map[string]string{"site/index.html": "Hello", "site/contact/index.html": `<form>{csrf}</form>{contact.error}`, "site/contact/thank-you.html": "Thanks", ".flea.config.json": `{"app":{"site_name":"test"},"apps":{"contact":{"mount":"/contact","email":{"to":"` + name + `@example.test"}}}}`} {
+		for path, body := range map[string]string{"site/index.html": "Hello", "site/contact/index.html": `<form>{csrf}</form>{contact.error}`, "site/contact/thank-you.html": "Thanks", ".itsy.config.json": `{"app":{"site_name":"test"},"apps":{"contact":{"mount":"/contact","email":{"to":"` + name + `@example.test"}}}}`} {
 			if err := os.WriteFile(filepath.Join(root, path), []byte(body), 0644); err != nil {
 				t.Fatal(err)
 			}

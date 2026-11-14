@@ -2,8 +2,8 @@ package syncstate
 
 import (
 	"encoding/json"
-	"flea/internal/snips"
 	"fmt"
+	"itsy/internal/snips"
 )
 
 // Comparison counts differing values, classifying direction only with a baseline.

@@ -2,12 +2,12 @@ package editstore
 
 import (
 	"bytes"
-	"flea/internal/editor"
-	"flea/internal/media"
-	"flea/internal/site"
-	"flea/internal/snips"
 	"image"
 	"image/png"
+	"itsy/internal/editor"
+	"itsy/internal/media"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 	"os"
 	"path/filepath"
 	"testing"

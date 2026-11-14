@@ -5,15 +5,16 @@ package editstore
 import (
 	"encoding/json"
 	"fmt"
+	"itsy/internal/sitefiles"
 	"os"
 	"path/filepath"
 	"slices"
 	"unicode/utf8"
 
-	"flea/internal/editor"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/state"
+	"itsy/internal/editor"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/state"
 )
 
 type Store struct {
@@ -23,7 +24,7 @@ type Store struct {
 }
 
 func (s *Store) lock() (func(), error) {
-	lock, pending := "", filepath.Join(s.Root, "flea", "runtime", ".snips-pending.json")
+	lock, pending := "", sitefiles.Path(s.Root, filepath.Join("itsy", "runtime", ".snips-pending.json"))
 	if s.ConfigPath != "" {
 		lock = filepath.Join(filepath.Dir(s.ConfigPath), "deploy.lock")
 		pending = filepath.Join(filepath.Dir(s.ConfigPath), "deploy.pending.json")

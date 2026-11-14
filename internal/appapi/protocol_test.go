@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/formguard"
+	"itsy/internal/formguard"
 )
 
 func TestMounts(t *testing.T) {

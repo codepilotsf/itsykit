@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/localenv"
-	"flea/internal/mailer"
+	"itsy/internal/localenv"
+	"itsy/internal/mailer"
 )
 
 type connectionCheck func(context.Context) (string, error)
@@ -22,7 +22,7 @@ func TestEmailWizard(t *testing.T) {
 	for _, fail := range []bool{false, true} {
 		dir := t.TempDir()
 		os.Mkdir(filepath.Join(dir, "_"), 0755)
-		os.WriteFile(filepath.Join(dir, ".flea.config.json"), []byte(`{"app":{"site_name":"Test"}}`), 0644)
+		os.WriteFile(filepath.Join(dir, ".itsy.config.json"), []byte(`{"app":{"site_name":"Test"}}`), 0644)
 		var out bytes.Buffer
 		err := configureEmail(context.Background(), dir, strings.NewReader("re_test123456\nMySite Support\nhello@example.test\n"), &out, func(s mailer.Settings) mailer.Checker {
 			if s.Name != "MySite Support" || s.From != "hello@example.test" {

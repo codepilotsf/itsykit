@@ -129,7 +129,7 @@ func (c *Client) Request(ctx context.Context, mount Mount, method, publicPath, q
 }
 
 // RequestWithSession is Request plus the app-owned session token read from
-// Flea's own cookie. The token is validated again here before it is forwarded.
+// ItsyWeb's own cookie. The token is validated again here before it is forwarded.
 func (c *Client) RequestWithSession(ctx context.Context, mount Mount, method, publicPath, query string, fields map[string]any, sessionToken string) (Envelope, int, error) {
 	var empty Envelope
 	if !ValidSessionToken(sessionToken) {

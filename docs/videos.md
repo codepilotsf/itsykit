@@ -12,13 +12,13 @@ mode and no admin-created media region without a developer designation.
 - MP4 container, one H.264 video track, with optional AAC-LC audio.
 - Enable **Web optimized / Fast start** when exporting.
 - Use standard 8-bit H.264 Baseline, Main or High profile; 1080p or less is a
-  practical export target. Flea accepts dimensions up to 8192 pixels per side.
+  practical export target. ItsyWeb accepts dimensions up to 8192 pixels per side.
 - Limit each file to **25 MiB**. The library holds up to 50 entries and **64 MiB**
   of video files, including retained replacements.
 - Export a regular, non-fragmented MP4 with no extra subtitle/data tracks.
   Add captions separately with native HTML `<track>` elements where needed.
 
-Flea checks MP4 box bounds, sample offsets/timing, codec declarations and decoder
+ItsyWeb checks MP4 box bounds, sample offsets/timing, codec declarations and decoder
 configuration. It does not decode every frame, strip embedded metadata, compress,
 resize, transcode or repair files. Preview playback after uploading. MP4 alone is
 not a codec: HEVC/H.265 files renamed to .mp4 are not supported. There is no WebM
@@ -47,17 +47,17 @@ the typed snip in JSON. Styling, dimensions and playback attributes remain
 developer-controlled. A missing poster starts empty but remains editable.
 Nested snips and competing child `<source>` elements are parsing errors.
 Videos stay outside rich text. There is no video multisnip field selector yet.
-The browser's native controls provide playback and seeking; Flea serves Range and
+The browser's native controls provide playback and seeking; ItsyWeb serves Range and
 HEAD requests from pinned, validated file handles rather than in-memory video
 buffers. Only catalogued files are served, with MP4 content type and hash ETags.
 Do not modify a hash-named file in place; upload a replacement instead.
 
 ## Storage, deployment and recovery
 
-Metadata is in a `type: "video"` entry beside ordinary snips in `flea/snips.json`.
+Metadata is in a `type: "video"` entry beside ordinary snips in `itsy/snips.json`.
 Its `video` value holds validated MP4 metadata; optional `poster` holds image
 metadata directly. There is only one stored source/poster value per snip.
-Commit metadata and templates. Local video files live in **flea/media/** and
+Commit metadata and templates. Local video files live in **itsy/media/** and
 are Git-ignored. Dev, uploads and pulls ensure that ignore rule; dev refuses
 already tracked video files. Files use SHA-256 names and are not renamed by admins.
 

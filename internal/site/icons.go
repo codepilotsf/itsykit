@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"html"
 	"io"
+	"itsy/internal/sitefiles"
 	"net/http"
 	"os"
 	"regexp"
@@ -19,7 +20,7 @@ import (
 
 // Only explicitly referenced SVGs are downloaded. No icon library is embedded.
 const LucideVersion = "1.47.0"
-const iconCacheDir = "flea/icons"
+const iconCacheDir = "itsy/icons"
 const iconSource = "https://unpkg.com/lucide-static@" + LucideVersion + "/"
 const maxIconBytes = 64 << 10
 
@@ -216,7 +217,7 @@ func openIconCache(rootPath string) (*os.Root, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, component := range strings.Split(iconCacheDir, "/") {
+	for _, component := range strings.Split(sitefiles.Resolve(root, iconCacheDir), "/") {
 		if err := root.Mkdir(component, 0755); err != nil && !os.IsExist(err) {
 			root.Close()
 			return nil, err

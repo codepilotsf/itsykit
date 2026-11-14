@@ -2,7 +2,7 @@ package site
 
 import (
 	"context"
-	"flea/internal/snips"
+	"itsy/internal/snips"
 	"net/http"
 )
 

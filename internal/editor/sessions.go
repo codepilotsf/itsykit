@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	"flea/internal/state"
+	"itsy/internal/state"
 )
 
 // Sessions are runtime state, never release content. Each transaction reads the

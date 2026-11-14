@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	"flea/internal/media"
-	"flea/internal/snips"
-	"flea/internal/video"
+	"itsy/internal/media"
+	"itsy/internal/snips"
+	"itsy/internal/video"
 )
 
 // MediaValidationError contains only a safe validation explanation, never

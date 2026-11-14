@@ -1,6 +1,6 @@
 ---
 name: prewind
-description: Style sites and applications that use Prewind. Use for theme tokens, utility classes, fluid typography and spacing, layout, and responsive styling. Applies across Flea CMS and Rails; framework-specific forms, components and file locations belong to their authoring skills.
+description: Style sites and applications that use Prewind. Use for theme tokens, utility classes, fluid typography and spacing, layout, and responsive styling. Applies across ItsyWeb and Rails; framework-specific forms, components and file locations belong to their authoring skills.
 ---
 
 # Prewind styling
@@ -29,5 +29,5 @@ and unintended overrides. Verify responsive rendering and interactions in the
 browser; source inspection alone does not establish visual correctness.
 
 This skill does not choose Simple Form, Zjax, a frontend build step or stylesheet
-paths. Load the installed Flea CMS or Preflight authoring skill when applicable;
+paths. Load the installed ItsyWeb or Preflight authoring skill when applicable;
 use the design skill when visual direction or UX decisions are part of the task.

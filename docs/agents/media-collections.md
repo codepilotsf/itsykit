@@ -12,7 +12,7 @@ only and is not a build/runtime dependency. Limits: 25 MiB/file, 64 MiB retained
 video files, 50 entries. No WebM fallback, video conversion or provider integration.
 Standalone media use typed snips.Entry values: Type image/video, direct Image or
 Video metadata, and optional direct Poster photo metadata. Never duplicate these
-values in a library record or template. Store bytes in flea/media/, Git-ignored locally
+values in a library record or template. Store bytes in itsy/media/, Git-ignored locally
 and below managed content/media in production. Deploy stages only checksum-pinned
 files named by committed metadata; source code still comes from Git. Normal
 deploy preserves remote video values; explicit snip sync compares video records.
@@ -21,7 +21,7 @@ backup compressed payloads 270 MiB; keep these limits consistent.
 LoadSyncSource is pull-only: it checks templates/metadata without opening videos,
 allowing fresh clones to fetch ignored bytes. It cannot serve HTTP. Pull must
 install and fully validate videos before writing content or sync baselines.
-The loader excludes flea/media/ from ordinary asset maps, validates catalogued
+The loader excludes itsy/media/ from ordinary asset maps, validates catalogued
 files and pins file handles for streaming via independent SectionReaders. Never
 resolve a filesystem path from a request. Reject links; changed file stat fails
 closed. Uploaded hash files are immutable, with no automatic pruning. os.File
@@ -40,7 +40,7 @@ Read docs/photos.md for photo commands, data boundaries and limits, and
 docs/recovery.md for backup/restore transport requirements.
 
 Photos are separate from rich text. Standalone image snips hold direct metadata;
-snips.Store.Media holds multisnip photo choices. Local flea/media/ and production
+snips.Store.Media holds multisnip photo choices. Local itsy/media/ and production
 content/media hold immutable hash-named JPEG/PNG files. Aggregate ImageAssets and
 VideoAssets include typed active/archive entries for loading and transport.
 Use bounded decoding, EXIF orientation, metadata-stripping re-encoding and 2048px

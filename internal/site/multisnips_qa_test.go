@@ -1,7 +1,7 @@
 package site
 
 import (
-	"flea/internal/snips"
+	"itsy/internal/snips"
 	"os"
 	"path/filepath"
 	"testing"
@@ -13,14 +13,14 @@ func TestQAMultisnipExtractionIsRepeatableAndPreservesEmpty(t *testing.T) {
 	if err := ExtractSnips(root); err != nil {
 		t.Fatal(err)
 	}
-	first, err := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	first, err := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if err := ExtractSnips(root); err != nil {
 		t.Fatal(err)
 	}
-	second, _ := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	second, _ := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	if string(first) != string(second) {
 		t.Fatal("second extraction changed content")
 	}
@@ -33,7 +33,7 @@ func TestQAMultisnipExtractionIsRepeatableAndPreservesEmpty(t *testing.T) {
 	}
 	store.Pages["/"].Multisnips["team"] = []snips.MultiItem{}
 	data, _ := store.Bytes()
-	put(t, root, "flea/snips.json", string(data))
+	put(t, root, "itsy/snips.json", string(data))
 	if err := ExtractSnips(root); err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func TestQAMultisnipDuplicateAuthoringDoesNotRewriteSource(t *testing.T) {
 	store := snips.NewStore()
 	store.Page("/").Multisnips = map[string][]snips.MultiItem{"team": {{ID: "a123456789", Fields: map[string]string{"name": "Existing"}}}}
 	data, _ := store.Bytes()
-	put(t, root, "flea/snips.json", string(data))
+	put(t, root, "itsy/snips.json", string(data))
 	if err := ExtractSnips(root); err == nil {
 		t.Error("duplicate compiled and authoring collection accepted")
 	}

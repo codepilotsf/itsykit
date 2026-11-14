@@ -4,7 +4,7 @@ set -euo pipefail
 kind=${1:?server or client required}
 arch=${2:?architecture required}
 source "$(dirname "$0")/version.sh"
-version=$(flea_version release)
+version=$(itsy_version release)
 [[ "$arch" == amd64 || "$arch" == arm64 ]] || exit 1
 [[ "$(go env GOHOSTARCH)" == "$arch" ]] || { echo 'Use a native runner for this architecture.' >&2; exit 1; }
 if [[ "$kind" == client ]]; then
@@ -21,15 +21,15 @@ go test ./...
 go test -race ./...
 go vet ./...
 mkdir -p dist
-flags="-s -w -X flea/internal/buildinfo.Version=$version"
+flags="-s -w -X itsy/internal/buildinfo.Version=$version"
 if [[ "$kind" == server ]]; then
   [[ "$(go env GOHOSTOS)" == linux ]] || exit 1
   file="dist/flea-server-linux-$arch"
-  CGO_ENABLED=0 go build -trimpath -ldflags "$flags" -o "$file" ./cmd/flea-server
+  CGO_ENABLED=0 go build -trimpath -ldflags "$flags" -o "$file" ./cmd/itsy-server
   "$file" -protocol
   if [[ "$arch" == amd64 ]]; then
     bash scripts/bundle-app.sh linux arm64
-    CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "$flags" -o dist/flea-server-linux-arm64 ./cmd/flea-server
+    CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath -ldflags "$flags" -o dist/flea-server-linux-arm64 ./cmd/itsy-server
   fi
 elif [[ "$kind" == client ]]; then
   system=$(go env GOHOSTOS)
@@ -37,7 +37,7 @@ elif [[ "$kind" == client ]]; then
   bash scripts/bundle.sh dist
   FLEA_REQUIRE_BUNDLE=1 go test ./internal/serverbundle -count=1
   file="dist/flea-$system-$arch"
-  CGO_ENABLED=0 go build -trimpath -ldflags "$flags" -o "$file" ./cmd/flea
+  CGO_ENABLED=0 go build -trimpath -ldflags "$flags" -o "$file" ./cmd/itsy
   smoke=$(mktemp -d)
   trap 'rm -rf -- "$smoke"' EXIT
   executable="$smoke/itsy"

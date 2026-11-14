@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/site"
+	"itsy/internal/site"
 )
 
 func TestLANExecutableFlags(t *testing.T) {
@@ -24,7 +24,7 @@ func TestLANExecutableFlags(t *testing.T) {
 		t.Skip("requires a private IPv4 interface: ", err)
 	}
 	binary := filepath.Join(t.TempDir(), "itsy")
-	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/flea")
+	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", binary, "../../cmd/itsy")
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build: %v\n%s", err, output)
 	}

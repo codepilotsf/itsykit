@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"flea/internal/appapi"
-	"flea/internal/sitefiles"
+	"itsy/internal/appapi"
+	"itsy/internal/sitefiles"
 )
 
 // appPackage is a resolved, confined custom-app package. The manifest describes
@@ -29,7 +29,7 @@ type appPackage struct {
 // header and any fat architecture table.
 const headerBytes = 4 << 10
 
-// loadAppPackage reads and validates flea/apps/<name>. It never follows a
+// loadAppPackage reads and validates itsy/apps/<name>. It never follows a
 // symlink and keeps every declared executable confined to the package directory.
 // The executable for the running platform is selected here; a package without
 // one is rejected with the required platform named.
@@ -38,14 +38,14 @@ func loadAppPackage(root *os.Root, siteRoot, runtimeRoot, name string) (appPacka
 	if name != filepath.Base(name) || !appapi.ValidName(name) {
 		return pkg, fmt.Errorf("invalid app name")
 	}
-	base := "flea/apps/" + name
+	base := sitefiles.Resolve(root, "itsy/apps/"+name)
 	raw, err := readFileBounded(root, base+"/app.json", sitefiles.MaxManifestBytes)
 	if err != nil {
-		return pkg, fmt.Errorf("app %q needs a package at flea/apps/%s with app.json and an executable", name, name)
+		return pkg, fmt.Errorf("app %q needs a package at itsy/apps/%s with app.json and an executable", name, name)
 	}
 	manifest, err := sitefiles.DecodeAppManifest(raw)
 	if err != nil {
-		return pkg, fmt.Errorf("flea/apps/%s/app.json %w", name, err)
+		return pkg, fmt.Errorf("itsy/apps/%s/app.json %w", name, err)
 	}
 	executables, err := sitefiles.ValidateAppManifest(manifest, name, appapi.Version)
 	if err != nil {
@@ -106,8 +106,8 @@ func loadAppPackage(root *os.Root, siteRoot, runtimeRoot, name string) (appPacka
 	return appPackage{
 		Name:       name,
 		Version:    manifest.Version,
-		Executable: filepath.Join(siteRoot, "flea", "apps", name, selected),
-		Dir:        filepath.Join(siteRoot, "flea", "apps", name),
+		Executable: sitefiles.Path(siteRoot, filepath.Join("itsy", "apps", name, selected)),
+		Dir:        sitefiles.Path(siteRoot, filepath.Join("itsy", "apps", name)),
 		Storage:    filepath.Join(runtimeRoot, "apps", name),
 		Hash:       sum,
 		Size:       size,

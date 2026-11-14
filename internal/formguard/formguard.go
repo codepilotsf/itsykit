@@ -15,7 +15,7 @@ import (
 	"sync"
 	"time"
 
-	"flea/internal/devaccess"
+	"itsy/internal/devaccess"
 )
 
 const Lifetime = 24 * time.Hour

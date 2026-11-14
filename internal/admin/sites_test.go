@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/host"
+	"itsy/internal/host"
 )
 
 var errTestFailure = errors.New("simulated restart failure")
@@ -377,7 +377,7 @@ func TestRemoveSiteUnmanagedFailsClosed(t *testing.T) {
 	if err := os.MkdirAll(filepath.Join(root, "site"), 0755); err != nil {
 		t.Fatal(err)
 	}
-	os.WriteFile(filepath.Join(root, ".flea.config.json"), []byte(`{"app":{"site_name":"Custom"}}`), 0644)
+	os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"Custom"}}`), 0644)
 	os.WriteFile(filepath.Join(root, "site", "index.html"), []byte("hi"), 0644)
 	c := host.Config{Listen: ":80", Sites: map[string]string{"x.test": root}}
 	data, _ := json.Marshal(c)

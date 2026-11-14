@@ -11,6 +11,11 @@ even when already current. A private `.flea-update-* version` probe retains the
 exact old version response required by released updaters; it performs no writes.
 See [installation](../installation.md) for the two-step path from old binaries.
 
+New sites use `.itsy.config.json` and `itsy/`. Existing `.flea.config.json`
+and `flea/` remain supported, with the current name preferred when present.
+Writes preserve the selected spelling; no migration or prompt is needed.
+Protocol 29 keeps older servers from accepting a new layout they cannot load.
+
 Core commands include `itsy new <directory>`, `itsy status`,
 `itsy dev [-port 3000]`, `itsy setup`, `itsy version`,
 `itsy deploy`, `itsy admin [email]`, and `itsy https`.
@@ -129,7 +134,7 @@ docs/apps.md; see apps/contact/README.md for the included app.
 internal/appmanager supervises children; internal/appruntime implements the
 child transport; internal/appbundle packages the target-specific Contact
 executable. Custom apps are site-local managed executables confined to
-flea/apps/<name>/. Keep credentials in inherited pipes and an already-bound
+itsy/apps/<name>/. Keep credentials in inherited pipes and an already-bound
 listener handoff. Never pass provider environment to children. Preserve
 parent-liveness cleanup, bounded restarts and per-site process isolation; this is
 not an OS sandbox.

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/admin"
-	"flea/internal/release"
+	"itsy/internal/admin"
+	"itsy/internal/release"
 )
 
 type remoteAdmin struct {

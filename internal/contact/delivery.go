@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	contactapp "flea/apps/contact"
-	"flea/internal/appapi"
-	"flea/internal/mailer"
+	contactapp "itsy/apps/contact"
+	"itsy/internal/appapi"
+	"itsy/internal/mailer"
 )
 
 type Email struct {

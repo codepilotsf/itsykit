@@ -12,10 +12,10 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/contact"
-	"flea/internal/localenv"
-	"flea/internal/mailer"
-	"flea/internal/site"
+	"itsy/internal/contact"
+	"itsy/internal/localenv"
+	"itsy/internal/mailer"
+	"itsy/internal/site"
 )
 
 func TestDevAdminReloadsAccessAndMail(t *testing.T) {
@@ -61,7 +61,7 @@ func TestDevAdminReloadsAccessAndMail(t *testing.T) {
 		t.Fatal(err)
 	}
 	get("Send sign-in code")
-	if err := os.WriteFile(filepath.Join(root, ".flea.config.json"), []byte(`{"app":{"site_name":"Test"},"admin":{"emails":[]}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"Test"},"admin":{"emails":[]}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	if err := public.Reload(root); err != nil {

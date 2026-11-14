@@ -21,10 +21,10 @@ import (
 	"sync"
 	"time"
 
-	"flea/internal/appapi"
-	"flea/internal/appbundle"
-	"flea/internal/appruntime"
-	"flea/internal/sitefiles"
+	"itsy/internal/appapi"
+	"itsy/internal/appbundle"
+	"itsy/internal/appruntime"
+	"itsy/internal/sitefiles"
 )
 
 // A single verified executable inode is shared by every site in this process.
@@ -158,7 +158,8 @@ func prepareStorage(spec Spec) error {
 		return fmt.Errorf("%s storage path must be absolute", spec.Name)
 	}
 	anchor := filepath.Dir(filepath.Dir(spec.RuntimeRoot))
-	if filepath.Clean(spec.RuntimeRoot) != filepath.Join(anchor, "flea", "runtime") {
+	container := filepath.Base(filepath.Dir(spec.RuntimeRoot))
+	if (container != "itsy" && container != "flea") || filepath.Clean(spec.RuntimeRoot) != filepath.Join(anchor, container, "runtime") {
 		return fmt.Errorf("%s storage path is not the managed runtime", spec.Name)
 	}
 	if filepath.Clean(spec.Storage) != filepath.Join(spec.RuntimeRoot, "apps", spec.Name) {
@@ -180,7 +181,7 @@ func prepareStorage(spec Spec) error {
 		name    string
 		private bool
 	}{
-		{"flea", false},
+		{container, false},
 		{"runtime", true},
 		{"apps", true},
 		{spec.Name, true},

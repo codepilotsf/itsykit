@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"flea/internal/release"
-	"flea/internal/sitefiles"
+	"itsy/internal/release"
+	"itsy/internal/sitefiles"
 )
 
 type gitState struct{ Branch, Commit, Prefix string }

@@ -1,10 +1,10 @@
 package site
 
 import (
-	"flea/internal/snips"
 	"fmt"
 	"golang.org/x/net/html"
 	"io"
+	"itsy/internal/snips"
 	"strings"
 )
 

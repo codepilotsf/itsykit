@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/mailer"
+	"itsy/internal/mailer"
 )
 
 func askSecret(ctx context.Context, in io.Reader, out io.Writer) (string, error) {

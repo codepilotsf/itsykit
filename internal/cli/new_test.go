@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/site"
+	"itsy/internal/site"
 )
 
 func configureNewTestGit(t *testing.T, config string) {
@@ -45,7 +45,7 @@ func TestNewInitializesGitWithCommit(t *testing.T) {
 		t.Fatal("new site should be clean", string(status), err)
 	}
 	files, err := exec.Command("git", "-C", "demo", "ls-tree", "-r", "--name-only", "HEAD").Output()
-	for _, file := range []string{".gitignore", ".flea.config.json", "site/index.html", "flea/icons/.keep", "flea/skills/"} {
+	for _, file := range []string{".gitignore", ".itsy.config.json", "site/index.html", "itsy/icons/.keep", "itsy/skills/"} {
 		if err != nil || !strings.Contains(string(files), file) {
 			t.Fatal("initial commit missing", file, err)
 		}
@@ -60,10 +60,10 @@ func TestNewInitializesGitWithCommit(t *testing.T) {
 	if _, err := os.Stat("demo/.gitignore"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat("demo/flea/icons/.keep"); err != nil {
+	if _, err := os.Stat("demo/itsy/icons/.keep"); err != nil {
 		t.Fatal("missing icon directory placeholder", err)
 	}
-	icons, err := os.ReadDir("demo/flea/icons")
+	icons, err := os.ReadDir("demo/itsy/icons")
 	if err != nil {
 		t.Fatal(err)
 	}

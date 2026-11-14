@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	"flea/internal/admin"
-	"flea/internal/host"
+	"itsy/internal/admin"
+	"itsy/internal/host"
 )
 
 // ServerIndexing configures one exact hostname, independent of website files or

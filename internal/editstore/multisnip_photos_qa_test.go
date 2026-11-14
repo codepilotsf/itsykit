@@ -1,9 +1,9 @@
 package editstore
 
 import (
-	"flea/internal/editor"
-	"flea/internal/media"
-	"flea/internal/snips"
+	"itsy/internal/editor"
+	"itsy/internal/media"
+	"itsy/internal/snips"
 	"os"
 	"path/filepath"
 	"testing"

@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/snips"
-	"flea/templates"
+	"itsy/internal/snips"
+	"itsy/templates"
 )
 
 // Exercise native cross-document transitions, not only CSS parsing.

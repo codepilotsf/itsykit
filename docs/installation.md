@@ -11,9 +11,20 @@ Use `itsy update` and `itsy update-server` for subsequent updates.
 
 The installer places `itsy` in `~/.local/bin` and retains `flea` as a relative
 symlink to it for the notice and update exception. The updater will not replace
-an unrelated existing `itsy` during conversion. Config filenames, content paths,
-server services, protocol identifiers, release URLs and downloadable artifact
-names retain their existing spelling. Local updates do not modify servers.
+an unrelated existing `itsy` during conversion.
+
+New sites use `.itsy.config.json` and `itsy/`. Existing `.flea.config.json` and
+`flea/` remain supported automatically, including writes, sessions, media and
+pull. Itsy names take precedence when present. No migration is performed.
+`ITSY_INSTALL_DIR` selects a different installer directory; `FLEA_INSTALL_DIR`
+remains supported for existing scripts.
+
+The new layout requires deployment protocol 29. Before deploying a new site to
+an existing server, explicitly run `itsy update-server` from a site with a saved
+destination. The update validates and preserves existing Flea sites; it does not
+rename server accounts, service paths, credentials, cookies or live content.
+Wire identifiers, locks, release URLs and artifact names remain stable. Local CLI
+updates never change remote servers.
 
 Already released Flea binaries cannot display new notices themselves. Their first
 `flea update` installs the renamed binary under the old name, using the preserved

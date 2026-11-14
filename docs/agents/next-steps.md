@@ -8,13 +8,14 @@ for completed changes, and [README.md](../../README.md) for current usage.
 
 ## Pending ItsyWeb rename release
 
-The local CLI rename uses `itsy`, with `flea update` as the only working old
-command. Before publication, assign the next minor version, sync the new installer
-to the website, and verify fresh installs, both steps from a released Flea CLI,
-reinstalls and already-current conversion on native Mac ARM64 and Linux AMD64.
-Keep download artifact names and URLs stable for existing updaters. Existing
-site/config/server paths and protocols remain unchanged. See
-[installation](../installation.md) and [release guidance](releasing.md).
+The CLI uses `itsy`, with `flea update` as the only working old command. New sites
+use `.itsy.config.json` and `itsy/`; old names remain supported without conversion.
+Before publication, assign the next minor version, sync the new installer to the
+website, and verify fresh installs and both updater steps on native Mac ARM64 and
+Linux AMD64. Verify protocol-28-to-29 server updates with existing site content,
+sessions and app storage preserved, then new-layout deployments and old-layout
+backup/pull/restore. Keep download URLs/artifact names and installed service paths
+stable. See [installation](../installation.md) and [release guidance](releasing.md).
 
 ## Current release status (November 9, 2026)
 

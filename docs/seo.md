@@ -1,7 +1,7 @@
 # Search discovery and canonical URLs
 
-From 0.20.0, Flea can generate a sitemap, advertise it through robots.txt, add canonical URLs
-and exclude selected pages from search. Enable this in `.flea.config.json`,
+From 0.20.0, ItsyWeb can generate a sitemap, advertise it through robots.txt, add canonical URLs
+and exclude selected pages from search. Enable this in `.itsy.config.json`,
 preserving the other settings:
 
 ```json
@@ -18,7 +18,7 @@ preserving the other settings:
 subdirectory, query or fragment. An optional trailing slash is normalized away;
 hostnames are normalized to lowercase. Use an ASCII hostname (Punycode for an
 internationalized domain). Numeric ports from 1 to 65535 are accepted. This setting
-does not register hosts, redirect aliases, configure TLS or deploy a site. Flea
+does not register hosts, redirect aliases, configure TLS or deploy a site. ItsyWeb
 never selects this address from a request Host or forwarding header.
 
 Without `seo`, automatic SEO behavior is disabled. Adding the object requires
@@ -73,7 +73,7 @@ the app requires a session. Use a custom sitemap for public app routes.
 
 Pages containing a `robots` or `googlebot` meta tag with `noindex` or `none` are
 omitted. A custom canonical is preserved; the page enters the generated sitemap
-only if its canonical exactly matches the absolute production URL Flea would
+only if its canonical exactly matches the absolute production URL ItsyWeb would
 generate. Pages with relative, empty or different custom canonicals are omitted.
 Metadata is checked in the ordinary visitor rendering at load time, without
 issuing form tokens, starting apps or rendering authenticated content.
@@ -83,7 +83,7 @@ content saves replace it along with the public routes; source reloads rebuild it
 Generation writes no site files. HEAD returns the same headers without a body;
 unsupported methods receive 405. Dev does not inject reload JavaScript into XML.
 
-Flea omits `lastmod`, `priority` and `changefreq`. It does not track the last
+ItsyWeb omits `lastmod`, `priority` and `changefreq`. It does not track the last
 significant change to a whole rendered page, so a deployment timestamp would be
 misleading. A generated sitemap is limited to 50,000 URLs and 50 MiB. Beyond
 either limit, validation asks for a custom sitemap index instead of publishing
@@ -91,13 +91,13 @@ an incomplete sitemap.
 
 ## Canonical URLs
 
-On successful public page responses, Flea inserts a missing
+On successful public page responses, ItsyWeb inserts a missing
 `<link rel="canonical" href="https://example.com/page">` before the closing
 `</head>`. Source files and existing markup bytes remain unchanged. HTML
 fragments without a closing head receive an HTTP `Link` canonical header instead.
 Query parameters are not part of the canonical URL.
 
-An existing canonical tag takes precedence. Flea does not add a canonical to
+An existing canonical tag takes precedence. ItsyWeb does not add a canonical to
 excluded or noindex pages, errors, admin pages, custom managed apps, discovery
 documents, redirects or unsuccessful app responses. Enabled Contact's form and
 Blog's public pages use the same production origin as the sitemap. This does not
@@ -119,7 +119,7 @@ fetch it to discover the noindex response.
 
 ## Robots.txt and custom discovery files
 
-When no custom robots.txt route exists, Flea generates:
+When no custom robots.txt route exists, ItsyWeb generates:
 
 ```text
 User-agent: *
@@ -129,7 +129,7 @@ Sitemap: https://example.com/sitemap.xml
 ```
 
 An authored `site/robots.txt` or `site/sitemap.xml` takes precedence independently.
-Flea serves those files unchanged, including streaming large files through the
+ItsyWeb serves those files unchanged, including streaming large files through the
 existing pinned asset handles. It does not append a Sitemap line to custom
 robots.txt or remove excluded URLs from a custom sitemap. Add the production
 Sitemap line and maintain exclusions yourself when providing these files.
@@ -147,7 +147,7 @@ production URL does not automatically classify other hosts as staging.
 
 ## Optional Google Search Console submission
 
-Google Search Console is Google's free reporting tool for website owners. Flea
+Google Search Console is Google's free reporting tool for website owners. ItsyWeb
 does not require an account or a Search Console integration to generate a sitemap.
 Its generated robots.txt already advertises the sitemap so Google can discover it.
 

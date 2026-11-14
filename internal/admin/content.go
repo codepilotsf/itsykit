@@ -2,15 +2,16 @@ package admin
 
 import (
 	"fmt"
+	"itsy/internal/sitefiles"
 	"os"
 	"os/user"
 	"path/filepath"
 	"strconv"
 
-	"flea/internal/host"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
+	"itsy/internal/host"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
 )
 
 // prepareContent stages a new snapshot without modifying the active one. The
@@ -54,7 +55,7 @@ func (m Manager) prepareContentPlan(c host.Config, name, id, dest string, projec
 	if err = realDirs(m.DataDir, []string{"sites", name, "content"}); err != nil {
 		return "", nil, err
 	}
-	if err = realDirs(m.DataDir, []string{"sites", name, "flea", "runtime"}); err != nil {
+	if err = realDirs(m.DataDir, []string{"sites", name, sitefiles.ResolveAt(filepath.Join(m.DataDir, "sites", name), "itsy"), "runtime"}); err != nil {
 		return "", nil, err
 	}
 	// Only content and private runtime directories are writable. Code releases,
@@ -79,7 +80,7 @@ func (m Manager) prepareContentPlan(c host.Config, name, id, dest string, projec
 		if e = os.Chmod(directory, 0750); e != nil {
 			return "", nil, e
 		}
-		runtime := filepath.Join(m.DataDir, "sites", name, "flea", "runtime")
+		runtime := sitefiles.Path(filepath.Join(m.DataDir, "sites", name), "itsy/runtime")
 		if e = os.Chown(runtime, uid, gid); e != nil {
 			return "", nil, e
 		}

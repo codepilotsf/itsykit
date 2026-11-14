@@ -2,10 +2,10 @@ package admin
 
 import (
 	"context"
-	"flea/internal/host"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
+	"itsy/internal/host"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
 	"strings"
 	"testing"
 )

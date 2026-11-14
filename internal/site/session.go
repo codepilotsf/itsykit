@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/appapi"
+	"itsy/internal/appapi"
 )
 
-// App-owned session bridge. Flea owns the cookie name and attributes and keeps
+// App-owned session bridge. ItsyWeb owns the cookie name and attributes and keeps
 // the opaque token out of templates, logs, URLs and public JSON. The token only
 // ever travels to the app as trusted transport metadata.
 

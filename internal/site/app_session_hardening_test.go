@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/appapi"
+	"itsy/internal/appapi"
 )
 
 // hardeningApp starts a fake protocol service and returns a ready client.

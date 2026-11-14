@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"sort"
 
-	"flea/internal/media"
-	"flea/internal/snips"
-	"flea/internal/video"
+	"itsy/internal/media"
+	"itsy/internal/snips"
+	"itsy/internal/video"
 )
 
 type Snapshot struct {

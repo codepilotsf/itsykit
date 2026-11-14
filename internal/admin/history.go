@@ -9,9 +9,9 @@ import (
 	"regexp"
 	"sort"
 
-	"flea/internal/host"
-	"flea/internal/release"
-	"flea/internal/site"
+	"itsy/internal/host"
+	"itsy/internal/release"
+	"itsy/internal/site"
 )
 
 var releaseID = regexp.MustCompile(`^[0-9]{8}-[0-9]{6}-[0-9a-f]{24}$`)

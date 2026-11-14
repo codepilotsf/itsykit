@@ -24,7 +24,7 @@ func TestAppRegistration(t *testing.T) {
 			root := fixture(t)
 			put(t, root, "contact/index.html", `<form>{csrf}</form>`)
 			put(t, root, "contact/thank-you.html", `Thanks`)
-			put(t, root, ".flea.config.json", `{"app":{"site_name":"Test"},`+tc.settings+`}`)
+			put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},`+tc.settings+`}`)
 			_, err := Load(root)
 			if (err == nil) != tc.valid {
 				t.Fatal("registration result", err)
@@ -35,7 +35,7 @@ func TestAppRegistration(t *testing.T) {
 	put(t, root, "contact/index.html", `Form`)
 	put(t, root, "contact/thank-you.html", `Thanks`)
 	put(t, root, "contact/style.css", `body { color: red; }`)
-	put(t, root, ".flea.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.test"}}}}`)
+	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.test"}}}}`)
 	if _, err := Load(root); err == nil {
 		t.Fatal("asset inside app mount")
 	}

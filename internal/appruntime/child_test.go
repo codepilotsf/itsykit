@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/appbundle"
+	"itsy/internal/appbundle"
 )
 
 func TestChildAuthenticationAndParentExit(t *testing.T) {

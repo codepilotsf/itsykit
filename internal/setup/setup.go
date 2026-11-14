@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/serverbundle"
+	"itsy/internal/serverbundle"
 )
 
 //go:embed install.sh

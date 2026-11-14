@@ -11,7 +11,7 @@ import (
 	"unicode/utf8"
 )
 
-// Custom-app package policy. A package lives at flea/apps/<name>/ and contains
+// Custom-app package policy. A package lives at itsy/apps/<name>/ and contains
 // app.json plus one executable per <goos>-<goarch>. The same rules gate the site
 // loader, the release packer/extractor and the deployment preflight so they
 // cannot diverge.
@@ -157,10 +157,11 @@ func AppExecutables(name string, manifest AppManifest) (map[string]bool, error) 
 }
 
 // AppPackageFile reports whether name is a static candidate package file: the
-// manifest or a single executable filename directly inside flea/apps/<name>.
+// manifest or a single executable filename directly inside itsy/apps/<name>.
 // Runtime storage, nested files and dotfiles are never candidates.
 func AppPackageFile(name string) bool {
-	rest, ok := strings.CutPrefix(name, "flea/apps/")
+	name = CanonicalName(name)
+	rest, ok := strings.CutPrefix(name, "itsy/apps/")
 	if !ok {
 		return false
 	}
@@ -179,10 +180,11 @@ func AppPackageFile(name string) bool {
 // descend into to reach a package file. It never admits the runtime data
 // directory.
 func AppPackageDir(name string) bool {
-	if name == "flea/apps" {
+	name = CanonicalName(name)
+	if name == "itsy/apps" {
 		return true
 	}
-	rest, ok := strings.CutPrefix(name, "flea/apps/")
+	rest, ok := strings.CutPrefix(name, "itsy/apps/")
 	return ok && !strings.Contains(rest, "/") && AppName.MatchString(rest)
 }
 

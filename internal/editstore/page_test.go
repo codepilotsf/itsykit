@@ -9,8 +9,8 @@ import (
 	"sync"
 	"testing"
 
-	"flea/internal/editor"
-	"flea/internal/snips"
+	"itsy/internal/editor"
+	"itsy/internal/snips"
 )
 
 func TestAtomicPageSave(t *testing.T) {

@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"strings"
 
-	"flea/internal/snips"
 	"golang.org/x/net/html"
+	"itsy/internal/snips"
 )
 
 // EditingVersion binds drafts to both content and developer-owned templates.

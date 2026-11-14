@@ -3,11 +3,13 @@ package site
 import (
 	"fmt"
 	"io/fs"
+	"itsy/internal/sitefiles"
 	"os"
 	"strings"
 )
 
 func loadDataDirectory(root *os.Root, directory, kind string, values map[string]map[string]any) error {
+	directory = sitefiles.Resolve(root, directory)
 	entries, err := fs.ReadDir(root.FS(), directory)
 	if err != nil && !os.IsNotExist(err) {
 		return err

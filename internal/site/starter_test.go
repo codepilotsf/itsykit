@@ -2,10 +2,10 @@ package site
 
 import (
 	"context"
-	"flea/internal/snips"
-	"flea/internal/viewer"
-	"flea/templates"
 	"html"
+	"itsy/internal/snips"
+	"itsy/internal/viewer"
+	"itsy/templates"
 	"net/http/httptest"
 	"os"
 	"strings"

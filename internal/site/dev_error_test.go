@@ -182,12 +182,12 @@ func TestDevMissingRouteAndMethod(t *testing.T) {
 func TestJSONDiagnosticDoesNotExposeSourceValues(t *testing.T) {
 	root := fixture(t)
 	s := NewServer(mustLoad(t, root))
-	put(t, root, ".flea.config.json", "{\n\"private\":\"secret-value\",\n}")
+	put(t, root, ".itsy.config.json", "{\n\"private\":\"secret-value\",\n}")
 	if err := s.Reload(root); err == nil {
 		t.Fatal("expected invalid JSON")
 	}
 	body := localRequest(s, "GET", "/").Body.String()
-	if !strings.Contains(body, ".flea.config.json:3") || strings.Contains(body, "secret-value") {
+	if !strings.Contains(body, ".itsy.config.json:3") || strings.Contains(body, "secret-value") {
 		t.Fatal("JSON diagnostic lacks safe location")
 	}
 }

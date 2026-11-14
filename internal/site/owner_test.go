@@ -3,7 +3,7 @@ package site
 import (
 	"bytes"
 	"context"
-	"flea/internal/snips"
+	"itsy/internal/snips"
 	"net/http/httptest"
 	"strings"
 	"testing"

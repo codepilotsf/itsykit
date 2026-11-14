@@ -2,7 +2,7 @@ package site
 
 import (
 	"context"
-	"flea/templates"
+	"itsy/templates"
 	"net/http"
 	"net/http/httptest"
 	"os"

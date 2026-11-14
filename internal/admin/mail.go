@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"flea/internal/mailer"
+	"itsy/internal/mailer"
 )
 
 func MailReady(configPath string) bool {

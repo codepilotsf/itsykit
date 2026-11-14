@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/snips"
+	"itsy/internal/snips"
 )
 
 func TestBareSnipExtraction(t *testing.T) {
@@ -39,14 +39,14 @@ func TestBareSnipExtraction(t *testing.T) {
 				t.Fatal("unstable ID", string(again))
 			}
 		}
-		if _, err := os.Stat(filepath.Join(root, "flea/snips.json")); err != nil {
+		if _, err := os.Stat(filepath.Join(root, "itsy/snips.json")); err != nil {
 			t.Fatal(err)
 		}
 	}
 }
 
 func TestOldContentIsRejectedWithoutWrites(t *testing.T) {
-	for _, name := range []string{"flea/fleas.json", "flea/fleas/old.json", "flea/.fleas-pending.json"} {
+	for _, name := range []string{"itsy/fleas.json", "itsy/fleas/old.json", "itsy/.fleas-pending.json"} {
 		root := fixture(t)
 		put(t, root, name, `{}`)
 		const source = `<section snip>Keep this</section>`
@@ -58,7 +58,7 @@ func TestOldContentIsRejectedWithoutWrites(t *testing.T) {
 		if string(got) != source {
 			t.Fatal("modified source", name)
 		}
-		if _, err := os.Stat(filepath.Join(root, "flea/snips.json")); !os.IsNotExist(err) {
+		if _, err := os.Stat(filepath.Join(root, "itsy/snips.json")); !os.IsNotExist(err) {
 			t.Fatal("created content", err)
 		}
 	}

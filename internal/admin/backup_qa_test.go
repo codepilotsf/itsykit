@@ -9,10 +9,10 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/backup"
-	"flea/internal/host"
-	"flea/internal/site"
-	"flea/internal/snips"
+	"itsy/internal/backup"
+	"itsy/internal/host"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 )
 
 func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {

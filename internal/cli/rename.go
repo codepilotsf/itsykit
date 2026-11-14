@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"flea/internal/buildinfo"
+	"itsy/internal/buildinfo"
 )
 
 // RunExecutable keeps the retired command separate from normal CLI dispatch.

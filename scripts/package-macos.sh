@@ -9,7 +9,7 @@ if [[ "${1:-}" == --help ]]; then
 fi
 [[ $(uname -s) == Darwin ]] || { echo 'Build Mac installers on macOS.' >&2; exit 1; }
 source scripts/version.sh
-version=$(flea_version)
+version=$(itsy_version)
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'Installer packages require a stable numeric version.' >&2; exit 1; }
 test -x bin/itsy
 [[ $(bin/itsy version) == "ItsyWeb $version" ]] || { echo 'Rebuild bin/itsy for this version first.' >&2; exit 1; }

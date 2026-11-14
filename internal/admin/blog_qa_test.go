@@ -10,18 +10,18 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/backup"
-	"flea/internal/host"
-	"flea/internal/media"
-	"flea/internal/release"
-	"flea/internal/site"
-	"flea/internal/snips"
+	"itsy/internal/backup"
+	"itsy/internal/host"
+	"itsy/internal/media"
+	"itsy/internal/release"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 )
 
 func blogArchive(t *testing.T, title string) string {
 	t.Helper()
 	root := t.TempDir()
-	for name, body := range map[string]string{".flea.config.json": `{"app":{"site_name":"Blog"},"apps":{"blog":{"mount":"/blog"}}}`, "site/index.html": "Home", "site/blog/_index.html": `{#each blog.data.posts as post}{post.title}{/each}`, "site/blog/_post.html": `{blog.data.post.body}`} {
+	for name, body := range map[string]string{".itsy.config.json": `{"app":{"site_name":"Blog"},"apps":{"blog":{"mount":"/blog"}}}`, "site/index.html": "Home", "site/blog/_index.html": `{#each blog.data.posts as post}{post.title}{/each}`, "site/blog/_post.html": `{blog.data.post.body}`} {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)
@@ -41,10 +41,10 @@ func blogArchive(t *testing.T, title string) string {
 	s := snips.NewStore()
 	s.Media = map[string]media.Photo{"Bbcdef1234": photo}
 	s.Blog = []snips.BlogPost{{ID: "Abcdef1234", Title: title, Slug: "post", Status: "published", PublishedAt: "2026-10-13T12:00:00Z", Body: "<p>Body</p>", Cover: "Bbcdef1234"}}
-	if err := os.MkdirAll(filepath.Join(root, "flea", "media"), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, "itsy", "media"), 0755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, "flea", "media", photo.File), processed, 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "itsy", "media", photo.File), processed, 0644); err != nil {
 		t.Fatal(err)
 	}
 	if err := site.SaveContent(root, s); err != nil {

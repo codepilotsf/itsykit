@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	"flea/internal/site"
+	"itsy/internal/site"
 )
 
 var errDevReplaced = errors.New("dev server replaced")

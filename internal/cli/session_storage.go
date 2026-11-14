@@ -3,13 +3,14 @@ package cli
 import (
 	"context"
 	"fmt"
+	"itsy/internal/sitefiles"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
-	"flea/internal/editor"
-	"flea/internal/site"
+	"itsy/internal/editor"
+	"itsy/internal/site"
 )
 
 func prepareLocalSessions(ctx context.Context, p *site.Project) error {
@@ -26,12 +27,12 @@ func prepareLocalSessions(ctx context.Context, p *site.Project) error {
 			return cmd
 		}
 		if out, err := git("rev-parse", "--show-toplevel").CombinedOutput(); err == nil {
-			tracked, err := git("ls-files", "--", "flea/runtime/", "flea/media/*.mp4").Output()
+			tracked, err := git("ls-files", "--", "itsy/runtime/", "itsy/media/*.mp4", "flea/runtime/", "flea/media/*.mp4").Output()
 			if err != nil {
 				return fmt.Errorf("Could not check Git tracking for session files.")
 			}
 			if len(tracked) > 0 {
-				return fmt.Errorf("Session files or video files are tracked by Git. Remove flea/runtime/ and flea/media/*.mp4 from Git tracking before starting dev.")
+				return fmt.Errorf("Session files or video files are tracked by Git. Remove itsy/runtime/ and itsy/media/*.mp4 from Git tracking before starting dev.")
 			}
 		} else if !strings.Contains(string(out), "not a git repository") {
 			return fmt.Errorf("Could not check this site's Git repository before storing sessions.")
@@ -40,5 +41,5 @@ func prepareLocalSessions(ctx context.Context, p *site.Project) error {
 	if err := site.IgnoreSessionFiles(p.Root); err != nil {
 		return err
 	}
-	return editor.PruneSessions(editor.Options{SessionPath: filepath.Join(p.Root, "flea", "runtime", "sessions.json"), Emails: p.Admin.Emails, SessionIdleDays: p.Admin.SessionIdleDays})
+	return editor.PruneSessions(editor.Options{SessionPath: sitefiles.Path(p.Root, filepath.Join("itsy", "runtime", "sessions.json")), Emails: p.Admin.Emails, SessionIdleDays: p.Admin.SessionIdleDays})
 }

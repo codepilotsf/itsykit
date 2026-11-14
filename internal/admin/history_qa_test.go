@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/host"
-	"flea/internal/site"
-	"flea/internal/snips"
+	"itsy/internal/host"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 )
 
 func TestQARollbackPreservesLiveStateAndOtherSites(t *testing.T) {

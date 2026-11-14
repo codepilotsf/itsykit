@@ -7,25 +7,30 @@ is `itsy`; only `flea update` dispatches through the retired command entry point
 When converting a regular `flea`, the updater exclusively links the verified
 executable to `itsy`, then atomically replaces `flea` with a relative symlink.
 An unrelated existing `itsy` is never replaced during conversion. The installer
-installs `itsy` and the same retired-command link. Existing paths, protocols and
-release artifact names retain their spelling. Already released updaters have a
+installs `itsy` and the same retired-command link. New site paths use Itsy names,
+with legacy config/data aliases. Installed server paths, wire identifiers and
+release artifacts retain their spelling. Already released updaters have a
 narrow read-only version probe; see docs/installation.md. Checksums are not
 independent signatures. Public-host and clean-machine verification remain pending.
 
 Project files have explicit boundaries: `site/` supplies templates and public
 assets; `mailers/` supplies private `*.email.html`/`*.email.txt` templates and
-`main.layout.html`; `flea/` holds content, media, data, icons and agent skills.
+`main.layout.html`; `itsy/` holds content, media, data, icons and agent skills.
 Shared agent skills and site requirements live in `.agents/`, with focused
-authoring guides in `flea/skills/`; both are excluded from runtime snapshots and
+authoring guides in `itsy/skills/`; both are excluded from runtime snapshots and
 archives by `internal/sitefiles`. The CLI embeds `.agents/` only for local site
 creation and preserves the Impeccable launcher executable bit on extraction.
-Runtime files are under `flea/runtime/`, outside serving, watching and archives.
+Runtime files are under `itsy/runtime/`, outside serving, watching and archives.
 Template names and public URLs stay relative to site/, not the project root.
 Extraction journals use physical site/ paths. All *.layout.html files are private.
-Root `.flea.config.json` is the only admitted dotfile. Deployment destinations
+Root `.itsy.config.json` and its explicit legacy alias `.flea.config.json` are
+the only admitted config dotfiles. `sitefiles/layout.go` selects each config/data
+name once per operation, preferring Itsy names and falling back only on absence.
+The ordinary confined type, ownership and symlink checks still apply. Loader,
+editor, media, archives, pull and session paths use this shared resolution. Deployment destinations
 are nested in deploy.branches; archive packing removes deploy while retaining
 runtime settings. Configuration reads stay bounded and confined. Protocol 25
-requires this structure, with no alternate old-layout loader.
+requires this structure; pre-protocol-25 layouts remain unsupported.
 
 Mail templates are private runtime files in `mailers/`. The shared inclusion
 policy retains them for watching, deployment and backups; the email renderer
@@ -39,7 +44,7 @@ public deployment administration API.
 
 `apps.contact` enables a validated mount, fixed recipient and optional sender
 override. Any other `apps.<name>` registers a **custom managed app**: a confined
-package under `flea/apps/<name>/` with a strict `app.json` manifest and one
+package under `itsy/apps/<name>/` with a strict `app.json` manifest and one
 executable per `<goos>-<goarch>`. `internal/sitefiles` owns the shared package
 path, manifest and native-binary policy used by the loader, the release
 packer/extractor and the deployment preflight, so they cannot diverge.
@@ -299,7 +304,7 @@ aggregate all referenced typed active/archive entries and catalogue files for
 loading, synchronization and recovery. Three-way sync compares a whole typed entry,
 excluding its developer-owned label, not merely the text content field.
 
-Hash-named MP4 files share flea/media/, but never enter AssetData. Loading validates
+Hash-named MP4 files share itsy/media/, but never enter AssetData. Loading validates
 bounded MP4 structure/codecs/checksum and pins a regular file handle. Requests
 select only catalogue entries and use independent SectionReaders for Range/HEAD;
 no request-derived path opens and no video playback buffers in the asset map.
@@ -335,8 +340,9 @@ sites before replacement; failed readiness restores the saved old executable.
 
 `sitefiles.Included` is a runtime inclusion policy, not a public-URL policy.
 Configuration and content belong in an archive but remain private over HTTP.
-Site configuration uses only `.flea.config.json`; protocol 26 rejects older
-server contracts before upload, including the inline-save/formatting contract.
+Site configuration uses `.itsy.config.json` or its explicit legacy JSON alias.
+Protocol 29 rejects older servers before new-layout deployment; its loader also
+retains the existing inline-save/formatting contract.
 There is no extensionless-name fallback.
 Do not combine this predicate with the server's URL checks.
 
@@ -380,7 +386,7 @@ Existing directives with redundant markers use the same transaction without new 
 The extractor reserves IDs against active and archived content,
 checks all regions, and builds edits before writing anything.
 
-While holding the in-process content mutex, it saves `flea/runtime/.snips-pending.json`, writes content,
+While holding the in-process content mutex, it saves `itsy/runtime/.snips-pending.json`, writes content,
 then replaces templates. The journal contains before/after values. Replay accepts
 either state, but refuses a conflicting independent edit and retains the journal.
 Local extraction and editor saves share that mutex; always acquire it before the
@@ -544,8 +550,8 @@ origin and CSRF validation remain exact.
 
 ### Session runtime state
 
-Both environments use a private `flea/runtime/sessions.json`: below the project locally,
-below `/var/lib/flea/sites/<name>/` in production. Production's `flea/` is service-owned
+Both environments use a private `itsy/runtime/sessions.json`: below the project locally,
+below `/var/lib/flea/sites/<name>/` in production. Production's `itsy/` is service-owned
 0700, beside content/releases, not inside either. Code and parent directories remain
 administrator-owned. Deployment protocol 26 requires these runtime permissions.
 Host derives this stable location from the administrator-configured managed content
@@ -567,7 +573,7 @@ activity POST, not an idle heartbeat. The controller is an external same-origin
 asset; no dynamic JavaScript interpolation. OTPs/rate limits remain
 bounded in-memory state. Browser/device tokens are independent and host-bound.
 
-The loader resolves leading flea settings comments before compiling partials.
+The loader resolves leading itsy settings comments before compiling partials.
 Selected layouts are private HTML files removed from the partial namespace;
 they may render partials but cannot select another layout. Only the layout
 compiler accepts slots. Unknown/duplicate settings and invalid targets fail load.
@@ -628,7 +634,7 @@ From this repository, using the installed Go executable:
 /usr/local/go/bin/go test -race ./...
 /usr/local/go/bin/go vet ./...
 bash scripts/build.sh
-/usr/local/go/bin/go build -o bin/flea-server ./cmd/flea-server
+/usr/local/go/bin/go build -o bin/flea-server ./cmd/itsy-server
 ```
 
 Use the normal disk-backed Go cache. On hosts with a small RAM-backed `/tmp`,

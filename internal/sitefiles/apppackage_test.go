@@ -61,25 +61,25 @@ func TestValidateAppManifestRules(t *testing.T) {
 }
 
 func TestAppPackagePathPolicy(t *testing.T) {
-	included := []string{"flea/apps/demo/app.json", "flea/apps/demo/demo", "flea/apps/demo/demo.exe"}
+	included := []string{"itsy/apps/demo/app.json", "itsy/apps/demo/demo", "itsy/apps/demo/demo.exe"}
 	for _, name := range included {
 		if !AppPackageFile(name) {
 			t.Fatalf("%s should be a package file", name)
 		}
 	}
-	excluded := []string{"flea/apps/demo/data", "flea/apps/demo/.hidden", "flea/apps/demo/nested/demo", "flea/apps/Demo/app.json", "flea/apps/demo", "site/index.html"}
+	excluded := []string{"itsy/apps/demo/data", "itsy/apps/demo/.hidden", "itsy/apps/demo/nested/demo", "itsy/apps/Demo/app.json", "itsy/apps/demo", "site/index.html"}
 	for _, name := range excluded {
 		if AppPackageFile(name) {
 			t.Fatalf("%s should not be a package file", name)
 		}
 	}
-	if !AppPackageDir("flea/apps") || !AppPackageDir("flea/apps/demo") {
+	if !AppPackageDir("itsy/apps") || !AppPackageDir("itsy/apps/demo") {
 		t.Fatal("package directories should be admitted")
 	}
-	if AppPackageDir("flea/apps/demo/nested") {
+	if AppPackageDir("itsy/apps/demo/nested") {
 		t.Fatal("nested package directory admitted")
 	}
-	if !AppExecutablePath("flea/apps/demo/demo") || AppExecutablePath("flea/apps/demo/app.json") {
+	if !AppExecutablePath("itsy/apps/demo/demo") || AppExecutablePath("itsy/apps/demo/app.json") {
 		t.Fatal("executable path classification wrong")
 	}
 }

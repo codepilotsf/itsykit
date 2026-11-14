@@ -4,13 +4,16 @@
 
 Flea is now ItsyWeb. Use `itsy` for all commands. Run `flea update` to
 install the new command; other `flea` commands show the rename notice and stop.
-Existing site files and server installations keep their current paths.
+New sites use `.itsy.config.json` and `itsy/`. Existing `.flea.config.json`
+and `flea/` continue working, with no conversion. Installed server paths stay
+compatible. Deploying the new layout requires a protocol-29 server; explicitly
+run `itsy update-server` before deploying to an older server.
 
 ## Install
 
 ItsyWeb 0.20.5 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
 setup and installer packaging respect `TMPDIR`, with private scratch directories
-and actionable storage diagnostics. Deployment protocol remains 28; CLI updates
+and actionable storage diagnostics. The public release uses protocol 28; this unreleased rename uses 29. CLI updates
 and server updates are separate operations. App wire protocol
 remains 2. The Mac binary is ad-hoc signed, not notarized; clean-Mac and real-email
 acceptance remain unverified. Both CLIs bundle x86-64 and cross-compiled ARM64
@@ -84,7 +87,7 @@ printed backup before trying again; some original files may still be in the site
 
 On first startup in a terminal, ItsyWeb asks for the site name and an optional admin
 email. Press Enter to skip the admin. New sites enable `dev.email_preview` in
-`.flea.config.json`: sign-in and contact emails open in your browser instead of
+`.itsy.config.json`: sign-in and contact emails open in your browser instead of
 being sent. No Resend setup is needed. The preview shows the sender, recipient,
 subject, date/time and actual message, including a usable sign-in code.
 Automated runs never prompt. Use `itsy admin` to add an admin later.
@@ -104,7 +107,7 @@ Dev starts at port 3000. If another process occupies it, ItsyWeb explains the
 conflict and tries 3001, 3002 and so on until it binds an available port.
 Use `itsy dev --port 4000` to require a specific port, or `--port 0` to let the
 operating system choose one. Your browser reloads
-automatically. Change the welcome text in `flea/snips.json`, or give the site
+automatically. Change the welcome text in `itsy/snips.json`, or give the site
 your own colors and fonts in `site/css/theme.css`. Press Ctrl-C to stop the server.
 Admin sign-in pages also refresh when their templates or layout change in dev.
 Signed-in pages reload too, including newly extracted snips, and retain edit
@@ -194,8 +197,8 @@ below. When you're ready to publish, see [deploy a site](#deploy-a-site) and
 
 ```text
 my-site/
-  .flea.config.json       App, admin, apps and deploy.branches settings
-  flea/
+  .itsy.config.json       App, admin, apps and deploy.branches settings
+  itsy/
     snips.json           Rich content and page metadata
     media/               Managed photos and optimized videos
     runtime/             Private sessions and extraction recovery
@@ -226,7 +229,7 @@ Start with `site/index.html` for your home page. Add `site/about.html` and it's
 available at `/about`. Put shared markup in `site/main.layout.html`, styles in
 `site/css/`, and developer-supplied images in `site/images/`.
 
-Every site needs `.flea.config.json`; JSON snips are optional. The starter gives
+Every site needs `.itsy.config.json`; JSON snips are optional. The starter gives
 you a welcome page, a layout with a header and footer, error pages, an SVG logo,
 and CSS you can make your own. It loads Google Fonts and Prewind from external
 services.
@@ -236,10 +239,10 @@ Only `site/` is the document root. Dotfiles/directories, `node_modules`,
 `go.mod`, and `go.sum` are excluded from serving, reloads, and deployment
 (these metadata names are case-insensitive). Keep other development files or
 secrets in ignored `.env` files. Mailers are loaded privately, never served.
-Managed media is served by its catalogue under `/media/`, not `/flea/media/`.
-`flea/runtime/` and `flea/skills/` are never served or deployed. Runtime is ignored
+Managed media is served by its catalogue under `/media/`, not `/itsy/media/`.
+`itsy/runtime/` and `itsy/skills/` are never served or deployed. Runtime is ignored
 by Git; skills remain committed. Deployment settings live under `deploy.branches`
-in `.flea.config.json` and are stripped from release archives and backups.
+in `.itsy.config.json` and are stripped from release archives and backups.
 
 This structure is required; there is no old-directory fallback or automatic
 migration. Existing projects need an explicit, collision-checked reorganization.
@@ -274,7 +277,7 @@ HTML pages instead.
 To select a custom layout, put this settings comment first in a page:
 
 ```html
-<!-- flea
+<!-- itsy
 layout: /admin.layout.html
 -->
 <h1>Page content</h1>
@@ -309,7 +312,7 @@ This affects link navigation, not the automatic dev refresh after saving a file.
 
 Partials are underscore-prefixed HTML files anywhere under site/. `{render footer}` includes `_footer.html` beside the calling template. `{render /foo/bar/footer}` includes `foo/bar/_footer.html`. Relative directory paths, including `./` and `../`, resolve from the calling template; nested renders resolve from the partial containing them. Paths are unquoted and omit the filename's underscore and `.html`. Paths escaping site/ are rejected. The root `main.layout.html`, `_404.html`, and `_500.html` are reserved, not partials. This replaces the former `{partial "name"}` syntax and `_partials/` convention.
 
-Missing and recursive includes fail validation, even in unused partials. Includes inherit the surrounding loop aliases. `page.path` is the canonical route. `page.title` and `page.description` come from that route's metadata in `flea/snips.json`. Without a title, the default is `Home` at `/`, otherwise the final route component with hyphens replaced by spaces and its first letter capitalized. Description defaults to empty. Metadata is contextually escaped.
+Missing and recursive includes fail validation, even in unused partials. Includes inherit the surrounding loop aliases. `page.path` is the canonical route. `page.title` and `page.description` come from that route's metadata in `itsy/snips.json`. Without a title, the default is `Home` at `/`, otherwise the final route component with hyphens replaced by spaces and its first letter capitalized. Description defaults to empty. Metadata is contextually escaped.
 
 ```html
 <h1>{snip.home.title}</h1>
@@ -327,7 +330,7 @@ Missing and recursive includes fail validation, even in unused partials. Include
 
 Values and conditions accept dotted paths only. Missing values render empty. Missing/null values, false, zero, empty strings, empty arrays, and empty objects are false in conditions. Empty or missing/null collections render no loop body; other non-array collections are errors. Nested loops and alias shadowing work; the outer alias is restored afterward. `app`, `page`, `data`, and legacy `snip` are reserved root names and remain accessible inside loops. Aliases start with a letter and contain letters, digits, or underscores.
 
-`{snip a7Km2pQ9xB}` renders sanitized rich HTML from `flea/snips.json`, only in HTML element content. Ordinary dotted-path values remain contextually escaped, including attributes and URLs. Legacy `{snip notice}` still reads the escaped `text` field from `flea/snips/notice.json`; legacy structured snips remain supported during migration. JSON content is never parsed as template syntax. There is no unrestricted raw-HTML directive.
+`{snip a7Km2pQ9xB}` renders sanitized rich HTML from `itsy/snips.json`, only in HTML element content. Ordinary dotted-path values remain contextually escaped, including attributes and URLs. Legacy `{snip notice}` still reads the escaped `text` field from `itsy/snips/notice.json`; legacy structured snips remain supported during migration. JSON content is never parsed as template syntax. There is no unrestricted raw-HTML directive.
 
 There are no expressions, comparisons, functions, filters, array indexes, or arbitrary code execution. Ordinary literal braces and JSON are preserved; see the recognition rules below. Script/style bodies and their opening tags are left untouched by the ItsyWeb parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; snip JSON is treated as data.
 
@@ -413,7 +416,7 @@ The bundled Contact app uses this directive. Configure its mount under
 `contact.invalid.*`, `contact.error` and `contact.flash.*`. Admin CSRF fields
 remain unchanged. ItsyWeb is not a general form handler, but you can register a
 managed local app under `apps.<name>` with a validated package at
-`flea/apps/<name>/`; it can own its own sessions. See
+`itsy/apps/<name>/`; it can own its own sessions. See
 [ItsyWeb apps](docs/apps.md) for the model, the exact request and response JSON,
 custom packages and app-owned sessions, and
 [Contact](apps/contact/README.md) for the included app's operational contract.
@@ -434,10 +437,10 @@ changes/Cancel controls. See [multisnips](docs/multisnips.md) for authoring/stor
 
 ### Editable snip regions
 
-Editable content uses `snip`, `{snip ID}`, and `flea/snips.json` with `snips`
+Editable content uses `snip`, `{snip ID}`, and `itsy/snips.json` with `snips`
 JSON keys. Existing sites using `flea` content markers or `fleas.json` need these
 renamed explicitly; there is no compatibility layer. Keep IDs and saved content
-unchanged. The CLI, `flea.config.json`, and `<!-- flea` settings comments retain
+unchanged. The CLI, `flea.config.json`, and `<!-- itsy` settings comments retain
 their names.
 
 While `itsy dev` is running, add an editable region to a template:
@@ -481,7 +484,7 @@ JPEG/PNG images and optimized H.264 MP4 videos are supported. Nested snips,
 srcset/picture combinations and competing video source elements are rejected.
 See [images](docs/photos.md) and [videos](docs/videos.md) for details.
 
-Private `flea/snips.json` stores rich content, typed media and page metadata:
+Private `itsy/snips.json` stores rich content, typed media and page metadata:
 
 ```json
 {
@@ -518,30 +521,30 @@ rejects unextracted regions and asks you to run dev and commit the resulting
 files. Every relevant save rescans all templates, extracts new regions, updates
 labels and route ownership, and moves unreferenced IDs to `archive`. Undoing a
 removal restores archived content by ID. Existing referenced content and page
-metadata are preserved. Dev prints `Snips updated in flea/snips.json.` when it writes
+metadata are preserved. Dev prints `Snips updated in itsy/snips.json.` when it writes
 changes. Missing IDs and malformed regions are reported in the terminal.
 
 Local content writes are coordinated in memory. A separate OS lock prevents dev,
 pull and reset from writing concurrently. Starting dev again gracefully stops
 the previous dev server before taking that lock; a crash releases it automatically.
 Server-side deployment/content locks are unchanged.
-A `flea/runtime/.snips-pending.json` recovery record saves the content and
+A `itsy/runtime/.snips-pending.json` recovery record saves the content and
 before/after templates before any replacement. Dev resumes interrupted writes;
 if files were independently edited, it stops rather than overwriting them.
 Reconcile those files with the recovery record and restart dev. Do not delete
 the recovery record without preserving its content.
 
-Developer-managed structured JSON belongs in `flea/data/*.json`, available as
+Developer-managed structured JSON belongs in `itsy/data/*.json`, available as
 `{data.team.members}` and in `{#each data.team.members as member}` loops. It is
 deployed with code, not treated as admin-editable rich content. Legacy
-`flea/snips/*.json` remains supported; new sites no longer generate that directory.
+`itsy/snips/*.json` remains supported; new sites no longer generate that directory.
 
 ### Site settings
 
-Site settings must use root `.flea.config.json`. Existing projects need the full
+Site settings must use root `.itsy.config.json`. Existing projects need the full
 structure described above; no old filename or directory fallback is supported.
 
-`.flea.config.json` stores public site-wide variables in `app`:
+`.itsy.config.json` stores public site-wide variables in `app`:
 
 ```json
 {
@@ -556,7 +559,7 @@ Other fields within `app` are available to templates. `admin.emails` controls ad
 access as described below. Top-level `redirects` defines permanent URL redirects
 as described under routing. Unknown top-level settings are ignored; `deploy`
 settings are used only by the CLI. JSON comments and trailing commas are errors.
-Rich snips live in `flea/snips.json`; structured data lives in `flea/data/*.json`.
+Rich snips live in `itsy/snips.json`; structured data lives in `itsy/data/*.json`.
 Use `{app.site_name}`, `{app.email}`, or your own `{app.phone}` in any page or
 layout. Keep secrets out of `app`. Page-specific values stay in `page.*`, and
 structured files stay in `data.*`; admin configuration is not exposed through `app`.
@@ -567,7 +570,7 @@ interactive `itsy dev` asks `Site name [My Project]:`; Enter accepts the default
 It saves `app.site_name` and does not ask again. Noninteractive dev uses the default
 without writing or prompting. Set and commit a nonempty name before deployment.
 There is no `site.*` alias or old-configuration fallback.
-Legacy named snips in `flea/snips/*.json` remain supported but are not browser-editable.
+Legacy named snips in `itsy/snips/*.json` remain supported but are not browser-editable.
 
 ## Admin editing
 
@@ -610,7 +613,7 @@ From your site's folder, run `itsy admin` and enter an email, or provide it dire
 itsy admin admin@example.com
 ```
 
-This creates or appends to `admin.emails` in `.flea.config.json`, preserves other
+This creates or appends to `admin.emails` in `.itsy.config.json`, preserves other
 settings, and skips addresses already present (case-insensitive). It accepts up
 to 20 admins and does not send email, commit, or deploy. Missing or invalid local
 mail settings start the email wizard automatically only when preview mode is off.
@@ -633,7 +636,7 @@ There is no registration, password, or user-management screen. All listed addres
 have the same editing access. Up to 20 unique addresses are supported; matching is
 case-insensitive. Only the developer can change the list.
 
-To view or remove admins, edit `admin.emails` in `.flea.config.json`. Dev reloads the
+To view or remove admins, edit `admin.emails` in `.itsy.config.json`. Dev reloads the
 list automatically. Removed admins lose access; other admins stay signed in.
 Access or email-setting changes clear pending codes, not valid sessions.
 Commit and deploy for the live site.
@@ -688,8 +691,8 @@ a shorter window also applies to existing sessions.
 
 ItsyWeb manages one private JSON file per site:
 
-- Development: `<project>/flea/runtime/sessions.json`
-- Production: `/var/lib/flea/sites/<site>/flea/runtime/sessions.json`, outside releases
+- Development: `<project>/itsy/runtime/sessions.json`
+- Production: `/var/lib/flea/sites/<site>/itsy/runtime/sessions.json`, outside releases
 
 These are independent local and live sessions, not files to copy between environments.
 The file contains hashed session tokens, admin addresses, host binding, CSRF values,
@@ -700,17 +703,17 @@ Malformed or unwritable session storage blocks sign-in rather than resetting it.
 Pending email codes are held only in memory and expire on restart.
 
 Session files are never publicly served or included in deployment archives.
-The starter ignores `/flea/runtime/sessions.json` and `/flea/runtime/.sessions-*`; dev ensures those
+The starter ignores `/itsy/runtime/sessions.json` and `/itsy/runtime/.sessions-*`; dev ensures those
 rules exist and refuses already tracked session files. Do not commit, edit, or
 copy session state. To sign everyone out, stop the server and delete only that
-site's `flea/runtime/sessions.json`, then start it again. Logout removes just the current
+site's `itsy/runtime/sessions.json`, then start it again. Logout removes just the current
 browser's session. Removing an admin revokes their sessions. Session files stay
 private; status reports site and deployment information.
 
-The production service can write the site's private `flea/` directory, not its
+The production service can write the site's private `itsy/` directory, not its
 release directory or configuration. Deployment protocol 27 requires the updated
 server and these permissions; there is no compatibility fallback for older servers.
-Custom-app storage lives under `flea/runtime/apps/<name>/` in that private
+Custom-app storage lives under `itsy/runtime/apps/<name>/` in that private
 directory, outside the immutable release.
 
 ### Editing content
@@ -811,7 +814,7 @@ values. There is no need to source the file. Parsing supports literal NAME=value
 lines, single/double quotes, and full-line comments, with no variable expansion
 or shell execution. Double-quoted escapes use JSON/Go string syntax. Only the
 mail settings are consumed; this does not export arbitrary variables to commands.
-Never place keys in `.flea.config.json` or commit them. No restart is needed for
+Never place keys in `.itsy.config.json` or commit them. No restart is needed for
 admin access or sign-in email changes. Contact forms still need a dev restart.
 Authentication still requires an emailed code.
 
@@ -830,7 +833,7 @@ service-owned `/etc/flea/deploy.lock`, and writable managed content/runtime dire
 Fresh setup installs these. Existing servers need an administrator-reviewed upgrade;
 do not use setup's destructive reset to upgrade a server with sites. Existing
 content directories must be owned by `flea:flea` (0750); release directories
-and host config remain root-owned. Each site's `flea/` runtime directory must be
+and host config remain root-owned. Each site's `itsy/` runtime directory must be
 owned by `flea:flea` (0700). Redeployment prepares content and runtime directories.
 Back up your server before changing installation permissions.
 
@@ -839,12 +842,12 @@ Back up your server before changing installation permissions.
 Enable `apps.blog` with `{"mount":"/blog"}` for a minimal blog with an admin post
 list and rich-text editor at `/admin/blog`. New posts are drafts; Publish/Unpublish
 is explicit, and saving a published post updates it immediately. Optional covers
-reuse the photo library. Posts use the `blog` array in `flea/snips.json` and ordinary
+reuse the photo library. Posts use the `blog` array in `itsy/snips.json` and ordinary
 HTML templates. See [Blog](docs/blog.md) for setup, JSON, tokens and synchronization.
 
 ## Contact app
 
-Enable Contact by merging this into `.flea.config.json`:
+Enable Contact by merging this into `.itsy.config.json`:
 
 ```json
 {
@@ -917,11 +920,11 @@ embedded from `templates/site/css/` into the executable when built.
 
 The full starter lives in `templates/`, mirroring a generated site's structure:
 edit `templates/site/*.html` for markup, `templates/site/css/` for styles,
-`templates/site/images/` for assets, and `templates/flea/` for JSON defaults.
+`templates/site/images/` for assets, and `templates/itsy/` for JSON defaults.
 `templates/README.md` is the generated site's readme. Rebuild ItsyWeb after
 editing these files. They are embedded in the executable, so `itsy new`
 works from any directory without access to this repository. The embedding
-includes private *.layout.html files, error pages, and root .flea.config.json.
+includes private *.layout.html files, error pages, and root .itsy.config.json.
 
 ## Lucide icons
 
@@ -938,7 +941,7 @@ Use literal lowercase Lucide names directly in templates, layouts, and partials:
 
 Before serving, `itsy dev` downloads the icons you've used from the pinned
 `lucide-static@1.47.0` package
-on unpkg. It stores them directly as `flea/icons/search.svg`, for example.
+on unpkg. It stores them directly as `itsy/icons/search.svg`, for example.
 New sites include `.keep` so the directory stays in Git. Each SVG contains the
 license notice in a comment, with no version folder or separate license file.
 New references are resolved during template reloads.
@@ -1005,7 +1008,7 @@ from an old snapshot. The operating system manages file caching.
 ### Permanent redirects for site migrations
 
 From 0.20.0, map old paths to their replacements in the top-level `redirects` object in
-`.flea.config.json`:
+`.itsy.config.json`:
 
 ```json
 {
@@ -1036,7 +1039,7 @@ redirects in the same change.
 
 Run `itsy status`, then check each old URL locally without following redirects
 and confirm its `Location` leads directly to the intended content. The shared
-`fleacms-site` skill can inventory the original website and prepare these mappings;
+`itsyweb-site` skill can inventory the original website and prepare these mappings;
 the bundled `import-brochure` skill includes this step for imports. A crawl cannot
 discover orphaned URLs without additional sources such as analytics or an old
 URL list. Query-based legacy pages, such as `/?p=123`, need a separate migration
@@ -1058,7 +1061,7 @@ version, run `itsy update-server` from a site with that server saved as its curr
 branch's destination. Server updates briefly restart every site on that host;
 deploying website files alone does not update the server software.
 
-Add a top-level `seo` object to `.flea.config.json`, alongside `app`:
+Add a top-level `seo` object to `.itsy.config.json`, alongside `app`:
 
 ```json
 "seo": {
@@ -1154,7 +1157,7 @@ for builds, persistent artifacts and cleanup limits.
 
 ### Snip synchronization
 
-Commit `flea/snips.json` with your site. It seeds the first deployment. Subsequent
+Commit `itsy/snips.json` with your site. It seeds the first deployment. Subsequent
 plain `itsy deploy` preserves existing live snips and page metadata while publishing
 committed templates, assets, configuration and CSS, including `site/css/theme.css`.
 Keep snip IDs stable. Removed IDs are archived; incompatible rich content fails
@@ -1227,7 +1230,7 @@ SSH connection is reused, including the same verified bundled-server extraction.
 Failed SSH authentication does not trigger setup,
 and an older or incomplete installation requires an update rather than reinstall.
 
-Selections are saved under `deploy.branches` in `.flea.config.json` before
+Selections are saved under `deploy.branches` in `.itsy.config.json` before
 attempting deployment, preserving app/admin/contact and other fields:
 
 ```json
@@ -1302,9 +1305,9 @@ that firewall ports are open. DNS names must point at the server for ACME.
 
 Deploy resolves referenced icons in a temporary snapshot, validates it, and
 uploads it over native SSH/SCP. Only files under `site/`, private `mailers/`,
-the runtime portion of `.flea.config.json`, managed `flea/media/`,
-`flea/snips.json`, `flea/data/`, legacy `flea/snips/`, and
-`flea/icons/` are included. Repository files and other private workspace files are
+the runtime portion of `.itsy.config.json`, managed `itsy/media/`,
+`itsy/snips.json`, `itsy/data/`, legacy `itsy/snips/`, and
+`itsy/icons/` are included. Repository files and other private workspace files are
 excluded. Archives are limited to 256 MiB uncompressed and 10,000 entries;
 symlinks, hard links, special files, duplicates, and traversal paths are rejected.
 
@@ -1545,7 +1548,7 @@ sites, and create `/var/lib/flea/certs` owned by `flea:flea` with mode
 unit permits writes within certificates, managed site state and the deployment
 lock; filesystem ownership still protects releases and site parents. Preserve
 content directories (flea-owned 0750) and create each managed site's private
-`flea/` directory (flea-owned 0700) before starting the new server. Reload systemd and restart
+`itsy/` directory (flea-owned 0700) before starting the new server. Reload systemd and restart
 after replacing the unit. For executable-only updates on a current installation,
 use `itsy update-server`; it does not migrate service units or configuration.
 After confirmation, a terminal spinner shows that the update is running; redirected
@@ -1690,8 +1693,8 @@ For hosting ItsyWeb's own release binaries independently of website deployments,
 see [disk-backed download hosting](docs/agents/download-hosting.md). This optional host
 setting does not change ordinary site assets or the 256 MiB site archive limit.
 
-New sites include AGENTS.md and portable skills in `flea/skills/`
-(`add-blog`, `add-contact-form`, `import-brochure` and `fleacms-site`). These are
+New sites include AGENTS.md and portable skills in `itsy/skills/`
+(`add-blog`, `add-contact-form`, `import-brochure` and `itsyweb-site`). These are
 developer instructions, not a runtime dependency or an automatically installed agent integration. They are
 excluded from serving and deployment. Generated `AGENTS.md` routes requests such
 as "add a blog" and "add a contact form" to focused skills documenting setup,

@@ -41,7 +41,7 @@ var rawClose = map[string]*regexp.Regexp{
 	"style":  regexp.MustCompile(`(?is)</style(?:\s[^>]*|/?)>`),
 }
 
-// compile translates the deliberately small FleaCMS language to html/template.
+// compile translates the deliberately small ItsyWeb language to html/template.
 // Go's contextual escaping also protects URL and attribute contexts.
 func (p *Project) compile(source, file string, stack []string, aliases map[string]string) (string, error) {
 	mediaBindings, mediaErr := scanMediaBindings(file, source)
@@ -223,7 +223,7 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 				return fail(i, fmt.Errorf("use an unquoted snip ID, for example {snip a7Km2pQ9xB}"))
 			}
 			if _, ok := p.rich[name]; ok {
-				rendered = "[[NW richFlea " + strconv.Quote(name) + " (lookup $ \"__ownerPreview\") NW]]"
+				rendered = "[[NW richSnip " + strconv.Quote(name) + " (lookup $ \"__ownerPreview\") NW]]"
 				break
 			}
 			data, ok := p.Snips[name]

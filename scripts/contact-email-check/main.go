@@ -18,10 +18,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"flea/internal/contact"
-	"flea/internal/mailer"
-	"flea/internal/site"
-	"flea/templates"
+	"itsy/internal/contact"
+	"itsy/internal/mailer"
+	"itsy/internal/site"
+	"itsy/templates"
 )
 
 type checkedSender struct {
@@ -71,7 +71,7 @@ func run(from, to string) error {
 		return os.WriteFile(p, data, 0600)
 	}
 	cfg, _ := json.Marshal(map[string]any{"app": map[string]string{"site_name": "Flea Contact delivery test"}, "apps": map[string]any{"contact": map[string]any{"mount": "/contact", "email": map[string]string{"to": to, "from": from}}}})
-	if err = write(".flea.config.json", cfg); err != nil {
+	if err = write(".itsy.config.json", cfg); err != nil {
 		return err
 	}
 	for name, body := range map[string]string{"site/contact/index.html": `<form method="post" action="/contact">{csrf}</form><p>{contact.invalid.email}</p><p>{contact.error}</p>`, "site/contact/thank-you.html": `<h1>Thanks</h1><p>{contact.flash.notice}</p>`} {

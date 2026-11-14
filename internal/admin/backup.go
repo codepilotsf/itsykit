@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"os"
 	"path/filepath"
 	"sort"
 
-	"flea/internal/backup"
-	"flea/internal/host"
-	"flea/internal/release"
-	"flea/internal/site"
-	"flea/internal/syncstate"
+	"itsy/internal/backup"
+	"itsy/internal/host"
+	"itsy/internal/release"
+	"itsy/internal/site"
+	"itsy/internal/syncstate"
 )
 
 func copyRelease(root, dest string) error {
@@ -73,7 +74,7 @@ func (m Manager) Backup(name, branch string, out io.Writer) error {
 		return err
 	}
 	if len(live.Snips.ImageAssets()) > 0 {
-		if err = os.MkdirAll(filepath.Join(stage, "flea", "media"), 0755); err != nil {
+		if err = os.MkdirAll(sitefiles.Path(stage, filepath.Join("itsy", "media")), 0755); err != nil {
 			return err
 		}
 		for _, photo := range live.Snips.ImageAssets() {
@@ -81,12 +82,12 @@ func (m Manager) Backup(name, branch string, out io.Writer) error {
 			if e != nil {
 				return e
 			}
-			if e = site.WriteManagedFile(stage, "flea/media/"+photo.File, data); e != nil {
+			if e = site.WriteManagedFile(stage, "itsy/media/"+photo.File, data); e != nil {
 				return e
 			}
 		}
 	}
-	if err = site.InstallVideos(filepath.Join(m.DataDir, "sites", name, "content", "media"), filepath.Join(stage, "flea", "media"), live.Snips); err != nil {
+	if err = site.InstallVideos(filepath.Join(m.DataDir, "sites", name, "content", "media"), sitefiles.Path(stage, filepath.Join("itsy", "media")), live.Snips); err != nil {
 		return err
 	}
 	if _, err = site.Load(stage); err != nil {

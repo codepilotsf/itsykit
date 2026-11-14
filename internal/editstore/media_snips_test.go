@@ -10,10 +10,10 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/editor"
-	"flea/internal/media"
-	"flea/internal/snips"
-	"flea/internal/video"
+	"itsy/internal/editor"
+	"itsy/internal/media"
+	"itsy/internal/snips"
+	"itsy/internal/video"
 )
 
 func TestAtomicMediaSnipSave(t *testing.T) {
@@ -143,7 +143,7 @@ func TestLocalExtractionRecoveryBlocksSaves(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err = os.WriteFile(filepath.Join(s.Root, "flea/runtime/.snips-pending.json"), []byte("{}"), 0600); err != nil {
+	if err = os.WriteFile(filepath.Join(s.Root, "itsy/runtime/.snips-pending.json"), []byte("{}"), 0600); err != nil {
 		t.Fatal(err)
 	}
 	if err = s.Save(editor.Update{Version: doc.Version, Route: "/", Title: "Blocked"}); err == nil {

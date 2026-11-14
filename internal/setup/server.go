@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/admin"
-	"flea/internal/release"
+	"itsy/internal/admin"
+	"itsy/internal/release"
 )
 
 // serverAdmin is an authenticated SSH session to an installed ItsyWeb host,

@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"flea/internal/snips"
-	"flea/internal/video"
+	"itsy/internal/snips"
+	"itsy/internal/video"
 )
 
 func qaVideoSite(t *testing.T) (string, video.Video, []byte) {
@@ -22,7 +22,7 @@ func qaVideoSite(t *testing.T) (string, video.Video, []byte) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	dir := filepath.Join(root, "flea", "media")
+	dir := filepath.Join(root, "itsy", "media")
 	if e = os.MkdirAll(dir, 0755); e != nil {
 		t.Fatal(e)
 	}
@@ -46,7 +46,7 @@ func TestQAVideoCatalogueOnlyAndSafeURLs(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if e = os.WriteFile(filepath.Join(root, "flea", "media", m.File), other, 0644); e != nil {
+	if e = os.WriteFile(filepath.Join(root, "itsy", "media", m.File), other, 0644); e != nil {
 		t.Fatal(e)
 	}
 	p := mustLoad(t, root)
@@ -71,7 +71,7 @@ func TestQAVideoRejectsSymlinkAndHardlink(t *testing.T) {
 	for _, kind := range []string{"symlink", "hardlink", "directory symlink"} {
 		t.Run(kind, func(t *testing.T) {
 			root, v, b := qaVideoSite(t)
-			dir := filepath.Join(root, "flea", "media")
+			dir := filepath.Join(root, "itsy", "media")
 			file := filepath.Join(dir, v.File)
 			outside := filepath.Join(t.TempDir(), v.File)
 			if e := os.WriteFile(outside, b, 0644); e != nil {
@@ -94,7 +94,7 @@ func TestQAVideoRejectsSymlinkAndHardlink(t *testing.T) {
 			if e != nil {
 				t.Fatal(e)
 			}
-			if f, e := OpenVideo(filepath.Join(root, "flea", "media"), v.File); e == nil {
+			if f, e := OpenVideo(filepath.Join(root, "itsy", "media"), v.File); e == nil {
 				f.Close()
 				t.Fatal("accepted linked video")
 			}
@@ -107,7 +107,7 @@ func TestQAVideoRejectsSymlinkAndHardlink(t *testing.T) {
 
 func TestQASyncSourceMissingVideosCannotServe(t *testing.T) {
 	root, v, _ := qaVideoSite(t)
-	if err := os.Remove(filepath.Join(root, "flea", "media", v.File)); err != nil {
+	if err := os.Remove(filepath.Join(root, "itsy", "media", v.File)); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := Load(root); err == nil {
@@ -143,7 +143,7 @@ func TestQAInstallVideosCountsRetainedStorage(t *testing.T) {
 		t.Fatal(err)
 	}
 	f.Close()
-	if err = InstallVideos(filepath.Join(root, "flea", "media"), dest, p.Content); err == nil {
+	if err = InstallVideos(filepath.Join(root, "itsy", "media"), dest, p.Content); err == nil {
 		t.Fatal("ignored retained video quota")
 	}
 	if _, err = os.Stat(filepath.Join(dest, "videos", v.File)); !os.IsNotExist(err) {

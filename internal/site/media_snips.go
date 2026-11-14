@@ -2,11 +2,12 @@ package site
 
 import (
 	"bytes"
-	"flea/internal/snips"
-	"flea/internal/video"
 	"fmt"
 	"golang.org/x/net/html"
 	"io"
+	"itsy/internal/sitefiles"
+	"itsy/internal/snips"
+	"itsy/internal/video"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -225,12 +226,12 @@ func extractMediaSnips(root, file, source string, store *snips.Store, used map[s
 				if e == nil {
 					v := video.Video{Metadata: m, Name: filepath.Base(src)}
 					entry.Video = &v
-					if e = r.Mkdir("flea/media", 0755); os.IsExist(e) {
+					if e = r.Mkdir(sitefiles.Resolve(r, "itsy/media"), 0755); os.IsExist(e) {
 						e = nil
 					}
 					if e == nil {
 						var entries []os.DirEntry
-						entries, e = os.ReadDir(filepath.Join(root, "flea", "media"))
+						entries, e = os.ReadDir(sitefiles.Path(root, filepath.Join("itsy", "media")))
 						var total int64
 						for _, f := range entries {
 							if video.Filename.MatchString(f.Name()) && f.Name() != m.File {
@@ -247,12 +248,12 @@ func extractMediaSnips(root, file, source string, store *snips.Store, used map[s
 						}
 					}
 					if e == nil {
-						f, openErr := OpenVideo(filepath.Join(root, "flea", "media"), m.File)
+						f, openErr := OpenVideo(sitefiles.Path(root, filepath.Join("itsy", "media")), m.File)
 						if openErr == nil {
 							e = CheckVideo(f, v)
 							f.Close()
 						} else if os.IsNotExist(openErr) {
-							e = writeSiteFile(r, "flea/media/"+m.File, data)
+							e = writeSiteFile(r, "itsy/media/"+m.File, data)
 						} else {
 							e = openErr
 						}

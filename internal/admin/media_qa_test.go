@@ -11,15 +11,15 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/backup"
-	"flea/internal/editor"
-	"flea/internal/editstore"
-	"flea/internal/host"
-	"flea/internal/media"
-	"flea/internal/release"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/video"
+	"itsy/internal/backup"
+	"itsy/internal/editor"
+	"itsy/internal/editstore"
+	"itsy/internal/host"
+	"itsy/internal/media"
+	"itsy/internal/release"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/video"
 )
 
 const typedMediaID = "Abcdefghij"
@@ -27,7 +27,7 @@ const typedMediaID = "Abcdefghij"
 func typedMediaArchive(t *testing.T, kind string) string {
 	t.Helper()
 	root := t.TempDir()
-	for _, dir := range []string{"site", "flea/media"} {
+	for _, dir := range []string{"site", "itsy/media"} {
 		if e := os.MkdirAll(filepath.Join(root, dir), 0755); e != nil {
 			t.Fatal(e)
 		}
@@ -64,7 +64,7 @@ func typedMediaArchive(t *testing.T, kind string) string {
 		markup = `<video src="{snip ` + typedMediaID + `.src}" poster="{snip ` + typedMediaID + `.poster}" controls></video>`
 	}
 	store.Page("/").Snips[typedMediaID] = entry
-	for name, body := range map[string][]byte{".flea.config.json": []byte(`{"app":{"site_name":"Test"}}`), "site/index.html": []byte(markup), "flea/media/" + filename: data} {
+	for name, body := range map[string][]byte{".itsy.config.json": []byte(`{"app":{"site_name":"Test"}}`), "site/index.html": []byte(markup), "itsy/media/" + filename: data} {
 		if e := os.WriteFile(filepath.Join(root, name), body, 0644); e != nil {
 			t.Fatal(e)
 		}
@@ -141,7 +141,7 @@ func TestQALivePhotosSurviveDeployBackupAndRestore(t *testing.T) {
 	if e != nil || *p.Content.Page("/").Snips[id].Image != photo {
 		t.Fatal("backup omitted photo", e)
 	}
-	if _, e = site.ReadPhoto(filepath.Join(stage, "flea", "media"), photo.File); e != nil {
+	if _, e = site.ReadPhoto(filepath.Join(stage, "itsy", "media"), photo.File); e != nil {
 		t.Fatal(e)
 	}
 	file := filepath.Join(t.TempDir(), "photo.backup")

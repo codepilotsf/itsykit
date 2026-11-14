@@ -1,4 +1,4 @@
-// Package appapi implements the internal Flea App Protocol foundation.
+// Package appapi implements the internal ItsyWeb App Protocol foundation.
 // It does not discover, launch, or publicly mount services.
 package appapi
 
@@ -16,10 +16,10 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"flea/internal/formguard"
+	"itsy/internal/formguard"
 )
 
-// Version is the current Flea App Protocol. It was 1 before the app-owned
+// Version is the current ItsyWeb App Protocol. It was 1 before the app-owned
 // session envelope and the managed launch contract were added; v1 services are
 // rejected explicitly rather than adapted.
 const Version = 2
@@ -27,7 +27,7 @@ const FormLimit = 32 << 10
 const ResponseLimit = 1 << 20
 const HandshakeLimit = 4 << 10
 
-// App-owned session bridge. Flea reads its own per-site/per-app cookie and
+// App-owned session bridge. ItsyWeb reads its own per-site/per-app cookie and
 // forwards the opaque token as trusted transport metadata; it never forwards a
 // browser Cookie or Authorization header. Token length and lifetime are bounded.
 const (
@@ -37,7 +37,7 @@ const (
 	SessionMaxAge   = 30 * 24 * 60 * 60 // seconds
 )
 
-// SessionDirective is the validated instruction an app gives Flea for its
+// SessionDirective is the validated instruction an app gives ItsyWeb for its
 // browser cookie. Present is false when the app omitted the key entirely.
 type SessionDirective struct {
 	Present bool
@@ -235,7 +235,7 @@ type RequestError struct {
 
 func (e *RequestError) Error() string { return e.Message }
 
-// DecodeForm keeps query values separate, removes only Flea's verified field,
+// DecodeForm keeps query values separate, removes only ItsyWeb's verified field,
 // and otherwise preserves literal names, empty strings, and repeated values.
 func DecodeForm(w http.ResponseWriter, r *http.Request, guard *formguard.Guard) (map[string]any, error) {
 	if r.Method != http.MethodPost {

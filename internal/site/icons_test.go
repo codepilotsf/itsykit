@@ -24,7 +24,7 @@ func TestIconsResolveOnlyNeededAndWorkOffline(t *testing.T) {
 	if p, err := Load(root); err != nil || len(p.Warnings) != 2 {
 		t.Fatalf("read-only load must warn for two missing icons: %v, %+v", err, p)
 	}
-	if _, err := os.Stat(filepath.Join(root, "flea/icons")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "itsy/icons")); !os.IsNotExist(err) {
 		t.Fatal("Load wrote cache")
 	}
 	requested := map[string]int{}
@@ -46,7 +46,7 @@ func TestIconsResolveOnlyNeededAndWorkOffline(t *testing.T) {
 	if len(requested) != 2 {
 		t.Fatalf("expected only two SVGs, got %v", requested)
 	}
-	files, err := os.ReadDir(filepath.Join(root, "flea/icons"))
+	files, err := os.ReadDir(filepath.Join(root, "itsy/icons"))
 	if err != nil || len(files) != 2 {
 		t.Fatalf("unexpected icon cache: %v %v", files, err)
 	}
@@ -54,7 +54,7 @@ func TestIconsResolveOnlyNeededAndWorkOffline(t *testing.T) {
 		if file.IsDir() || !strings.HasSuffix(file.Name(), ".svg") {
 			t.Fatal("cache must contain flat SVG files")
 		}
-		data, err := os.ReadFile(filepath.Join(root, "flea/icons", file.Name()))
+		data, err := os.ReadFile(filepath.Join(root, "itsy/icons", file.Name()))
 		if err != nil || !strings.Contains(string(data), "ISC License") || !strings.Contains(string(data), "Cole Bemis") {
 			t.Fatal("missing icon license notice", err)
 		}
@@ -117,7 +117,7 @@ func TestBadIconDirectives(t *testing.T) {
 
 func TestIconsDoNotParseContentOrRawElements(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "flea/snips/content.json", `{"text":"{icon search}<svg onload=alert(1)>"}`)
+	put(t, root, "itsy/snips/content.json", `{"text":"{icon search}<svg onload=alert(1)>"}`)
 	put(t, root, "index.html", `<script>const icon="{icon search}";</script><style>/* {icon search} */</style>{snip.content.text}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
@@ -127,7 +127,7 @@ func TestIconsDoNotParseContentOrRawElements(t *testing.T) {
 	if !strings.Contains(string(b), `{icon search}&lt;svg`) {
 		t.Fatal(string(b))
 	}
-	if _, err := os.Stat(filepath.Join(root, "flea/icons")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "itsy/icons")); !os.IsNotExist(err) {
 		t.Fatal("data or raw element triggered download")
 	}
 }
@@ -243,7 +243,7 @@ func TestUnsafeDownloadedIconRemainsError(t *testing.T) {
 func TestIconCacheRejectsSymlinks(t *testing.T) {
 	root := fixture(t)
 	outside := t.TempDir()
-	if err := os.Symlink(outside, filepath.Join(root, "flea/icons")); err != nil {
+	if err := os.Symlink(outside, filepath.Join(root, "itsy/icons")); err != nil {
 		t.Fatal(err)
 	}
 	if cache, err := openIconCache(root); err == nil {

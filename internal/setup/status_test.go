@@ -15,10 +15,10 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/admin"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
+	"itsy/internal/admin"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
 )
 
 func statusFixture(t *testing.T, configured bool) (*site.Project, DeploySettings) {

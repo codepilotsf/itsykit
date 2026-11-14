@@ -11,12 +11,12 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/backup"
-	"flea/internal/release"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
-	"flea/internal/video"
+	"itsy/internal/backup"
+	"itsy/internal/release"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
+	"itsy/internal/video"
 )
 
 func TestQAPullHydratesIgnoredVideoInFreshClone(t *testing.T) {
@@ -46,10 +46,10 @@ func TestQAPullHydratesIgnoredVideoInFreshClone(t *testing.T) {
 	if e = os.CopyFS(remoteRoot, os.DirFS(root)); e != nil {
 		t.Fatal(e)
 	}
-	if e = os.MkdirAll(filepath.Join(remoteRoot, "flea", "media"), 0755); e != nil {
+	if e = os.MkdirAll(filepath.Join(remoteRoot, "itsy", "media"), 0755); e != nil {
 		t.Fatal(e)
 	}
-	if e = os.WriteFile(filepath.Join(remoteRoot, "flea", "media", meta.File), b, 0644); e != nil {
+	if e = os.WriteFile(filepath.Join(remoteRoot, "itsy", "media", meta.File), b, 0644); e != nil {
 		t.Fatal(e)
 	}
 	remote := syncstate.Snapshot{Exists: true, Snips: content, Revision: "remote-release"}
@@ -84,7 +84,7 @@ func TestQAPullHydratesIgnoredVideoInFreshClone(t *testing.T) {
 	if e != nil || p.Content.Videos["Abcdefghij"].File != meta.File {
 		t.Fatal("hydration failed", e)
 	}
-	got, e := os.ReadFile(filepath.Join(root, "flea", "media", meta.File))
+	got, e := os.ReadFile(filepath.Join(root, "itsy", "media", meta.File))
 	if e != nil || !bytes.Equal(got, b) {
 		t.Fatal("incorrect hydrated bytes", e)
 	}

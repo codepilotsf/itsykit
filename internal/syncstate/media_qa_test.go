@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/media"
-	"flea/internal/snips"
+	"itsy/internal/media"
+	"itsy/internal/snips"
 )
 
 func TestQAPhotoSyncConflictsAreExplicit(t *testing.T) {

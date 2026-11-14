@@ -18,8 +18,8 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/devaccess"
-	"flea/internal/site"
+	"itsy/internal/devaccess"
+	"itsy/internal/site"
 )
 
 // Real HTTP LAN origin, real login/session, real editor bootstrap and page save.

@@ -15,7 +15,7 @@ import (
 var alignment = regexp.MustCompile(`(?i)^\s*text-align\s*:\s*(left|center|right)\s*;?\s*$`)
 
 // Sanitize reconstructs a small formatting vocabulary. No source tag or
-// attribute is trusted, and content is never reparsed as FleaCMS template code.
+// attribute is trusted, and content is never reparsed as ItsyWeb template code.
 func Sanitize(source string) (string, error) {
 	if len(source) > 1<<20 {
 		return "", fmt.Errorf("snip content exceeds 1 MiB")

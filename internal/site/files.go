@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"itsy/internal/sitefiles"
 	"os"
 	"path"
 	"strings"
@@ -17,7 +18,7 @@ import (
 // with the opened handle rejects symlink swaps during a reload as well as
 // symlinks already present at validation time.
 func readFile(root *os.Root, name string) ([]byte, error) {
-	return readFileBounded(root, name, 100<<20)
+	return readFileBounded(root, sitefiles.Resolve(root, name), 100<<20)
 }
 func readFileBounded(root *os.Root, name string, limit int64) ([]byte, error) {
 	f, err := openSiteFile(root, name, limit)
@@ -72,6 +73,7 @@ func openSiteFile(root *os.Root, name string, limit int64) (*os.File, error) {
 }
 
 func readJSON(root *os.Root, path string, target any) error {
+	path = sitefiles.Resolve(root, path)
 	data, err := readFile(root, path)
 	if err != nil {
 		return fmt.Errorf("%s: %w", path, err)
@@ -123,6 +125,7 @@ func pinnedDir(root *os.Root, directory string) (*os.Root, error) {
 }
 
 func writeSiteFile(root *os.Root, name string, data []byte) error {
+	name = sitefiles.Resolve(root, name)
 	if !fs.ValidPath(name) || strings.ContainsAny(name, "\\\x00") {
 		return fmt.Errorf("invalid site path: %q", name)
 	}
@@ -154,7 +157,7 @@ func replaceFile(root *os.Root, name string, data []byte) error {
 	if _, err := rand.Read(random[:]); err != nil {
 		return err
 	}
-	temp := ".flea-" + hex.EncodeToString(random[:])
+	temp := ".itsy-" + hex.EncodeToString(random[:])
 	f, err := root.OpenFile(temp, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
 	if err != nil {
 		return err

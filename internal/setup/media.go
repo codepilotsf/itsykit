@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"os"
 	"path/filepath"
 
-	"flea/internal/backup"
-	"flea/internal/media"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
+	"itsy/internal/backup"
+	"itsy/internal/media"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
 )
 
 // Fetch a coherent photo snapshot using the same private backup transport. The
@@ -43,7 +44,7 @@ func fetchPhotos(ctx context.Context, s DeploySettings, remote syncstate.Snapsho
 	if manifest.Name != s.Name || manifest.Branch != s.Branch || manifest.StateVersion != remote.Version() {
 		return "", fmt.Errorf("live photos changed; retry pull")
 	}
-	return filepath.Join(stage, "flea", "media"), nil
+	return sitefiles.Path(stage, filepath.Join("itsy", "media")), nil
 }
 
 func installPhotos(root, source string, store *snips.Store) error {
@@ -55,7 +56,7 @@ func installPhotos(root, source string, store *snips.Store) error {
 	if len(store.ImageAssets()) == 0 && len(store.VideoAssets()) == 0 {
 		return nil
 	}
-	dir := filepath.Join(root, "flea", "media")
+	dir := sitefiles.Path(root, filepath.Join("itsy", "media"))
 	if err := os.Mkdir(dir, 0755); err != nil && !os.IsExist(err) {
 		return err
 	}
@@ -76,7 +77,7 @@ func installPhotos(root, source string, store *snips.Store) error {
 			if e = media.CheckBytes(photo, b); e != nil {
 				return e
 			}
-			if e = site.WriteManagedFile(root, "flea/media/"+photo.File, b); e != nil {
+			if e = site.WriteManagedFile(root, "itsy/media/"+photo.File, b); e != nil {
 				return e
 			}
 		}

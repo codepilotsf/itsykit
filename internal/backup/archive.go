@@ -12,7 +12,7 @@ import (
 	"os"
 	"regexp"
 
-	"flea/internal/release"
+	"itsy/internal/release"
 )
 
 const magic = "FLEA-BACKUP-1\n"

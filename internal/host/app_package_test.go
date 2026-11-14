@@ -19,11 +19,11 @@ import (
 
 	xhtml "golang.org/x/net/html"
 
-	"flea/internal/editor"
-	"flea/internal/editstore"
-	"flea/internal/release"
-	"flea/internal/site"
-	"flea/internal/snips"
+	"itsy/internal/editor"
+	"itsy/internal/editstore"
+	"itsy/internal/release"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 )
 
 // hostNativeExecutable returns a minimal valid native header for this platform
@@ -62,12 +62,12 @@ func appRelease(t *testing.T, base, revision string, withApp bool) (string, stri
 		config = `{"app":{"site_name":"Example"},"apps":{"demo":{"mount":"/demo"}}}`
 	}
 	files := map[string]string{
-		".flea.config.json":    config,
+		".itsy.config.json":    config,
 		"site/index.html":      "<h1>Home</h1>",
 		"site/demo/index.html": "<p>Demo</p>",
 	}
 	if withApp {
-		files["flea/apps/demo/app.json"] = `{"name":"demo","version":"1.0.0","protocol":2,"executable":{"` + runtime.GOOS + "-" + runtime.GOARCH + `":"demo"}}`
+		files["itsy/apps/demo/app.json"] = `{"name":"demo","version":"1.0.0","protocol":2,"executable":{"` + runtime.GOOS + "-" + runtime.GOARCH + `":"demo"}}`
 	}
 	for name, body := range files {
 		file := filepath.Join(root, filepath.FromSlash(name))
@@ -79,7 +79,7 @@ func appRelease(t *testing.T, base, revision string, withApp bool) (string, stri
 		}
 	}
 	if withApp {
-		if err := os.WriteFile(filepath.Join(root, "flea", "apps", "demo", "demo"), hostNativeExecutable(), 0555); err != nil {
+		if err := os.WriteFile(filepath.Join(root, "itsy", "apps", "demo", "demo"), hostNativeExecutable(), 0555); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -136,7 +136,7 @@ func TestCustomAppRequiresManagedContent(t *testing.T) {
 	if _, _, err := Load(file, nil); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join(root, "flea", "runtime")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "itsy", "runtime")); !os.IsNotExist(err) {
 		t.Fatal("read-only load created runtime state inside the release")
 	}
 }
@@ -146,7 +146,7 @@ func TestCustomAppRequiresManagedContent(t *testing.T) {
 func TestCustomAppStorageSurvivesReleaseChange(t *testing.T) {
 	dir := t.TempDir()
 	base := filepath.Join(dir, "sites", "example")
-	runtimeRoot := filepath.Join(base, "flea", "runtime")
+	runtimeRoot := filepath.Join(base, "itsy", "runtime")
 	for _, revision := range []string{"first", "second"} {
 		root, content := appRelease(t, base, revision, true)
 		if got := site.ManagedRuntimeRoot(content); got != runtimeRoot {
@@ -156,7 +156,7 @@ func TestCustomAppStorageSurvivesReleaseChange(t *testing.T) {
 		if _, _, err := Load(file, nil); err != nil {
 			t.Fatal(revision, err)
 		}
-		if _, err := os.Stat(filepath.Join(root, "flea", "runtime")); !os.IsNotExist(err) {
+		if _, err := os.Stat(filepath.Join(root, "itsy", "runtime")); !os.IsNotExist(err) {
 			t.Fatal("runtime state entered a release")
 		}
 	}
@@ -207,12 +207,12 @@ func sampleReleaseFiles(t *testing.T, base, revision, binary string, files map[s
 	for name, body := range files {
 		write(name, []byte(body), 0644)
 	}
-	write("flea/apps/session/app.json", []byte(`{"name":"session","version":"0.1.0","protocol":2,"executable":{"`+runtime.GOOS+"-"+runtime.GOARCH+`":"session"}}`), 0644)
+	write("itsy/apps/session/app.json", []byte(`{"name":"session","version":"0.1.0","protocol":2,"executable":{"`+runtime.GOOS+"-"+runtime.GOARCH+`":"session"}}`), 0644)
 	body, err := os.ReadFile(binary)
 	if err != nil {
 		t.Fatal(err)
 	}
-	write("flea/apps/session/session", body, 0755)
+	write("itsy/apps/session/session", body, 0755)
 
 	var packed bytes.Buffer
 	if err := release.Pack(src, &packed); err != nil {
@@ -225,7 +225,7 @@ func sampleReleaseFiles(t *testing.T, base, revision, binary string, files map[s
 	if err := release.Extract(bytes.NewReader(packed.Bytes()), root); err != nil {
 		t.Fatal(err)
 	}
-	info, err := os.Stat(filepath.Join(root, "flea", "apps", "session", "session"))
+	info, err := os.Stat(filepath.Join(root, "itsy", "apps", "session", "session"))
 	if err != nil || info.Mode().Perm() != 0555 {
 		t.Fatalf("packaged executable mode %v %v", info, err)
 	}
@@ -249,7 +249,7 @@ func sampleReleaseFiles(t *testing.T, base, revision, binary string, files map[s
 func sampleRelease(t *testing.T, base, revision, binary, page string) (string, string) {
 	t.Helper()
 	return sampleReleaseFiles(t, base, revision, binary, map[string]string{
-		".flea.config.json":       `{"app":{"site_name":"Example"},"apps":{"session":{"mount":"/session"}}}`,
+		".itsy.config.json":       `{"app":{"site_name":"Example"},"apps":{"session":{"mount":"/session"}}}`,
 		"site/session/index.html": page,
 	})
 }
@@ -469,7 +469,7 @@ func TestBlogSaveKeepsCustomAppSessionAndManagedRuntime(t *testing.T) {
 		`<p id="state">{session.data.authenticated}</p>` +
 		`<form method="post" action="/session">{csrf}<input name="action" value="login"></form>`
 	root, content := sampleReleaseFiles(t, base, "first", binary, map[string]string{
-		".flea.config.json":       `{"app":{"site_name":"Example"},"apps":{"blog":{"mount":"/blog"},"session":{"mount":"/session"}}}`,
+		".itsy.config.json":       `{"app":{"site_name":"Example"},"apps":{"blog":{"mount":"/blog"},"session":{"mount":"/session"}}}`,
 		"site/session/index.html": page,
 		"site/blog/_index.html":   `<main id="posts">{#each blog.data.posts as post}<a href="{post.url}">{post.title}</a>{/each}</main>`,
 		"site/blog/_post.html":    `<main id="post"><h1>{blog.data.post.title}</h1>{blog.data.post.body}</main>`,
@@ -478,7 +478,7 @@ func TestBlogSaveKeepsCustomAppSessionAndManagedRuntime(t *testing.T) {
 	// Custom-app storage is stable per-site runtime state derived from managed
 	// content, never the immutable release, so it survives a release or save.
 	runtimeRoot := site.ManagedRuntimeRoot(content)
-	if want := filepath.Join(base, "flea", "runtime"); runtimeRoot != want {
+	if want := filepath.Join(base, "itsy", "runtime"); runtimeRoot != want {
 		t.Fatalf("managed runtime root %q, want %q", runtimeRoot, want)
 	}
 	if strings.HasPrefix(runtimeRoot, root) {
@@ -556,7 +556,7 @@ func TestBlogSaveKeepsCustomAppSessionAndManagedRuntime(t *testing.T) {
 	if site.ManagedRuntimeRoot(content) != runtimeRoot {
 		t.Fatal("managed runtime root changed across reload")
 	}
-	if _, err := os.Stat(filepath.Join(root, "flea", "runtime")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(root, "itsy", "runtime")); !os.IsNotExist(err) {
 		t.Fatal("runtime state entered the immutable release")
 	}
 	if body := hostGet(reloaded, "demo.test", "/session", session).Body.String(); !strings.Contains(body, `<p id="state">true</p>`) {

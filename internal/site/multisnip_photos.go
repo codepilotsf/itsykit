@@ -1,11 +1,12 @@
 package site
 
 import (
-	"flea/internal/media"
-	"flea/internal/snips"
 	"fmt"
 	"golang.org/x/net/html"
 	"io"
+	"itsy/internal/media"
+	"itsy/internal/sitefiles"
+	"itsy/internal/snips"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -127,16 +128,16 @@ func importPhoto(root, src, alt string, store *snips.Store, used map[string]stru
 	if id == "" {
 		return "", fmt.Errorf("could not allocate photo ID")
 	}
-	if err = r.Mkdir("flea/media", 0755); err != nil && !os.IsExist(err) {
+	if err = r.Mkdir(sitefiles.Resolve(r, "itsy/media"), 0755); err != nil && !os.IsExist(err) {
 		return "", err
 	}
-	parent, err := pinnedDir(r, "flea/media")
+	parent, err := pinnedDir(r, sitefiles.Resolve(r, "itsy/media"))
 	if err != nil {
 		return "", err
 	}
 	defer parent.Close()
 	var total int64
-	entries, err := os.ReadDir(filepath.Join(root, "flea", "media"))
+	entries, err := os.ReadDir(sitefiles.Path(root, filepath.Join("itsy", "media")))
 	if err != nil {
 		return "", err
 	}
@@ -159,7 +160,7 @@ func importPhoto(root, src, alt string, store *snips.Store, used map[string]stru
 	} else if !os.IsNotExist(e) {
 		return "", e
 	}
-	if err = writeSiteFile(r, "flea/media/"+photo.File, data); err != nil {
+	if err = writeSiteFile(r, "itsy/media/"+photo.File, data); err != nil {
 		return "", err
 	}
 	store.Media[id] = photo

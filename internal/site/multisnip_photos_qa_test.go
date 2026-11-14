@@ -48,14 +48,14 @@ func TestQAMultisnipPhotoExtractionAndEscaping(t *testing.T) {
 	if strings.Contains(string(source), `snip="photo"`) || !strings.Contains(string(source), `src="{snip.photo.src}"`) {
 		t.Fatal("incorrect rewritten image", string(source))
 	}
-	before, e := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	before, e := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	if e != nil {
 		t.Fatal(e)
 	}
 	if e = ExtractSnips(root); e != nil {
 		t.Fatal(e)
 	}
-	after, _ := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	after, _ := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	if !bytes.Equal(before, after) {
 		t.Fatal("photo extraction not idempotent")
 	}

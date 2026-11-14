@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"flea/internal/site"
+	"itsy/internal/site"
 )
 
 // resetSite only operates on a recognized local site. Moving old entries into
@@ -34,8 +35,8 @@ func resetSite(root string, in io.Reader, out io.Writer) error {
 	if info, err := os.Lstat(filepath.Join(root, "site")); err != nil || !info.IsDir() {
 		return fmt.Errorf("site must be a real directory, not a link")
 	}
-	for _, name := range []string{".flea.config.json", "site/main.layout.html", "site/index.html"} {
-		info, err := os.Lstat(filepath.Join(root, name))
+	for _, name := range []string{".itsy.config.json", "site/main.layout.html", "site/index.html"} {
+		info, err := os.Lstat(sitefiles.Path(root, name))
 		if err != nil || !info.Mode().IsRegular() {
 			return fmt.Errorf("run itsy reset from a site with config, layout and index files")
 		}
@@ -49,7 +50,7 @@ func resetSite(root string, in io.Reader, out io.Writer) error {
 	}
 	defer unlock()
 	parent := filepath.Dir(root)
-	stage, err := os.MkdirTemp(parent, ".flea-reset-stage-")
+	stage, err := os.MkdirTemp(parent, ".itsy-reset-stage-")
 	if err != nil {
 		return err
 	}
@@ -68,7 +69,7 @@ func resetSite(root string, in io.Reader, out io.Writer) error {
 		fmt.Fprintln(out, "Kept your site unchanged.")
 		return nil
 	}
-	backup, err := os.MkdirTemp(parent, ".flea-reset-backup-")
+	backup, err := os.MkdirTemp(parent, ".itsy-reset-backup-")
 	if err != nil {
 		return err
 	}

@@ -11,11 +11,11 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/admin"
-	"flea/internal/backup"
-	"flea/internal/release"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
+	"itsy/internal/admin"
+	"itsy/internal/backup"
+	"itsy/internal/release"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
 )
 
 func qaRecoverySite(t *testing.T) string {

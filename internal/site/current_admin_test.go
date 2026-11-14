@@ -1,8 +1,8 @@
 package site
 
 import (
-	"flea/internal/snips"
-	"flea/internal/viewer"
+	"itsy/internal/snips"
+	"itsy/internal/viewer"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -29,7 +29,7 @@ func TestCurrentAdminIsRequestScoped(t *testing.T) {
 	if _, ok := p.App["current_admin"]; ok {
 		t.Fatal("shared snapshot mutated")
 	}
-	put(t, root, ".flea.config.json", `{"app":{"site_name":"Test","current_admin":{"email":"forged"}}}`)
+	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test","current_admin":{"email":"forged"}}}`)
 	if _, err := Load(root); err == nil {
 		t.Fatal("configured identity accepted")
 	}

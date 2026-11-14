@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	contactapp "flea/apps/contact"
-	"flea/internal/mailer"
+	contactapp "itsy/apps/contact"
+	"itsy/internal/mailer"
 	"time"
 )
 

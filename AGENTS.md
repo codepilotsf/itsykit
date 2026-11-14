@@ -64,31 +64,38 @@ dependencies, trust boundaries, loading, transactions or publication.
 | Owner toolbar, authentication, sessions, onboarding, mail configuration, editor prototype | [Editor](docs/agents/editor.md); media guide for those modes |
 | Versions, packaging and releases | [RELEASING.md](docs/agents/releasing.md) and version rules below |
 
-## CLI rename
+## CLI and site naming
 
 Use `itsy` for all commands. The retired `flea` command prints the rename notice
 and exits without dispatch, except `flea update`, which installs `itsy`. Preserve
 the narrow read-only version probe required by already released Flea updaters.
-Existing `.flea.config.json`, `flea/`, protocol names, server paths and release
-artifact names remain unchanged; this rename does not migrate site or server data.
+New sites use `.itsy.config.json`, `itsy/`, and `<!-- itsy` page settings. Existing
+`.flea.config.json`, `flea/`, and `<!-- flea` remain explicitly supported; prefer
+Itsy names when present and otherwise use the legacy name. Writes stay in the
+selected files; never silently rename or migrate a site. These naming aliases
+are the owner-approved exception to the general no-compatibility rule.
+Installed server paths/accounts, wire identifiers, development/install locks,
+release URLs and public artifact names retain their spelling for compatibility.
+Protocol 29 is required before deploying the new site layout; an explicit
+`itsy update-server` can upgrade the server while preserving old sites.
 
 ## Site and UI essentials
 
 Generated sites use `site/` for public templates/assets, `mailers/` for private
-email templates, `flea/` for content/data/media/icons/skills, and
-`.flea.config.json` for configuration. Runtime state is private in
-`flea/runtime/`. Globals use `app.*`; there is no `site.*` alias.
+email templates, `itsy/` for content/data/media/icons/skills, and
+`.itsy.config.json` for configuration. Runtime state is private in
+`itsy/runtime/`. Globals use `app.*`; there is no `site.*` alias.
 Bundled Contact uses the Flea App Protocol and explicit `{csrf}` visitor forms.
 Optional Blog uses the built-in content/editor snapshot; read [Blog](docs/blog.md)
 before changing posts, routes, rich bodies or synchronization. Contact is
 bundled; other apps are managed local executables registered under `apps.<name>`
-with a validated package at `flea/apps/<name>/`, and they own their sessions and
+with a validated package at `itsy/apps/<name>/`, and they own their sessions and
 storage. See [Flea apps](docs/apps.md) and the runtime/template guides for both
 applications. Do not change admin form contracts or add remote-service,
 package-registry or arbitrary-install support.
 Generated-site guidance lives in `templates/AGENTS.md` and the bundled skills in
 `templates/.agents/skills/` (core, delivery, coding orchestration, design, Prewind
-and Flea authoring), plus focused `templates/flea/skills/` guides (`add-blog`,
+and Flea authoring), plus focused `templates/itsy/skills/` guides (`add-blog`,
 `add-contact-form`, `import-brochure`). Keep them consistent with starter syntax,
 committed, and excluded from serving/deployment. Impeccable stays globally installed
 and must never be copied or linked into a site or template. Personal conversation preferences
@@ -127,7 +134,7 @@ all driven by theme tokens. Styles are developer-managed; normal deployment publ
 Use Prewind's global-first conventions and supported utilities, not assumed
 Tailwind classes. Use `container` without `max-w-full`, theme tokens and fluid
 spacing. Preserve vendored CSS/JS. Use `{icon name}` and the flat
-`flea/icons/name.svg` cache; never generate toolbar SVG paths in JavaScript.
+`itsy/icons/name.svg` cache; never generate toolbar SVG paths in JavaScript.
 
 Owner edits happen on the page with explicit Save/Cancel. The Edit switch defaults on
 and persists per tab across pages. The second row slides beneath the top bar and

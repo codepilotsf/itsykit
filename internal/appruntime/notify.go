@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"time"
 
-	contactapp "flea/apps/contact"
+	contactapp "itsy/apps/contact"
 )
 
 func notify(ctx context.Context, cfg launchConfig, s contactapp.Submission) error {

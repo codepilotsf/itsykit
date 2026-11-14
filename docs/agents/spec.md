@@ -126,7 +126,7 @@ private email templates and delivery. Success redirects to mount/thank-you;
 validation returns 422 and operational failures 503, preserving safe fields.
 No submissions are stored. Old contact config/routes are not supported.
 See docs/apps.md for the app model, the full JSON contract, custom managed
-packages (flea/apps/<name>/ with a validated app.json, confined executable and
+packages (itsy/apps/<name>/ with a validated app.json, confined executable and
 app-owned storage) and app-owned sessions, and apps/contact/README.md for the
 included app's acceptance limits. Remote, registry-based and arbitrary-install
 registration are not supported.
@@ -138,7 +138,7 @@ send email or deploy. It prompts for email settings when needed. Dev reloads
 owner access and sign-in mail without restart; live changes require deployment.
 
 Admin sessions are persistent JSON runtime state, not a database: local
-flea/runtime/sessions.json and production sites/<name>/flea/runtime/sessions.json outside releases.
+itsy/runtime/sessions.json and production sites/<name>/itsy/runtime/sessions.json outside releases.
 admin.session_idle_days defaults to 30 (omitted/zero), accepts 1–365, and renews
 on authenticated activity. Active editing renews at most once a minute; idle tabs
 do not. Sessions survive browser closure, restart and deploy. Logout and owner
@@ -212,7 +212,7 @@ content and runtime state have separate locations.
 
 ```text
 my-site/
-  .flea.config.json
+  .itsy.config.json
   flea/
     snips.json
     media/
@@ -220,7 +220,7 @@ my-site/
       sessions.json
     skills/
       import-brochure/SKILL.md
-      fleacms-site/SKILL.md
+      itsyweb-site/SKILL.md
     data/
       team.json
     icons/
@@ -257,19 +257,19 @@ my-site/
 | `**/_name.html` | Developer                              | No                             | Reusable partial templates, except reserved names |
 | `_404.html`    | Developer                               | Only as the 404 response       | Not-found document                                |
 | `_500.html`    | Developer                               | Only as the 500 response       | Server-error document                             |
-| `.flea.config.json`  | Developer                               | No                             | Site configuration                                |
-| `flea/snips.json` | Site admin or developer | No | Editable content and page metadata |
-| `flea/media/` | Site admin | Catalogue URLs under `/media/` only | Managed photos and optimized videos |
-| `flea/runtime/` | Server | No | Ignored sessions and recovery journals |
-| `flea/skills/` | Developer | No | Committed agent guidance, excluded from deployment |
+| `.itsy.config.json`  | Developer                               | No                             | Site configuration                                |
+| `itsy/snips.json` | Site admin or developer | No | Editable content and page metadata |
+| `itsy/media/` | Site admin | Catalogue URLs under `/media/` only | Managed photos and optimized videos |
+| `itsy/runtime/` | Server | No | Ignored sessions and recovery journals |
+| `itsy/skills/` | Developer | No | Committed agent guidance, excluded from deployment |
 | `mailers/` | Developer | No | Private email bodies and layout |
 
-Any file or directory whose basename begins with `_` is private/reserved and must never be reachable through a public URL. `flea/` is additionally reserved as ItsyWeb's private workspace.
+Any file or directory whose basename begins with `_` is private/reserved and must never be reachable through a public URL. `itsy/` is additionally reserved as ItsyWeb's private workspace.
 
 ## File-based routing
 
 ItsyWeb maps page files in `site/` to extensionless routes. Neither `site/` nor
-`flea/` becomes a URL prefix. All `*.layout.html` templates remain private.
+`itsy/` becomes a URL prefix. All `*.layout.html` templates remain private.
 The root config includes branch-specific `deploy.branches` settings, stripped
 from runtime archives and backups; credentials remain in ignored `.env`.
 
@@ -318,7 +318,7 @@ The layout explicitly gates admin/_toolbar.html with {#if app.current_admin} and
 supplies a csrf-token meta tag. This reserved request-only object is absent for
 visitors. External editor assets and a protected metadata endpoint keep source small.
 
-There is no `routes.json`. Top-level `.flea.config.json` `redirects` maps exact old paths to existing local public URLs for 301 GET/HEAD responses. Sources may have legacy extensions or trailing slashes. No query-specific/wildcard/external rules, private paths, chains, loops or active route/app conflicts are accepted. Incoming queries survive unless the target supplies a query. Deployment protocol 28 requires matching clients and servers.
+There is no `routes.json`. Top-level `.itsy.config.json` `redirects` maps exact old paths to existing local public URLs for 301 GET/HEAD responses. Sources may have legacy extensions or trailing slashes. No query-specific/wildcard/external rules, private paths, chains, loops or active route/app conflicts are accepted. Incoming queries survive unless the target supplies a query. Deployment protocol 28 requires matching clients and servers.
 
 ## Templates
 
@@ -353,7 +353,7 @@ Pages use the default layout without configuration in v1:
 </main>
 ```
 
-A leading `<!-- flea` settings comment may select `layout: /admin.layout.html`
+A leading `<!-- itsy` settings comment may select `layout: /admin.layout.html`
 before its closing `-->`. Root-relative private HTML layouts replace the default
 wrapper for that page and support `{slot}`. Unknown or duplicate settings, missing
 layouts and nesting are errors. Only layout selection is currently supported;
@@ -390,9 +390,9 @@ dotted-path interpolation. Icons inherit currentColor and are decorative by
 default; labeled icons use role img.
 
 Do not bundle the library. Phase-one dev resolves missing referenced icons
-from pinned lucide-static 1.47.0 into `flea/icons/name.svg` before serving,
+from pinned lucide-static 1.47.0 into `itsy/icons/name.svg` before serving,
 including during reloads. Include the license in each SVG comment and ship
-`flea/icons/.keep`, not a version directory or separate license. Status is read-only
+`itsy/icons/.keep`, not a version directory or separate license. Status is read-only
 and reports missing icons as warnings without a failing exit code. Missing icons
 or download failures render nothing and do not cause a 500 response. Malformed
 directives and unsafe SVGs remain errors. Downloads are bounded, cancellable, and atomic;
@@ -402,14 +402,14 @@ See README.md for supported attributes.
 
 ### Snips
 
-Snips are owner-editable sanitized HTML stored in private `flea/snips.json`.
+Snips are owner-editable sanitized HTML stored in private `itsy/snips.json`.
 Spans and CSS classes on supported content elements survive rendering and editing.
 Scripts, event handlers and arbitrary inline styles remain blocked.
 They are distinct from partials and structured developer data:
 
 - A partial is a reusable developer template.
 - A snip is owner content identified by a stable 10-character alphanumeric ID.
-- Structured objects for loops live in `flea/data/*.json`, exposed as `data.*`.
+- Structured objects for loops live in `itsy/data/*.json`, exposed as `data.*`.
 
 Create an editable region while dev runs:
 
@@ -549,7 +549,7 @@ ItsyWeb validates a snip before writing it. It writes content atomically: create
 
 ## Configuration
 
-`.flea.config.json` contains JSON only. Comments and trailing commas are not supported. The site loader reads the `app` object. Local `.flea.config.json` stores a `deploy.branches` map of confirmed deployment settings (target, domain, name, www_redirect, https, email, agree_tos, expected_ips). First deploy prompts and saves; later deploys select only the current branch. Changed settings require `-configure` confirmation. The `deploy` section contains no credentials and is excluded from uploads; runtime settings, including redirects, are retained. Use branch names directly without environment labels or questions. Generate the internal site name automatically; staging suggests a subdomain. Top-level `redirects` now supplies exact page migration mappings; WWW-to-primary redirects remain host-level 308 responses.
+`.itsy.config.json` contains JSON only. Comments and trailing commas are not supported. The site loader reads the `app` object. Local `.itsy.config.json` stores a `deploy.branches` map of confirmed deployment settings (target, domain, name, www_redirect, https, email, agree_tos, expected_ips). First deploy prompts and saves; later deploys select only the current branch. Changed settings require `-configure` confirmation. The `deploy` section contains no credentials and is excluded from uploads; runtime settings, including redirects, are retained. Use branch names directly without environment labels or questions. Generate the internal site name automatically; staging suggests a subdomain. Top-level `redirects` now supplies exact page migration mappings; WWW-to-primary redirects remain host-level 308 responses.
 
 Example:
 
@@ -757,7 +757,7 @@ itsy rollback
   or a failed commit preserves the created site with instructions to finish setup.
   Includes a starter .gitignore. No remote or hosted project is created; successful
   commit output explains how to add origin and push main.
-- Creates default `.flea.config.json`, editable starter copy, a layout with inline
+- Creates default `.itsy.config.json`, editable starter copy, a layout with inline
   header/footer, error pages, and a welcome page with its SVG mark. Navigation links
   Team and Contact; /test remains an unlinked example. Contact uses an introduction
   beside a three-field form, stacked on mobile. Home, Team, Contact, Thank You and
@@ -789,7 +789,7 @@ itsy rollback
 - Requires deployment protocol 27 before upload, offering first-time setup when absent. Validates the
   packaged site, uploads over SSH/SCP, stages, and atomically switches host config.
 - Restarts and verifies revision/hostname; restores the prior config on failure.
-- Uses native SSH and the saved current-branch mapping in .flea.config.json. The first
+- Uses native SSH and the saved current-branch mapping in .itsy.config.json. The first
   invocation confirms server/domain, WWW redirect, and
   HTTPS, then saves configuration for future deploys.
 - Ask for an SSH username, default root, when user@host is not supplied. Save it
@@ -908,7 +908,7 @@ Do not add custom server functions in v1. They turn a small static host into a m
 These are intentionally not blockers for the initial routing/template prototype:
 
 1. **Snip schema filename and syntax:** colocated `about-us.schema.json`, a central schema folder, or schema inside the snip JSON.
-2. **Public URL prefix for flea-managed images:** use a stable virtual prefix and do not expose `flea/` directly.
+2. **Public URL prefix for flea-managed images:** use a stable virtual prefix and do not expose `itsy/` directly.
 3. **Rich text model:** sanitized HTML versus a constrained Markdown-like format.
 4. **First form destination:** email, host inbox, webhook, or a combination.
 5. **Editor user model:** one site-owner account initially versus host-managed multiple editor accounts.
@@ -938,7 +938,7 @@ ItsyWeb is meaningfully usable when a developer can:
 ## Blog (implemented)
 
 Optional `apps.blog` enables a mounted listing and published post routes plus
-private post-list/edit admin screens. Posts live in `flea/snips.json` with title,
+private post-list/edit admin screens. Posts live in `itsy/snips.json` with title,
 slug, excerpt, sanitized rich body, status, publication date and optional library
 cover. Drafts require explicit Publish; published saves update immediately.
 See [Blog](../blog.md) for the supported format, tokens, limits and sync behavior.

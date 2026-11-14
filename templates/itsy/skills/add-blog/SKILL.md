@@ -1,9 +1,9 @@
 ---
 name: add-blog
-description: Add, enable or customize ItsyWeb's built-in Blog on an existing Flea site. Use for requests such as "add a blog", "let's create a blog", "set up a blog", or authoring blog posts and templates. Covers app configuration, post JSON, available template values and the admin editor. Does not apply to a static article page or a full-site redesign.
+description: Add, enable or customize ItsyWeb's built-in Blog on an existing ItsyWeb site. Use for requests such as "add a blog", "let's create a blog", "set up a blog", or authoring blog posts and templates. Covers app configuration, post JSON, available template values and the admin editor. Does not apply to a static article page or a full-site redesign.
 ---
 
-# Add a Flea Blog
+# Add a ItsyWeb Blog
 
 Read the site's [README](../../../README.md) and [AGENTS](../../../AGENTS.md).
 Inspect Git status, configuration, templates and content before editing. Preserve
@@ -14,10 +14,10 @@ require a full-site design interview.
 
 ## Enable and connect
 
-Blog requires Flea 0.15.0 or newer and a matching server. Check `itsy version`;
+Blog requires ItsyWeb 0.15.0 or newer and a matching server. Check `itsy version`;
 do not assume the public download channel includes Blog yet.
 
-Merge this fragment into `.flea.config.json`, preserving all other fields:
+Merge this fragment into `.itsy.config.json`, preserving all other fields:
 
 ```json
 {"apps":{"blog":{"mount":"/blog"}}}
@@ -32,7 +32,7 @@ Fresh matching-version sites include these templates and the authenticated
 `site/admin/blog.html` and `site/admin/blog-edit.html`. For an older site, generate
 a disposable matching-version site with `itsy new NAME --skip-git` outside the
 working project. Copy only the missing Blog/admin templates and incorporate their
-Blog CSS; the matching Flea runtime supplies `/admin/assets/blog.js`. Preserve
+Blog CSS; the matching ItsyWeb runtime supplies `/admin/assets/blog.js`. Preserve
 the template's script reference, the site's layout and existing admin
 authentication/CSRF/version controls. Never reset the existing site or
 replace its entire layout/styles. Add the listing link to the existing navigation
@@ -96,7 +96,7 @@ Admins sign in at `/admin`, then use `/admin/blog`: New post, Save draft, explic
 Publish/Unpublish. Saving a published post updates it immediately. Keep posts as
 drafts unless publication is requested. A future date does not schedule publishing.
 
-Agents may edit the top-level `blog` array in `flea/snips.json`. Merge records,
+Agents may edit the top-level `blog` array in `itsy/snips.json`. Merge records,
 preserving `pages`, `shared`, `archive`, `media`, videos and other posts. For a new
 post generate a unique, secure-random ten-character case-sensitive alphanumeric
 ID; check existing IDs and keep it stable through edits. This differs from snip

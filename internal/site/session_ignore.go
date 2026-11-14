@@ -1,13 +1,14 @@
 package site
 
 import (
+	"itsy/internal/sitefiles"
 	"os"
 	"strings"
 )
 
 // sessionIgnoreRules are the lines IgnoreSessionFiles ensures are present in the
 // project's .gitignore.
-var sessionIgnoreRules = []string{"/flea/runtime/", "/flea/media/*.mp4"}
+var sessionIgnoreRules = []string{"/itsy/runtime/", "/itsy/media/*.mp4"}
 
 // IgnoreSessionFiles preserves developer rules and keeps private runtime state
 // out of ordinary Git adds. The CLI first checks for already tracked files.
@@ -20,10 +21,10 @@ func IgnoreSessionFiles(directory string) error {
 		return err
 	}
 	defer root.Close()
-	if err := root.MkdirAll("flea/runtime", 0700); err != nil {
+	if err := root.MkdirAll(sitefiles.Resolve(root, "itsy/runtime"), 0700); err != nil {
 		return err
 	}
-	private, err := pinnedDir(root, "flea/runtime")
+	private, err := pinnedDir(root, sitefiles.Resolve(root, "itsy/runtime"))
 	if err != nil {
 		return err
 	}
@@ -40,7 +41,8 @@ func IgnoreSessionFiles(directory string) error {
 	}
 
 	var missing []string
-	for _, rule := range sessionIgnoreRules {
+	for _, canonicalRule := range sessionIgnoreRules {
+		rule := "/" + sitefiles.Resolve(root, strings.TrimPrefix(canonicalRule, "/"))
 		if !present[rule] {
 			missing = append(missing, rule)
 		}

@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/editor"
-	"flea/internal/site"
-	"flea/internal/state"
-	"flea/templates"
+	"itsy/internal/editor"
+	"itsy/internal/site"
+	"itsy/internal/state"
+	"itsy/templates"
 )
 
 func TestLocalSavesDuringDevReloads(t *testing.T) {
@@ -51,7 +51,7 @@ func TestLocalSavesDuringDevReloads(t *testing.T) {
 	case <-time.After(3 * time.Second):
 		t.Fatal("watcher did not stop")
 	}
-	if _, err := os.Stat(filepath.Join(s.Root, "flea", ".snips.lock")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(s.Root, "itsy", ".snips.lock")); !os.IsNotExist(err) {
 		t.Fatal("local lock file created", err)
 	}
 }
@@ -86,9 +86,9 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 	t.Helper()
 	root := t.TempDir()
 	files := map[string]string{
-		".flea.config.json": `{"app":{"site_name":"Editor test"},"admin":{"emails":["owner@example.test"]}}`,
+		".itsy.config.json": `{"app":{"site_name":"Editor test"},"admin":{"emails":["owner@example.test"]}}`,
 		"site/index.html":   `<h1>{snip abcdefghij}</h1><p>{page.title}</p><p>{page.description}</p>`,
-		"flea/snips.json":   `{"pages":{"/":{"snips":{"abcdefghij":{"label":"Heading","content":"Original"}}}},"shared":{"snips":{}}}`,
+		"itsy/snips.json":   `{"pages":{"/":{"snips":{"abcdefghij":{"label":"Heading","content":"Original"}}}},"shared":{"snips":{}}}`,
 	}
 	layout, err := templates.Files.ReadFile("site/admin.layout.html")
 	if err != nil {
@@ -110,7 +110,7 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 	}
 	// Keep reload tests offline: their toolbar references the canonical icon cache.
 	// Missing icons would let LoadEditing perform network I/O under the content lock.
-	icons, err := templates.Files.ReadDir("flea/icons")
+	icons, err := templates.Files.ReadDir("itsy/icons")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +118,7 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 		if icon.IsDir() {
 			continue
 		}
-		name := "flea/icons/" + icon.Name()
+		name := "itsy/icons/" + icon.Name()
 		body, err := templates.Files.ReadFile(name)
 		if err != nil {
 			t.Fatal(err)
@@ -142,12 +142,12 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 		t.Fatal(err)
 	}
 	public := site.NewProductionServer(p, nil)
-	s := &Store{Root: root, ContentPath: filepath.Join(root, "flea", "snips.json"), Emails: p.Admin.Emails, Publish: public.Publish}
+	s := &Store{Root: root, ContentPath: filepath.Join(root, "itsy", "snips.json"), Emails: p.Admin.Emails, Publish: public.Publish}
 	if remote {
 		dir := t.TempDir()
 		s.ConfigPath = filepath.Join(dir, "server.json")
 		s.ContentPath = filepath.Join(dir, "content.json")
-		if err := os.WriteFile(s.ContentPath, []byte(files["flea/snips.json"]), 0644); err != nil {
+		if err := os.WriteFile(s.ContentPath, []byte(files["itsy/snips.json"]), 0644); err != nil {
 			t.Fatal(err)
 		}
 		c := map[string]any{"sites": map[string]string{"example.test": root}, "content": map[string]string{"example.test": s.ContentPath}}
@@ -236,7 +236,7 @@ func TestRejectUnknownTargetsAndChangedAccess(t *testing.T) {
 			t.Fatal("invalid edit accepted", u)
 		}
 	}
-	if err := os.WriteFile(filepath.Join(s.Root, ".flea.config.json"), []byte(`{"app":{"site_name":"Changed"},"admin":{"emails":[]}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(s.Root, ".itsy.config.json"), []byte(`{"app":{"site_name":"Changed"},"admin":{"emails":[]}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := s.Read(); err == nil {

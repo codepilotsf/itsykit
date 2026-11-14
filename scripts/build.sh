@@ -11,16 +11,16 @@ case "$("$GO_BINARY" env GOOS)-$("$GO_BINARY" env GOARCH)" in
   *) echo 'CLI builds support Apple Silicon macOS and x86-64 Linux.' >&2; exit 1 ;;
 esac
 source scripts/version.sh
-version=$(flea_version)
+version=$(itsy_version)
 export CGO_ENABLED=0 GOFLAGS=
 unset GOOS GOARCH
-flags="-s -w -X flea/internal/buildinfo.Version=$version"
+flags="-s -w -X itsy/internal/buildinfo.Version=$version"
 stage=$(mktemp -d)
 trap 'rm -rf -- "$stage"' EXIT
 for arch in amd64 arm64; do
   GO_BINARY="$GO_BINARY" bash scripts/bundle-app.sh linux "$arch"
   echo "Building Linux server ($arch)..."
-  GOOS=linux GOARCH="$arch" "$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/flea-server-linux-$arch" ./cmd/flea-server
+  GOOS=linux GOARCH="$arch" "$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/flea-server-linux-$arch" ./cmd/itsy-server
 done
 bash scripts/bundle.sh "$stage"
 FLEA_REQUIRE_BUNDLE=1 "$GO_BINARY" test ./internal/serverbundle -count=1
@@ -28,7 +28,7 @@ mkdir -p bin
 echo 'Building ItsyWeb with both servers bundled...'
 GO_BINARY="$GO_BINARY" bash scripts/bundle-app.sh "$("$GO_BINARY" env GOOS)" "$("$GO_BINARY" env GOARCH)"
 FLEA_REQUIRE_APP_BUNDLE=1 "$GO_BINARY" test ./internal/appmanager ./internal/site -run 'TestManaged' -count=1
-"$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/itsy" ./cmd/flea
+"$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/itsy" ./cmd/itsy
 "$stage/itsy" version
 # A fresh inode avoids macOS retaining the previous executable's code signature.
 # Rename within bin/ also leaves the last working executable intact until ready.

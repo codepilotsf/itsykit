@@ -6,6 +6,13 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Create sites with `.itsy.config.json`, `itsy/` and `<!-- itsy` layout settings.
+  Retain the old JSON filename, data directory and layout comment automatically;
+  writes stay in the selected layout. Protocol 29 blocks incompatible older
+  servers before deployment; explicit server updates preserve old sites.
+- Rename the internal Go module and executable source directories to `itsy`,
+  and distribute the site authoring skill as `itsyweb-site`.
+
 - Rename the product to ItsyWeb and the CLI to `itsy`. Retired `flea` commands
   display the rename notice and stop; `flea update` remains available to install
   `itsy` with a prominent explanation, including when already up to date.

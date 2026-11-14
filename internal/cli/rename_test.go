@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/buildinfo"
+	"itsy/internal/buildinfo"
 )
 
 func TestRetiredCommandStopsBeforeDispatch(t *testing.T) {

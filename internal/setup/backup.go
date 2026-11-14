@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/backup"
-	"flea/internal/site"
+	"itsy/internal/backup"
+	"itsy/internal/site"
 )
 
 type boundedDownload struct {

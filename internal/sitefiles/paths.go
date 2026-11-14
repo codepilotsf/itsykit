@@ -11,10 +11,11 @@ func Included(name string) bool {
 	if !fs.ValidPath(name) || strings.ContainsAny(name, "\\\x00") {
 		return false
 	}
+	name = CanonicalName(name)
 	if name == "." {
 		return true
 	}
-	if name == ".flea.config.json" {
+	if name == ".itsy.config.json" {
 		return true
 	}
 	for _, part := range strings.Split(name, "/") {
@@ -26,10 +27,10 @@ func Included(name string) bool {
 			return false
 		}
 	}
-	if name == "flea" || name == "flea/snips.json" {
+	if name == "itsy" || name == "itsy/snips.json" {
 		return true
 	}
-	for _, directory := range []string{"site", "mailers", "flea/data", "flea/snips", "flea/icons", "flea/media"} {
+	for _, directory := range []string{"site", "mailers", "itsy/data", "itsy/snips", "itsy/icons", "itsy/media"} {
 		if name == directory || strings.HasPrefix(name, directory+"/") {
 			return true
 		}

@@ -20,8 +20,8 @@ Missing icons produce deduplicated `Project.Warnings` and render nothing.
 Download/network failures are also warnings; status exits 0 when otherwise valid.
 Print warnings at startup/reload, not on every request. Invalid directives and
 unsafe or malformed downloaded/cached SVGs remain validation errors.
-Cache validated SVG files directly as `flea/icons/name.svg`. New sites include
-`flea/icons/.keep`; keep this directory in Git. Embed the pinned upstream license
+Cache validated SVG files directly as `itsy/icons/name.svg`. New sites include
+`itsy/icons/.keep`; keep this directory in Git. Embed the pinned upstream license
 notice in each SVG comment, with no version subdirectory or separate LICENSE.
 The upstream version stays pinned in Go. Cached icons work offline.
 Downloads are bounded, cancellable, and atomically saved via confined handles.

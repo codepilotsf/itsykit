@@ -2,7 +2,7 @@ package contact
 
 import (
 	"encoding/json"
-	"flea/internal/appapi"
+	"itsy/internal/appapi"
 	"os"
 	"testing"
 )

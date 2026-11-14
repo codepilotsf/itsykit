@@ -12,7 +12,7 @@ Write example items on their page:
 </div>
 ```
 
-`flea dev` moves the seed into `pages["/team"].multisnips.team` in `flea/snips.json`
+`flea dev` moves the seed into `pages["/team"].multisnips.team` in `itsy/snips.json`
 (on the homepage, the route is `/`). The value is a direct ordered array:
 
 ```json
@@ -42,7 +42,7 @@ The template becomes:
 {/multisnip}
 ```
 
-Flea preserves classes and surrounding markup. To seed several existing items,
+ItsyWeb preserves classes and surrounding markup. To seed several existing items,
 repeat adjacent same-name authoring blocks with identical markup outside their
 editable fields. Dev extracts them in source order and keeps one loop template.
 Different classes, fixed text or structure are rejected rather than discarded.

@@ -5,14 +5,14 @@ import (
 	"net"
 	"net/http"
 
-	contactapp "flea/apps/contact"
-	"flea/internal/appapi"
-	"flea/internal/contact"
-	"flea/internal/viewer"
+	contactapp "itsy/apps/contact"
+	"itsy/internal/appapi"
+	"itsy/internal/contact"
+	"itsy/internal/viewer"
 )
 
 func (s *Server) serveInstalledApp(w http.ResponseWriter, r *http.Request, mount appapi.Mount) {
-	// Contact's read-only pages are fixed in Flea and never call the child, and
+	// Contact's read-only pages are fixed in ItsyWeb and never call the child, and
 	// only the mount itself accepts a POST. A custom managed app may read on GET
 	// so it can authenticate the session.
 	readonly := false

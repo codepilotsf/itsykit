@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/snips"
+	"itsy/internal/snips"
 )
 
 func TestEditableRegionsExtractRenderAndReload(t *testing.T) {
@@ -56,7 +56,7 @@ func TestEditableRegionsExtractRenderAndReload(t *testing.T) {
 	content.Pages["/"].Title = "Custom title"
 	content.Pages["/"].Description = `<script>metadata</script>`
 	b, _ := content.Bytes()
-	put(t, root, "flea/snips.json", string(b))
+	put(t, root, "itsy/snips.json", string(b))
 	put(t, root, "main.layout.html", `<title>{page.title}</title><meta name="description" content="{page.description}"><body>{slot}</body>`)
 	p = mustLoad(t, root)
 	rendered, err = p.render(p.Pages["/"], "/")
@@ -91,7 +91,7 @@ func TestRegionValidationAndNoWritesOnFailure(t *testing.T) {
 
 func TestLegacyTenCharacterNameStillEscapes(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "flea/snips/abcdefghij.json", `{"text":"<b>legacy</b>"}`)
+	put(t, root, "itsy/snips/abcdefghij.json", `{"text":"<b>legacy</b>"}`)
 	put(t, root, "index.html", `<p>{snip abcdefghij}</p><p title='{snip abcdefghij}'>Test</p>`)
 	p, err := LoadEditing(context.Background(), root)
 	if err != nil {
@@ -149,9 +149,9 @@ func TestRecoveryWithExistingFormattedContent(t *testing.T) {
 			journal, _ := json.Marshal(tx)
 			put(t, root, transactionFile, string(journal))
 			if saved {
-				put(t, root, "flea/snips.json", string(content))
+				put(t, root, "itsy/snips.json", string(content))
 			} else {
-				put(t, root, "flea/snips.json", string(before))
+				put(t, root, "itsy/snips.json", string(before))
 			}
 			if err := ExtractSnips(root); err != nil {
 				t.Fatal(err)
@@ -226,7 +226,7 @@ func TestDevSynchronizesSnipAdditionsRemovalsAndRestore(t *testing.T) {
 	if err != nil || p.SnipsUpdated {
 		t.Fatal("unchanged reload wrote content", err)
 	}
-	if _, err := os.Lstat(filepath.Join(root, "flea", ".snips.lock")); !os.IsNotExist(err) {
+	if _, err := os.Lstat(filepath.Join(root, "itsy", ".snips.lock")); !os.IsNotExist(err) {
 		t.Fatal("local lock file exists", err)
 	}
 }

@@ -92,7 +92,7 @@ func commandStart(s string) bool {
 	return false
 }
 
-// group returns an exclusive end, whether this is Flea syntax, and a lexical
+// group returns an exclusive end, whether this is ItsyWeb syntax, and a lexical
 // error only for recognizable syntax. Literal groups are never recursively read.
 func (l braceLexer) group(start int) (int, bool, error) {
 	s := l.source

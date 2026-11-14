@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/admin"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
+	"itsy/internal/admin"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
 )
 
 // Status validates an already-loaded project and reads its branch's deployment.

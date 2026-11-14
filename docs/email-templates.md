@@ -20,7 +20,7 @@ contents; there is no old-path or built-in site-template fallback.
 
 ## Local delivery previews
 
-New sites include `"dev": {"email_preview": true}` in `.flea.config.json`.
+New sites include `"dev": {"email_preview": true}` in `.itsy.config.json`.
 While `flea dev` runs, sign-in and contact emails open as browser previews instead
 of being sent. First-run dev asks for the site name and optional admin email,
 never Resend credentials. Approved admins still use the normal code sign-in flow;
@@ -40,7 +40,7 @@ to send real mail. Restart after changing preview mode or preview sender details
 Previews are held in memory, with at most 20 messages and 10-minute expiry.
 Their random URLs work only on the exact loopback dev address by default.
 With `flea dev --lan` (or `-l`), they also work on the printed network addresses.
-Previews still open on the computer running Flea. Enter its code on the other
+Previews still open on the computer running ItsyWeb. Enter its code on the other
 device, or replace the preview URL's loopback IP with a printed network IP while
 keeping its port and random path. A preview link is private access to that message;
 share it only with someone you trust. No preview listing or login bypass is added.

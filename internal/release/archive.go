@@ -1,16 +1,16 @@
 // Package release packages only site runtime files and extracts bounded archives
 // into fresh release directories. It never accepts links, and admits executable
-// modes only for a confined custom-app package file (flea/apps/<name>/<exe>).
+// modes only for a confined custom-app package file (itsy/apps/<name>/<exe>).
 package release
 
 import (
 	"archive/tar"
 	"compress/gzip"
 	"errors"
-	"flea/internal/sitefiles"
 	"fmt"
 	"io"
 	"io/fs"
+	"itsy/internal/sitefiles"
 	"os"
 	"path"
 	"strings"
@@ -71,7 +71,7 @@ func CheckAppPlatforms(root, goos, goarch string) error {
 		return err
 	}
 	defer r.Close()
-	entries, err := fs.ReadDir(r.FS(), "flea/apps")
+	entries, err := fs.ReadDir(r.FS(), sitefiles.Resolve(r, "itsy/apps"))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
@@ -83,7 +83,7 @@ func CheckAppPlatforms(root, goos, goarch string) error {
 			continue
 		}
 		name := entry.Name()
-		base := "flea/apps/" + name
+		base := sitefiles.Resolve(r, "itsy/apps/"+name)
 		raw, err := readBounded(r, base+"/app.json", sitefiles.MaxManifestBytes)
 		if err != nil {
 			if os.IsNotExist(err) {
@@ -140,7 +140,7 @@ func CheckAppPlatforms(root, goos, goarch string) error {
 // half a package; a directory with no manifest is ignored.
 func packagedAppFiles(root *os.Root) (map[string]bool, error) {
 	files := map[string]bool{}
-	entries, err := fs.ReadDir(root.FS(), "flea/apps")
+	entries, err := fs.ReadDir(root.FS(), sitefiles.Resolve(root, "itsy/apps"))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return files, nil
@@ -152,7 +152,7 @@ func packagedAppFiles(root *os.Root) (map[string]bool, error) {
 		if !entry.IsDir() || !sitefiles.AppName.MatchString(name) {
 			continue
 		}
-		base := "flea/apps/" + name
+		base := sitefiles.Resolve(root, "itsy/apps/"+name)
 		raw, err := readBounded(root, base+"/app.json", sitefiles.MaxManifestBytes)
 		if err != nil {
 			if os.IsNotExist(err) {
@@ -188,7 +188,7 @@ func packagedAppFiles(root *os.Root) (map[string]bool, error) {
 // validatePackages checks the extracted tree contains exactly each manifest and
 // its declared executables, all runnable regular files.
 func validatePackages(root *os.Root) error {
-	entries, err := fs.ReadDir(root.FS(), "flea/apps")
+	entries, err := fs.ReadDir(root.FS(), sitefiles.Resolve(root, "itsy/apps"))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
@@ -200,7 +200,7 @@ func validatePackages(root *os.Root) error {
 			continue
 		}
 		name := entry.Name()
-		base := "flea/apps/" + name
+		base := sitefiles.Resolve(root, "itsy/apps/"+name)
 		raw, err := readBounded(root, base+"/app.json", sitefiles.MaxManifestBytes)
 		if err != nil {
 			return fmt.Errorf("release app %q is missing a valid manifest", name)
@@ -302,7 +302,7 @@ func Pack(directory string, output io.Writer) error {
 			hdr.Mode = int64(sitefiles.ExecutableMode)
 		}
 		var config []byte
-		if name == ".flea.config.json" && !info.IsDir() {
+		if sitefiles.CanonicalName(name) == ".itsy.config.json" && !info.IsDir() {
 			if info.Size() > 1<<20 {
 				return fmt.Errorf("site config exceeds 1 MiB")
 			}

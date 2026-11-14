@@ -2,9 +2,9 @@ package site
 
 import (
 	"bytes"
-	"flea/internal/mailer"
 	"fmt"
 	htmltemplate "html/template"
+	"itsy/internal/mailer"
 	"os"
 	"regexp"
 	"strings"

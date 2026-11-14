@@ -1,7 +1,7 @@
 package site
 
 import (
-	"flea/templates"
+	"itsy/templates"
 	"net/http/httptest"
 	"os"
 	"strings"

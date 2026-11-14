@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/host"
+	"itsy/internal/host"
 )
 
 func TestActivationProgress(t *testing.T) {

@@ -25,9 +25,9 @@ itsy_install() (
   }
   version=$(fetch --max-filesize 128 "$base/latest.txt") || fail 'No release is available. Your installation was not changed.'
   [[ ${#version} -le 64 && "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || fail 'Invalid release version.'
-  destination=${FLEA_INSTALL_DIR:-"$HOME/.local/bin"}
-  [[ "$destination" == /* ]] || fail 'FLEA_INSTALL_DIR must be an absolute directory.'
-  mkdir -p "$destination" || fail 'Choose a writable FLEA_INSTALL_DIR. No sudo is needed.'
+  destination=${ITSY_INSTALL_DIR:-${FLEA_INSTALL_DIR:-"$HOME/.local/bin"}}
+  [[ "$destination" == /* ]] || fail 'ITSY_INSTALL_DIR must be an absolute directory.'
+  mkdir -p "$destination" || fail 'Choose a writable ITSY_INSTALL_DIR. No sudo is needed.'
   [[ ! -L "$destination/itsy" ]] || fail 'The existing itsy is a symlink. Use itsy update or choose another directory.'
   [[ ! -e "$destination/itsy" || -f "$destination/itsy" ]] || fail 'The itsy installation target is not a regular file.'
   if [[ -L "$destination/flea" ]]; then

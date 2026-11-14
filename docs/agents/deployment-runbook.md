@@ -90,7 +90,7 @@ plain `go build` alone can embed stale servers.
 
 Use a fresh temporary site for `new` and `status`, compare affected starter files,
 and exercise changed behavior using the exact final artifacts. Stop test servers.
-Confirm the installed CLI path/version separately from `bin/flea`.
+Confirm the installed CLI path/version separately from `bin/itsy`.
 
 The preferred release matrix uses native runners through `scripts/release.sh`:
 native Linux AMD64 server checks/builds plus a cross-compiled ARM64 server,

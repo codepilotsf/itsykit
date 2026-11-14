@@ -14,7 +14,7 @@ func TestIgnoreSessionFilesAppendsMissingRulesOnce(t *testing.T) {
 			t.Fatalf("run %d: %v", i, err)
 		}
 	}
-	want := ".env\n/.env\n/flea/runtime/\n/flea/media/*.mp4\n"
+	want := ".env\n/.env\n/itsy/runtime/\n/itsy/media/*.mp4\n"
 	if got := readGitignore(t, dir); got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}
@@ -24,7 +24,7 @@ func TestIgnoreSessionFilesKeepsRulesAlreadyPresent(t *testing.T) {
 	dir := t.TempDir()
 	// The rules are present but not at the end of the file (a trailing /.env is),
 	// which the old suffix check missed and would duplicate on every run.
-	original := "/flea/runtime/\n/flea/media/*.mp4\n/.env\n"
+	original := "/itsy/runtime/\n/itsy/media/*.mp4\n/.env\n"
 	writeGitignore(t, dir, original)
 	for i := 0; i < 3; i++ {
 		if err := IgnoreSessionFiles(dir); err != nil {
@@ -41,7 +41,7 @@ func TestIgnoreSessionFilesCreatesGitignore(t *testing.T) {
 	if err := IgnoreSessionFiles(dir); err != nil {
 		t.Fatal(err)
 	}
-	want := "/flea/runtime/\n/flea/media/*.mp4\n"
+	want := "/itsy/runtime/\n/itsy/media/*.mp4\n"
 	if got := readGitignore(t, dir); got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}
@@ -49,12 +49,12 @@ func TestIgnoreSessionFilesCreatesGitignore(t *testing.T) {
 
 func TestIgnoreSessionFilesPreservesContentWhenAppending(t *testing.T) {
 	for _, tc := range []struct{ original, want string }{
-		{"/.env\n\n", "/.env\n\n/flea/runtime/\n/flea/media/*.mp4\n"},
-		{"/.env", "/.env\n/flea/runtime/\n/flea/media/*.mp4\n"},
-		{"\n\n", "\n\n/flea/runtime/\n/flea/media/*.mp4\n"},
-		{"", "/flea/runtime/\n/flea/media/*.mp4\n"},
-		{"/flea/runtime/\n\n", "/flea/runtime/\n\n/flea/media/*.mp4\n"},
-		{"/flea/media/*.mp4\r\n/.env\r\n", "/flea/media/*.mp4\r\n/.env\r\n/flea/runtime/\n"},
+		{"/.env\n\n", "/.env\n\n/itsy/runtime/\n/itsy/media/*.mp4\n"},
+		{"/.env", "/.env\n/itsy/runtime/\n/itsy/media/*.mp4\n"},
+		{"\n\n", "\n\n/itsy/runtime/\n/itsy/media/*.mp4\n"},
+		{"", "/itsy/runtime/\n/itsy/media/*.mp4\n"},
+		{"/itsy/runtime/\n\n", "/itsy/runtime/\n\n/itsy/media/*.mp4\n"},
+		{"/itsy/media/*.mp4\r\n/.env\r\n", "/itsy/media/*.mp4\r\n/.env\r\n/itsy/runtime/\n"},
 	} {
 		t.Run(tc.original, func(t *testing.T) {
 			dir := t.TempDir()

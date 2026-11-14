@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"flea/internal/site"
+	"itsy/internal/site"
 )
 
 // ValidIndexingMode accepts the two exact-host policies. Allow adds no header

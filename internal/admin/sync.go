@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"regexp"
 
-	"flea/internal/host"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
+	"itsy/internal/host"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
 )
 
 // Snapshot is a privileged SSH-only export. It never includes config, sessions,

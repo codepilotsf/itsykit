@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/editor"
-	"flea/internal/mailer"
 	"golang.org/x/net/html"
+	"itsy/internal/editor"
+	"itsy/internal/mailer"
 )
 
 type testMailbox chan mailer.Message

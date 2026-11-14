@@ -34,9 +34,9 @@ func repoSite(t *testing.T) string {
 	root := t.TempDir()
 	os.Mkdir(filepath.Join(root, "."), 0755)
 	os.Mkdir(filepath.Join(root, "site"), 0755)
-	os.Mkdir(filepath.Join(root, "flea"), 0755)
+	os.Mkdir(filepath.Join(root, "itsy"), 0755)
 	os.WriteFile(filepath.Join(root, "site", "index.html"), []byte("committed"), 0644)
-	os.WriteFile(filepath.Join(root, ".flea.config.json"), []byte(`{"app":{"site_name":"test"}}`), 0644)
+	os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"test"}}`), 0644)
 	initRepo(t, root)
 	return root
 }
@@ -58,7 +58,7 @@ func TestFirstDeployAndBranchMappings(t *testing.T) {
 	if _, err := currentGit(context.Background(), root, true); err == nil {
 		t.Fatal("new config did not require commit")
 	}
-	testGit(t, root, "add", ".flea.config.json")
+	testGit(t, root, "add", ".itsy.config.json")
 	testGit(t, root, "commit", "-m", "main mapping")
 	out.Reset()
 	got, err := SelectDeployment(context.Background(), root, DeploySettings{}, nil, false, false, strings.NewReader(""), &out)
@@ -97,14 +97,14 @@ func TestCertificateEmailDefaultsToGit(t *testing.T) {
 
 func TestFirstDeployConfiguresBeforeInitialCommit(t *testing.T) {
 	root := t.TempDir()
-	os.WriteFile(filepath.Join(root, ".flea.config.json"), []byte(`{"app":{"site_name":"test"}}`), 0644)
+	os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"test"}}`), 0644)
 	testGit(t, root, "init", "-b", "main")
 	answers := strings.Join([]string{"server", "", "example.test", "", "", "dev@example.test", "y", ""}, "\n") + "\n"
 	s, err := SelectDeployment(context.Background(), root, DeploySettings{}, nil, false, false, strings.NewReader(answers), io.Discard)
 	if err != nil || s.Branch != "main" {
 		t.Fatal(s, err)
 	}
-	if _, err := os.Stat(filepath.Join(root, ".flea.config.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(root, ".itsy.config.json")); err != nil {
 		t.Fatal("settings were not saved", err)
 	}
 	err = deploy(context.Background(), root, s, false, strings.NewReader(""), io.Discard, io.Discard, func(context.Context, command) error { t.Fatal("connected without a commit"); return nil })
@@ -172,7 +172,7 @@ func TestNestedCommittedSnapshotAndIgnoredFiles(t *testing.T) {
 	os.MkdirAll(filepath.Join(sub, "."), 0755)
 	os.MkdirAll(filepath.Join(sub, "site"), 0755)
 	os.WriteFile(filepath.Join(sub, "site", "index.html"), []byte("nested commit"), 0644)
-	os.WriteFile(filepath.Join(sub, ".flea.config.json"), []byte(`{"app":{"site_name":"nested"}}`), 0644)
+	os.WriteFile(filepath.Join(sub, ".itsy.config.json"), []byte(`{"app":{"site_name":"nested"}}`), 0644)
 	os.WriteFile(filepath.Join(root, ".gitignore"), []byte("sites/demo/ignored.txt\n"), 0644)
 	initRepo(t, root)
 	os.WriteFile(filepath.Join(sub, "ignored.txt"), []byte("not committed"), 0644)
@@ -212,7 +212,7 @@ func TestCommittedSymlinkRejected(t *testing.T) {
 func TestDeploymentConfigPreservesUnrelatedFields(t *testing.T) {
 	root := repoSite(t)
 	before := `{"app":{"site_name":"Keep","extra":{"nested":true}},"admin":{"emails":["owner@example.test"]},"contact":{"to":"contact@example.test"},"custom":[1,2,3]}`
-	name := filepath.Join(root, ".flea.config.json")
+	name := filepath.Join(root, ".itsy.config.json")
 	if err := os.WriteFile(name, []byte(before), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -247,7 +247,7 @@ func TestDeploymentConfigPreservesUnrelatedFields(t *testing.T) {
 	if err != nil || got.Branches["main"].Target != "root@server" {
 		t.Fatal(got, err)
 	}
-	if _, err = os.Stat(filepath.Join(root, "flea", "deploy.json")); !os.IsNotExist(err) {
+	if _, err = os.Stat(filepath.Join(root, "itsy", "deploy.json")); !os.IsNotExist(err) {
 		t.Fatal("created obsolete deployment file")
 	}
 	if err = os.WriteFile(name, []byte(`{"app":`), 0644); err != nil {

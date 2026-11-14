@@ -29,7 +29,7 @@ func TestAdminAllowlistValidation(t *testing.T) {
 	}
 	root := fixture(t)
 	data, _ := json.Marshal(map[string]any{"app": map[string]string{"site_name": "Test"}, "admin": AdminAccess{Emails: []string{" Owner@Example.Test "}}})
-	put(t, root, ".flea.config.json", string(data))
+	put(t, root, ".itsy.config.json", string(data))
 	p, err := Load(root)
 	if err != nil {
 		t.Fatal(err)

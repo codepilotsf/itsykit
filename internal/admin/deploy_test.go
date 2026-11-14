@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/host"
-	"flea/internal/release"
+	"itsy/internal/host"
+	"itsy/internal/release"
 )
 
 func fixture(t *testing.T) (Manager, Options) {
@@ -31,7 +31,7 @@ func fixture(t *testing.T) (Manager, Options) {
 func archive(t *testing.T, title string) string {
 	t.Helper()
 	root := t.TempDir()
-	for name, body := range map[string]string{".flea.config.json": `{"app":{"site_name":"` + title + `"}}`, "site/index.html": "<h1>{app.site_name}</h1>", "site/style.css": "body{}"} {
+	for name, body := range map[string]string{".itsy.config.json": `{"app":{"site_name":"` + title + `"}}`, "site/index.html": "<h1>{app.site_name}</h1>", "site/style.css": "body{}"} {
 		file := filepath.Join(root, name)
 		os.MkdirAll(filepath.Dir(file), 0755)
 		os.WriteFile(file, []byte(body), 0644)
@@ -251,7 +251,7 @@ func TestDeploymentHTTPWorkflow(t *testing.T) {
 			path   string
 			status int
 			body   string
-		}{{"/", 200, title}, {"/style.css", 200, "body{}"}, {"/.flea.config.json", 404, ""}, {"/index.html", 404, ""}} {
+		}{{"/", 200, title}, {"/style.css", 200, "body{}"}, {"/.itsy.config.json", 404, ""}, {"/index.html", 404, ""}} {
 			req, _ := http.NewRequest("GET", "http://"+address+tc.path, nil)
 			req.Host = "example.test"
 			res, err := http.DefaultClient.Do(req)

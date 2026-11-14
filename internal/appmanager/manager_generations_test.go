@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/appapi"
+	"itsy/internal/appapi"
 )
 
 // This file adds coverage for the case the failed-launch tests miss: a child

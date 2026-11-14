@@ -1,10 +1,11 @@
 package admin
 
 import (
-	"flea/internal/media"
-	"flea/internal/site"
-	"flea/internal/snips"
 	"fmt"
+	"itsy/internal/media"
+	"itsy/internal/site"
+	"itsy/internal/sitefiles"
+	"itsy/internal/snips"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -44,7 +45,7 @@ func (m Manager) prepareMedia(source, content string, store *snips.Store) error 
 	for _, photo := range store.ImageAssets() {
 		data, err := site.ReadPhoto(root, photo.File)
 		if os.IsNotExist(err) {
-			data, err = site.ReadPhoto(filepath.Join(source, "flea", "media"), photo.File)
+			data, err = site.ReadPhoto(sitefiles.Path(source, filepath.Join("itsy", "media")), photo.File)
 			if err != nil {
 				return fmt.Errorf("missing photo in deployment: %w", err)
 			}
@@ -69,7 +70,7 @@ func (m Manager) prepareMedia(source, content string, store *snips.Store) error 
 			return fmt.Errorf("photo library exceeds 64 MiB")
 		}
 	}
-	if err := site.InstallVideos(filepath.Join(source, "flea", "media"), root, store); err != nil {
+	if err := site.InstallVideos(sitefiles.Path(source, filepath.Join("itsy", "media")), root, store); err != nil {
 		return err
 	}
 	return nil

@@ -47,7 +47,7 @@ Backups can contain admin addresses and content; handle them as private data.
 
 Credentials, certificates, deployment settings, sessions and custom-app storage
 are excluded. Custom-app storage lives in the stable per-site runtime directory
-(`/var/lib/flea/sites/<name>/flea/runtime/apps/<name>`), so a rollback or restore
+(`/var/lib/flea/sites/<name>/itsy/runtime/apps/<name>`), so a rollback or restore
 does not remove it, but it is never backed up automatically; back it up yourself.
 Host indexing policy is excluded too. A backup is not a whole-server
 disaster-recovery image. Record server/email setup separately.

@@ -17,7 +17,7 @@ const ExecutableMode os.FileMode = 0o555
 func RuntimeConfig(data []byte) ([]byte, error) {
 	var fields map[string]json.RawMessage
 	if err := json.Unmarshal(data, &fields); err != nil || fields == nil {
-		return nil, fmt.Errorf(".flea.config.json must be a valid object")
+		return nil, fmt.Errorf(".itsy.config.json must be a valid object")
 	}
 	delete(fields, "deploy")
 	data, err := json.MarshalIndent(fields, "", "  ")

@@ -6,7 +6,7 @@ relative to the repository root unless stated otherwise.
 
 New sites include a short AGENTS.md, shared/authoring skills in .agents/skills/,
 version-specific .agents/site-requirements.md, and focused Blog/Contact/import
-guides in flea/skills/. Keep these in Git but exclude them from runtime loading,
+guides in itsy/skills/. Keep these in Git but exclude them from runtime loading,
 public assets and deployment via sitefiles. This does not
 install or assume a particular agent plugin. Update skill conventions alongside
 template changes; test imports without publishing or using live credentials.
@@ -14,8 +14,8 @@ template changes; test imports without publishing or using live credentials.
 Read `docs/agents/architecture.md` for dependency direction, trust boundaries, transaction
 ordering, and review follow-ups. Keep it current when those responsibilities change.
 
-- `cmd/flea/main.go`: executable entry point.
-- `cmd/flea-server/main.go`: standalone persistent server entry point.
+- `cmd/itsy/main.go`: executable entry point.
+- `cmd/itsy-server/main.go`: standalone persistent server entry point.
 - `internal/host/`: strict server JSON config, hostname routing, readiness, and shutdown.
 - `internal/host/indexing.go`: exact-host indexing enforcement and static crawl diagnostics.
 - `internal/admin/indexing.go` and `internal/setup/indexing.go`: reviewed SSH host-policy changes and inspection.
@@ -50,7 +50,7 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `apps/contact/`: included Contact validation, manifest and canonical contract.
 - `internal/contact/`: site-bound single-use email capability and shared budget.
 - `internal/appmanager/`: managed child launch, readiness, backoff and cleanup for bundled and custom apps.
-- `internal/appruntime/` and `cmd/flea-contact/`: private child transport and Contact entry point.
+- `internal/appruntime/` and `cmd/itsy-contact/`: private child transport and Contact entry point.
 - `internal/appbundle/`: matching-platform Contact executable; build before its parent.
 - `internal/site/apps.go`, `app_bridge.go`, `app_package.go`, `session.go`, `flash.go`: registration, validated custom packages, public dispatch, app sessions and private flash.
 - `samples/session-app/`: independent stdlib custom-app example used by the site lifecycle test.

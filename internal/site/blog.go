@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/snips"
+	"itsy/internal/snips"
 )
 
 const blogBodyAction = `[[NW blogBody $ NW]]`

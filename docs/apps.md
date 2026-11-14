@@ -1,15 +1,15 @@
-# Flea apps
+# ItsyWeb apps
 
-An app is a small, separate JSON service that a Flea site can mount at a public
-URL. Flea owns the public page, the HTML form, the redirect, the template values
+An app is a small, separate JSON service that a ItsyWeb site can mount at a public
+URL. ItsyWeb owns the public page, the HTML form, the redirect, the template values
 and the email. The app owns its own logic and validates its own fields. This
 guide explains the model, the shipped Contact app, the exact JSON contract, and
 how a developer can write a compatible service.
 
-Contact ships with Flea and is enabled only by `apps.contact`. You can also
+Contact ships with ItsyWeb and is enabled only by `apps.contact`. You can also
 register your own **managed local app**: build an executable that speaks the
-current Flea App Protocol (version 2), put a validated package under
-`flea/apps/<name>/`, and enable it with `apps.<name>.mount`. No Flea source
+current ItsyWeb App Protocol (version 2), put a validated package under
+`itsy/apps/<name>/`, and enable it with `apps.<name>.mount`. No ItsyWeb source
 change is needed. This guide explains
 the model, the exact JSON contract, the managed launch contract, app-owned
 sessions, and how to write, build, mount and test a compatible service.
@@ -46,14 +46,14 @@ must not be read as shipped behavior.
 Three roles, and only one of them knows the other two:
 
 - **The visitor** sees an ordinary HTML page and submits an ordinary form.
-- **Flea** serves the page, checks the form, forwards a small JSON object to the
+- **ItsyWeb** serves the page, checks the form, forwards a small JSON object to the
   app, receives a small JSON object back, then renders the page, redirects or
-  shows an error. Flea never runs app business logic.
+  shows an error. ItsyWeb never runs app business logic.
 - **The app** is an independent HTTP service. It receives JSON, decides what to
   do, and returns JSON. It does not render pages and does not send email itself;
-  it can request a narrow, site-bound capability when Flea allows it.
+  it can request a narrow, site-bound capability when ItsyWeb allows it.
 
-An app is not a general application framework, a database or a job queue. Flea
+An app is not a general application framework, a database or a job queue. ItsyWeb
 keeps public pages static and sends only the data an app needs. Values returned
 by an app are request-local: they are never written into the published site or
 compiled as template source.
@@ -68,7 +68,7 @@ returns values under `contact.data.*`, `contact.invalid.*`, `contact.error` and
 | --- | --- |
 | Contact app: configure, render a form, deliver one email | Shipped |
 | Contact mount path, recipient and optional sender | Shipped |
-| Flea App Protocol v2 types, mount rules, JSON envelope | Shipped |
+| ItsyWeb App Protocol v2 types, mount rules, JSON envelope | Shipped |
 | Managed child process launch | Shipped |
 | Register a managed local app package from site config | Shipped in 0.17.0 |
 | Site-bound email capability for Contact | Shipped |
@@ -76,14 +76,14 @@ returns values under `contact.data.*`, `contact.invalid.*`, `contact.error` and
 | `url`/port key for an external or remote service | Not supported |
 | Public SDK or importable helper package | Not available |
 | Read-only routes declared in configuration | Not implemented |
-| Database, storage or uploads provided by Flea | Not part of the contract |
+| Database, storage or uploads provided by ItsyWeb | Not part of the contract |
 
 `apps.contact` is the bundled app. Any other `apps.<name>` entry is a **custom
-managed app**: Flea validates `flea/apps/<name>/app.json`, confines its
+managed app**: ItsyWeb validates `itsy/apps/<name>/app.json`, confines its
 executable to the package directory, launches it the same way as Contact, and
 verifies the running service at handshake time. Remote services, package
 registries, automatic downloads and arbitrary shell commands are not supported.
-The protocol is documented so you can build a service in any language; Flea's Go
+The protocol is documented so you can build a service in any language; ItsyWeb's Go
 packages are private and are not a public SDK.
 
 ## Enable Contact
@@ -91,7 +91,7 @@ packages are private and are not a public SDK.
 Contact sends a visitor's message to one email address. It has no database,
 inbox, uploads, automatic replies or delivery queue.
 
-Merge this into `.flea.config.json`, preserving your other settings:
+Merge this into `.itsy.config.json`, preserving your other settings:
 
 ```json
 {
@@ -130,7 +130,7 @@ inbox delivery.
 
 ## The Contact form and templates
 
-The form is ordinary HTML. Flea does not scan forms or inject hidden fields, so
+The form is ordinary HTML. ItsyWeb does not scan forms or inject hidden fields, so
 include `{csrf}` yourself:
 
 ```html
@@ -152,9 +152,9 @@ include `{csrf}` yourself:
 </form>
 ```
 
-`{csrf}` renders the complete hidden `_csrf` input. Flea checks the visitor
+`{csrf}` renders the complete hidden `_csrf` input. ItsyWeb checks the visitor
 cookie, the token and the exact Origin before forwarding, then removes `_csrf`
-from the JSON. Tokens expire after 24 hours or a full Flea restart; reload an
+from the JSON. Tokens expire after 24 hours or a full ItsyWeb restart; reload an
 expired form. Template reloads keep tokens valid. Admin forms keep their own
 unchanged protection.
 
@@ -184,10 +184,10 @@ message. They receive `email.name`, `email.address`, `email.message` and public
 
 Two different boundaries are easy to confuse. Keep them separate:
 
-1. **Browser to Flea.** The visitor submits an HTML form. Flea checks CSRF,
-   Origin, method, content type, size and the rate limit. Flea never sends the
+1. **Browser to ItsyWeb.** The visitor submits an HTML form. ItsyWeb checks CSRF,
+   Origin, method, content type, size and the rate limit. ItsyWeb never sends the
    browser's cookies or `Authorization` header to the app.
-2. **Flea to app.** Flea converts the checked form into flat JSON and calls the
+2. **ItsyWeb to app.** ItsyWeb converts the checked form into flat JSON and calls the
    app's mount-relative route with its own private bearer credential.
 
 | Browser request | Service request | Result |
@@ -197,7 +197,7 @@ Two different boundaries are easy to confuse. Keep them separate:
 | `GET /contact/thank-you` | none | Render the thank-you page and any flash |
 | `GET /contact/list` | none | `404`; Contact only mounts the form and thank-you |
 
-Contact's two read-only pages are fixed in Flea and never call the child, and
+Contact's two read-only pages are fixed in ItsyWeb and never call the child, and
 only Contact's mount accepts a `POST`. A **custom** app may read on `GET`: a page
 that exists below its mount calls the service route with the request method and
 query, so an app can render state (for example, whether a session is signed in).
@@ -207,7 +207,7 @@ implemented.
 
 Mount stripping is generic: the mount itself maps to `/` and descendant paths
 keep their suffix. `GET /articles?page=2` calls the service with `GET /?page=2`,
-preserving query parameters and repeated values. Flea matches mounts on
+preserving query parameters and repeated values. ItsyWeb matches mounts on
 path-segment boundaries, so `/articles` never captures `/articles-extra`. These
 are URL paths, not filesystem paths.
 
@@ -220,20 +220,20 @@ the submitted form names.
 {"name":"Alex","email":"alex@example.com","message":"Hello","website":""}
 ```
 
-Rules that Flea enforces when building this object:
+Rules that ItsyWeb enforces when building this object:
 
 - Only `POST` submissions are forwarded with a body.
 - The browser form must be `application/x-www-form-urlencoded`. A query string
   on the POST is rejected with `400`.
-- `_csrf` belongs to Flea. It is verified and removed, never forwarded. An app
+- `_csrf` belongs to ItsyWeb. It is verified and removed, never forwarded. An app
   must not define `_csrf`.
 - A name submitted once becomes a JSON string. A name submitted more than once
   becomes an array of strings. The app decides how to handle repeats.
 - A submitted empty field stays an empty string (`""`). A missing field is
   absent. Unchecked checkboxes are absent.
 - Field names are literal. `address.city` and `items[0]` stay exactly those
-  JSON keys; Flea does not interpret dots, brackets or indexes as nesting.
-- Values are always strings or arrays of strings. Flea never converts numbers,
+  JSON keys; ItsyWeb does not interpret dots, brackets or indexes as nesting.
+- Values are always strings or arrays of strings. ItsyWeb never converts numbers,
   booleans or `null` and never nests. The app performs its own conversion.
 - The JSON body is bounded to 192 KiB (six times the 32 KiB form bound).
 - Non-UTF-8 names or values fail with `400`.
@@ -241,9 +241,9 @@ Rules that Flea enforces when building this object:
   `_csrf` key are rejected by the service-side reader. Contact reports these as
   `400`; other services choose their own status.
 
-Flea does not validate app business fields. Contact does that in its own code.
+ItsyWeb does not validate app business fields. Contact does that in its own code.
 Unknown keys, repeated values and type mismatches reach Contact and fail there,
-not in Flea's transport.
+not in ItsyWeb's transport.
 
 ## Response envelope
 
@@ -277,13 +277,13 @@ Rules for the envelope:
 - `session` is validated before any cookie changes. See
   [App-owned sessions](#app-owned-sessions).
 
-Only envelope keys are reserved. Names inside `data` belong to the app. Flea
+Only envelope keys are reserved. Names inside `data` belong to the app. ItsyWeb
 renders valid JSON `data` as returned, but the included Contact bridge only ever
 redisplays the bounded `name`, `email` and `message` values on failure.
 
 ## Status codes and browser outcomes
 
-Flea accepts three application statuses and maps everything else to a safe
+ItsyWeb accepts three application statuses and maps everything else to a safe
 unavailable result. The envelope must match the status:
 
 | Service status | Envelope requirement | Meaning |
@@ -382,10 +382,10 @@ registered for Contact):
 
 ## Transport, handshake and limits
 
-Flea calls the app over HTTP on loopback with a private bearer credential.
+ItsyWeb calls the app over HTTP on loopback with a private bearer credential.
 These are protocol facts, not site settings.
 
-- **Handshake.** Before any app request, Flea calls `GET /_flea/handshake` with
+- **Handshake.** Before any app request, ItsyWeb calls `GET /_flea/handshake` with
   `Authorization: Bearer <app-token>`. The app must return `200` and JSON with
   `name` matching the expected app, `protocol` equal to `2`, and a non-empty
   `version`. A missing or wrong credential must be denied before the app
@@ -393,7 +393,7 @@ These are protocol facts, not site settings.
 - **Authorization.** Every Flea-to-app call carries the same bearer token.
   Browser cookies and `Authorization` headers are never forwarded. Handshake
   is service-internal and is never exposed through the public mount.
-- **Content type.** Flea sends `Content-Type: application/json` on POST and
+- **Content type.** ItsyWeb sends `Content-Type: application/json` on POST and
   `Accept: application/json`. Responses must be `application/json`; a response
   with any `Content-Encoding` is rejected. Upstream redirects are not followed.
 - **Bounds.** Handshake response 4 KiB; ordinary response 1 MiB; request body
@@ -410,9 +410,9 @@ These are protocol facts, not site settings.
 
 ## Managed process contract
 
-Apps are launched and supervised by Flea only during an actual `flea dev` or
+Apps are launched and supervised by ItsyWeb only during an actual `flea dev` or
 host run. Loading, `flea status`, validation and extraction never start an app.
-This is an **internal managed contract between Flea and a confined executable,
+This is an **internal managed contract between ItsyWeb and a confined executable,
 not site configuration**. A site configures only `apps.<name>.mount` (and
 `apps.contact.email`); it never sets ports, descriptors or tokens.
 
@@ -424,14 +424,14 @@ For a managed child (bundled Contact or a custom package):
   `{"Name":"<app>","Token":"<64 hex>","Storage":"<private dir>","CapabilityURL":"","CapabilityToken":""}`.
   Contact receives a non-empty `CapabilityURL` and `CapabilityToken`; a custom
   app receives empty strings for both. Unknown fields are rejected, so declare
-  all five. The app token authenticates Flea's calls to the app.
+  all five. The app token authenticates ItsyWeb's calls to the app.
 - **fd 5** is a parent-liveness pipe. When the parent closes it, the child
   cancels and shuts down.
 - The child environment is only `LANG=C`. Standard output and error are
   discarded so private payloads are not logged. Credentials never appear in
   argv, environment, site files or logs.
 - Contact uses one checksum-verified private executable shared by its enabled
-  sites; a custom app runs the executable confined to `flea/apps/<name>/`. Flea
+  sites; a custom app runs the executable confined to `itsy/apps/<name>/`. ItsyWeb
   starts one child per site and app, allows five attempts with 1, 2, 4 and 8
   second backoff, then leaves that app unavailable until restart while other
   pages stay up.
@@ -440,16 +440,16 @@ For a managed child (bundled Contact or a custom package):
 
 The `Storage` directory is app-owned private runtime state under the stable
 per-site runtime directory, a sibling of admin session state and outside every
-immutable release (`<site>/flea/runtime/apps/<name>/` in development,
-`<data>/sites/<name>/flea/runtime/apps/<name>/` in production), created `0700`.
-It therefore survives a release change. Flea never reads, prunes or backs it up;
+immutable release (`<site>/itsy/runtime/apps/<name>/` in development,
+`<data>/sites/<name>/itsy/runtime/apps/<name>/` in production), created `0700`.
+It therefore survives a release change. ItsyWeb never reads, prunes or backs it up;
 it is excluded from releases and backups, so back app data up yourself. A
 production site with a custom app requires a managed content snapshot. See
 [App-owned sessions](#app-owned-sessions).
 
 ### Capability request and response
 
-The child does not hold mail credentials. It asks Flea for the one thing it is
+The child does not hold mail credentials. It asks ItsyWeb for the one thing it is
 allowed to do. Contact posts to:
 
 ```text
@@ -464,7 +464,7 @@ Body (exactly these three keys):
 {"name":"Alex","email":"alex@example.com","message":"Hello"}
 ```
 
-Flea requires an identical, currently admitted submission and permits only one
+ItsyWeb requires an identical, currently admitted submission and permits only one
 attempt. It chooses recipient, sender, subject and templates itself; the visitor
 address is Reply-To only. Responses: `204` on success, `422` for an invalid
 body, `403` for an unauthorized or already-used notification, `503` when
@@ -474,13 +474,13 @@ delivery capacity is unavailable. The endpoint is never mounted publicly.
 
 Three separate ideas:
 
-- **Protocol** is the wire contract, an integer. The current Flea App Protocol is
-  `2` (v1 is rejected; there is no fallback). Flea checks the running service's
+- **Protocol** is the wire contract, an integer. The current ItsyWeb App Protocol is
+  `2` (v1 is rejected; there is no fallback). ItsyWeb checks the running service's
   protocol at handshake time.
 - **App version** is the app's own release string, for example `0.1.0`. It need
-  not match Flea's version. It identifies the app build, not the contract.
+  not match ItsyWeb's version. It identifies the app build, not the contract.
 - **Manifest** is a package description, not site routing. A custom package's
-  `flea/apps/<name>/app.json` declares one executable per platform, keyed
+  `itsy/apps/<name>/app.json` declares one executable per platform, keyed
   `<goos>-<goarch>`:
 
 ```json
@@ -496,14 +496,14 @@ Three separate ideas:
 ```
 
 The bundled Contact manifest (`apps/contact/app.json`) declares no executable
-because Flea extracts it from its own platform bundle. The manifest is not
+because ItsyWeb extracts it from its own platform bundle. The manifest is not
 trusted as proof of compatibility: the handshake is. Site configuration never
 contains a version or protocol.
 
 ## Writing a compatible service
 
-You can write an independent HTTP service that speaks the current Flea App
-Protocol. It can be in any language; it does not need Flea's Go packages, which
+You can write an independent HTTP service that speaks the current ItsyWeb App
+Protocol. It can be in any language; it does not need ItsyWeb's Go packages, which
 are private and cannot be imported by an external module. There is no public SDK.
 Once built, you register it as a managed local package; see
 [Custom managed apps](#custom-managed-apps).
@@ -521,7 +521,7 @@ The short example below is a complete, standard-library way to exercise the wire
 contract manually. It is not a managed package. The fuller runnable sample,
 including the inherited-fd launch contract, app-owned sessions and persistence,
 is [`samples/session-app`](../samples/session-app) in this repository; it imports
-no Flea package.
+no ItsyWeb package.
 
 ```go
 package main
@@ -629,9 +629,9 @@ manifest. Then enable it in site config. The manifest is validated when the site
 loads; the running service is verified by the handshake at startup.
 
 ```text
-flea/apps/session/app.json             {"name":"session","version":"0.1.0","protocol":2,"executable":{"darwin-arm64":"session-darwin-arm64","linux-amd64":"session-linux-amd64"}}
-flea/apps/session/session-darwin-arm64 the Mac executable
-flea/apps/session/session-linux-amd64  the server executable
+itsy/apps/session/app.json             {"name":"session","version":"0.1.0","protocol":2,"executable":{"darwin-arm64":"session-darwin-arm64","linux-amd64":"session-linux-amd64"}}
+itsy/apps/session/session-darwin-arm64 the Mac executable
+itsy/apps/session/session-linux-amd64  the server executable
 ```
 
 ```json
@@ -645,14 +645,14 @@ flea/apps/session/session-linux-amd64  the server executable
 Create a page at the mount, for example `site/session/index.html`, using
 `{session.data.*}` and, for forms, `{csrf}`. Restart `flea dev` after changing app
 settings or rebuilding the executable. No `url`, port, registry or install
-command is involved: Flea launches only the confined executable you placed
+command is involved: ItsyWeb launches only the confined executable you placed
 there. See [Custom managed apps](#custom-managed-apps) for validation and
 confinement rules.
 
 ## Custom managed apps
 
 Any `apps.<name>` entry other than `contact` registers a custom managed app.
-Flea loads the package at `flea/apps/<name>/` at project validation time:
+ItsyWeb loads the package at `itsy/apps/<name>/` at project validation time:
 
 - `app.json` must be a single JSON object with exactly `name`, `version`,
   `protocol` and `executable`, with no duplicate, trailing, unknown or
@@ -669,7 +669,7 @@ Flea loads the package at `flea/apps/<name>/` at project validation time:
   The running platform's executable must also carry an execute bit and begin a
   native binary for that platform (ELF on Linux, Mach-O on macOS). Path
   separators, `..` and nested paths are rejected, so the executable cannot escape
-  the package. At launch Flea re-opens it confined, verifies its size and SHA-256
+  the package. At launch ItsyWeb re-opens it confined, verifies its size and SHA-256
   against the value recorded at load, and copies it to a private file before
   running, so a swap after validation cannot change what runs.
 - The site must have a page at the configured `mount`. Pages below the mount are
@@ -681,17 +681,17 @@ Flea loads the package at `flea/apps/<name>/` at project validation time:
 
 The mount uses the same rules as Contact: a canonical public path below the site
 root that does not overlap an asset, a core route or another mount. At runtime
-Flea sends the app its name, token and a private storage directory through the
+ItsyWeb sends the app its name, token and a private storage directory through the
 inherited credential pipe and supervises one child per site with bounded
 backoff. An unavailable custom app only affects its own routes.
 
 ## App-owned sessions
 
 The app owns session storage, authentication, expiry, revocation and token
-generation. Flea adds no session database and keeps no app session data. It
+generation. ItsyWeb adds no session database and keeps no app session data. It
 bridges the browser and the app:
 
-- On each request, Flea reads its own per-site, per-app cookie and forwards the
+- On each request, ItsyWeb reads its own per-site, per-app cookie and forwards the
   opaque token to the app as the `X-Flea-Session` request header. It never
   forwards a browser `Cookie` or `Authorization` header, and the token is never
   put into templates, logs, URLs or public JSON.
@@ -703,7 +703,7 @@ bridges the browser and the app:
 | `null` | Clear the cookie |
 | `{"token":"<opaque>","max_age":<seconds>}` | Set or rotate the cookie |
 
-Rules Flea enforces before changing any cookie:
+Rules ItsyWeb enforces before changing any cookie:
 
 - `session` is accepted only on a `200` response. On `422` or `503` it is a
   service failure and no cookie changes.
@@ -715,7 +715,7 @@ Rules Flea enforces before changing any cookie:
   or case-variant keys, duplicate keys, a non-object value or malformed JSON are
   rejected. An explicit `null` is the only valid non-object value.
 
-Flea owns the cookie name and attributes. In production the name is
+ItsyWeb owns the cookie name and attributes. In production the name is
 `__Host-flea-session-<app>` with `Secure`, `HttpOnly`, `SameSite=Lax`, `Path=/`
 and no `Domain`; in trusted HTTP development a site-specific name is used so two
 sites on one loopback host never share a cookie. Cookies are isolated by app, and
@@ -727,10 +727,10 @@ and no token is forwarded. A cookie for another app is never read for this app.
 The session cookie is written before the response status or redirect, so a
 successful redirect carries it. Concurrent responses for the same app each carry
 one session cookie; ordinary browser cookie rules decide which one wins, and the
-last committed response takes effect. An app session never grants Flea admin or
+last committed response takes effect. An app session never grants ItsyWeb admin or
 editor access: those use separate cookies and remain unchanged.
 
-Store sessions in the private `Storage` directory Flea passes at launch. It is
+Store sessions in the private `Storage` directory ItsyWeb passes at launch. It is
 stable per-site runtime state outside every release, never packaged and never
 backed up, so keep your own copy; a normal app restart or release change leaves
 it untouched.
@@ -738,14 +738,14 @@ it untouched.
 ## Limits and future integration
 
 - Contact is bundled. Any other app must be a managed local executable under
-  `flea/apps/<name>/`; there is no install command, package registry or
+  `itsy/apps/<name>/`; there is no install command, package registry or
   automatic download.
 - Remote services, external `url`/port registration, read-route declarations in
   configuration, databases, storage platforms and file uploads are not part of
   the contract.
-- Flea supervises only a confined local executable. It does not run arbitrary
+- ItsyWeb supervises only a confined local executable. It does not run arbitrary
   shell commands and does not sandbox processes; loopback HTTP is not isolation.
-- App sessions and app storage are app-owned. Flea stores no session data and
+- App sessions and app storage are app-owned. ItsyWeb stores no session data and
   does not back up app storage; keep your own copy. A normal release change
   leaves the runtime directory in place. An app session never grants admin or
   editor access.

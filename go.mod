@@ -1,4 +1,4 @@
-module flea
+module itsy
 
 go 1.26.0
 

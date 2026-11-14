@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/appapi"
+	"itsy/internal/appapi"
 )
 
 // TestSessionOnRedirectCommitsCookie checks that a session set alongside a

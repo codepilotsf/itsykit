@@ -252,7 +252,7 @@ func TestLinuxServerBuilds(t *testing.T) {
 	for _, arch := range []string{"amd64", "arm64"} {
 		t.Run(arch, func(t *testing.T) {
 			binary := filepath.Join(t.TempDir(), "flea-server")
-			cmd := exec.Command(goBinary, "build", "-o", binary, "./cmd/flea-server")
+			cmd := exec.Command(goBinary, "build", "-o", binary, "./cmd/itsy-server")
 			cmd.Dir = source
 			cmd.Env = buildEnv(arch)
 			if output, err := cmd.CombinedOutput(); err != nil {

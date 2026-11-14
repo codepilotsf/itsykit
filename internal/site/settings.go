@@ -7,7 +7,7 @@ import (
 )
 
 // pageSettings is deliberately a small key:value format, not YAML. Only a
-// leading flea comment is metadata; ordinary HTML comments remain inert.
+// leading itsy (or legacy flea) comment is metadata; ordinary comments remain inert.
 func pageSettings(file, source string) (body, layout string, err error) {
 	body = source
 	trimmed := strings.TrimLeft(source, " \t\r\n\ufeff")
@@ -17,15 +17,16 @@ func pageSettings(file, source string) (body, layout string, err error) {
 			err = sourceError(file, source, position, err)
 		}
 	}()
-	if !strings.HasPrefix(trimmed, "<!-- flea\n") && !strings.HasPrefix(trimmed, "<!-- flea\r\n") {
+	prefix := settingsCommentPrefix(trimmed)
+	if prefix == "" {
 		return
 	}
 	end := strings.Index(trimmed, "-->")
 	if end < 0 {
-		return "", "", fmt.Errorf("unclosed flea settings comment")
+		return "", "", fmt.Errorf("unclosed itsy settings comment")
 	}
-	settings := strings.TrimPrefix(trimmed[:end], "<!-- flea")
-	position += len("<!-- flea")
+	settings := strings.TrimPrefix(trimmed[:end], prefix)
+	position += len(prefix)
 	for _, line := range strings.Split(settings, "\n") {
 		lineStart := position
 		position += len(line) + 1
@@ -55,11 +56,20 @@ func pageSettings(file, source string) (body, layout string, err error) {
 	}
 	body = trimmed[end+3:]
 	rest := strings.TrimSpace(body)
-	if strings.HasPrefix(rest, "<!-- flea\n") || strings.HasPrefix(rest, "<!-- flea\r\n") {
+	if settingsCommentPrefix(rest) != "" {
 		position = len(source) - len(rest)
-		return "", "", fmt.Errorf("use one flea settings comment per page")
+		return "", "", fmt.Errorf("use one itsy settings comment per page")
 	}
 	return
+}
+
+func settingsCommentPrefix(source string) string {
+	for _, prefix := range []string{"<!-- itsy", "<!-- flea"} {
+		if strings.HasPrefix(source, prefix+"\n") || strings.HasPrefix(source, prefix+"\r\n") {
+			return prefix
+		}
+	}
+	return ""
 }
 
 func (p *Project) collectLayouts() error {

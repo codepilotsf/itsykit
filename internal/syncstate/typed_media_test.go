@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/snips"
+	"itsy/internal/snips"
 )
 
 func typedImageStore(t *testing.T, alt, label string) *snips.Store {

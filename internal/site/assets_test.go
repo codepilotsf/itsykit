@@ -123,7 +123,7 @@ func TestStreamedAssetDoesNotFollowReplacementSymlink(t *testing.T) {
 	if err := os.Remove(file); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Symlink(filepath.Join(root, ".flea.config.json"), file); err != nil {
+	if err := os.Symlink(filepath.Join(root, ".itsy.config.json"), file); err != nil {
 		t.Fatal(err)
 	}
 	if w := request(NewProductionServer(p, nil), "GET", "/large.bin"); w.Code != 200 || w.Body.String() != body {
@@ -169,7 +169,7 @@ func TestManagedPhotoStreamsValidatedFile(t *testing.T) {
 		if w.Code != 200 || w.Header().Get("Content-Type") != "image/png" {
 			t.Fatal("photo not served", w.Code)
 		}
-		if err := os.WriteFile(filepath.Join(root, "flea/media", photo.File), []byte("corrupt"), 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(root, "itsy/media", photo.File), []byte("corrupt"), 0644); err != nil {
 			t.Fatal(err)
 		}
 		if w := request(NewProductionServer(p, nil), "GET", route); w.Code != 503 {

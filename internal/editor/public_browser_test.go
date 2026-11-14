@@ -5,7 +5,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
-	"flea/internal/snips"
+	"itsy/internal/snips"
 	"net/http"
 	"net/http/httptest"
 	"os"

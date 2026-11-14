@@ -3,10 +3,10 @@ package snips
 import (
 	"bytes"
 	"encoding/json"
-	"flea/internal/media"
-	"flea/internal/video"
 	"fmt"
 	"io"
+	"itsy/internal/media"
+	"itsy/internal/video"
 	"regexp"
 	"strings"
 )

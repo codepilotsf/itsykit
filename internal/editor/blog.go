@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/media"
-	"flea/internal/snips"
+	"itsy/internal/media"
+	"itsy/internal/snips"
 )
 
 type BlogEdit struct {

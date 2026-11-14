@@ -4,23 +4,24 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"os"
 	"path/filepath"
 	"syscall"
 	"unicode/utf8"
 
-	"flea/internal/editor"
-	"flea/internal/media"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/video"
+	"itsy/internal/editor"
+	"itsy/internal/media"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/video"
 )
 
 func (s *Store) mediaRoot() string {
 	if s.ConfigPath != "" {
 		return site.ManagedMediaRoot(s.ContentPath)
 	}
-	return filepath.Join(s.Root, "flea", "media")
+	return sitefiles.Path(s.Root, filepath.Join("itsy", "media"))
 }
 
 // runtimeRoot keeps custom-app storage stable and private beside admin sessions
@@ -29,7 +30,7 @@ func (s *Store) runtimeRoot() string {
 	if s.ConfigPath != "" {
 		return site.ManagedRuntimeRoot(s.ContentPath)
 	}
-	return filepath.Join(s.Root, "flea", "runtime")
+	return sitefiles.Path(s.Root, filepath.Join("itsy", "runtime"))
 }
 
 // Files become durable before the content transaction. A rejected draft can

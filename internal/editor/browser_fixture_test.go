@@ -10,10 +10,10 @@ import (
 	"regexp"
 	"strings"
 
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/viewer"
-	"flea/templates"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/viewer"
+	"itsy/templates"
 )
 
 // Isolated toolbar behavior tests supply their own explicit test layout and
@@ -60,7 +60,7 @@ func browserDecorate(w http.ResponseWriter, r *http.Request, decorate func([]byt
 		section = strings.ReplaceAll(section, "{app.current_admin.email}", template.HTMLEscapeString(identity.Email))
 		section = regexp.MustCompile(`\{icon ([a-z-]+) size="18"\}`).ReplaceAllStringFunc(section, func(directive string) string {
 			name := strings.Fields(directive)[1]
-			data, err := templates.Files.ReadFile("flea/icons/" + name + ".svg")
+			data, err := templates.Files.ReadFile("itsy/icons/" + name + ".svg")
 			if err != nil {
 				panic(err)
 			}

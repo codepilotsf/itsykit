@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/appapi"
+	"itsy/internal/appapi"
 )
 
 var testPlatform = runtime.GOOS + "-" + runtime.GOARCH
@@ -80,12 +80,12 @@ func TestCustomAppRegistration(t *testing.T) {
 	load := func(t *testing.T, settings, man string, executable bool, page bool) error {
 		t.Helper()
 		root := fixture(t)
-		put(t, root, ".flea.config.json", settings)
+		put(t, root, ".itsy.config.json", settings)
 		if man != "" {
-			put(t, root, "flea/apps/demo/app.json", man)
+			put(t, root, "itsy/apps/demo/app.json", man)
 		}
 		if executable {
-			writeExecutable(t, root, "flea/apps/demo/demo")
+			writeExecutable(t, root, "itsy/apps/demo/demo")
 		}
 		if page {
 			put(t, root, "demo/index.html", `<form method="post" action="/demo">{csrf}</form>`)
@@ -128,9 +128,9 @@ func TestCustomAppRegistration(t *testing.T) {
 
 	// A non-executable file is not a runnable package.
 	root := fixture(t)
-	put(t, root, ".flea.config.json", valid)
-	put(t, root, "flea/apps/demo/app.json", validManifest)
-	put(t, root, "flea/apps/demo/demo", "not executable")
+	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy/apps/demo/app.json", validManifest)
+	put(t, root, "itsy/apps/demo/demo", "not executable")
 	put(t, root, "demo/index.html", "Form")
 	if _, err := Load(root); err == nil {
 		t.Fatal("non-executable package accepted")
@@ -138,14 +138,14 @@ func TestCustomAppRegistration(t *testing.T) {
 
 	// A symlinked executable is refused.
 	root = fixture(t)
-	put(t, root, ".flea.config.json", valid)
-	put(t, root, "flea/apps/demo/app.json", validManifest)
+	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy/apps/demo/app.json", validManifest)
 	put(t, root, "demo/index.html", "Form")
 	target := filepath.Join(root, "_secret")
 	if err := os.WriteFile(target, []byte("secret"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Symlink(target, filepath.Join(root, "flea", "apps", "demo", "demo")); err != nil {
+	if err := os.Symlink(target, filepath.Join(root, "itsy", "apps", "demo", "demo")); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := Load(root); err == nil {
@@ -160,10 +160,10 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 	valid := `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`
 	load := func(t *testing.T) error {
 		root := fixture(t)
-		put(t, root, ".flea.config.json", valid)
-		put(t, root, "flea/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
+		put(t, root, ".itsy.config.json", valid)
+		put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 		put(t, root, "demo/index.html", "Form")
-		writeExecutable(t, root, "flea/apps/demo/demo")
+		writeExecutable(t, root, "itsy/apps/demo/demo")
 		_, err := Load(root)
 		return err
 	}
@@ -173,8 +173,8 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 
 	// app.json is reserved and is never a valid executable filename.
 	root := fixture(t)
-	put(t, root, ".flea.config.json", valid)
-	put(t, root, "flea/apps/demo/app.json", manifest("demo", "1.0.0", 2, "app.json"))
+	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "app.json"))
 	put(t, root, "demo/index.html", "Form")
 	if _, err := Load(root); err == nil {
 		t.Fatal("reserved app.json accepted as an executable")
@@ -182,10 +182,10 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 
 	// A declaration whose bytes are not the platform's native format is refused.
 	root = fixture(t)
-	put(t, root, ".flea.config.json", valid)
-	put(t, root, "flea/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
+	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	put(t, root, "demo/index.html", "Form")
-	if err := os.WriteFile(filepath.Join(root, "flea", "apps", "demo", "demo"), []byte("#!/bin/sh\nexit 0\n"), 0755); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "itsy", "apps", "demo", "demo"), []byte("#!/bin/sh\nexit 0\n"), 0755); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := Load(root); err == nil {
@@ -194,14 +194,14 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 
 	// A hardlink on a non-selected declared artifact is still refused.
 	root = fixture(t)
-	put(t, root, ".flea.config.json", valid)
-	put(t, root, "flea/apps/demo/app.json", fmt.Sprintf(`{"name":"demo","version":"1.0.0","protocol":2,"executable":{%q:"demo",%q:"demo-plan9"}}`, testPlatform, "plan9-386"))
+	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy/apps/demo/app.json", fmt.Sprintf(`{"name":"demo","version":"1.0.0","protocol":2,"executable":{%q:"demo",%q:"demo-plan9"}}`, testPlatform, "plan9-386"))
 	put(t, root, "demo/index.html", "Form")
-	writeExecutable(t, root, "flea/apps/demo/demo")
-	if err := os.WriteFile(filepath.Join(root, "flea", "apps", "demo", "demo-plan9"), []byte("#!/bin/sh\n"), 0755); err != nil {
+	writeExecutable(t, root, "itsy/apps/demo/demo")
+	if err := os.WriteFile(filepath.Join(root, "itsy", "apps", "demo", "demo-plan9"), []byte("#!/bin/sh\n"), 0755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Link(filepath.Join(root, "flea", "apps", "demo", "demo-plan9"), filepath.Join(root, "_linked")); err != nil {
+	if err := os.Link(filepath.Join(root, "itsy", "apps", "demo", "demo-plan9"), filepath.Join(root, "_linked")); err != nil {
 		t.Skipf("hardlinks unavailable: %v", err)
 	}
 	if _, err := Load(root); err == nil {
@@ -210,11 +210,11 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 
 	// A hardlinked manifest is refused.
 	root = fixture(t)
-	put(t, root, ".flea.config.json", valid)
-	put(t, root, "flea/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
+	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	put(t, root, "demo/index.html", "Form")
-	writeExecutable(t, root, "flea/apps/demo/demo")
-	if err := os.Link(filepath.Join(root, "flea", "apps", "demo", "app.json"), filepath.Join(root, "_manifest-link")); err != nil {
+	writeExecutable(t, root, "itsy/apps/demo/demo")
+	if err := os.Link(filepath.Join(root, "itsy", "apps", "demo", "app.json"), filepath.Join(root, "_manifest-link")); err != nil {
 		t.Skipf("hardlinks unavailable: %v", err)
 	}
 	if _, err := Load(root); err == nil {
@@ -229,10 +229,10 @@ func TestAppStorageIsStableRuntimeState(t *testing.T) {
 	releaseA := fixture(t)
 	releaseB := fixture(t)
 	for _, root := range []string{releaseA, releaseB} {
-		put(t, root, ".flea.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
-		put(t, root, "flea/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
+		put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
+		put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 		put(t, root, "demo/index.html", "Form")
-		writeExecutable(t, root, "flea/apps/demo/demo")
+		writeExecutable(t, root, "itsy/apps/demo/demo")
 	}
 	contentPath := filepath.Join(t.TempDir(), "sites", "demo", "content", "rev.json")
 	runtimeRoot := ManagedRuntimeRoot(contentPath)
@@ -255,7 +255,7 @@ func TestAppStorageIsStableRuntimeState(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := dev.appPackages["demo"].Storage; got != filepath.Join(releaseA, "flea", "runtime", "apps", "demo") {
+	if got := dev.appPackages["demo"].Storage; got != filepath.Join(releaseA, "itsy", "runtime", "apps", "demo") {
 		t.Fatalf("dev storage %q", got)
 	}
 }
@@ -265,10 +265,10 @@ func TestAppStorageIsStableRuntimeState(t *testing.T) {
 // process.
 func TestChangedPackageFailsClosed(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".flea.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
-	put(t, root, "flea/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
+	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
+	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	put(t, root, "demo/index.html", "Form")
-	writeExecutable(t, root, "flea/apps/demo/demo")
+	writeExecutable(t, root, "itsy/apps/demo/demo")
 	p := mustLoad(t, root)
 	s := NewProductionServer(p, nil)
 	s.apps.Lock()
@@ -289,11 +289,11 @@ func TestChangedPackageFailsClosed(t *testing.T) {
 // swapped through its other name after validation, fails closed at load.
 func TestAppPackageHardlinkRejected(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".flea.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
-	put(t, root, "flea/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
+	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
+	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	put(t, root, "demo/index.html", "Form")
-	writeExecutable(t, root, "flea/apps/demo/demo")
-	if err := os.Link(filepath.Join(root, "flea", "apps", "demo", "demo"), filepath.Join(root, "_second-link")); err != nil {
+	writeExecutable(t, root, "itsy/apps/demo/demo")
+	if err := os.Link(filepath.Join(root, "itsy", "apps", "demo", "demo"), filepath.Join(root, "_second-link")); err != nil {
 		t.Skipf("hardlinks unavailable: %v", err)
 	}
 	if _, err := Load(root); err == nil {

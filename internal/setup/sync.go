@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,10 +16,10 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/release"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
+	"itsy/internal/release"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
 )
 
 type limitedOutput struct{ bytes.Buffer }
@@ -214,7 +215,7 @@ func pull(ctx context.Context, root string, in io.Reader, out, errOut io.Writer,
 		return e
 	}
 	// Pull never overwrites uncommitted content, and never commits on your behalf.
-	paths := []string{"flea/snips.json", "flea/media/"}
+	paths := []string{sitefiles.ResolveAt(root, "itsy/snips.json"), sitefiles.ResolveAt(root, "itsy/media/")}
 	args := append([]string{"status", "--porcelain=v1", "--untracked-files=all", "--"}, paths...)
 	status, e := git(ctx, root, args...)
 	if e != nil {

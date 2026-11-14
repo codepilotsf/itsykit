@@ -7,18 +7,18 @@ import (
 	"path/filepath"
 	"testing"
 
-	"flea/internal/editor"
-	"flea/internal/editstore"
-	"flea/internal/host"
-	"flea/internal/release"
-	"flea/internal/site"
-	"flea/internal/snips"
+	"itsy/internal/editor"
+	"itsy/internal/editstore"
+	"itsy/internal/host"
+	"itsy/internal/release"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 )
 
 func richArchive(t *testing.T, include bool, css ...string) string {
 	t.Helper()
 	root := t.TempDir()
-	if err := os.Mkdir(filepath.Join(root, "flea"), 0755); err != nil {
+	if err := os.Mkdir(filepath.Join(root, "itsy"), 0755); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.Mkdir(filepath.Join(root, "site"), 0755); err != nil {
@@ -28,10 +28,10 @@ func richArchive(t *testing.T, include bool, css ...string) string {
 	store.Page("/").Title = "Local title"
 	store.Page("/").Snips["a7Km2pQ9xB"] = snips.Entry{Label: "title", Content: "Local seed"}
 	data, _ := store.Bytes()
-	if err := os.WriteFile(filepath.Join(root, "flea/snips.json"), data, 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "itsy/snips.json"), data, 0644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, ".flea.config.json"), []byte(`{"app":{"site_name":"Test"}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"Test"}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	page := `<p>No region</p>`

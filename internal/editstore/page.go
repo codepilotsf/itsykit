@@ -5,10 +5,10 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"flea/internal/editor"
-	"flea/internal/site"
-	"flea/internal/snips"
 	"golang.org/x/net/html"
+	"itsy/internal/editor"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 )
 
 func applyPage(p *site.Project, edit editor.PageEdit) error {

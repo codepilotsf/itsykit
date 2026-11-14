@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"flea/internal/host"
+	"itsy/internal/host"
 )
 
 // SetIndexing changes only the named registered host. Omitted settings on code

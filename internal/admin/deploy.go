@@ -18,12 +18,12 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/host"
-	"flea/internal/release"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/state"
-	"flea/internal/syncstate"
+	"itsy/internal/host"
+	"itsy/internal/release"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/state"
+	"itsy/internal/syncstate"
 )
 
 type Options struct {

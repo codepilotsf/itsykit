@@ -3,12 +3,13 @@ package site
 import (
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"os"
 	"regexp"
 	"strings"
 
-	"flea/internal/snips"
 	"golang.org/x/net/html"
+	"itsy/internal/snips"
 )
 
 var richRef = regexp.MustCompile(`\{\s*snip\s+([A-Za-z0-9]{10})\s*\}`)
@@ -269,8 +270,8 @@ func snipScope(file string) string {
 	return pageRoute(file)
 }
 func rejectOldContentPaths(root *os.Root) error {
-	for _, name := range []string{"flea/fleas.json", "flea/fleas", "flea/.fleas-pending.json"} {
-		if _, err := root.Lstat(name); err == nil {
+	for _, name := range []string{"itsy/fleas.json", "itsy/fleas", "itsy/.fleas-pending.json"} {
+		if _, err := root.Lstat(sitefiles.Resolve(root, name)); err == nil {
 			return fmt.Errorf("unsupported old content path %s; update the site to the snip format before continuing", name)
 		} else if !os.IsNotExist(err) {
 			return err
@@ -282,7 +283,7 @@ func readSnipStore(root *os.Root) (*snips.Store, error) {
 	if err := rejectOldContentPaths(root); err != nil {
 		return nil, err
 	}
-	data, err := readFile(root, "flea/snips.json")
+	data, err := readFile(root, "itsy/snips.json")
 	if os.IsNotExist(err) {
 		return snips.NewStore(), nil
 	}

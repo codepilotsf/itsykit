@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/site"
+	"itsy/internal/site"
 )
 
 func TestCleanAndStarterCreation(t *testing.T) {
@@ -52,7 +52,7 @@ func TestResetKeepsGitAndRecoverableFiles(t *testing.T) {
 	if err := os.Mkdir(filepath.Join(root, ".git"), 0700); err != nil {
 		t.Fatal(err)
 	}
-	for name, value := range map[string]string{".git/HEAD": "history", ".env": "secret", "flea/media/upload.jpg": "photo", "custom.txt": "custom"} {
+	for name, value := range map[string]string{".git/HEAD": "history", ".env": "secret", "itsy/media/upload.jpg": "photo", "custom.txt": "custom"} {
 		if err := os.WriteFile(filepath.Join(root, name), []byte(value), 0600); err != nil {
 			t.Fatal(err)
 		}
@@ -75,7 +75,7 @@ func TestResetKeepsGitAndRecoverableFiles(t *testing.T) {
 	if err := resetSite(root, strings.NewReader("yes\n"), &out); err != nil {
 		t.Fatal(err)
 	}
-	backups, err := filepath.Glob(filepath.Join(parent, ".flea-reset-backup-*"))
+	backups, err := filepath.Glob(filepath.Join(parent, ".itsy-reset-backup-*"))
 	if err != nil || len(backups) != 1 {
 		t.Fatal(backups, err)
 	}
@@ -83,7 +83,7 @@ func TestResetKeepsGitAndRecoverableFiles(t *testing.T) {
 	if info.Mode().Perm() != 0700 {
 		t.Fatal("backup permissions")
 	}
-	for _, name := range []string{".env", "flea/media/upload.jpg", "custom.txt", "site/team.html"} {
+	for _, name := range []string{".env", "itsy/media/upload.jpg", "custom.txt", "site/team.html"} {
 		if _, err := os.Stat(filepath.Join(root, name)); !os.IsNotExist(err) {
 			t.Fatalf("reset retained %s", name)
 		}

@@ -11,7 +11,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"flea/internal/appapi"
+	"itsy/internal/appapi"
 )
 
 const Version = "0.1.0"

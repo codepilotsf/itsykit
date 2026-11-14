@@ -8,11 +8,11 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/backup"
-	"flea/internal/editor"
-	"flea/internal/editstore"
-	"flea/internal/host"
-	"flea/internal/site"
+	"itsy/internal/backup"
+	"itsy/internal/editor"
+	"itsy/internal/editstore"
+	"itsy/internal/host"
+	"itsy/internal/site"
 )
 
 func TestQALiveVideoDeployBackupRestore(t *testing.T) {

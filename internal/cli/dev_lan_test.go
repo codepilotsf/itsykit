@@ -17,10 +17,10 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/contact"
-	"flea/internal/devaccess"
-	"flea/internal/editor"
-	"flea/internal/site"
+	"itsy/internal/contact"
+	"itsy/internal/devaccess"
+	"itsy/internal/editor"
+	"itsy/internal/site"
 )
 
 // Exercise the real dev admin/store/public pipeline as a different LAN device.
@@ -261,7 +261,7 @@ func TestLANDevWorkflow(t *testing.T) {
 	if w := req("POST", "/", nil, nil); w.Code != 405 || !strings.Contains(w.Body.String(), "Check the form") {
 		t.Fatal("LAN diagnostic unavailable", w.Code)
 	}
-	for _, path := range []string{"/.flea.config.json", "/flea/runtime/sessions.json", "/mailers/sign-in.email.html"} {
+	for _, path := range []string{"/.itsy.config.json", "/itsy/runtime/sessions.json", "/mailers/sign-in.email.html"} {
 		if w := req("GET", path, nil, nil); w.Code != 404 {
 			t.Fatalf("private path %s: %d", path, w.Code)
 		}

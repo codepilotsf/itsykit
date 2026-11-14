@@ -1,7 +1,7 @@
 package syncstate
 
 import (
-	"flea/internal/snips"
+	"itsy/internal/snips"
 	"testing"
 )
 

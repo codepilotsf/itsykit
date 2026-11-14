@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"unicode/utf8"
 
-	"flea/internal/editor"
-	"flea/internal/media"
-	"flea/internal/site"
-	"flea/internal/snips"
+	"itsy/internal/editor"
+	"itsy/internal/media"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 )
 
 func (s *Store) applyBlog(p *site.Project, edit editor.BlogEdit) error {

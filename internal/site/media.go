@@ -1,9 +1,10 @@
 package site
 
 import (
-	"flea/internal/media"
-	"flea/internal/snips"
 	"fmt"
+	"itsy/internal/media"
+	"itsy/internal/sitefiles"
+	"itsy/internal/snips"
 	"os"
 	"path/filepath"
 )
@@ -17,7 +18,7 @@ func ManagedMediaRoot(contentPath string) string {
 // of the content snapshot and its admin sessions. Custom-app storage lives under
 // it so it survives immutable code releases; the release tree never holds it.
 func ManagedRuntimeRoot(contentPath string) string {
-	return filepath.Join(filepath.Dir(filepath.Dir(contentPath)), "flea", "runtime")
+	return sitefiles.Path(filepath.Dir(filepath.Dir(contentPath)), filepath.Join("itsy", "runtime"))
 }
 func (p *Project) loadMedia() error {
 	var total int64
@@ -57,7 +58,7 @@ func (p *Project) loadMedia() error {
 			f.Close()
 			return fmt.Errorf("photo library exceeds 64 MiB")
 		}
-		p.Assets[route] = "flea/media/" + photo.File
+		p.Assets[route] = "itsy/media/" + photo.File
 		delete(p.AssetData, route)
 		if prior, ok := p.assetFiles[route]; ok {
 			prior.file.Close()

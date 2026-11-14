@@ -14,7 +14,7 @@ import (
 
 func TestArchiveRoundTripAndScope(t *testing.T) {
 	root := t.TempDir()
-	for name, body := range map[string]string{"site/index.html": "hello", ".flea.config.json": `{"app":{"site_name":"test"},"admin":{"emails":["owner@example.test"]},"redirects":{"/old.html":"/"},"deploy":{"branches":{"main":{"target":"private-target"}}}}`, "flea/data/home.json": "{}", "flea/runtime/sessions.json": "private-session", ".git/config": "secret", "README.md": "local", ".agents/skills/core/SKILL.md": "private agent instructions", ".agents/skills-source.md": "local source provenance"} {
+	for name, body := range map[string]string{"site/index.html": "hello", ".itsy.config.json": `{"app":{"site_name":"test"},"admin":{"emails":["owner@example.test"]},"redirects":{"/old.html":"/"},"deploy":{"branches":{"main":{"target":"private-target"}}}}`, "itsy/data/home.json": "{}", "itsy/runtime/sessions.json": "private-session", ".git/config": "secret", "README.md": "local", ".agents/skills/core/SKILL.md": "private agent instructions", ".agents/skills-source.md": "local source provenance"} {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)
@@ -40,10 +40,10 @@ func TestArchiveRoundTripAndScope(t *testing.T) {
 	if data, err := os.ReadFile(filepath.Join(dest, "site", "index.html")); err != nil || string(data) != "hello" {
 		t.Fatal(string(data), err)
 	}
-	if _, err := os.Stat(filepath.Join(dest, ".flea.config.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(dest, ".itsy.config.json")); err != nil {
 		t.Fatal("configuration missing from release", err)
 	}
-	configBytes, err := os.ReadFile(filepath.Join(dest, ".flea.config.json"))
+	configBytes, err := os.ReadFile(filepath.Join(dest, ".itsy.config.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func TestArchiveRoundTripAndScope(t *testing.T) {
 	if data, err := os.ReadFile(filepath.Join(dest, "mailers", "sign-in.email.html")); err != nil || string(data) != "{email.code}" {
 		t.Fatal("mailer missing from release", err)
 	}
-	for _, name := range []string{"flea/runtime", ".git/config", "README.md", ".agents"} {
+	for _, name := range []string{"itsy/runtime", ".git/config", "README.md", ".agents"} {
 		if _, err := os.Stat(filepath.Join(dest, name)); !os.IsNotExist(err) {
 			t.Fatal("included local file", name)
 		}
@@ -92,10 +92,10 @@ func TestArchiveAppPackage(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	write("flea/apps/session/app.json", `{"name":"session","version":"0.1.0","protocol":2,"executable":{"linux-amd64":"session"}}`, 0644)
-	write("flea/apps/session/session", "#!/bin/sh\n", 0755)
-	write("flea/apps/session/data/sessions.json", `{"secret":"state"}`, 0600)
-	write("flea/apps/session/notes.txt", "not packaged", 0644)
+	write("itsy/apps/session/app.json", `{"name":"session","version":"0.1.0","protocol":2,"executable":{"linux-amd64":"session"}}`, 0644)
+	write("itsy/apps/session/session", "#!/bin/sh\n", 0755)
+	write("itsy/apps/session/data/sessions.json", `{"secret":"state"}`, 0600)
+	write("itsy/apps/session/notes.txt", "not packaged", 0644)
 	write("site/index.html", "hello", 0644)
 	var b bytes.Buffer
 	if err := Pack(root, &b); err != nil {
@@ -105,7 +105,7 @@ func TestArchiveAppPackage(t *testing.T) {
 	if err := Extract(bytes.NewReader(b.Bytes()), dest); err != nil {
 		t.Fatal(err)
 	}
-	info, err := os.Stat(filepath.Join(dest, "flea", "apps", "session", "session"))
+	info, err := os.Stat(filepath.Join(dest, "itsy", "apps", "session", "session"))
 	if err != nil || info.Mode().Perm() != 0555 {
 		t.Fatalf("packaged executable mode %v %v", info.Mode(), err)
 	}
@@ -114,10 +114,10 @@ func TestArchiveAppPackage(t *testing.T) {
 	if info.Mode().Perm()&0o444 != 0o444 || info.Mode().Perm()&0o111 != 0o111 || info.Mode().Perm()&0o222 != 0 {
 		t.Fatalf("packaged executable is not service-readable: %v", info.Mode())
 	}
-	if _, err := os.Stat(filepath.Join(dest, "flea", "apps", "session", "app.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(dest, "itsy", "apps", "session", "app.json")); err != nil {
 		t.Fatal("manifest missing from package", err)
 	}
-	for _, name := range []string{"flea/apps/session/data", "flea/apps/session/notes.txt", "flea/apps/session/data/sessions.json"} {
+	for _, name := range []string{"itsy/apps/session/data", "itsy/apps/session/notes.txt", "itsy/apps/session/data/sessions.json"} {
 		if _, err := os.Stat(filepath.Join(dest, name)); !os.IsNotExist(err) {
 			t.Fatalf("runtime/unlisted app file packaged: %s", name)
 		}
@@ -172,7 +172,7 @@ func nativeExecutable(goos, goarch string) []byte {
 
 func TestAppPlatformPreflight(t *testing.T) {
 	root := t.TempDir()
-	dir := filepath.Join(root, "flea", "apps", "session")
+	dir := filepath.Join(root, "itsy", "apps", "session")
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		t.Fatal(err)
 	}
@@ -231,13 +231,13 @@ func TestPackRejectsHardlinkedAppArtifact(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		write("flea/apps/session/app.json", []byte(`{"name":"session","version":"0.1.0","protocol":2,"executable":{"linux-amd64":"session","darwin-arm64":"session-darwin"}}`), 0644)
-		write("flea/apps/session/session", []byte("#!/bin/sh\n"), 0755)
-		write("flea/apps/session/session-darwin", []byte("#!/bin/sh\n"), 0755)
+		write("itsy/apps/session/app.json", []byte(`{"name":"session","version":"0.1.0","protocol":2,"executable":{"linux-amd64":"session","darwin-arm64":"session-darwin"}}`), 0644)
+		write("itsy/apps/session/session", []byte("#!/bin/sh\n"), 0755)
+		write("itsy/apps/session/session-darwin", []byte("#!/bin/sh\n"), 0755)
 		return root
 	}
 	root := setup(t)
-	if err := os.Link(filepath.Join(root, "flea", "apps", "session", "session-darwin"), filepath.Join(root, "_other")); err != nil {
+	if err := os.Link(filepath.Join(root, "itsy", "apps", "session", "session-darwin"), filepath.Join(root, "_other")); err != nil {
 		t.Skipf("hardlinks unavailable: %v", err)
 	}
 	if err := Pack(root, &bytes.Buffer{}); err == nil {
@@ -245,7 +245,7 @@ func TestPackRejectsHardlinkedAppArtifact(t *testing.T) {
 	}
 
 	root = setup(t)
-	if err := os.Link(filepath.Join(root, "flea", "apps", "session", "app.json"), filepath.Join(root, "_manifest")); err != nil {
+	if err := os.Link(filepath.Join(root, "itsy", "apps", "session", "app.json"), filepath.Join(root, "_manifest")); err != nil {
 		t.Skipf("hardlinks unavailable: %v", err)
 	}
 	if err := Pack(root, &bytes.Buffer{}); err == nil {
@@ -262,14 +262,14 @@ func TestPackRejectsNonStrictManifest(t *testing.T) {
 		`{"name":"session","version":"0.1.0","protocol":2,"executable":{"linux-amd64":"session"},"url":"x"}`,
 	} {
 		root := t.TempDir()
-		file := filepath.Join(root, "flea", "apps", "session", "app.json")
+		file := filepath.Join(root, "itsy", "apps", "session", "app.json")
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)
 		}
 		if err := os.WriteFile(file, []byte(manifest), 0644); err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(filepath.Join(root, "flea", "apps", "session", "session"), []byte("#!/bin/sh\n"), 0755); err != nil {
+		if err := os.WriteFile(filepath.Join(root, "itsy", "apps", "session", "session"), []byte("#!/bin/sh\n"), 0755); err != nil {
 			t.Fatal(err)
 		}
 		if err := Pack(root, &bytes.Buffer{}); err == nil {
@@ -289,9 +289,9 @@ func TestExtractRejectsUnlistedAppFile(t *testing.T) {
 		tw.WriteHeader(&tar.Header{Name: name, Typeflag: tar.TypeReg, Mode: mode, Size: int64(len(body))})
 		io.WriteString(tw, body)
 	}
-	write("flea/apps/session/app.json", 0644, `{"name":"session","version":"0.1.0","protocol":2,"executable":{"linux-amd64":"session"}}`)
-	write("flea/apps/session/session", 0555, "#!/bin/sh\n")
-	write("flea/apps/session/extra", 0644, "unlisted")
+	write("itsy/apps/session/app.json", 0644, `{"name":"session","version":"0.1.0","protocol":2,"executable":{"linux-amd64":"session"}}`)
+	write("itsy/apps/session/session", 0555, "#!/bin/sh\n")
+	write("itsy/apps/session/extra", 0644, "unlisted")
 	tw.Close()
 	gz.Close()
 	if err := Extract(&b, t.TempDir()); err == nil {
@@ -305,7 +305,7 @@ func TestRejectUnsafeArchives(t *testing.T) {
 		typ  byte
 		size int64
 	}{
-		{"../escape", tar.TypeReg, 0}, {"../../escape", tar.TypeReg, 0}, {"/tmp/escape", tar.TypeReg, 0}, {"./index", tar.TypeReg, 0}, {"site/link", tar.TypeSymlink, 0}, {"site/hardlink", tar.TypeLink, 0}, {"site/fifo", tar.TypeFifo, 0}, {"flea/runtime/sessions.json", tar.TypeReg, 0}, {"site/huge", tar.TypeReg, MaxBytes + 1}, {"site\\escape", tar.TypeReg, 0},
+		{"../escape", tar.TypeReg, 0}, {"../../escape", tar.TypeReg, 0}, {"/tmp/escape", tar.TypeReg, 0}, {"./index", tar.TypeReg, 0}, {"site/link", tar.TypeSymlink, 0}, {"site/hardlink", tar.TypeLink, 0}, {"site/fifo", tar.TypeFifo, 0}, {"itsy/runtime/sessions.json", tar.TypeReg, 0}, {"site/huge", tar.TypeReg, MaxBytes + 1}, {"site\\escape", tar.TypeReg, 0},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			var b bytes.Buffer

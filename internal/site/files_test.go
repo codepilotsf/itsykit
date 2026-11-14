@@ -68,7 +68,7 @@ func TestConfinedWritesAndReads(t *testing.T) {
 }
 
 func TestDataDirectoriesShareValidation(t *testing.T) {
-	for _, directory := range []string{"flea/snips", "flea/data"} {
+	for _, directory := range []string{"itsy/snips", "itsy/data"} {
 		t.Run(directory, func(t *testing.T) {
 			root := fixture(t)
 			put(t, root, directory+"/extra.json", `{"title":"Hello"}`)
@@ -82,8 +82,8 @@ func TestDataDirectoriesShareValidation(t *testing.T) {
 		})
 	}
 	root := fixture(t)
-	put(t, root, "flea/snips/duplicate.json", `{}`)
-	put(t, root, "flea/data/duplicate.json", `{}`)
+	put(t, root, "itsy/snips/duplicate.json", `{}`)
+	put(t, root, "itsy/data/duplicate.json", `{}`)
 	if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "duplicate legacy snip/data") {
 		t.Fatal(err)
 	}

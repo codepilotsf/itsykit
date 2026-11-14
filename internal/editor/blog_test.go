@@ -3,7 +3,7 @@ package editor
 import (
 	"bytes"
 	"encoding/json"
-	"flea/internal/snips"
+	"itsy/internal/snips"
 	"mime/multipart"
 	"net/http/httptest"
 	"net/url"

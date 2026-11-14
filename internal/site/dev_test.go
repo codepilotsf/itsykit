@@ -21,7 +21,7 @@ func TestDevPreviewConfiguration(t *testing.T) {
 			if err := os.Mkdir(filepath.Join(root, "site"), 0755); err != nil {
 				t.Fatal(err)
 			}
-			if err := os.WriteFile(filepath.Join(root, ".flea.config.json"), []byte(tc.raw), 0644); err != nil {
+			if err := os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(tc.raw), 0644); err != nil {
 				t.Fatal(err)
 			}
 			dev, err := ReadDevSettings(root)

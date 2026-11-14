@@ -1,7 +1,7 @@
 package mailer
 
 import (
-	"flea/internal/localenv"
+	"itsy/internal/localenv"
 	"os"
 )
 

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/backup"
-	"flea/internal/host"
-	"flea/internal/syncstate"
+	"itsy/internal/backup"
+	"itsy/internal/host"
+	"itsy/internal/syncstate"
 )
 
 func setTestIndexing(t *testing.T, m Manager, name, domain, mode string) {
@@ -60,7 +60,7 @@ func TestIndexingPersistsAcrossDeploySyncRollbackRestore(t *testing.T) {
 	if _, err = backup.Extract(bytes.NewReader(buf.Bytes()), dest); err != nil {
 		t.Fatal(err)
 	}
-	raw, err := os.ReadFile(filepath.Join(dest, ".flea.config.json"))
+	raw, err := os.ReadFile(filepath.Join(dest, ".itsy.config.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

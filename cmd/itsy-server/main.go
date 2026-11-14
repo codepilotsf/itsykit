@@ -12,11 +12,11 @@ import (
 	"strings"
 	"syscall"
 
-	"flea/internal/admin"
-	"flea/internal/buildinfo"
-	"flea/internal/host"
-	"flea/internal/release"
-	"flea/internal/syncstate"
+	"itsy/internal/admin"
+	"itsy/internal/buildinfo"
+	"itsy/internal/host"
+	"itsy/internal/release"
+	"itsy/internal/syncstate"
 )
 
 func main() {

@@ -1,9 +1,9 @@
 ---
 name: add-contact-form
-description: Add, enable or repair ItsyWeb's bundled Contact form on an existing Flea site. Use for requests such as "add a contact form", "create a contact page", "let visitors email us", or connecting a form to Resend. Covers configuration, exact field names, CSRF, feedback tokens and mail templates. Does not apply to arbitrary forms, uploads, newsletters or a contact page that only displays an address.
+description: Add, enable or repair ItsyWeb's bundled Contact form on an existing ItsyWeb site. Use for requests such as "add a contact form", "create a contact page", "let visitors email us", or connecting a form to Resend. Covers configuration, exact field names, CSRF, feedback tokens and mail templates. Does not apply to arbitrary forms, uploads, newsletters or a contact page that only displays an address.
 ---
 
-# Add a Flea Contact form
+# Add a ItsyWeb Contact form
 
 Read the site's [README](../../../README.md) and [AGENTS](../../../AGENTS.md).
 Inspect Git status, existing Contact configuration, navigation and templates.
@@ -14,7 +14,7 @@ authorize deployment or sending real test mail.
 ## Configure and connect
 
 Reuse an existing `apps.contact` entry. Otherwise merge this fragment into
-`.flea.config.json`, preserving other fields:
+`.itsy.config.json`, preserving other fields:
 
 ```json
 {"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.com"}}}}
@@ -60,7 +60,7 @@ No `{app ...}` tag, old `contact` config or `/_flea/contact` alias is needed.
 ```
 
 `{csrf}` renders the **whole hidden `_csrf` input**, not a token value. Keep it
-inside the form as ordinary element content; Flea does not inject it for you.
+inside the form as ordinary element content; ItsyWeb does not inject it for you.
 Do not alter admin CSRF controls, remove exact Origin checks or bypass login.
 Use a native URL-encoded POST, no multipart uploads or custom JSON endpoint.
 

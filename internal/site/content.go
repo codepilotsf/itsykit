@@ -1,10 +1,11 @@
 package site
 
 import (
+	"itsy/internal/sitefiles"
 	"os"
 	"sync"
 
-	"flea/internal/snips"
+	"itsy/internal/snips"
 )
 
 var localContentMu sync.Mutex
@@ -29,8 +30,8 @@ func SaveContent(directory string, content *snips.Store) error {
 		return err
 	}
 	defer root.Close()
-	if err := root.Mkdir("flea", 0755); err != nil && !os.IsExist(err) {
+	if err := root.Mkdir(sitefiles.Resolve(root, "itsy"), 0755); err != nil && !os.IsExist(err) {
 		return err
 	}
-	return writeSiteFile(root, "flea/snips.json", data)
+	return writeSiteFile(root, "itsy/snips.json", data)
 }

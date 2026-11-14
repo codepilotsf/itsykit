@@ -7,7 +7,7 @@ live site configuration or installs/replaces a binary.
 
 Build locally for the target architecture after refreshing the matching Contact
 bundle with `scripts/build.sh`. Compile `./scripts/app-capacity` and
-`./cmd/flea-server` with CGO_ENABLED=0 and the target GOOS/GOARCH. Obtain approval
+`./cmd/itsy-server` with CGO_ENABLED=0 and the target GOOS/GOARCH. Obtain approval
 before transferring private executables to a remote host. Upload only to a new,
 private, disk-backed directory; verify SHA-256 values at both ends.
 

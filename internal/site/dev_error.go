@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"strings"
 
-	"flea/internal/devaccess"
+	"itsy/internal/devaccess"
 )
 
 //go:embed dev_error.html
@@ -67,7 +67,7 @@ func serveDevError(w http.ResponseWriter, r *http.Request, p *Project, code int,
 		case strings.Contains(v.Detail, "missing partial"):
 			v.Hint = "Check the partial’s name and location. {render footer} looks for _footer.html beside the calling template; {render /footer} starts at the site root."
 		case strings.Contains(v.Detail, "layout"):
-			v.Hint = "Check the leading flea settings comment and the selected layout file. Layout paths start at the site root, and a layout needs {slot} for the page content."
+			v.Hint = "Check the leading itsy settings comment and the selected layout file. Layout paths start at the site root, and a layout needs {slot} for the page content."
 		case strings.Contains(v.Detail, "route collision"):
 			v.Hint = "Two HTML files map to the same URL. Keep just one: about.html and about/index.html both become /about."
 		case strings.Contains(v.Detail, "snip") && (strings.Contains(v.Detail, "nested") || strings.Contains(v.Detail, "closing") || strings.Contains(v.Detail, "unclosed")):

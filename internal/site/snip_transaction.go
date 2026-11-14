@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"flea/internal/sitefiles"
-	"flea/internal/snips"
+	"itsy/internal/sitefiles"
+	"itsy/internal/snips"
 )
 
 type snipEdit struct{ Before, After string }
@@ -22,7 +22,7 @@ type snipTransaction struct {
 	Edits         map[string]snipEdit
 }
 
-const transactionFile = "flea/runtime/.snips-pending.json"
+const transactionFile = "itsy/runtime/.snips-pending.json"
 
 func sameSnipJSON(a, b []byte) bool {
 	var left, right bytes.Buffer
@@ -33,12 +33,12 @@ func finishSnipTransaction(root *os.Root, tx snipTransaction) error {
 	if _, err := snips.Decode(tx.Content); err != nil {
 		return err
 	}
-	current, readErr := readFile(root, "flea/snips.json")
+	current, readErr := readFile(root, "itsy/snips.json")
 	if readErr != nil && !os.IsNotExist(readErr) {
 		return readErr
 	}
 	if !(os.IsNotExist(readErr) && (len(tx.BeforeContent) == 0 || string(tx.BeforeContent) == "null")) && !sameSnipJSON(current, tx.BeforeContent) && !sameSnipJSON(current, tx.Content) {
-		return fmt.Errorf("flea/snips.json changed during extraction; recovery file retained. Reconcile it with flea/runtime/.snips-pending.json before retrying")
+		return fmt.Errorf("itsy/snips.json changed during extraction; recovery file retained. Reconcile it with itsy/runtime/.snips-pending.json before retrying")
 	}
 	for name, e := range tx.Edits {
 		if !fs.ValidPath(name) || !strings.HasPrefix(name, "site/") || !sitefiles.Included(name) || !strings.HasSuffix(name, ".html") {
@@ -52,7 +52,7 @@ func finishSnipTransaction(root *os.Root, tx snipTransaction) error {
 			return fmt.Errorf("%s changed during extraction; restore the original or pending template before retrying", name)
 		}
 	}
-	if err := writeSiteFile(root, "flea/snips.json", tx.Content); err != nil {
+	if err := writeSiteFile(root, "itsy/snips.json", tx.Content); err != nil {
 		return err
 	}
 	for name, e := range tx.Edits {
@@ -67,5 +67,5 @@ func finishSnipTransaction(root *os.Root, tx snipTransaction) error {
 			return err
 		}
 	}
-	return root.Remove(transactionFile)
+	return root.Remove(sitefiles.Resolve(root, transactionFile))
 }

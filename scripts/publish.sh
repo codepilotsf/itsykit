@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 source "$(dirname "$0")/version.sh"
-version="v$(flea_version release)"
+version="v$(itsy_version release)"
 base="${CI_API_V4_URL:?}/projects/${CI_PROJECT_ID:?}/packages/generic/flea/$version"
 files=(flea-server-linux-amd64 flea-server-linux-arm64 flea-darwin-amd64 flea-darwin-arm64)
 for file in "${files[@]}"; do test -s "dist/$file"; done

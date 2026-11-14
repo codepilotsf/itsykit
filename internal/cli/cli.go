@@ -16,15 +16,16 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/buildinfo"
-	"flea/internal/contact"
-	"flea/internal/devaccess"
-	"flea/internal/mailer"
-	"flea/internal/mailpreview"
-	"flea/internal/selfupdate"
-	"flea/internal/setup"
-	"flea/internal/site"
-	"flea/templates"
+	"itsy/internal/buildinfo"
+	"itsy/internal/contact"
+	"itsy/internal/devaccess"
+	"itsy/internal/mailer"
+	"itsy/internal/mailpreview"
+	"itsy/internal/selfupdate"
+	"itsy/internal/setup"
+	"itsy/internal/site"
+	"itsy/internal/sitefiles"
+	"itsy/templates"
 )
 
 const usage = `_________
@@ -217,7 +218,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "admin":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: itsy admin [email]\n\nAdd an admin and set up email if needed. Local access updates automatically.\nView or remove admins in admin.emails in .flea.config.json.\nCommit and deploy to apply live changes. No invitation is sent.")
+			fmt.Fprintln(out, "Usage: itsy admin [email]\n\nAdd an admin and set up email if needed. Local access updates automatically.\nView or remove admins in admin.emails in .itsy.config.json.\nCommit and deploy to apply live changes. No invitation is sent.")
 			fmt.Fprintln(out)
 			return 0
 		}
@@ -243,7 +244,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		if added {
-			fmt.Fprintf(out, "\nAdded %s to .flea.config.json.\n", email)
+			fmt.Fprintf(out, "\nAdded %s to %s.\n", email, sitefiles.ResolveAt(".", sitefiles.ConfigName))
 		} else {
 			fmt.Fprintf(out, "\n%s already has admin access in this site's configuration. Nothing changed.\n", email)
 		}
@@ -299,7 +300,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet(args[0], flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintf(flags.Output(), "Usage: itsy %s [options]\n\nConfigure the current Git branch's destination and publish it.\nUse -configure to edit saved settings in .flea.config.json.\nDeployment requires a clean, committed Git repository.\n\nOptions\n", args[0])
+			fmt.Fprintf(flags.Output(), "Usage: itsy %s [options]\n\nConfigure the current Git branch's destination and publish it.\nUse -configure to edit saved settings in .itsy.config.json.\nDeployment requires a clean, committed Git repository.\n\nOptions\n", args[0])
 			flags.PrintDefaults()
 			fmt.Fprintln(flags.Output())
 		}
@@ -603,7 +604,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			logger.Print("Email preview is on. Messages open in your browser and are not sent.")
 		}
 		if p.SnipsUpdated {
-			logger.Print("Snips updated in flea/snips.json.")
+			logger.Printf("Snips updated in %s.", sitefiles.ResolveAt(p.Root, "itsy/snips.json"))
 		}
 		for _, warning := range p.Warnings {
 			logger.Printf("Warning: %s", warning)
@@ -828,11 +829,11 @@ func createSite(target string, starter bool) error {
 			switch name {
 			case "site/index.html":
 				body, err = templates.MinimalFiles.ReadFile("minimal/index.html")
-			case "flea/snips.json":
+			case "itsy/snips.json":
 				body, err = templates.MinimalFiles.ReadFile("minimal/snips.json")
 			case "site/_navigation.html":
 				body = []byte("<a href=\"/\">Home</a>\n")
-			case ".flea.config.json":
+			case ".itsy.config.json":
 				body = []byte("{\n  \"app\": {},\n  \"redirects\": {},\n  \"dev\": {\"email_preview\": true},\n  \"admin\": {\"emails\": [], \"session_idle_days\": 30}\n}\n")
 			}
 			if err != nil {
@@ -865,7 +866,7 @@ func createSite(target string, starter bool) error {
 		err = site.IgnoreSessionFiles(target)
 	}
 	if err == nil {
-		err = boundary.Mkdir(filepath.Join("flea", "media"), 0755)
+		err = boundary.Mkdir(filepath.Join("itsy", "media"), 0755)
 	}
 	return err
 }

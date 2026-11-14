@@ -17,7 +17,7 @@ func (s *Server) AdminSettings() (AdminAccess, error) {
 	return a, nil
 }
 
-// Admin templates are site-owned Flea HTML, compiled with the normal layout.
+// Admin templates are site-owned ItsyWeb HTML, compiled with the normal layout.
 // They are excluded from public routes and can only be selected by editor state.
 func (p *Project) buildAdminLayout() error {
 	p.adminTemplates = map[string]*template.Template{}

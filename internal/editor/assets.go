@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/templates"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/templates"
 )
 
 //go:embed inline/blog.js

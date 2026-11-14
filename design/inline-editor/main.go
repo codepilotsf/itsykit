@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/snips"
-	"flea/templates"
+	"itsy/internal/snips"
+	"itsy/templates"
 )
 
 //go:embed index.html prototype.css app.js checks.js vendor/*

@@ -4,14 +4,15 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"net/http"
 	"os"
 	"path/filepath"
 	"syscall"
 	"time"
 
-	"flea/internal/snips"
-	"flea/internal/video"
+	"itsy/internal/snips"
+	"itsy/internal/video"
 )
 
 // Snapshot holds an already-open, checksum-validated file, never a URL-derived
@@ -118,7 +119,7 @@ func (p *Project) loadVideos() error {
 			return fmt.Errorf("video library exceeds 64 MiB")
 		}
 		p.videos[route] = videoAsset{f, info, v.File}
-		p.Assets[route] = "flea/media/" + v.File
+		p.Assets[route] = "itsy/media/" + v.File
 	}
 	success = true
 	return nil
@@ -242,5 +243,5 @@ func StageVideos(root, dest string) error {
 	if e != nil {
 		return e
 	}
-	return InstallVideos(filepath.Join(root, "flea", "media"), filepath.Join(dest, "flea", "media"), s)
+	return InstallVideos(sitefiles.Path(root, filepath.Join("itsy", "media")), sitefiles.Path(dest, filepath.Join("itsy", "media")), s)
 }

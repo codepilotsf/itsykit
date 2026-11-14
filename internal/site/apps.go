@@ -8,10 +8,10 @@ import (
 	"strings"
 	"sync"
 
-	"flea/internal/appapi"
-	"flea/internal/appmanager"
-	"flea/internal/contact"
-	"flea/internal/mailer"
+	"itsy/internal/appapi"
+	"itsy/internal/appmanager"
+	"itsy/internal/contact"
+	"itsy/internal/mailer"
 )
 
 type MiniApp struct {
@@ -20,7 +20,7 @@ type MiniApp struct {
 }
 
 // validateApps registers the built-in Blog and Contact apps plus any managed
-// custom app package under flea/apps/<name>. A custom package is validated at
+// custom app package under itsy/apps/<name>. A custom package is validated at
 // load; the running service is still checked by the authenticated handshake at
 // startup.
 func (p *Project) validateApps(boundary *os.Root) error {

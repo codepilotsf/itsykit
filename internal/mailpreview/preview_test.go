@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"flea/internal/devaccess"
-	"flea/internal/mailer"
+	"itsy/internal/devaccess"
+	"itsy/internal/mailer"
 )
 
 func fixture(t *testing.T) (*Preview, *string) {

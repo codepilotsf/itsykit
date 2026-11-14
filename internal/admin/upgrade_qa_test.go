@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/editor"
-	"flea/internal/editstore"
-	"flea/internal/host"
+	"itsy/internal/editor"
+	"itsy/internal/editstore"
+	"itsy/internal/host"
 )
 
 func qaUpgrader(t *testing.T) (Upgrader, string) {

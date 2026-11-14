@@ -26,7 +26,7 @@ func TestBuildVersions(t *testing.T) {
 		{"", "v99.0.0", "release", "", false},
 		{"", "", "release", "", false},
 	} {
-		cmd := exec.Command("bash", "-c", `source ../../scripts/version.sh; flea_version "$MODE"`)
+		cmd := exec.Command("bash", "-c", `source ../../scripts/version.sh; itsy_version "$MODE"`)
 		cmd.Env = append(os.Environ(), "VERSION="+tc.version, "CI_COMMIT_TAG="+tc.tag, "MODE="+tc.mode)
 		output, err := cmd.CombinedOutput()
 		if (err == nil) != tc.valid || (tc.valid && strings.TrimSpace(string(output)) != tc.want) {

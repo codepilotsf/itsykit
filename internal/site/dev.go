@@ -18,6 +18,6 @@ func ReadDevSettings(directory string) (DevSettings, error) {
 	var config struct {
 		Dev DevSettings `json:"dev"`
 	}
-	err = readJSON(root, ".flea.config.json", &config)
+	err = readJSON(root, ".itsy.config.json", &config)
 	return config.Dev, err
 }

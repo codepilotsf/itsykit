@@ -5,13 +5,13 @@ Read this when the task touches this subsystem. Paths in prose and code are
 relative to the repository root unless stated otherwise.
 
 A generated site uses `site/` for public templates/assets, root `mailers/` for
-private email templates, and `flea/` for content, media, data, icons and skills.
-`flea/runtime/` holds sessions and extraction recovery records and is Git-ignored.
+private email templates, and `itsy/` for content, media, data, icons and skills.
+`itsy/runtime/` holds sessions and extraction recovery records and is Git-ignored.
 `.agents/skills/` holds shared core/design/Prewind and Flea authoring skills.
 Root `AGENTS.md` explicitly reads core; conversation defaults yield to personal
 preferences without changing project security or permissions. Version-specific
 site requirements stay in `.agents/site-requirements.md`. Focused Blog, Contact
-and import guides remain in `flea/skills/`. All agent guidance stays in Git and
+and import guides remain in `itsy/skills/`. All agent guidance stays in Git and
 is excluded from serving and archives. The embedded `.agents/` tree is copied
 into both minimal and example sites. Include the shared coding orchestration skill;
 Impeccable stays globally installed and must never be copied or linked into a site.
@@ -21,7 +21,7 @@ template values consistent with the actual app contracts. These additions do not
 require a full-site design consultation. Bundled import/redesign and site-building
 skills use two design directions and a sample-page review before a substantial full build, unless the user explicitly
 delegates those decisions. Keep generated README/AGENTS summaries aligned.
-`.flea.config.json` at the project root stores public globals in the required `app` object.
+`.itsy.config.json` at the project root stores public globals in the required `app` object.
 Branch destinations live under `deploy.branches` in that same file. Preserve other
 JSON fields when saving destinations and strip `deploy` from releases/backups.
 Templates use app.site_name and other app.* values; no site.* compatibility alias.
@@ -36,15 +36,18 @@ Top-level `redirects` maps exact legacy paths to existing local public URLs for
 301 GET/HEAD responses. It is developer-managed runtime config, preserved in
 archives and by destination-setting writes, never template data. Keep starter
 README/site requirements and the import skill aligned with the runtime contract;
-the canonical shared `fleacms-site` migration workflow lives in Master Skills.
+the canonical shared `itsyweb-site` migration workflow lives in Master Skills.
 New sites omit site_name until interactive dev prompts with the title-cased project
 folder default and saves the answer. Saved names must be nonempty strings.
 Read-only/noninteractive loads use the folder default without writing; deployment
 requires a committed name so temporary release directories never change it.
-Use this exact filename everywhere; no extensionless configuration fallback.
+New sites use this filename. Existing `.flea.config.json` files remain supported;
+choose the Itsy spelling when present and otherwise read and write the legacy
+file. The same rule selects `itsy/` or `flea/`. No automatic conversion occurs.
+Extensionless configuration files remain unsupported.
 Deployment protocol 26 requires the JSON-suffixed configuration filename and
 inline editing with the updated rich-content sanitization policy.
-Owner-editable snips live in flea/snips.json: pages map canonical routes to title,
+Owner-editable snips live in itsy/snips.json: pages map canonical routes to title,
 description, and snips; shared.snips holds reusable regions; archive holds removed
 IDs. Entries have content and an optional label. Bare snip attributes need no
 name or value. IDs are 10 case-sensitive alphanumeric chars,
@@ -60,8 +63,8 @@ native editable wrapper outline and restore developer styling when editing ends.
 Keep keyboard focus indicators on toolbar buttons and form controls.
 Validate rich references identically in the parser and region scanner;
 IDs cannot contain braces, whitespace or punctuation.
-Developer-managed structured objects live in flea/data/*.json and use data.*.
-Legacy flea/snips/*.json and escaped named directives remain supported.
+Developer-managed structured objects live in itsy/data/*.json and use data.*.
+Legacy itsy/snips/*.json and escaped named directives remain supported.
 
 Bare img/video snip attributes import local seed files and become typed snip
 entries. Rewritten templates use src="{snip ID.src}" and alt="{snip ID.alt}"
@@ -91,7 +94,7 @@ it before Server.reloadMu. No local content filesystem lock; multiple dev proces
 one project are unsupported. No legacy lock cleanup or automatic migration.
 On every relevant save, archive unreferenced IDs and restore reintroduced IDs,
 preserving content and metadata. Log successful snip updates. Persist
-flea/runtime/.snips-pending.json with before/after
+itsy/runtime/.snips-pending.json with before/after
 templates and content before saving content, then templates. Replay on restart;
 stop if independently edited files conflict. Status and deploy never extract.
 Deploy refuses unextracted regions. Do not ignore recovery records.
@@ -100,7 +103,7 @@ Reconstruct rich HTML with an allowlist using x/net/html.
 Allow spans and escaped class attributes on supported content tags. Preserve them
 through browser sanitization and inline editing; keep event handlers and arbitrary
 inline CSS blocked. Classes are developer-controlled styling, not executable markup.
-Never compile JSON into template source. Only sanitized values become template.HTML through richFlea at
+Never compile JSON into template source. Only sanitized values become template.HTML through richSnip at
 execution; require element-text contexts, reject attributes/raw-text contexts.
 Script/style source remains untouched. Block scripts, styles, SVG/MathML, forms,
 embeds, images, arbitrary attributes, and unsafe links. Page metadata and data.*
@@ -109,12 +112,11 @@ remain escaped. Snip JSON is limited to 5 MiB and each content value to 1 MiB.
 Use internal/sitefiles as the shared exclusion policy for loading, reloads,
 Git snapshots, and archives. Exclude dotpaths, node_modules, and project metadata
 (README.md, AGENTS.md, ARCHITECTURE.md, spec.md, next-steps.md, checklist.md, LICENSE, LICENSE.md, go.mod, go.sum).
-Include only site/, mailers/, .flea.config.json and approved flea/ content, data,
-media and icon files in release snapshots. The config is the sole dotfile exception.
+Include only site/, mailers/, .itsy.config.json (or its legacy alias) and approved
+itsy/ (or legacy flea/) content, data, media and icon files in release snapshots. The selected config is the sole dotfile exception.
 Private runtime and skills never enter archives. Keep the project-root read boundary
 separate from the site/ template boundary: logical template names remain site-relative,
-while extraction journal edit paths begin with site/. No old-directory fallback or
-automatic migration. Protocol 25 prevents old servers receiving this structure.
+while extraction journal edit paths begin with site/. Only the explicit Itsy/Flea naming aliases are supported; no automatic migration. Protocol 25 prevents old servers receiving this structure.
 
 `itsy new <directory>` creates a site in a new or completely empty directory;
 `.` selects the current directory. Count hidden entries and `.git` as content,
@@ -140,7 +142,7 @@ before deployment. Embed the starter .gitignore explicitly; retain deployment
 settings and icon caches in version control by default.
 
 - `main.layout.html` is the optional global wrapper; `{slot}` inserts the page.
-- A leading `<!-- flea` comment with `layout: /admin.layout.html` on its own
+- A leading `<!-- itsy` (or legacy `<!-- flea`) comment with `layout: /admin.layout.html` on its own
   line and a closing `-->` selects a custom layout. Use one block before markup,
   site-relative *.layout.html paths, and only supported key:value settings.
   Reject unknown/duplicate keys, missing/unsafe layouts, nested layouts and settings

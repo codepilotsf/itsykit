@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"itsy/internal/sitefiles"
 	"log"
 	"net"
 	"net/http"
@@ -19,12 +20,12 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/contact"
-	"flea/internal/editor"
-	"flea/internal/editstore"
-	"flea/internal/mailer"
-	"flea/internal/site"
-	"flea/internal/snips"
+	"itsy/internal/contact"
+	"itsy/internal/editor"
+	"itsy/internal/editstore"
+	"itsy/internal/mailer"
+	"itsy/internal/site"
+	"itsy/internal/snips"
 )
 
 const HealthPath = "/_flea/health"
@@ -352,7 +353,7 @@ func serve(ctx context.Context, config Config, handler http.Handler, logger *log
 // Managed content is <site>/content/<revision>.json; sessions belong beside
 // content, not within either the revision or its immutable release directory.
 func managedSessionPath(contentPath string) string {
-	return filepath.Join(filepath.Dir(filepath.Dir(contentPath)), "flea", "runtime", "sessions.json")
+	return sitefiles.Path(filepath.Dir(filepath.Dir(contentPath)), filepath.Join("itsy", "runtime", "sessions.json"))
 }
 
 func initializeSessions(config Config) error {

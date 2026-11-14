@@ -12,7 +12,7 @@ import (
 	"sort"
 	"time"
 
-	"flea/internal/host"
+	"itsy/internal/host"
 )
 
 // ValidSiteName reports whether name is a stable managed site identifier.

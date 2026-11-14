@@ -10,10 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"flea/internal/devaccess"
-	"flea/internal/mailer"
-	"flea/internal/media"
-	"flea/internal/snips"
+	"itsy/internal/devaccess"
+	"itsy/internal/mailer"
+	"itsy/internal/media"
+	"itsy/internal/snips"
 )
 
 type Document struct {

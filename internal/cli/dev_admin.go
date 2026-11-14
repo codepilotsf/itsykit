@@ -1,16 +1,17 @@
 package cli
 
 import (
+	"itsy/internal/sitefiles"
 	"log"
 	"net/http"
 	"path/filepath"
 	"slices"
 	"sync"
 
-	"flea/internal/editor"
-	"flea/internal/editstore"
-	"flea/internal/mailer"
-	"flea/internal/site"
+	"itsy/internal/editor"
+	"itsy/internal/editstore"
+	"itsy/internal/mailer"
+	"itsy/internal/site"
 )
 
 // Rebuild authentication state only when local access or mail settings change.
@@ -52,8 +53,8 @@ func devAdmin(root, name string, public *site.Server, logger *log.Logger, previe
 			} else if mail.Validate() == nil {
 				sender = mailer.NewResend(mail)
 			}
-			store := &editstore.Store{Root: root, ContentPath: filepath.Join(root, "flea", "snips.json"), Emails: current.Emails, Publish: public.Publish}
-			options := editor.Options{Emails: current.Emails, SessionPath: filepath.Join(root, "flea", "runtime", "sessions.json"), SessionIdleDays: current.SessionIdleDays, Name: name, Sender: sender, Backend: store, Local: true, Logger: logger, Render: public.RenderAdmin, Public: public.ServeOwner}
+			store := &editstore.Store{Root: root, ContentPath: sitefiles.Path(root, filepath.Join("itsy", "snips.json")), Emails: current.Emails, Publish: public.Publish}
+			options := editor.Options{Emails: current.Emails, SessionPath: sitefiles.Path(root, filepath.Join("itsy", "runtime", "sessions.json")), SessionIdleDays: current.SessionIdleDays, Name: name, Sender: sender, Backend: store, Local: true, Logger: logger, Render: public.RenderAdmin, Public: public.ServeOwner}
 			options.RenderEmail = public.RenderEmail
 			options.ReloadScript = public.AdminReload
 			if err := editor.PruneSessions(options); err != nil {

@@ -57,7 +57,7 @@ func run(server, root string) error {
 	for n := 0; n < 30; n++ {
 		dir := filepath.Join(base, fmt.Sprintf("site-%02d", n))
 		files := map[string]string{
-			".flea.config.json":           `{"app":{"site_name":"Contact capacity"},"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.test"}}}}`,
+			".itsy.config.json":           `{"app":{"site_name":"Contact capacity"},"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.test"}}}}`,
 			"site/index.html":             `<h1>{app.site_name}</h1><p>Ordinary page.</p>`,
 			"site/contact/index.html":     `<form method="post" action="/contact">{csrf}<input name="name" value="{contact.data.name}"><p>{contact.error}</p></form>`,
 			"site/contact/thank-you.html": `<h1>Thanks</h1><p>{contact.flash.notice}</p>`,

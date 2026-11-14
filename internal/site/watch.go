@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"flea/internal/sitefiles"
 	"github.com/fsnotify/fsnotify"
+	"itsy/internal/sitefiles"
 )
 
 const watchDebounce = 100 * time.Millisecond
@@ -98,7 +98,7 @@ func (s *Server) Watch(ctx context.Context, root string, logger *log.Logger) err
 				s.mu.RUnlock()
 				if logger != nil {
 					if project.SnipsUpdated {
-						logger.Print("Snips updated in flea/snips.json.")
+						logger.Printf("Snips updated in %s.", sitefiles.ResolveAt(root, "itsy/snips.json"))
 					}
 					for _, warning := range project.Warnings {
 						logger.Printf("Warning: %s", warning)

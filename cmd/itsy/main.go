@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"flea/internal/cli"
+	"itsy/internal/cli"
 )
 
 func main() {

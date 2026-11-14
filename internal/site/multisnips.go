@@ -8,10 +8,10 @@ import (
 	"regexp"
 	"strings"
 
-	"flea/internal/media"
-	"flea/internal/snips"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+	"itsy/internal/media"
+	"itsy/internal/snips"
 )
 
 // EmptyPhotoSource is a fixed, non-executable portrait placeholder shared by

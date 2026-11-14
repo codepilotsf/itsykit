@@ -240,7 +240,7 @@ func TestUpdateRejectsUnsupportedPlatformsBeforeDownloading(t *testing.T) {
 func TestRenamedExecutableMigration(t *testing.T) {
 	dir := t.TempDir()
 	candidate := filepath.Join(dir, "release", "itsy")
-	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", candidate, "../../cmd/flea")
+	build := exec.Command(filepath.Join(runtime.GOROOT(), "bin", "go"), "build", "-o", candidate, "../../cmd/itsy")
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build: %v\n%s", err, output)
 	}

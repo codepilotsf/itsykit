@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Shared version validation for local builds, releases, and publishing.
-flea_version() {
+itsy_version() {
   local root recorded version numeric prerelease pattern
   root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
   recorded=$(sed -n 's/^var Version = "\([^"]*\)"$/\1/p' "$root/internal/buildinfo/version.go")

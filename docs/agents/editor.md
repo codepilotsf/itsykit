@@ -88,7 +88,7 @@ Server.RenderAdmin against the current immutable snapshot. Never compile editor
 values as source. Exclude the entire admin directory from public routes/assets;
 only editor state selects these templates. Missing files have no embedded fallback.
 Without a layout, render the page as written. Preserve developer layout changes.
-Use FleaCMS as the product name, without a space. /admin is sign-in only and
+Use ItsyWeb as the product name, without a space. /admin is sign-in only and
 redirects authenticated owners to /. The old dashboard template and /admin/save
 route are removed. Do not add a fallback. Browse using the site's navigation;
 unlinked-page discovery remains deferred. Pages without snips still have Page details.
@@ -109,7 +109,7 @@ credentials or sender details during dev startup. New sites enable
 dev.email_preview; the CLI-only preview sender handles both auth and contact
 mail without provider credentials. Read docs/email-templates.md for its boundaries.
 Confirm the site name with "Config file updated." and an added admin with
-"Added <email> to .flea.config.json." Noninteractive stdin never prompts. Only
+"Added <email> to .itsy.config.json." Noninteractive stdin never prompts. Only
 the explicit email wizard checks Resend. Reload after adding an owner, before
 initializing sessions and serving. Keep secrets in ignored .env,
 never site config. Malformed settings or wizard failures stop with an error.
@@ -149,7 +149,7 @@ claim that the connection check verifies the sender domain or email delivery.
 Local /admin must show actionable environment setup instructions when email is
 unconfigured; production keeps an owner-facing message without local shell steps.
 
-`admin.emails` in .flea.config.json is a developer-owned list (max 20), empty by
+`admin.emails` in .itsy.config.json is a developer-owned list (max 20), empty by
 default. /admin supports email OTP; the public-page editor supports title/description
 rich content, designated images/videos, collections.
 Templates, schemas, archived entries and developer configuration remain private.
@@ -157,7 +157,7 @@ Codes use crypto/rand, expire in 10 minutes and allow five attempts. Store hashe
 codes in bounded expiring maps. Sessions use admin.session_idle_days (omitted/zero
 means 30, otherwise 1–365). Persist only token hashes, email, host, CSRF, last activity
 and expiry. Store up to 2048 sessions in a bounded 2 MiB JSON file, 0600, at local
-flea/runtime/sessions.json or production sites/<name>/flea/runtime/sessions.json outside releases.
+itsy/runtime/sessions.json or production sites/<name>/itsy/runtime/sessions.json outside releases.
 The production runtime directory is flea-owned 0700; site parents/releases remain
 root-owned. Use confined reads, reject links and unsafe permissions, and lock
 read-modify-write with .sessions-lock. Sync an exclusive private temporary file,

@@ -20,8 +20,8 @@ import (
 	"sync"
 	"time"
 
-	"flea/internal/devaccess"
-	"flea/internal/mailer"
+	"itsy/internal/devaccess"
+	"itsy/internal/mailer"
 )
 
 const Path = "/_flea/email-preview/"

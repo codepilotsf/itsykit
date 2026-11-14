@@ -3,12 +3,12 @@ package setup
 import (
 	"context"
 	"encoding/json"
-	"flea/internal/release"
-	"flea/internal/site"
-	"flea/internal/snips"
-	"flea/internal/syncstate"
 	"fmt"
 	"io"
+	"itsy/internal/release"
+	"itsy/internal/site"
+	"itsy/internal/snips"
+	"itsy/internal/syncstate"
 	"os"
 	"path/filepath"
 	"strings"
@@ -96,7 +96,7 @@ func TestPullPreservesNewLocalSnipsAndScopesBaseline(t *testing.T) {
 	if e := pull(context.Background(), root, strings.NewReader(""), io.Discard, io.Discard, run); e == nil {
 		t.Fatal("dirty local content overwritten")
 	}
-	if !strings.Contains(testGit(t, root, "status", "--short"), "flea/snips.json") {
+	if !strings.Contains(testGit(t, root, "status", "--short"), "itsy/snips.json") {
 		t.Fatal("pull committed changes")
 	}
 }

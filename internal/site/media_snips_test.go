@@ -2,9 +2,9 @@ package site
 
 import (
 	"bytes"
-	"flea/internal/snips"
 	"image"
 	"image/png"
+	"itsy/internal/snips"
 	"os"
 	"path/filepath"
 	"strings"
@@ -43,11 +43,11 @@ func TestTypedMediaSnips(t *testing.T) {
 	if err != nil || strings.Contains(string(public), "data-snip-media") || !strings.Contains(string(public), "/media/") {
 		t.Fatalf("public %s %v", public, err)
 	}
-	before, _ := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	before, _ := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	if err = ExtractSnips(root); err != nil {
 		t.Fatal(err)
 	}
-	after, _ := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	after, _ := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	if !bytes.Equal(before, after) {
 		t.Fatal("not idempotent")
 	}
@@ -62,11 +62,11 @@ func TestTypedMediaWrongTypeDoesNotPublishExtraction(t *testing.T) {
 	}
 	source := `<img src="{snip Abcdefghij.src}" alt="{snip Abcdefghij.alt}"><p snip>New content</p>`
 	put(t, root, "index.html", source)
-	before, _ := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	before, _ := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	if err := ExtractSnips(root); err == nil {
 		t.Fatal("accepted wrong media type")
 	}
-	after, _ := os.ReadFile(filepath.Join(root, "flea/snips.json"))
+	after, _ := os.ReadFile(filepath.Join(root, "itsy/snips.json"))
 	template, _ := os.ReadFile(filepath.Join(root, "site/index.html"))
 	if !bytes.Equal(before, after) || string(template) != source {
 		t.Fatal("published invalid extraction")

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"flea/internal/site"
-	"flea/templates"
+	"itsy/internal/site"
+	"itsy/templates"
 )
 
 func TestAuthenticatedPublicPreview(t *testing.T) {

@@ -1,6 +1,6 @@
 # Real-page editor assets
 
-These files are embedded in Flea, not copied into generated sites. There is no
+These files are embedded in ItsyWeb, not copied into generated sites. There is no
 npm install or frontend build step.
 
 - `squire.js`: unmodified Squire 2.4.9 distribution, MIT. See SQUIRE-LICENSE.
