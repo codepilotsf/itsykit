@@ -31,7 +31,7 @@
       },
       "t3/reframe-flea-html-focus": {
         "target": "root@fleacms.com",
-        "domain": "itsy.fleacms.com",
+        "domain": "itsy.fleacms.com,itsyweb.dev",
         "name": "itsy-web",
         "https": true,
         "email": "sean@codepilot.com",
