@@ -1,0 +1,591 @@
+{
+  "items": [
+    {
+      "url": "/docs",
+      "title": "Getting Started",
+      "first": true,
+      "chapters": [
+        {
+          "id": "before-you-begin",
+          "title": "Before you begin"
+        },
+        {
+          "id": "installation",
+          "title": "1. Install ItsyWeb"
+        },
+        {
+          "id": "create-a-site",
+          "title": "2. Create a site"
+        },
+        {
+          "id": "your-files",
+          "title": "3. Find your files"
+        },
+        {
+          "id": "homepage",
+          "title": "4. Write the homepage"
+        },
+        {
+          "id": "add-a-page",
+          "title": "5. Add a second page"
+        },
+        {
+          "id": "shared-layout",
+          "title": "6. Change the shared layout"
+        },
+        {
+          "id": "partials",
+          "title": "7. Reuse a partial"
+        },
+        {
+          "id": "styles",
+          "title": "8. Add a little CSS"
+        },
+        {
+          "id": "check-and-save",
+          "title": "9. Check and save your work"
+        }
+      ]
+    },
+    {
+      "url": "/docs/installation",
+      "title": "Installation and updates",
+      "first": false,
+      "chapters": [
+        {
+          "id": "installation",
+          "title": "Install ItsyWeb"
+        },
+        {
+          "id": "updates",
+          "title": "Keep ItsyWeb up to date"
+        }
+      ]
+    },
+    {
+      "url": "/docs/development",
+      "title": "Local development",
+      "first": false,
+      "chapters": [
+        {
+          "id": "quickstart",
+          "title": "Your first HTML site"
+        },
+        {
+          "id": "quickstart-chapter-1",
+          "title": "Edit a page"
+        },
+        {
+          "id": "quickstart-chapter-2",
+          "title": "Check and save"
+        },
+        {
+          "id": "quickstart-chapter-3",
+          "title": "Other ways to start"
+        },
+        {
+          "id": "lan-testing",
+          "title": "Test on another device"
+        },
+        {
+          "id": "lan-testing-chapter-1",
+          "title": "Sign-in codes and email previews"
+        }
+      ]
+    },
+    {
+      "url": "/docs/templates",
+      "title": "Pages, layouts and data",
+      "first": false,
+      "chapters": [
+        {
+          "id": "project-structure",
+          "title": "A folder you can follow"
+        },
+        {
+          "id": "templates",
+          "title": "HTML, with reusable pieces"
+        },
+        {
+          "id": "templates-chapter-1",
+          "title": "Add a page"
+        },
+        {
+          "id": "templates-chapter-2",
+          "title": "Share a layout"
+        },
+        {
+          "id": "templates-chapter-3",
+          "title": "Reuse a partial"
+        },
+        {
+          "id": "templates-chapter-4",
+          "title": "Settings and structured data"
+        },
+        {
+          "id": "templates-chapter-5",
+          "title": "Page titles and descriptions"
+        }
+      ]
+    },
+    {
+      "url": "/docs/styling",
+      "title": "CSS and icons",
+      "first": false,
+      "chapters": [
+        {
+          "id": "styling",
+          "title": "Your CSS, your design"
+        },
+        {
+          "id": "styling-chapter-1",
+          "title": "Icons"
+        }
+      ]
+    },
+    {
+      "url": "/docs/agents",
+      "title": "Working with coding agents",
+      "first": false,
+      "chapters": [
+        {
+          "id": "agents",
+          "title": "AI-assisted development"
+        },
+        {
+          "id": "agents-chapter-1",
+          "title": "Use the skills in an existing project"
+        }
+      ]
+    },
+    {
+      "url": "/docs/editing",
+      "title": "On-page editing",
+      "first": false,
+      "chapters": [
+        {
+          "id": "optional-features",
+          "title": "When you need more than templates"
+        },
+        {
+          "id": "editable-content",
+          "title": "Optional on-page editing"
+        },
+        {
+          "id": "admin-editing",
+          "title": "Hand over the editing"
+        },
+        {
+          "id": "content-sync",
+          "title": "Sync optional editable content"
+        }
+      ]
+    },
+    {
+      "url": "/docs/media",
+      "title": "Photos, videos and collections",
+      "first": false,
+      "chapters": [
+        {
+          "id": "media",
+          "title": "Editable photos & videos"
+        },
+        {
+          "id": "media-chapter-1",
+          "title": "Photos"
+        },
+        {
+          "id": "media-chapter-2",
+          "title": "Videos"
+        },
+        {
+          "id": "collections",
+          "title": "Admin-managed collections"
+        }
+      ]
+    },
+    {
+      "url": "/docs/email",
+      "title": "Email and contact forms",
+      "first": false,
+      "chapters": [
+        {
+          "id": "email",
+          "title": "Email & contact forms"
+        },
+        {
+          "id": "email-chapter-1",
+          "title": "A contact form"
+        },
+        {
+          "id": "email-chapter-2",
+          "title": "Email templates"
+        }
+      ]
+    },
+    {
+      "url": "/docs/blog",
+      "title": "Blog",
+      "first": false,
+      "chapters": [
+        {
+          "id": "blog",
+          "title": "Enable a blog"
+        },
+        {
+          "id": "blog-chapter-1",
+          "title": "1. Enable it in your site configuration"
+        },
+        {
+          "id": "blog-chapter-2",
+          "title": "2. Add the templates"
+        },
+        {
+          "id": "blog-chapter-3",
+          "title": "3. Preview, commit and deploy"
+        },
+        {
+          "id": "blog-chapter-4",
+          "title": "Create and publish posts"
+        },
+        {
+          "id": "blog-chapter-5",
+          "title": "Post JSON for agents and developers"
+        },
+        {
+          "id": "blog-chapter-6",
+          "title": "Template values"
+        },
+        {
+          "id": "blog-chapter-7",
+          "title": "Keep live edits when deploying"
+        }
+      ]
+    },
+    {
+      "url": "/docs/apps",
+      "title": "Managed apps",
+      "first": false,
+      "chapters": [
+        {
+          "id": "apps",
+          "title": "Apps"
+        },
+        {
+          "id": "apps-chapter-1",
+          "title": "What you can use"
+        },
+        {
+          "id": "apps-chapter-2",
+          "title": "Enable Contact"
+        },
+        {
+          "id": "apps-chapter-3",
+          "title": "How a submission flows"
+        },
+        {
+          "id": "custom-apps",
+          "title": "Building a custom app"
+        },
+        {
+          "id": "custom-apps-chapter-1",
+          "title": "Register a package"
+        },
+        {
+          "id": "custom-apps-chapter-2",
+          "title": "Two boundaries"
+        },
+        {
+          "id": "custom-apps-chapter-3",
+          "title": "Request JSON"
+        },
+        {
+          "id": "custom-apps-chapter-4",
+          "title": "Response envelope"
+        },
+        {
+          "id": "custom-apps-chapter-5",
+          "title": "Statuses and browser outcomes"
+        },
+        {
+          "id": "custom-apps-chapter-6",
+          "title": "Launch contract"
+        },
+        {
+          "id": "custom-apps-chapter-7",
+          "title": "Handshake and transport"
+        },
+        {
+          "id": "custom-app-sessions",
+          "title": "App-owned sessions"
+        },
+        {
+          "id": "custom-apps-chapter-9",
+          "title": "A complete managed sample"
+        },
+        {
+          "id": "custom-apps-chapter-10",
+          "title": "Try the contract locally"
+        },
+        {
+          "id": "custom-apps-chapter-11",
+          "title": "What remains planned"
+        }
+      ]
+    },
+    {
+      "url": "/docs/deployment",
+      "title": "Server setup and deployment",
+      "first": false,
+      "chapters": [
+        {
+          "id": "deployment",
+          "title": "Put your site online"
+        },
+        {
+          "id": "server",
+          "title": "Set up the server"
+        },
+        {
+          "id": "deployment-chapter-2",
+          "title": "Deploy a branch"
+        },
+        {
+          "id": "deployment-chapter-3",
+          "title": "Temporary packaging storage"
+        }
+      ]
+    },
+    {
+      "url": "/docs/redirects",
+      "title": "Migration redirects",
+      "first": false,
+      "chapters": [
+        {
+          "id": "redirects",
+          "title": "Preserve old links with 301 redirects"
+        },
+        {
+          "id": "redirects-chapter-1",
+          "title": "Inventory the original website with an agent"
+        },
+        {
+          "id": "redirects-chapter-2",
+          "title": "Validate before deploying"
+        }
+      ]
+    },
+    {
+      "url": "/docs/seo",
+      "title": "Search engines and SEO",
+      "first": false,
+      "chapters": [
+        {
+          "id": "seo-discovery",
+          "title": "Sitemaps, canonical URLs and page exclusions"
+        },
+        {
+          "id": "seo-update",
+          "title": "1. Check your CLI and server"
+        },
+        {
+          "id": "seo-configure",
+          "title": "2. Set the production address"
+        },
+        {
+          "id": "seo-check",
+          "title": "3. Check locally, then deploy"
+        },
+        {
+          "id": "seo-discovery-chapter-4",
+          "title": "What ItsyWeb includes and preserves"
+        },
+        {
+          "id": "seo-search-console",
+          "title": "Optional: tell Google where the sitemap is"
+        },
+        {
+          "id": "indexing",
+          "title": "Keep staging out of search"
+        }
+      ]
+    },
+    {
+      "url": "/docs/recovery",
+      "title": "Backups and recovery",
+      "first": false,
+      "chapters": [
+        {
+          "id": "recovery",
+          "title": "Backups & recovery"
+        },
+        {
+          "id": "recovery-chapter-1",
+          "title": "Make a backup"
+        },
+        {
+          "id": "recovery-chapter-2",
+          "title": "Roll back code"
+        },
+        {
+          "id": "recovery-chapter-3",
+          "title": "Restore a backup"
+        },
+        {
+          "id": "recovery-chapter-4",
+          "title": "Reset a local project"
+        }
+      ]
+    },
+    {
+      "url": "/docs/release-notes",
+      "title": "Release notes",
+      "first": false,
+      "chapters": [
+        {
+          "id": "release-notes",
+          "title": "Release notes"
+        },
+        {
+          "id": "release-notes-chapter-1",
+          "title": "0.21.0 · November 14, 2026"
+        },
+        {
+          "id": "release-notes-chapter-2",
+          "title": "0.20.5 · November 9, 2026"
+        },
+        {
+          "id": "release-notes-chapter-3",
+          "title": "0.20.4 · November 9, 2026"
+        },
+        {
+          "id": "release-notes-chapter-4",
+          "title": "0.20.3 · November 9, 2026"
+        },
+        {
+          "id": "release-notes-chapter-5",
+          "title": "0.20.2 · November 2, 2026"
+        },
+        {
+          "id": "release-notes-chapter-6",
+          "title": "0.20.1 · November 2, 2026"
+        },
+        {
+          "id": "release-notes-chapter-7",
+          "title": "0.20.0 · October 30, 2026"
+        },
+        {
+          "id": "release-notes-chapter-8",
+          "title": "0.19.0 · October 24, 2026"
+        },
+        {
+          "id": "release-notes-chapter-9",
+          "title": "0.18.0 · October 21, 2026"
+        },
+        {
+          "id": "release-notes-chapter-10",
+          "title": "0.17.0 · October 18, 2026"
+        },
+        {
+          "id": "release-notes-chapter-11",
+          "title": "0.16.1 · October 18, 2026"
+        },
+        {
+          "id": "release-notes-chapter-12",
+          "title": "0.16.0 · October 13, 2026"
+        },
+        {
+          "id": "release-notes-chapter-13",
+          "title": "0.15.1 · October 13, 2026"
+        },
+        {
+          "id": "release-notes-chapter-14",
+          "title": "0.15.0 · October 13, 2026"
+        },
+        {
+          "id": "release-notes-chapter-15",
+          "title": "0.14.0 · October 13, 2026"
+        },
+        {
+          "id": "release-notes-chapter-16",
+          "title": "0.13.0 · October 12, 2026"
+        },
+        {
+          "id": "release-notes-chapter-17",
+          "title": "0.12.0 · October 12, 2026"
+        },
+        {
+          "id": "release-notes-chapter-18",
+          "title": "0.11.0 · October 12, 2026"
+        },
+        {
+          "id": "release-notes-chapter-19",
+          "title": "0.10.0 · October 5, 2026"
+        },
+        {
+          "id": "release-notes-chapter-20",
+          "title": "0.9.0 · October 5, 2026"
+        },
+        {
+          "id": "release-notes-chapter-21",
+          "title": "0.8.1 · October 3, 2026"
+        },
+        {
+          "id": "release-notes-chapter-22",
+          "title": "0.8.0 · October 3, 2026"
+        },
+        {
+          "id": "release-notes-chapter-23",
+          "title": "0.7.1 · October 3, 2026"
+        },
+        {
+          "id": "release-notes-chapter-24",
+          "title": "0.7.0 · October 3, 2026"
+        },
+        {
+          "id": "release-notes-chapter-25",
+          "title": "0.6.2 · October 1, 2026"
+        },
+        {
+          "id": "release-notes-chapter-26",
+          "title": "0.6.1 · October 1, 2026"
+        },
+        {
+          "id": "release-notes-chapter-27",
+          "title": "0.6.0 · October 1, 2026"
+        },
+        {
+          "id": "release-notes-chapter-28",
+          "title": "0.5.0 · September 29, 2026"
+        },
+        {
+          "id": "release-notes-chapter-29",
+          "title": "0.4.1 · September 29, 2026"
+        },
+        {
+          "id": "release-notes-chapter-30",
+          "title": "0.3.0 · September 29, 2026"
+        }
+      ]
+    },
+    {
+      "url": "/docs/support",
+      "title": "About ItsyWeb and support",
+      "first": false,
+      "chapters": [
+        {
+          "id": "overview",
+          "title": "HTML doesn't need a build pipeline."
+        },
+        {
+          "id": "limitations",
+          "title": "Where ItsyWeb fits"
+        },
+        {
+          "id": "support",
+          "title": "Need a hand?"
+        }
+      ]
+    }
+  ]
+}

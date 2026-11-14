@@ -1,17 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#optional-features">When you need more than templates</a>
-<a href="#editable-content">Optional on-page editing</a>
-<a href="#admin-editing">Hand over the editing</a>
-<a href="#content-sync">Sync optional editable content</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#optional-features">When you need more than templates</a>
-<a href="#editable-content">Optional on-page editing</a>
-<a href="#admin-editing">Hand over the editing</a>
-<a href="#content-sync">Sync optional editable content</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>On-page editing</h1>
@@ -27,8 +20,10 @@
 <section id="admin-editing"><h2>Hand over the editing</h2><p>Add an approved admin from your site folder:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy admin admin@example.com</code></pre><p>This adds the address to <code>admin.emails</code>. Admins visit <code>/admin</code> and sign in with an emailed code. All approved admins have the same editing access.</p><p>Editing starts enabled. Click text or media, make changes, then use <strong>Save</strong> or <strong>Cancel</strong>. Both keep editing on. Save updates the page in place without reloading it; Cancel returns to the latest successful save.</p><p>New local sites preview email in the browser without sending it. Production needs HTTPS and real email delivery. Commit and deploy admin-list changes before sharing the live sign-in link.</p><p>Sessions have a default 30-day idle window. Set <code>admin.session_idle_days</code> to a value from 1 to 365. An empty admin list disables live sign-in.</p></section>
 
 <section id="content-sync"><h2>Sync optional editable content</h2><h3>Keep admin changes</h3><p>Normal deployment preserves live editable content and publishes committed CSS. To bring those edits into your local project, stop dev and run:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy pull</code></pre><p>Pull retrieves live content and referenced media. Review and commit the result.</p><p>To deliberately publish local content edits, first establish a pull baseline, then run:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy deploy --with-snips</code></pre><p>Conflicts require an explicit choice between the live and local changes.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/media">Photos, videos and collections</a></li><li><a href="/docs/email">Email and contact forms</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/media">Photos, videos and collections</a></li><li><a href="/docs/email">Email and contact forms</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

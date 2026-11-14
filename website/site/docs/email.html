@@ -1,15 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#email">Email &amp; contact forms</a>
-<a href="#email-chapter-1">A contact form</a>
-<a href="#email-chapter-2">Email templates</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#email">Email &amp; contact forms</a>
-<a href="#email-chapter-1">A contact form</a>
-<a href="#email-chapter-2">Email templates</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Email and contact forms</h1>
@@ -23,8 +18,10 @@
   &lt;div hidden&gt;&lt;label&gt;Leave empty &lt;input name="website" tabindex="-1" autocomplete="off" /&gt;&lt;/label&gt;&lt;/div&gt;
   &lt;button type="submit"&gt;Send message&lt;/button&gt;
 &lt;/form&gt;</code></pre><p>Success redirects to the mount's <code>thank-you</code> page with a visitor-bound notice. Messages are emailed, not stored, and validation re-renders the form with safe values on error. There is no general-purpose form backend.</p><h3 id="email-chapter-2">Email templates</h3><p>Customize <code>mailers/*.email.html</code> and <code>*.email.txt</code>. HTML emails share <code>mailers/main.layout.html</code>. Keep its slot and use escaped <code>app.*</code> and <code>email.*</code> values.</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy email preview sign-in</code></pre><p>This renders a sample without sending an email.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/editing">On-page editing</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/editing">On-page editing</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

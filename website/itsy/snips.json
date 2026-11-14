@@ -13,8 +13,8 @@
       }
     },
     "/docs": {
-      "title": "Guides",
-      "description": "Learn ItsyWeb with a hands-on Getting Started tutorial and focused guides to templates, styling, editing, deployment, and more.",
+      "title": "Getting Started",
+      "description": "Build your first ItsyWeb site, step by step: two HTML pages, shared navigation, a layout, a partial, and a little CSS.",
       "snips": {}
     },
     "/docs/installation": {
@@ -95,11 +95,6 @@
     "/docs/support": {
       "title": "About ItsyWeb and support",
       "description": "Understand where ItsyWeb fits, its current limits, and how to report a problem.",
-      "snips": {}
-    },
-    "/docs/getting-started": {
-      "title": "Getting Started",
-      "description": "Build your first ItsyWeb site, step by step: two HTML pages, shared navigation, a layout, a partial, and a little CSS.",
       "snips": {}
     }
   },

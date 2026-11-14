@@ -1,15 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#redirects">Preserve old links with 301 redirects</a>
-<a href="#redirects-chapter-1">Inventory the original website with an agent</a>
-<a href="#redirects-chapter-2">Validate before deploying</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#redirects">Preserve old links with 301 redirects</a>
-<a href="#redirects-chapter-1">Inventory the original website with an agent</a>
-<a href="#redirects-chapter-2">Validate before deploying</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Migration redirects</h1>
@@ -37,8 +32,10 @@
       <p>Run <code>itsy status</code>, then use a local dev server to check each old URL without following redirects. Confirm its 301 and <code>Location</code>, then check the destination serves the intended content in one hop. Check query behavior and unchanged URLs too.</p>
       <div class="notice"><p><strong>Update both CLI and server.</strong> This feature requires deployment protocol 28. Run <code>itsy update</code>, then explicitly update the shared server with <code>itsy update-server</code> before deploying rules. Public 0.19.0 and earlier ignore site redirect settings.</p></div>
     </section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/seo">Search engines and SEO</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/seo">Search engines and SEO</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

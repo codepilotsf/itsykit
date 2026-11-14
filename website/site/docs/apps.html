@@ -1,41 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#apps">Apps</a>
-<a href="#apps-chapter-1">What you can use</a>
-<a href="#apps-chapter-2">Enable Contact</a>
-<a href="#apps-chapter-3">How a submission flows</a>
-<a href="#custom-apps">Building a custom app</a>
-<a href="#custom-apps-chapter-1">Register a package</a>
-<a href="#custom-apps-chapter-2">Two boundaries</a>
-<a href="#custom-apps-chapter-3">Request JSON</a>
-<a href="#custom-apps-chapter-4">Response envelope</a>
-<a href="#custom-apps-chapter-5">Statuses and browser outcomes</a>
-<a href="#custom-apps-chapter-6">Launch contract</a>
-<a href="#custom-apps-chapter-7">Handshake and transport</a>
-<a href="#custom-app-sessions">App-owned sessions</a>
-<a href="#custom-apps-chapter-9">A complete managed sample</a>
-<a href="#custom-apps-chapter-10">Try the contract locally</a>
-<a href="#custom-apps-chapter-11">What remains planned</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#apps">Apps</a>
-<a href="#apps-chapter-1">What you can use</a>
-<a href="#apps-chapter-2">Enable Contact</a>
-<a href="#apps-chapter-3">How a submission flows</a>
-<a href="#custom-apps">Building a custom app</a>
-<a href="#custom-apps-chapter-1">Register a package</a>
-<a href="#custom-apps-chapter-2">Two boundaries</a>
-<a href="#custom-apps-chapter-3">Request JSON</a>
-<a href="#custom-apps-chapter-4">Response envelope</a>
-<a href="#custom-apps-chapter-5">Statuses and browser outcomes</a>
-<a href="#custom-apps-chapter-6">Launch contract</a>
-<a href="#custom-apps-chapter-7">Handshake and transport</a>
-<a href="#custom-app-sessions">App-owned sessions</a>
-<a href="#custom-apps-chapter-9">A complete managed sample</a>
-<a href="#custom-apps-chapter-10">Try the contract locally</a>
-<a href="#custom-apps-chapter-11">What remains planned</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Managed apps</h1>
@@ -353,8 +322,10 @@ func writeJSON(w http.ResponseWriter, status int, body any) &#123;
   -H "Authorization: Bearer $APP_TOKEN" \
   -H "Content-Type: application/json" \
   -d '&#123;"name":"Alex"&#125;'</code></pre><p>This proves the wire contract, authentication and statuses. It does not mount the service in a site.</p><h3 id="custom-apps-chapter-11">What remains planned</h3><p>Remote (non-local) services, public read-only routes declared in configuration, databases, storage helpers and file uploads remain planned. ItsyWeb supervises only a confined local executable; it does not download packages or run arbitrary commands.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/email">Email and contact forms</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/email">Email and contact forms</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

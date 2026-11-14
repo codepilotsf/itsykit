@@ -1,25 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#blog">Enable a blog</a>
-<a href="#blog-chapter-1">1. Enable it in your site configuration</a>
-<a href="#blog-chapter-2">2. Add the templates</a>
-<a href="#blog-chapter-3">3. Preview, commit and deploy</a>
-<a href="#blog-chapter-4">Create and publish posts</a>
-<a href="#blog-chapter-5">Post JSON for agents and developers</a>
-<a href="#blog-chapter-6">Template values</a>
-<a href="#blog-chapter-7">Keep live edits when deploying</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#blog">Enable a blog</a>
-<a href="#blog-chapter-1">1. Enable it in your site configuration</a>
-<a href="#blog-chapter-2">2. Add the templates</a>
-<a href="#blog-chapter-3">3. Preview, commit and deploy</a>
-<a href="#blog-chapter-4">Create and publish posts</a>
-<a href="#blog-chapter-5">Post JSON for agents and developers</a>
-<a href="#blog-chapter-6">Template values</a>
-<a href="#blog-chapter-7">Keep live edits when deploying</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Blog</h1>
@@ -88,8 +73,10 @@ itsy deploy</code></pre>
       <p>Normal <code>itsy deploy</code> preserves live posts by ID and seeds new source-only IDs. Before an agent edits existing live posts in Git, run <code>itsy pull</code>. Publish reviewed source changes with <code>itsy deploy --with-snips</code>; this existing flag includes Blog records and cover metadata. Conflicting edits require a whole-post choice, and noninteractive conflicts stop.</p>
       <p>Omitting a post from source never deletes its live record. Unpublish it to remove its public page. Backups include live posts and covers; rollback keeps current content while selecting earlier code. Comments, categories, tags, search, scheduling and revision history are deferred.</p>
     </section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/editing">On-page editing</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/editing">On-page editing</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

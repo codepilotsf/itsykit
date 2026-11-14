@@ -1,15 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#overview">HTML doesn&#x27;t need a build pipeline.</a>
-<a href="#limitations">Where ItsyWeb fits</a>
-<a href="#support">Need a hand?</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#overview">HTML doesn&#x27;t need a build pipeline.</a>
-<a href="#limitations">Where ItsyWeb fits</a>
-<a href="#support">Need a hand?</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>About ItsyWeb and support</h1>
@@ -19,13 +14,15 @@
 <p>You want to write HTML and CSS. Then you need the same navigation on every page, a shared footer and URLs without <code>.html</code>. That shouldn't mean adopting a framework or generating a second copy of your website.</p>
 <p>ItsyWeb is a web server that understands HTML with a few extra instructions. Layouts wrap your pages, partials reuse markup, and variables, loops and conditions let you work with settings and JSON data. The server assembles the page when it serves it. You keep writing HTML.</p>
 <p>It also includes the tools to run the site: local development with live reload, Ubuntu server setup over SSH, deployment, automatic HTTPS, backups and code rollback. There is no frontend build step or language runtime to install.</p>
-<p>Start with the <a href="/docs/getting-started">Getting Started tutorial</a>. You can use the server and deployment tools without setting up an editor or enabling an app. Those <a href="/docs/editing#optional-features">optional features</a> are documented separately.</p></section>
+<p>Start with the <a href="/docs">Getting Started tutorial</a>. You can use the server and deployment tools without setting up an editor or enabling an app. Those <a href="/docs/editing#optional-features">optional features</a> are documented separately.</p></section>
 
 <section id="limitations"><h2>Where ItsyWeb fits</h2><p>Use ItsyWeb for websites you would otherwise build in plain HTML, with shared templates and the tools to run them. It does not turn HTML into a general application framework or provide an ecommerce platform.</p><ul><li>No general content field schemas or general-purpose form backend. Templates do not execute arbitrary server-side application code; custom logic belongs in a managed app.</li><li>Custom apps are managed local executables only: no remote services, package registry or public SDK. Each app owns and protects its own storage.</li><li>No video transcoding or video fields in collections.</li><li>No content revision-history interface. Use the backup and recovery commands.</li><li>Editable rich text is sanitized and does not accept unrestricted HTML. This restriction applies to the optional content editor; your source templates remain developer-authored HTML.</li><li>Downloads currently cover Apple Silicon macOS and x86-64 Linux. Clean-machine testing is in progress.</li></ul><p>The source repository is private. The binaries are free to use, without an account or license key.</p></section>
 
 <section id="support"><h2>Need a hand?</h2><p>Start with <code>itsy status</code> to check your site and <code>itsy &lt;command&gt; --help</code> for a command's options.</p><p>If you're testing ItsyWeb, send feedback to the person who invited you. Include your operating system, processor, ItsyWeb version, the command you ran and the exact error. Leave out credentials, sign-in codes and private runtime files.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/getting-started">Getting Started</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs">Getting Started</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

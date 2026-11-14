@@ -1,23 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#seo-discovery">Sitemaps, canonical URLs and page exclusions</a>
-<a href="#seo-update">1. Check your CLI and server</a>
-<a href="#seo-configure">2. Set the production address</a>
-<a href="#seo-check">3. Check locally, then deploy</a>
-<a href="#seo-discovery-chapter-4">What ItsyWeb includes and preserves</a>
-<a href="#seo-search-console">Optional: tell Google where the sitemap is</a>
-<a href="#indexing">Keep staging out of search</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#seo-discovery">Sitemaps, canonical URLs and page exclusions</a>
-<a href="#seo-update">1. Check your CLI and server</a>
-<a href="#seo-configure">2. Set the production address</a>
-<a href="#seo-check">3. Check locally, then deploy</a>
-<a href="#seo-discovery-chapter-4">What ItsyWeb includes and preserves</a>
-<a href="#seo-search-console">Optional: tell Google where the sitemap is</a>
-<a href="#indexing">Keep staging out of search</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Search engines and SEO</h1>
@@ -82,8 +69,10 @@ itsy dev</code></pre>
 
 <section id="indexing"><h2>Keep staging out of search</h2><p>From ItsyWeb 0.19.0, configure indexing for an already registered hostname over SSH. Staging and production can serve the same website files:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy server indexing root@server staging.example.com noindex
 itsy server list root@server</code></pre><p>Type the exact hostname when asked. ItsyWeb sends <code>X-Robots-Tag: noindex, nofollow</code> on that hostname's pages, assets, app responses, errors, downloads and redirects. Aliases can have different policies. The command restarts the shared service, briefly affecting other sites.</p><p>Policy belongs to the server, outside site app settings, editable content and release files. Normal deployment, content sync, code rollback and site restore retain the current policy. <code>itsy status</code> and <code>itsy server list</code> show effective settings. Existing hostnames without a policy keep their behavior; ItsyWeb does not infer staging from the hostname.</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy server indexing root@server staging.example.com allow</code></pre><p><code>allow</code> stops adding the framework restriction. It does not emit <code>index, follow</code>, remove owner-authored headers or meta tags, or guarantee search visibility. Each exact registered hostname is configured separately; wildcards and arbitrary forwarding headers cannot select a policy.</p><div class="notice"><p><strong>Keep robots.txt crawlable.</strong> A site-wide <code>Disallow: /</code> can stop crawlers discovering the noindex header. The host policy does not rewrite robots.txt, sitemaps, canonical tags or templates, and reports detected static site-wide crawl blocks. The separate <a href="/docs/seo#seo-discovery">SEO settings</a> can generate missing discovery documents and canonical tags. This controls cooperative search indexing, not private access.</p></div><p>Removing a site clears only its own hostname policies; redeploying a removed name does not restore them. Site backups exclude host policy. Interrupted policy changes use the existing server-side <code>sudo itsy-server -recover</code> journal, which restores the complete prior host configuration. Upgrade both client and server to protocol 28 before using this feature. Verify the live staging header before removing any existing site-level meta fallback.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/redirects">Migration redirects</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/redirects">Migration redirects</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

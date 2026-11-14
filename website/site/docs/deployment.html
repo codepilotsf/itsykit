@@ -1,17 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#deployment">Put your site online</a>
-<a href="#server">Set up the server</a>
-<a href="#deployment-chapter-2">Deploy a branch</a>
-<a href="#deployment-chapter-3">Temporary packaging storage</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#deployment">Put your site online</a>
-<a href="#server">Set up the server</a>
-<a href="#deployment-chapter-2">Deploy a branch</a>
-<a href="#deployment-chapter-3">Temporary packaging storage</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Server setup and deployment</h1>
@@ -22,8 +15,10 @@
   trap 'rmdir -- "$scratch"' EXIT
   TMPDIR="$scratch" itsy deploy
 )</code></pre><p>The selected directory must exist and be writable. An invalid explicit setting fails without falling back elsewhere. Keep worktrees and retained screenshots or logs outside disposable scratch.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/recovery">Backups and recovery</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/recovery">Backups and recovery</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

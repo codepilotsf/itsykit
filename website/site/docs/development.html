@@ -1,21 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#quickstart">Your first HTML site</a>
-<a href="#quickstart-chapter-1">Edit a page</a>
-<a href="#quickstart-chapter-2">Check and save</a>
-<a href="#quickstart-chapter-3">Other ways to start</a>
-<a href="#lan-testing">Test on another device</a>
-<a href="#lan-testing-chapter-1">Sign-in codes and email previews</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#quickstart">Your first HTML site</a>
-<a href="#quickstart-chapter-1">Edit a page</a>
-<a href="#quickstart-chapter-2">Check and save</a>
-<a href="#quickstart-chapter-3">Other ways to start</a>
-<a href="#lan-testing">Test on another device</a>
-<a href="#lan-testing-chapter-1">Sign-in codes and email previews</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Local development</h1>
@@ -41,8 +30,10 @@ itsy dev</code></pre>
 <p>Dev starts at port 3000 and explains occupied ports before trying 3001, 3002 and so on. An explicit <code>--port</code> stays fixed; <code>--port 0</code> lets the operating system choose. Running <code>itsy dev</code> again replaces this site's running dev server, including when changing ports or LAN mode. Pull and reset are never interrupted. Stop any dev process started with an older binary manually once.</p></section>
 
 <section id="lan-testing"><h2>Test on another device</h2><p>To use a phone, tablet or another computer on the same trusted network, start dev with:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy dev --lan</code></pre><p><code>itsy dev -l</code> does the same thing. ItsyWeb prints <strong>Network</strong> and <strong>Hostname</strong> URLs for detected private/Tailscale IPv4 addresses and this computer's name/local alias. Open a printed URL, such as <code>http://studio:3000</code>, when that name resolves to the dev computer. Its <code>/admin</code> link opens sign-in. Exact Host/port and peer checks remain required. Without the flag, dev stays accessible only on your computer using the printed Website URL.</p><p>This is the full dev site: approved admins can sign in, edit text and collections, upload photos and videos, and save changes. Contact forms, browser reloads and dev diagnostics work over the network too. Each device signs in separately.</p><h3 id="lan-testing-chapter-1">Sign-in codes and email previews</h3><p>With email preview enabled, messages still open on the computer running ItsyWeb. Enter the code on your other device. To share a private preview, replace its loopback IP with the printed network IP, keeping the port and random path. Anyone with that link and network access can read the message, so keep it private. There is no public inbox.</p><div class="notice"><p>LAN mode uses <strong>unencrypted HTTP</strong>. Use it only on a trusted network, never forward the development port, and restart dev after changing networks. VPN addresses may also appear. Your firewall must allow the selected port; guest Wi-Fi can block connections between devices. Use <code>--port 3001</code> if you need a different port.</p></div></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/templates">Pages, layouts and data</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/templates">Pages, layouts and data</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

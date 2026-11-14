@@ -21,8 +21,12 @@ same ItsyWeb repository. Run the site commands below from `website/`.
 
 ## Public guides
 
-`site/docs.html` is the guide index at `/docs`. Each focused guide lives in
-`site/docs/`, with its own chapter navigation and links to related guides.
+`site/docs.html` is Getting Started, the documentation landing page at `/docs`.
+The remaining guides live in `site/docs/`. All guides share the accordion
+navigation in `site/_guides-nav.html`, driven by `itsy/data/guides.json`.
+Keep guide URLs and chapter IDs in that data file aligned with the pages.
+The current guide opens in the sidebar; phones show the same navigation inside
+Guides. `site/js/guides.js` selects the current guide and chapter.
 Getting Started builds one small site from installation through local validation;
 server deployment and optional editing belong in their own guides. Keep tutorial
 examples executable with the current CLI and starter. Encode literal template

@@ -1,23 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#project-structure">A folder you can follow</a>
-<a href="#templates">HTML, with reusable pieces</a>
-<a href="#templates-chapter-1">Add a page</a>
-<a href="#templates-chapter-2">Share a layout</a>
-<a href="#templates-chapter-3">Reuse a partial</a>
-<a href="#templates-chapter-4">Settings and structured data</a>
-<a href="#templates-chapter-5">Page titles and descriptions</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#project-structure">A folder you can follow</a>
-<a href="#templates">HTML, with reusable pieces</a>
-<a href="#templates-chapter-1">Add a page</a>
-<a href="#templates-chapter-2">Share a layout</a>
-<a href="#templates-chapter-3">Reuse a partial</a>
-<a href="#templates-chapter-4">Settings and structured data</a>
-<a href="#templates-chapter-5">Page titles and descriptions</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Pages, layouts and data</h1>
@@ -38,8 +25,10 @@ layout: /custom.layout.html
 &#123;:else&#125;
   &lt;p&gt;Meet the team soon.&lt;/p&gt;
 &#123;/each&#125;</code></pre><p>Conditions take dotted paths, not JavaScript expressions. Use <code>&#123;#unless app.phone&#125;...&#123;/unless&#125;</code> for a negative condition. Both support <code>&#123;:else&#125;</code> and <code>&#123;:else if dotted.path&#125;</code>.</p><h3 id="templates-chapter-5">Page titles and descriptions</h3><p>Page metadata lives under the route in <code>pages</code> in <code>itsy/snips.json</code>. Update its <code>title</code> and <code>description</code> fields. The layout can use <code>&#123;page.title&#125;</code>, <code>&#123;page.description&#125;</code> and <code>&#123;page.path&#125;</code>. Ordinary page text can stay directly in your HTML.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/styling">CSS and icons</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/styling">CSS and icons</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

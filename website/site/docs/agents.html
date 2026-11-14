@@ -1,13 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#agents">AI-assisted development</a>
-<a href="#agents-chapter-1">Use the skills in an existing project</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#agents">AI-assisted development</a>
-<a href="#agents-chapter-1">Use the skills in an existing project</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Working with coding agents</h1>
@@ -28,8 +25,10 @@
       <p>A CLI update leaves your project's files intact. Generate a disposable site with a matching 0.15.1-or-newer CLI, then copy <code>itsy/skills/add-blog/</code> and <code>itsy/skills/add-contact-form/</code> into your project. Add the matching request routes to your own <code>AGENTS.md</code>, preserving its custom rules. You can also point an agent directly at either <code>SKILL.md</code>.</p>
       <p>These guidance files stay in Git but are excluded from public serving and deployment. A skill does not grant permission to publish posts, send real test mail or deploy.</p>
     </section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/getting-started">Getting Started</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs">Getting Started</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>

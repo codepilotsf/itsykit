@@ -1,17 +1,10 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <a class="guide-index-link" href="/docs">All guides</a>
-    <h2 class="docs-nav-heading">In this guide</h2>
-    <nav class="docs-toc" aria-label="Guide chapters"><a href="#media">Editable photos &amp; videos</a>
-<a href="#media-chapter-1">Photos</a>
-<a href="#media-chapter-2">Videos</a>
-<a href="#collections">Admin-managed collections</a></nav>
+    <h2 class="docs-nav-heading">Guides</h2>
+    {render /guides-nav}
   </aside>
   <article class="docs-content">
-    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#media">Editable photos &amp; videos</a>
-<a href="#media-chapter-1">Photos</a>
-<a href="#media-chapter-2">Videos</a>
-<a href="#collections">Admin-managed collections</a></nav></details>
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Photos, videos and collections</h1>
@@ -26,8 +19,10 @@
   &lt;p snip="title"&gt;Studio founder&lt;/p&gt;
   &lt;img snip="photo" src="/images/sam.jpg" alt="Sam" /&gt;
 &lt;/article&gt;</code></pre><p>Dev turns the seed into a loop. Admins use the on-page Add tile, remove button and drag handles. Arrow keys on a handle can reorder items too.</p><p>Keep each group on an individual page, with one root element. Don't nest groups or place them in layouts, partials or other loops. Video fields are not supported in multisnips.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/editing">On-page editing</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/editing">On-page editing</a></li></ul></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
+
+<script src="/js/guides.js" defer></script>
