@@ -23,7 +23,10 @@
         tab.tabIndex = active ? 0 : -1;
         panels[current].hidden = !active;
       });
-      group.dispatchEvent(new CustomEvent('demo:select', { bubbles: true }));
+      group.dispatchEvent(new CustomEvent('demo:select', {
+        bubbles: true,
+        detail: { panel: panels[index] }
+      }));
     }
     tabs.forEach(function (tab, index) {
       tab.setAttribute('role', 'tab');
@@ -69,7 +72,7 @@
     }
   }
 
-  // Each view tells the next part of the same story, once, with explicit replay.
+  // Each view plays on first appearance and restarts whenever its tab is selected.
   // Completing an interrupted sequence leaves its final, readable HTML in place.
   function sequence(id, duration, scene) {
     var panel = document.getElementById(id);
@@ -92,6 +95,7 @@
     function play() {
       if (motion.matches || panel.hidden || document.hidden) return;
       finish(false);
+      panel.getAnimations({ subtree: true }).forEach(function (animation) { animation.cancel(); });
       played = true;
       running = true;
       panel.classList.add('demo-playing');
@@ -123,7 +127,7 @@
     panel.querySelectorAll('pre,.example-page').forEach(function (element) {
       element.addEventListener('focusin', function () { finish(false); });
     });
-    var controller = { panel: panel, finish: finish, enter: enter, replay: replay };
+    var controller = { panel: panel, finish: finish, play: play, replay: replay };
     sequences.push(controller);
     if ('IntersectionObserver' in window) {
       var observer = new IntersectionObserver(function (entries) {
@@ -269,10 +273,10 @@
     });
   }
 
-  document.addEventListener('demo:select', function () {
+  document.addEventListener('demo:select', function (event) {
     sequences.forEach(function (controller) {
       if (controller.panel.hidden) controller.finish(false);
-      else controller.enter();
+      else if (controller.panel === event.detail.panel) controller.play();
     });
   });
   document.querySelectorAll('[data-demo-next]').forEach(function (link) {

@@ -69,9 +69,10 @@
   .demo-playing [data-publish-step].is-current { opacity:1; }
   .demo-playing [data-publish-preview] { opacity:.45; }
   .demo-playing [data-publish-lock] { visibility:hidden; }
-  .edit-original { color:transparent; }
-  [data-edit-title] { position:relative; }
-  .edit-copy { position:absolute; top:0; left:0; color:var(--hero-ink); border-right:2px solid var(--accent); }
+  [data-edit-title] { display:inline-grid; vertical-align:baseline; }
+  [data-edit-value],.edit-copy { grid-area:1/1; }
+  .edit-original [data-edit-value] { opacity:0; }
+  .edit-copy { justify-self:start; margin-right:-2px; color:var(--hero-ink); border-right:2px solid var(--accent); }
   .agent-section { background:var(--hero-ink); padding:var(--space-xl) 0; }
   .agent-grid { --container-max:1120px; --container-padding:0 var(--page-gutter); display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.75fr); align-items:start; gap:32px; }
   .agent-grid > h2 { margin:28px 0 0; font-size:clamp(2rem,2.9vw,2.75rem); line-height:1.12; letter-spacing:-.035em; }
