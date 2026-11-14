@@ -76,6 +76,8 @@ The shared header and upper homepage use a 1600px container and fluid page gutte
 
 The agent demonstration puts the file tree beside the file content; at 520px it becomes horizontal file tabs above the content. At 800px the surrounding heading and explanation stack. Documentation retains its sidebar and reading column, with the native Guides disclosure below 640px. The extra header agent link is hidden below 640px; the homepage and documentation still provide the guide link.
 
+Documentation uses the shared page gutter. Its pale sidebar has the large radius and a thin border; the sticky offset accounts for the admin toolbar. Below 640px the Guides disclosure takes the same pale surface and gently curved panel treatment.
+
 ## Elevation & Depth
 
 The homepage uses tonal layering and thin borders rather than added shadows. Navy, the darker code surface, pane headers and the white preview establish hierarchy. Existing framework shadow tokens remain available to other components; this redesign adds none.
@@ -95,6 +97,8 @@ Actions and tabs use the default radius. Large demonstrations use the large radi
 **Example preview:** native HTML, clearly labeled as an example. Its local buttons change authored example content without navigating the visitor away. The displayed port follows ItsyWeb's actual default.
 
 **File tabs:** selected filenames use pale blue. Desktop arrow navigation is vertical, matching the file tree; phone navigation is horizontal, matching its reflow.
+
+**Guide navigation:** the current guide uses ice and navy, matching the homepage view tabs. The current chapter uses pale blue. Code panes have 12px corners and pane-colored copy controls; next-guide links use a pale, bordered panel with a pale blue hover state.
 
 **Motion:** a single 200ms preview refresh with exponential easing. Tab color changes take 160ms. Both are limited to visitors who have not requested reduced motion.
 

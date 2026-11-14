@@ -1,12 +1,14 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-14T20:30:00Z",
+  "generatedAt": "2026-11-14T20:54:46.200193+00:00",
   "title": "Design system: ItsyWeb",
   "extensions": {
     "sourceFiles": [
       "site/css/theme.css",
       "site/css/global.css",
-      "site/css/homepage.css"
+      "site/css/homepage.css",
+      "site/css/guides.css",
+      "site/css/docs-code.css"
     ],
     "motion": [
       {
@@ -76,6 +78,13 @@
       "description": "Reading link as implemented on the homepage.",
       "html": "<a class=\"ds-link\" href=\"/docs/templates\">Pages, layouts and data</a>",
       "css": ".ds-link{display:inline-flex;color:var(--brand-1,#245f91);font:600 .88rem/1.5 Inter,system-ui,sans-serif;text-decoration:none}.ds-link:hover{text-decoration:underline;text-underline-offset:4px}.ds-link:focus-visible{outline:2px solid var(--brand-1,#245f91);outline-offset:3px}"
+    },
+    {
+      "name": "Guide navigation",
+      "kind": "nav",
+      "description": "Pale documentation navigation with ice on the current guide and pale blue on the current chapter.",
+      "html": "<nav class=\"ds-guides\" aria-label=\"Guides\"><details open><summary>Getting Started</summary><a href=\"#installation\" aria-current=\"location\">1. Install ItsyWeb</a><a href=\"#create-a-site\">2. Create a site</a></details></nav>",
+      "css": ".ds-guides{padding:12px;border:1px solid var(--light,#d8e3ed);border-radius:var(--rounded-lg,1rem);background:var(--hero-ink,#f5f9ff);font:.87rem/1.5 Inter,system-ui,sans-serif}.ds-guides summary{padding:13px 10px;border-radius:var(--rounded,.625rem);background:var(--accent,#a4dbff);color:var(--black,#142b43);font-weight:600;cursor:pointer}.ds-guides a{display:block;margin:8px 0 8px 12px;padding:6px 8px;border-radius:6px;color:var(--dark,#4f657b);text-decoration:none}.ds-guides a[aria-current]{background:var(--brand-2-light,#d8edfc);color:var(--black,#142b43);font-weight:600}.ds-guides a:hover{background:var(--lighter,#f2f7fc);color:var(--brand-1,#245f91)}.ds-guides a:focus-visible,.ds-guides summary:focus-visible{outline:2px solid var(--brand-1,#245f91);outline-offset:3px}"
     }
   ],
   "narrative": {

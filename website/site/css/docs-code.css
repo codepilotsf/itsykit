@@ -5,10 +5,11 @@
     color: var(--hero-ink);
     color-scheme: dark;
     scrollbar-color: var(--hero-comment) var(--hero-terminal);
+    border-radius: 12px;
   }
 
   .docs-content pre:focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--brand-1);
     outline-offset: 3px;
   }
 
@@ -73,7 +74,7 @@
   }
 
   .docs-content .copy-button {
-    background: var(--brand-2);
+    background: var(--hero-pane);
     border-color: var(--hero-comment);
     color: var(--hero-ink);
   }
@@ -82,5 +83,10 @@
   .docs-content .copy-button.is-copied {
     color: var(--accent);
     border-color: var(--accent);
+  }
+
+  .docs-content .copy-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 }
