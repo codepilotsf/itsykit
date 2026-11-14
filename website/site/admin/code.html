@@ -1,0 +1,19 @@
+<!-- itsy
+layout: /admin.layout.html
+-->
+<div class="container py-xl">
+ <section class="admin-access">
+  {#if admin.message}<p role="status">{admin.message}</p>{/if}
+  <h1 class="text-xl mt-0">Check your email</h1>
+  <p class="text-dark">Enter your six-digit code. It expires after 10 minutes.</p>
+  <form method="post" action="/admin/verify">
+    <input type="hidden" name="csrf" value="{admin.csrf}" />
+    <label class="form-field">Sign-in code
+      <input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9][0-9][0-9][0-9][0-9][0-9]" minlength="6" maxlength="6" required autofocus />
+    </label>
+    <button class="w-full ui-brand-1 text-white">Sign in</button>
+  </form>
+  <p class="text-sm text-dark">No email? Check your spam folder.</p>
+  <p class="text-sm"><a href="/admin">Try another email or request a new code</a></p>
+ </section>
+</div>

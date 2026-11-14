@@ -1,0 +1,20 @@
+# macOS metadata
+.DS_Store
+._*
+
+# Temporary editor files
+*.swp
+*.swo
+*~
+
+# Local environment secrets
+.env
+.env.*
+!.env.example
+/itsy/runtime/
+/itsy/media/*.mp4
+
+# Private release source snapshots and verification records; never deploy.
+/release-work/
+/itsy/runtime/
+/itsy/media/*.mp4

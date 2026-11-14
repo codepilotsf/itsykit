@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{page.title} | {app.site_name}</title>
+    <meta name="description" content="{page.description}" />
+    <link rel="canonical" href="https://itsyweb.dev{page.path}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="{app.site_name}" />
+    <meta property="og:title" content="{page.title} | {app.site_name}" />
+    <meta property="og:description" content="{page.description}" />
+    <meta property="og:url" content="https://itsyweb.dev{page.path}" />
+    <meta property="og:image" content="https://itsyweb.dev/images/social-preview.png?v=118f9bca0c9d" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="ItsyWeb: Write HTML. Skip the build pipeline. Layouts, clean URLs, deployment and HTTPS." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{page.title} | {app.site_name}" />
+    <meta name="twitter:description" content="{page.description}" />
+    <meta name="twitter:image" content="https://itsyweb.dev/images/social-preview.png?v=118f9bca0c9d" />
+    <meta name="twitter:image:alt" content="ItsyWeb: Write HTML. Skip the build pipeline. Layouts, clean URLs, deployment and HTTPS." />
+    <link rel="stylesheet" href="/css/global.css?v=79fa0cda1997" />
+    {#if app.current_admin}
+    <meta name="csrf-token" content="{app.current_admin.csrf_token}" />
+    {/if}
+    <link rel="icon" href="/images/favicon-32.png?v=797376b865a3" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/images/favicon.svg?v=797376b865a3" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png?v=797376b865a3" sizes="180x180" />
+  </head>
+  <body class="flex flex-col min-h-screen m-0 p-0">
+    {#if app.current_admin} {render /admin/toolbar} {/if}
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <nav
+        class="container flex items-center justify-between"
+        aria-label="Main navigation"
+      >
+        <a class="wordmark" href="/" aria-label="ItsyWeb home"><img class="itsy-logo" src="/images/logo.svg?v=202baa56b764" width="176" height="38" alt="ItsyWeb" /></a>
+        <div class="site-links flex items-center gap-md">
+          {render /navigation}
+        </div>
+      </nav>
+    </header>
+    <main id="main" class="flex-1" tabindex="-1">{slot}</main>
+    <footer class="site-footer">
+      <div class="footer-inner container">
+        <div>
+          <a class="wordmark" href="/"><img class="itsy-logo" src="/images/logo.svg?v=202baa56b764" width="176" height="38" alt="ItsyWeb" /></a>
+          <p>HTML, shared templates and a server you control.</p>
+        </div>
+        <nav class="flex flex-wrap gap-md" aria-label="Footer navigation">
+          <a href="/docs#release-notes">Release notes</a
+          ><a href="/docs#support">Support</a>
+        </nav>
+        <p class="copyright">&copy; 2026 ItsyWeb</p>
+      </div>
+    </footer>
+    <p id="copy-status" class="visually-hidden" role="status" aria-live="polite"></p>
+    <script src="/js/copy.js" defer></script>
+    <script src="/js/header.js" defer></script>
+  </body>
+</html>

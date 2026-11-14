@@ -1,0 +1,60 @@
+{
+  "title": "A logo for Itsy Web",
+  "question": "Which logo direction should I refine and put on the site? The existing site colors and layout stay in place.",
+  "options": [
+    {
+      "id": "thread",
+      "label": "One thread",
+      "kicker": "RECOMMENDED",
+      "thesis": "A continuous strand becomes a compact i/w mark: a small tool that connects the whole website.",
+      "palette": [
+        "#142b43",
+        "#a4dbff",
+        "#f5f9ff"
+      ],
+      "materials": [
+        "Flat graphic identity",
+        "Softly squared custom lettering"
+      ],
+      "viewport": "An expressive i/w symbol beside Itsy Web; the symbol stands alone in the browser tab.",
+      "risk": "The strand must stay distinctive rather than becoming a generic infinity loop.",
+      "comp": ".impeccable/mocks/decision/itsy-web-thread.png"
+    },
+    {
+      "id": "spider",
+      "label": "Itsy, the builder",
+      "thesis": "A tiny, purposeful spider gives Itsy a memorable character without making the product feel like a toy.",
+      "palette": [
+        "#142b43",
+        "#a4dbff",
+        "#f5f9ff"
+      ],
+      "materials": [
+        "Minimal spot-color illustration",
+        "Warm, precise wordmark"
+      ],
+      "viewport": "A bold little eight-legged silhouette paired with Itsy Web, tested on pale and navy grounds.",
+      "risk": "A mascot is more playful and makes the name\u2019s spider association explicit.",
+      "comp": ".impeccable/mocks/decision/itsy-web-spider.png"
+    },
+    {
+      "id": "slot",
+      "label": "The slot",
+      "thesis": "A header, page and footer fit together as one compact architectural symbol.",
+      "palette": [
+        "#142b43",
+        "#a4dbff",
+        "#f5f9ff"
+      ],
+      "materials": [
+        "Geometric graphic identity",
+        "Sturdy, carefully spaced lettering"
+      ],
+      "viewport": "A restrained modular mark and Itsy Web wordmark, with a clear single-color silhouette.",
+      "risk": "The most technical option needs a strong silhouette to avoid looking like a generic layout icon.",
+      "comp": ".impeccable/mocks/decision/itsy-web-slot.png"
+    }
+  ],
+  "reroll": true,
+  "steer": true
+}

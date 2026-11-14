@@ -1,0 +1,86 @@
+/* Navy code surfaces with distinct syntax colors and Ice actions. */
+@layer styles {
+  .docs-content pre {
+    background: var(--hero-terminal);
+    color: var(--hero-ink);
+    color-scheme: dark;
+    scrollbar-color: var(--hero-comment) var(--hero-terminal);
+  }
+
+  .docs-content pre:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .docs-content pre ::selection {
+    background: var(--accent);
+    color: var(--brand-2);
+  }
+
+  .docs-content pre > code {
+    font-size: inherit;
+    color: inherit;
+    background: transparent;
+    white-space: inherit;
+    overflow-wrap: normal;
+    tab-size: 2;
+  }
+
+  .docs-content pre .token.comment,
+  .docs-content pre .token.prolog,
+  .docs-content pre .token.doctype,
+  .docs-content pre .token.cdata {
+    color: var(--hero-comment);
+  }
+
+  .docs-content pre .token.punctuation {
+    color: var(--hero-muted);
+  }
+
+  .docs-content pre .token.tag,
+  .docs-content pre .token.property {
+    color: #e99a9f;
+  }
+
+  .docs-content pre .token.keyword {
+    color: #cfa4ed;
+  }
+
+  .docs-content pre .token.function,
+  .docs-content pre .token.class-name {
+    color: #7dc3f5;
+  }
+
+  .docs-content pre .token.attr-name,
+  .docs-content pre .token.builtin {
+    color: #e5c07b;
+  }
+
+  .docs-content pre .token.boolean,
+  .docs-content pre .token.number {
+    color: #e5ac80;
+  }
+
+  .docs-content pre .token.string,
+  .docs-content pre .token.attr-value {
+    color: var(--accent);
+  }
+
+  .docs-content pre .token.operator,
+  .docs-content pre .token.variable,
+  .docs-content pre .token.entity {
+    color: #75c9d5;
+  }
+
+  .docs-content .copy-button {
+    background: var(--brand-2);
+    border-color: var(--hero-comment);
+    color: var(--hero-ink);
+  }
+
+  .docs-content .copy-button:hover:not(:disabled),
+  .docs-content .copy-button.is-copied {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+}

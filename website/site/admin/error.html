@@ -1,0 +1,15 @@
+<!-- itsy
+layout: /admin.layout.html
+-->
+<div class="container py-xl">
+ <section class="admin-access">
+  <h1 class="text-xl mt-0">Your changes weren’t saved</h1>
+  <p role="alert">{admin.message}</p>
+  {#if admin.draft}
+  <label class="form-field">Copy your text before leaving
+    <textarea readonly>{admin.draft}</textarea>
+  </label>
+  {/if}
+  <a href="/">Back to website</a>
+ </section>
+</div>
