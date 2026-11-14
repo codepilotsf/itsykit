@@ -1,0 +1,89 @@
+<div class="docs-shell container">
+  <aside class="docs-sidebar">
+    <a class="guide-index-link" href="/docs">All guides</a>
+    <h2 class="docs-nav-heading">In this guide</h2>
+    <nav class="docs-toc" aria-label="Guide chapters"><a href="#seo-discovery">Sitemaps, canonical URLs and page exclusions</a>
+<a href="#seo-update">1. Check your CLI and server</a>
+<a href="#seo-configure">2. Set the production address</a>
+<a href="#seo-check">3. Check locally, then deploy</a>
+<a href="#seo-discovery-chapter-4">What ItsyWeb includes and preserves</a>
+<a href="#seo-search-console">Optional: tell Google where the sitemap is</a>
+<a href="#indexing">Keep staging out of search</a></nav>
+  </aside>
+  <article class="docs-content">
+    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#seo-discovery">Sitemaps, canonical URLs and page exclusions</a>
+<a href="#seo-update">1. Check your CLI and server</a>
+<a href="#seo-configure">2. Set the production address</a>
+<a href="#seo-check">3. Check locally, then deploy</a>
+<a href="#seo-discovery-chapter-4">What ItsyWeb includes and preserves</a>
+<a href="#seo-search-console">Optional: tell Google where the sitemap is</a>
+<a href="#indexing">Keep staging out of search</a></nav></details>
+    <header>
+      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <h1>Search engines and SEO</h1>
+      <p>Configure sitemaps, canonical URLs, Search Console, and staging indexing policy.</p>
+    </header>
+<section id="seo-discovery">
+      <h2>Sitemaps, canonical URLs and page exclusions</h2>
+      <p>ItsyWeb 0.20.0 can keep your public page list up to date for search engines. A <strong>sitemap</strong> lists the page addresses you want discovered. A <strong>canonical tag</strong> identifies a page's preferred address. Configure these once; ItsyWeb updates the generated sitemap when public content changes.</p>
+
+      <h3 id="seo-update">1. Check your CLI and server</h3>
+      <p>Update your installed CLI and check its version:</p>
+      <pre tabindex="0" aria-label="Update the local CLI"><code class="language-bash">itsy update
+itsy version</code></pre>
+      <p>This feature starts in 0.20.0 and requires matching CLI/server deployment protocol 28. If an existing server runs an older version, run the following from a site whose current Git branch has that server saved as its deployment destination:</p>
+      <pre tabindex="0" aria-label="Update a configured site's server"><code class="language-bash">itsy update-server</code></pre>
+      <p>It asks before briefly restarting every site on that host. Updating the CLI or deploying website files alone does not update the server executable. A new server set up with the current CLI already receives its bundled runtime. See <a href="/docs/deployment#deployment">deployment</a> for destination setup.</p>
+
+      <h3 id="seo-configure">2. Set the production address</h3>
+      <p>Add a top-level <code>seo</code> object to <code>itsy.config.json</code>, alongside <code>app</code>. This minimal example shows the placement; keep your existing app, admin, apps and deployment settings:</p>
+      <pre tabindex="0" aria-label="Search discovery configuration"><code class="language-json">&#123;
+  "app": &#123;"site_name": "Example"&#125;,
+  "seo": &#123;
+    "url": "https://example.com",
+    "exclude": ["/campaign/receipt"]
+  &#125;
+&#125;</code></pre>
+      <p>Replace <code>https://example.com</code> with your site's production HTTPS address, even while working locally or on staging. Use only the origin: no credentials, subdirectory, query or fragment. ItsyWeb uses this configured address rather than a request Host or forwarding header. Without <code>seo</code>, automatic discovery is disabled. This setting does not configure DNS, register a hostname or enable HTTPS.</p>
+      <p><code>exclude</code> is optional. Replace the example path with an existing page you want kept out of search, or omit the list. Entries match one exact path without wildcards, queries or trailing slashes; excluding <code>/campaign</code> does not exclude its descendants. Exclusion does not create a missing page.</p>
+
+      <h3 id="seo-check">3. Check locally, then deploy</h3>
+      <pre tabindex="0" aria-label="Validate and preview search discovery"><code class="language-bash">itsy status
+itsy dev</code></pre>
+      <p>Open the local address printed by dev. Check these responses:</p>
+      <ul>
+        <li><strong><code>/sitemap.xml</code>:</strong> XML containing eligible public page addresses on your production domain, with no localhost or staging URLs.</li>
+        <li><strong><code>/robots.txt</code>:</strong> a <code>Sitemap: https://example.com/sitemap.xml</code> line using your production address, unless you supply a custom file.</li>
+        <li><strong>A public page:</strong> use View Source to find its <code>rel="canonical"</code> link. It uses the production address without tracking queries. An HTML fragment without a closing head receives a canonical HTTP <code>Link</code> header instead.</li>
+        <li><strong>An existing excluded page:</strong> it still loads, but the browser's Network panel shows <code>X-Robots-Tag: noindex</code>. It has no generated canonical or sitemap entry.</li>
+      </ul>
+      <p>Commit your reviewed configuration and site changes, then deploy from the intended branch:</p>
+      <pre tabindex="0" aria-label="Publish committed search discovery settings"><code class="language-bash">itsy deploy</code></pre>
+      <p>Normal deployment publishes the committed configuration and preserves existing live editable content. Repeat the checks on the public domain. If you use curl, check an existing excluded page's headers with:</p>
+      <pre tabindex="0" aria-label="Check an excluded page's response headers"><code class="language-bash">curl -I https://example.com/campaign/receipt</code></pre>
+      <p>Replace the address and path with your own; expect <code>X-Robots-Tag: noindex</code>. Excluded pages remain public. Use authentication for private information, and keep excluded pages crawlable so search engines can read the noindex header.</p>
+
+      <h3 id="seo-discovery-chapter-4">What ItsyWeb includes and preserves</h3>
+      <p>The generated sitemap includes ordinary public pages, enabled Blog listings and published posts, and enabled Contact forms. Drafts, private/admin routes, assets, errors, managed custom apps, redirects and enabled Contact's thank-you page stay out. Contact's thank-you page receives noindex automatically. Pages with robots or googlebot noindex metadata are also omitted. There are no guessed modification dates; beyond 50,000 URLs or 50 MiB, provide a custom sitemap index.</p>
+      <p>Existing canonical tags are preserved. A page with a custom canonical enters the generated sitemap only if that tag exactly matches its absolute production URL. Relative, empty or different custom canonicals keep the page out of the generated list.</p>
+      <p>Custom <code>site/sitemap.xml</code> and <code>site/robots.txt</code> routes take precedence independently and are served unchanged. ItsyWeb does not append a Sitemap line to a custom robots.txt or remove excluded URLs from a custom sitemap. Maintain those declarations and exclusions yourself. Generated documents live in memory; you do not need to create or commit them. Redirect rules cannot use either discovery endpoint as a source while automatic SEO is enabled.</p>
+      <p>The <a href="/docs/seo#indexing">exact-host staging policy</a> remains separate. It still adds noindex/nofollow to staging responses, including discovery documents, while shared sitemaps and canonicals name the production origin. A production URL does not automatically protect other hostnames; configure staging policy explicitly.</p>
+
+      <h3 id="seo-search-console">Optional: tell Google where the sitemap is</h3>
+      <p><a href="https://search.google.com/search-console">Google Search Console</a> is Google's free reporting tool for website owners. <strong>It is optional.</strong> ItsyWeb's generated robots.txt already advertises the sitemap, so Google can discover it without an account or integration in ItsyWeb.</p>
+      <p>To see whether Google has read the sitemap and reported processing errors, first make sure it is reachable on your public production domain. Then:</p>
+      <ol>
+        <li>Open Search Console and verify that you own the production domain or site address.</li>
+        <li>Select that site and open <strong>Sitemaps</strong>.</li>
+        <li>Submit <code>https://example.com/sitemap.xml</code>. If the form already supplies your site's address, enter only <code>sitemap.xml</code>.</li>
+      </ol>
+      <p>You submit the <strong>URL</strong>, not an uploaded XML file. Keep the same URL as content changes; you do not need to submit it after every edit. Submission does not guarantee indexing, ranking or AI citations. See <a href="https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap">Google's sitemap guide</a>.</p>
+    </section>
+
+<section id="indexing"><h2>Keep staging out of search</h2><p>From ItsyWeb 0.19.0, configure indexing for an already registered hostname over SSH. Staging and production can serve the same website files:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy server indexing root@server staging.example.com noindex
+itsy server list root@server</code></pre><p>Type the exact hostname when asked. ItsyWeb sends <code>X-Robots-Tag: noindex, nofollow</code> on that hostname's pages, assets, app responses, errors, downloads and redirects. Aliases can have different policies. The command restarts the shared service, briefly affecting other sites.</p><p>Policy belongs to the server, outside site app settings, editable content and release files. Normal deployment, content sync, code rollback and site restore retain the current policy. <code>itsy status</code> and <code>itsy server list</code> show effective settings. Existing hostnames without a policy keep their behavior; ItsyWeb does not infer staging from the hostname.</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy server indexing root@server staging.example.com allow</code></pre><p><code>allow</code> stops adding the framework restriction. It does not emit <code>index, follow</code>, remove owner-authored headers or meta tags, or guarantee search visibility. Each exact registered hostname is configured separately; wildcards and arbitrary forwarding headers cannot select a policy.</p><div class="notice"><p><strong>Keep robots.txt crawlable.</strong> A site-wide <code>Disallow: /</code> can stop crawlers discovering the noindex header. The host policy does not rewrite robots.txt, sitemaps, canonical tags or templates, and reports detected static site-wide crawl blocks. The separate <a href="/docs/seo#seo-discovery">SEO settings</a> can generate missing discovery documents and canonical tags. This controls cooperative search indexing, not private access.</p></div><p>Removing a site clears only its own hostname policies; redeploying a removed name does not restore them. Site backups exclude host policy. Interrupted policy changes use the existing server-side <code>sudo itsy-server -recover</code> journal, which restores the complete prior host configuration. Upgrade both client and server to protocol 28 before using this feature. Verify the live staging header before removing any existing site-level meta fallback.</p></section>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/redirects">Migration redirects</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+  </article>
+</div>
+<script src="/js/prism.js" defer></script>
+<script src="/js/prism-go.js" defer></script>

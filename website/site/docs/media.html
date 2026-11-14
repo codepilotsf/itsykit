@@ -1,0 +1,33 @@
+<div class="docs-shell container">
+  <aside class="docs-sidebar">
+    <a class="guide-index-link" href="/docs">All guides</a>
+    <h2 class="docs-nav-heading">In this guide</h2>
+    <nav class="docs-toc" aria-label="Guide chapters"><a href="#media">Editable photos &amp; videos</a>
+<a href="#media-chapter-1">Photos</a>
+<a href="#media-chapter-2">Videos</a>
+<a href="#collections">Admin-managed collections</a></nav>
+  </aside>
+  <article class="docs-content">
+    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#media">Editable photos &amp; videos</a>
+<a href="#media-chapter-1">Photos</a>
+<a href="#media-chapter-2">Videos</a>
+<a href="#collections">Admin-managed collections</a></nav></details>
+    <header>
+      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <h1>Photos, videos and collections</h1>
+      <p>Add editable media and lists that admins can manage on the page.</p>
+    </header>
+<section id="media"><h2>Editable photos &amp; videos</h2><p>Ordinary images and videos use normal HTML and public asset paths. The snip attributes below are for media you want an admin to replace in the browser.</p><h3 id="media-chapter-1">Photos</h3><pre tabindex="0" aria-label="Code example"><code class="language-markup">&lt;img snip src="/images/studio.jpg"
+  alt="The studio in the afternoon"
+  width="1200" height="800" /&gt;</code></pre><p>Dev imports a local JPEG or PNG into managed media and creates the source and alt-text bindings. Keep dimensions, classes and links in your HTML. Don't combine a media snip with <code>srcset</code>, <code>picture</code> or competing <code>source</code> elements.</p><p>Admins click a photo in Edit mode to choose or upload a replacement. Save publishes it; Cancel discards the draft.</p><h3 id="media-chapter-2">Videos</h3><pre tabindex="0" aria-label="Code example"><code class="language-markup">&lt;video snip src="/videos/studio.mp4" controls&gt;&lt;/video&gt;</code></pre><p>Use a fast-start MP4 with H.264 video and optional AAC-LC audio, up to 25 MiB. ItsyWeb does not transcode videos. Admins can replace the video or its poster from the page editor.</p><p>Video storage is limited to 64 MiB, including retained replacements. Managed MP4 files are Git-ignored. Restore missing files on a fresh checkout with <code>itsy pull</code> before validation.</p></section>
+
+<section id="collections"><h2>Admin-managed collections</h2><p>For developer-managed lists, use JSON data and a loop as shown in <a href="/docs/templates#templates">templates</a>. Use a multisnip when an admin needs to manage the list on the page.</p><p>A multisnip lets an admin add, remove and reorder items such as team members. Give the group a name and name its editable fields:</p><pre tabindex="0" aria-label="Code example"><code class="language-markup">&lt;article multisnip="team"&gt;
+  &lt;h2 snip="name"&gt;Sam Rivera&lt;/h2&gt;
+  &lt;p snip="title"&gt;Studio founder&lt;/p&gt;
+  &lt;img snip="photo" src="/images/sam.jpg" alt="Sam" /&gt;
+&lt;/article&gt;</code></pre><p>Dev turns the seed into a loop. Admins use the on-page Add tile, remove button and drag handles. Arrow keys on a handle can reorder items too.</p><p>Keep each group on an individual page, with one root element. Don't nest groups or place them in layouts, partials or other loops. Video fields are not supported in multisnips.</p></section>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/editing">On-page editing</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+  </article>
+</div>
+<script src="/js/prism.js" defer></script>
+<script src="/js/prism-go.js" defer></script>

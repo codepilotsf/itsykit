@@ -1,0 +1,22 @@
+<div class="docs-shell container">
+  <aside class="docs-sidebar">
+    <a class="guide-index-link" href="/docs">All guides</a>
+    <h2 class="docs-nav-heading">In this guide</h2>
+    <nav class="docs-toc" aria-label="Guide chapters"><a href="#styling">Your CSS, your design</a>
+<a href="#styling-chapter-1">Icons</a></nav>
+  </aside>
+  <article class="docs-content">
+    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#styling">Your CSS, your design</a>
+<a href="#styling-chapter-1">Icons</a></nav></details>
+    <header>
+      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <h1>CSS and icons</h1>
+      <p>Customize theme tokens, write CSS, and use the built-in icon syntax.</p>
+    </header>
+<section id="styling"><h2>Your CSS, your design</h2><p>Generated sites include Prewind 1.3.1. Start with global styles, then use utilities for individual adjustments. There is no CSS build step.</p><p>Edit <code>site/css/theme.css</code> for colors, fonts and spacing tokens. Put shared rules in <code>site/css/global.css</code> inside <code>@layer styles</code>. CSS stays in source and is published by normal deployment.</p><h3 id="styling-chapter-1">Icons</h3><pre tabindex="0" aria-label="Code example"><code class="language-markup">&#123;icon arrow-right&#125;
+&#123;icon search size="20" aria-label="Search"&#125;</code></pre><p>Dev downloads only the referenced Lucide icons into <code>itsy/icons/</code>. Commit the cache for offline use. Status checks do not download icons.</p></section>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/deployment">Server setup and deployment</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+  </article>
+</div>
+<script src="/js/prism.js" defer></script>
+<script src="/js/prism-go.js" defer></script>

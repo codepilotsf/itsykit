@@ -13,8 +13,93 @@
       }
     },
     "/docs": {
-      "title": "Documentation",
-      "description": "Build and run an HTML website with ItsyWeb: pages, layouts, partials, clean URLs, local development, SSH deployment and automatic HTTPS. Optional editing and apps when needed.",
+      "title": "Guides",
+      "description": "Learn ItsyWeb with a hands-on Getting Started tutorial and focused guides to templates, styling, editing, deployment, and more.",
+      "snips": {}
+    },
+    "/docs/installation": {
+      "title": "Installation and updates",
+      "description": "Install a supported CLI, update an existing installation, and check version requirements.",
+      "snips": {}
+    },
+    "/docs/development": {
+      "title": "Local development",
+      "description": "Create projects, use live reload, and test from another device on your network.",
+      "snips": {}
+    },
+    "/docs/templates": {
+      "title": "Pages, layouts and data",
+      "description": "Map files to URLs, share markup with layouts and partials, and use JSON data.",
+      "snips": {}
+    },
+    "/docs/styling": {
+      "title": "CSS and icons",
+      "description": "Customize theme tokens, write CSS, and use the built-in icon syntax.",
+      "snips": {}
+    },
+    "/docs/deployment": {
+      "title": "Server setup and deployment",
+      "description": "Set up an Ubuntu host and publish committed source with automatic HTTPS.",
+      "snips": {}
+    },
+    "/docs/redirects": {
+      "title": "Migration redirects",
+      "description": "Map old paths directly to their replacements with exact 301 redirects.",
+      "snips": {}
+    },
+    "/docs/seo": {
+      "title": "Search engines and SEO",
+      "description": "Configure sitemaps, canonical URLs, Search Console, and staging indexing policy.",
+      "snips": {}
+    },
+    "/docs/recovery": {
+      "title": "Backups and recovery",
+      "description": "Back up a site, recover code or content, and understand what each operation preserves.",
+      "snips": {}
+    },
+    "/docs/editing": {
+      "title": "On-page editing",
+      "description": "Make selected content editable, enable admin access, and sync live changes.",
+      "snips": {}
+    },
+    "/docs/media": {
+      "title": "Photos, videos and collections",
+      "description": "Add editable media and lists that admins can manage on the page.",
+      "snips": {}
+    },
+    "/docs/email": {
+      "title": "Email and contact forms",
+      "description": "Preview email locally, configure delivery, and add the bundled Contact form.",
+      "snips": {}
+    },
+    "/docs/blog": {
+      "title": "Blog",
+      "description": "Enable a blog, customize its templates, and create and publish posts.",
+      "snips": {}
+    },
+    "/docs/apps": {
+      "title": "Managed apps",
+      "description": "Understand app mounts, build a local executable, and work with app-owned sessions.",
+      "snips": {}
+    },
+    "/docs/agents": {
+      "title": "Working with coding agents",
+      "description": "Use the bundled site, import, Blog, and Contact instructions with a coding agent.",
+      "snips": {}
+    },
+    "/docs/release-notes": {
+      "title": "Release notes",
+      "description": "Read the changes and upgrade requirements for each published release.",
+      "snips": {}
+    },
+    "/docs/support": {
+      "title": "About ItsyWeb and support",
+      "description": "Understand where ItsyWeb fits, its current limits, and how to report a problem.",
+      "snips": {}
+    },
+    "/docs/getting-started": {
+      "title": "Getting Started",
+      "description": "Build your first ItsyWeb site, step by step: two HTML pages, shared navigation, a layout, a partial, and a little CSS.",
       "snips": {}
     }
   },

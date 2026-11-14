@@ -1,0 +1,45 @@
+<div class="docs-shell container">
+  <aside class="docs-sidebar">
+    <a class="guide-index-link" href="/docs">All guides</a>
+    <h2 class="docs-nav-heading">In this guide</h2>
+    <nav class="docs-toc" aria-label="Guide chapters"><a href="#project-structure">A folder you can follow</a>
+<a href="#templates">HTML, with reusable pieces</a>
+<a href="#templates-chapter-1">Add a page</a>
+<a href="#templates-chapter-2">Share a layout</a>
+<a href="#templates-chapter-3">Reuse a partial</a>
+<a href="#templates-chapter-4">Settings and structured data</a>
+<a href="#templates-chapter-5">Page titles and descriptions</a></nav>
+  </aside>
+  <article class="docs-content">
+    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#project-structure">A folder you can follow</a>
+<a href="#templates">HTML, with reusable pieces</a>
+<a href="#templates-chapter-1">Add a page</a>
+<a href="#templates-chapter-2">Share a layout</a>
+<a href="#templates-chapter-3">Reuse a partial</a>
+<a href="#templates-chapter-4">Settings and structured data</a>
+<a href="#templates-chapter-5">Page titles and descriptions</a></nav></details>
+    <header>
+      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <h1>Pages, layouts and data</h1>
+      <p>Map files to URLs, share markup with layouts and partials, and use JSON data.</p>
+    </header>
+<section id="project-structure"><h2>A folder you can follow</h2><dl class="file-list"><dt>site/</dt><dd>Public HTML, CSS, images and other assets.</dd><dt>site/main.layout.html</dt><dd>The shared page wrapper.</dd><dt>itsy/snips.json</dt><dd>Editable content and page metadata.</dd><dt>itsy/data/</dt><dd>Optional JSON data you maintain in code.</dd><dt>itsy/media/</dt><dd>Managed photos and videos.</dd><dt>mailers/</dt><dd>Private email templates.</dd><dt>itsy.config.json</dt><dd>Site settings and branch deployment destinations.</dd><dt>itsy/runtime/</dt><dd>Private, Git-ignored runtime state.</dd><dt>itsy/skills/</dt><dd>Portable instructions for coding agents.</dd></dl><p>Public URLs leave off <code>site/</code>. For example, <code>site/images/logo.svg</code> is served at <code>/images/logo.svg</code>. Keep secrets out of configuration, templates and Git.</p></section>
+
+<section id="templates"><h2>HTML, with reusable pieces</h2><p>Keep page content in HTML files. The server handles the shared pieces when it serves a page, so you do not need to run a static site generator after changing your header.</p><h3 id="templates-chapter-1">Add a page</h3><p>Create <code>site/about.html</code> for <code>/about</code>. You can use <code>site/about/index.html</code> instead, but not both. Link to extensionless URLs without a trailing slash. Explicit <code>.html</code> URLs and trailing slashes return 404 unless you configure an exact <a href="/docs/redirects#redirects">redirect</a>. Assets keep their paths: <code>site/images/logo.svg</code> is <code>/images/logo.svg</code>. Files and directories beginning with <code>_</code> or <code>.</code> are private.</p><h3 id="templates-chapter-2">Share a layout</h3><p>The default wrapper is <code>site/main.layout.html</code>. Put <code>&#123;slot&#125;</code> where the page content belongs.</p><pre tabindex="0" aria-label="Code example"><code class="language-markup">&lt;header&gt;Our studio&lt;/header&gt;
+&lt;main&gt;&#123;slot&#125;&lt;/main&gt;
+&lt;footer&gt;Thanks for stopping by.&lt;/footer&gt;</code></pre><p>For a different wrapper, put this comment at the very start of a page:</p><pre tabindex="0" aria-label="Code example"><code class="language-markup">&lt;!-- itsy
+layout: /custom.layout.html
+--&gt;</code></pre><p>Preserve the generated layout's <code>app.current_admin</code> conditional blocks, CSRF meta tag and admin toolbar include. They allow the optional editor to work if you enable admin access later; they do not require you to make your page content editable.</p><h3 id="templates-chapter-3">Reuse a partial</h3><p>Put navigation, a card or any other shared markup in a private partial. Include it wherever you need it; editing the partial updates every page that uses it.</p><p>Create <code>site/_card.html</code>, then include it with <code>&#123;render card&#125;</code>. Relative names resolve beside the calling template. <code>&#123;render /shared/card&#125;</code> selects <code>site/shared/_card.html</code>.</p><h3 id="templates-chapter-4">Settings and structured data</h3><p>Public settings live under <code>app</code> in <code>itsy.config.json</code>. Use <code>&#123;app.site_name&#125;</code> in your templates. A file named <code>itsy/data/team.json</code> is available as <code>data.team</code>.</p><pre tabindex="0" aria-label="Code example"><code class="language-markup">&#123;#if app.phone&#125;
+  &lt;p&gt;Call &#123;app.phone&#125;&lt;/p&gt;
+&#123;/if&#125;
+
+&#123;#each data.team.members as member&#125;
+  &lt;p&gt;&#123;member.name&#125;&lt;/p&gt;
+&#123;:else&#125;
+  &lt;p&gt;Meet the team soon.&lt;/p&gt;
+&#123;/each&#125;</code></pre><p>Conditions take dotted paths, not JavaScript expressions. Use <code>&#123;#unless app.phone&#125;...&#123;/unless&#125;</code> for a negative condition. Both support <code>&#123;:else&#125;</code> and <code>&#123;:else if dotted.path&#125;</code>.</p><h3 id="templates-chapter-5">Page titles and descriptions</h3><p>Page metadata lives under the route in <code>pages</code> in <code>itsy/snips.json</code>. Update its <code>title</code> and <code>description</code> fields. The layout can use <code>&#123;page.title&#125;</code>, <code>&#123;page.description&#125;</code> and <code>&#123;page.path&#125;</code>. Ordinary page text can stay directly in your HTML.</p></section>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/styling">CSS and icons</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+  </article>
+</div>
+<script src="/js/prism.js" defer></script>
+<script src="/js/prism-go.js" defer></script>

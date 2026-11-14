@@ -19,6 +19,16 @@ content and runtime files. Downloads are served from `itsyweb.dev`. This
 server source live beside it in [../system/](../system/README.md), in the
 same ItsyWeb repository. Run the site commands below from `website/`.
 
+## Public guides
+
+`site/docs.html` is the guide index at `/docs`. Each focused guide lives in
+`site/docs/`, with its own chapter navigation and links to related guides.
+Getting Started builds one small site from installation through local validation;
+server deployment and optional editing belong in their own guides. Keep tutorial
+examples executable with the current CLI and starter. Encode literal template
+braces in code examples so the documentation displays rather than executes them.
+Page titles and descriptions live in `itsy/snips.json`.
+
 ## Getting started
 
 Install the current public test release for Apple Silicon macOS or x86-64 Linux:
@@ -27,7 +37,7 @@ Install the current public test release for Apple Silicon macOS or x86-64 Linux:
 curl -fsSL https://itsyweb.dev/install.sh | bash
 ```
 
-See [installation notes](https://itsyweb.dev/docs#installation) for PATH setup and
+See [installation notes](https://itsyweb.dev/docs/installation) for PATH setup and
 current testing limits. No Intel Mac or Linux ARM64 CLI download is available;
 both supported CLIs can deploy to x86-64 and ARM64 Linux servers.
 
@@ -312,7 +322,7 @@ map replacements and verify responses. Provide old URL/analytics exports for
 orphaned pages; leave ambiguous mappings for a decision. Run `itsy status` and
 verify 301/Location and the final content locally. Update both CLI and server to
 protocol 28 before deploying; public 0.19.0 and earlier ignore these rules. See
-[the public guide](https://itsyweb.dev/docs#redirects).
+[the public guide](https://itsyweb.dev/docs/redirects#redirects).
 
 ## Search discovery
 
@@ -355,7 +365,7 @@ Google Search Console is optional: generated robots.txt already advertises the
 sitemap. To see Google's processing reports, verify ownership of the production
 site and add `https://example.com/sitemap.xml` in its Sitemaps report. Submit the
 URL, not an uploaded file; it stays current without resubmitting after every edit.
-See [the public walkthrough](https://itsyweb.dev/docs#seo-discovery).
+See [the public walkthrough](https://itsyweb.dev/docs/seo#seo-discovery).
 
 ## Hostname indexing
 
@@ -377,7 +387,7 @@ owner-authored restrictions. Keep robots.txt crawlable so crawlers can discover
 noindex; ItsyWeb warns about detected static site-wide blocks without rewriting it.
 Site backups exclude policy; removal clears only owned hosts. Verify native
 headers before removing an existing meta fallback. See the
-[public documentation](https://itsyweb.dev/docs#indexing) and RELEASES.md for
+[public documentation](https://itsyweb.dev/docs/seo#indexing) and RELEASES.md for
 actual rollout evidence.
 
 ## Optional editing and apps
@@ -385,8 +395,8 @@ actual rollout evidence.
 The HTML, development and deployment workflow works without configuring an
 editor or enabling an app. Leave developer-managed text in your HTML. Use the
 features below when an admin needs to change content or a site needs a contact
-form or blog. The public documentation covers [Blog](https://itsyweb.dev/docs#blog)
-and [custom managed apps](https://itsyweb.dev/docs#custom-apps) in detail.
+form or blog. The public documentation covers [Blog](https://itsyweb.dev/docs/blog#blog)
+and [custom managed apps](https://itsyweb.dev/docs/apps#custom-apps) in detail.
 
 ### Editable content
 

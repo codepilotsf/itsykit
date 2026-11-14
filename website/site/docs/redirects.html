@@ -1,0 +1,44 @@
+<div class="docs-shell container">
+  <aside class="docs-sidebar">
+    <a class="guide-index-link" href="/docs">All guides</a>
+    <h2 class="docs-nav-heading">In this guide</h2>
+    <nav class="docs-toc" aria-label="Guide chapters"><a href="#redirects">Preserve old links with 301 redirects</a>
+<a href="#redirects-chapter-1">Inventory the original website with an agent</a>
+<a href="#redirects-chapter-2">Validate before deploying</a></nav>
+  </aside>
+  <article class="docs-content">
+    <details class="docs-mobile"><summary>In this guide</summary><nav class="docs-toc" aria-label="Mobile guide chapters"><a href="#redirects">Preserve old links with 301 redirects</a>
+<a href="#redirects-chapter-1">Inventory the original website with an agent</a>
+<a href="#redirects-chapter-2">Validate before deploying</a></nav></details>
+    <header>
+      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <h1>Migration redirects</h1>
+      <p>Map old paths directly to their replacements with exact 301 redirects.</p>
+    </header>
+<section id="redirects">
+      <h2>Preserve old links with 301 redirects</h2>
+      <p>From ItsyWeb 0.20.0, keep visitors and search engines reaching the right content when you migrate a site or move a page. Add exact old paths to a top-level <code>redirects</code> object in <code>itsy.config.json</code>, alongside <code>app</code>:</p>
+      <pre tabindex="0" aria-label="Migration redirect configuration"><code class="language-json">&#123;
+  "app": &#123;"site_name": "Example"&#125;,
+  "redirects": &#123;
+    "/about-us.html": "/about",
+    "/services/": "/services",
+    "/old-team.php": "/about#team"
+  &#125;
+&#125;</code></pre>
+      <p>GET and HEAD requests for a listed path return <strong>301 Moved Permanently</strong>. Sources match exact, case-sensitive paths, including explicitly listed old extensions and trailing slashes. Unlisted legacy URLs still return 404. These rules never redirect POST or other mutation requests.</p>
+      <p>Destinations must be existing public pages or assets on this site, including published Blog posts. They may include a query or fragment. Incoming queries survive unless the destination supplies a query of its own; a destination ending in <code>?</code> explicitly clears it. ItsyWeb decodes source paths once and rejects duplicate decoded sources, unsafe/private paths, conflicts with active pages, assets or managed app subtrees, and redirect chains or loops. Former Blog slugs can be explicit sources. Update their redirects when removing a destination.</p>
+      <p>There are no wildcard, regex, query-specific or external-URL rules. An old site that uses different pages at <code>/?p=123</code> and <code>/?p=456</code> needs a separate migration decision. Path rules do not configure DNS, certificates or arbitrary hostname redirects. Existing HTTP-to-HTTPS and WWW redirects continue to use 308.</p>
+      <h3 id="redirects-chapter-1">Inventory the original website with an agent</h3>
+      <p>Ask your coding agent:</p>
+      <pre tabindex="0" aria-label="Agent migration request"><code class="language-none">Use itsy-site to inventory https://example.com and prepare 301 redirects for this Itsy site.</code></pre>
+      <p>The skill reads public sitemaps and internal links, preserves useful URLs, maps moved content to real replacements and records ambiguous or unsupported URLs. Supply old URL lists or analytics exports when available: a live crawl cannot discover every orphaned page. Full brochure imports include this step too. Existing sites can copy the matching skill from a fresh temporary site; updating the CLI does not replace project instructions.</p>
+      <h3 id="redirects-chapter-2">Validate before deploying</h3>
+      <p>Run <code>itsy status</code>, then use a local dev server to check each old URL without following redirects. Confirm its 301 and <code>Location</code>, then check the destination serves the intended content in one hop. Check query behavior and unchanged URLs too.</p>
+      <div class="notice"><p><strong>Update both CLI and server.</strong> This feature requires deployment protocol 28. Run <code>itsy update</code>, then explicitly update the shared server with <code>itsy update-server</code> before deploying rules. Public 0.19.0 and earlier ignore site redirect settings.</p></div>
+    </section>
+    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/seo">Search engines and SEO</a></li><li><a href="/docs">Browse all guides</a></li></ul></nav>
+  </article>
+</div>
+<script src="/js/prism.js" defer></script>
+<script src="/js/prism-go.js" defer></script>
