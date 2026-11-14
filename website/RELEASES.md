@@ -1,5 +1,66 @@
 # Publishing ItsyWeb downloads
 
+## 0.22.0 published and websites deployed November 14, 2026
+
+The approved homepage and matching Docs theme are live on both existing public
+website destinations. Framework tag `v0.22.0` remains immutable at
+`d21da420a2518f1097d79da0f80a66347b221094`. Website-only follow-up
+`b8019cba5aabce1ca3fc168165c554606b2cdb3b` preserves the already deployed installer
+PATH improvements; its system tree is identical to the tag. Source was integrated
+and pushed to CP Git before deployment. The source repository remains private.
+
+Deployments ran sequentially through the supported 0.22.0 CLI, with normal live
+Blog preservation and no explicit content sync:
+
+| Site / branch | Domains | Activation |
+| --- | --- | --- |
+| `itsy-web` / `t3/reframe-flea-html-focus` | itsyweb.dev, itsy.fleacms.com | `20261114-212920-e298c932a5abcb78ccb8b445` |
+| `fleacms-website-main` / `main` | fleacms.com, www.fleacms.com redirect | `20261114-213138-e8cc85769c3a94943766916b` |
+
+Both channels now select 0.22.0. Public checks after the second activation passed
+on both primary domains: exact title/description/sharing on 16 routes, 87 internal
+links/fragments, nine source asset hashes including the installer, removed guide
+404s, the selected checksum manifest and latest.txt. Both aliases reached the
+correct Docs; the legacy WWW redirect remains. Live browser checks covered
+homepage tabs and keyboard navigation, mobile guide navigation, loaded fonts and
+responsive layout. Supported status checks reported reachable hosting and code
+and content matching the deployed source for both saved destinations.
+
+The preserved installer SHA-256 is
+`deb56fba7c8c248daa24d637521205f17495c607d59bd105b8c0aebf16740d63`.
+Both copyable guide commands and README include the parent-shell export. Bash
+syntax, the authored focused installer regressions, exact live/source installer
+bytes and mobile copy feedback passed. The homepage's compact install step points
+to the printed PATH instructions.
+
+The release owner verified native Linux Bash and native Mac Zsh public fresh
+installs, same-terminal and fresh interactive/login use, reinstall idempotence,
+new/status, 0.21.0 updates, already-current behavior, the legacy 0.20.5 two-step
+transition and downloaded Mac signature. Tests used private HOME directories;
+normal Kirin and Mac installations were then updated through the supported updater.
+Final public CLI hashes:
+
+- Linux AMD64: `16411183735071699ea5575d0e0990836fc55559d8b5de35f5b114c43a5351d9`.
+- Mac ARM64: `76428a72a66dd1ad87441f032b9c6b6d643d08eda76ebb2f1a01096f41e9e3ab`.
+
+The shared runtime is 0.22.0 / protocol 30. All 34 HTTPS health identities matched
+the final revision. The coordinated conversion and final sweep preserved 22 sites,
+two Blog posts, 14 media records/files, 26 private runtime files with their hashes,
+modes and owners, 92 historical download files and all host policies. No pending
+journals remain. The framework receipt records the initial recovered activation,
+Cubitalk refresh and exact runtime/artifact evidence:
+[0.22.0 verification](../system/docs/agents/release-0220-verification.md).
+
+Deploy commands used a task-local SSH wrapper applying `GOMEMLIMIT=320MiB` and a
+disk-backed `TMPDIR` to the complete remote shell command. A preflight-only wrapper
+error involving shell builtin `set` was corrected before deployment; no persistent
+service policy changed. Temporary local previews were stopped. Private operator
+logs, HTTP checks and native receipts remain under
+`/home/sean/itsyweb-releases/0.22.0/`. Clean-machine/notarization, real email and
+native ARM64 Linux server acceptance remain outside these checks. This receipt
+and the final system receipt are documentation-only follow-ups to the deployed
+snapshot and do not require redeployment or moving the release tag.
+
 ## Installer PATH deployment, November 14, 2026
 
 Installer change `47cd929`, integrated with current docs in source `8ce42b7`, is
