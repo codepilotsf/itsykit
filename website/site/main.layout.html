@@ -22,15 +22,11 @@
     <meta name="twitter:image" content="https://itsyweb.dev/images/social-preview.png?v=118f9bca0c9d" />
     <meta name="twitter:image:alt" content="ItsyWeb: Write HTML. Skip the build pipeline. Layouts, clean URLs, deployment and HTTPS." />
     <link rel="stylesheet" href="/css/global.css?v=guide-sequence-20261114" />
-    {#if app.current_admin}
-    <meta name="csrf-token" content="{app.current_admin.csrf_token}" />
-    {/if}
     <link rel="icon" href="/images/favicon-32.png?v=797376b865a3" type="image/png" sizes="32x32" />
     <link rel="icon" href="/images/favicon.svg?v=797376b865a3" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/images/apple-touch-icon.png?v=797376b865a3" sizes="180x180" />
   </head>
   <body class="flex flex-col min-h-screen m-0 p-0">
-    {#if app.current_admin} {render /admin/toolbar} {/if}
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <nav

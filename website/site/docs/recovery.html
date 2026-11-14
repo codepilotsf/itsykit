@@ -1,3 +1,7 @@
+<!-- itsy
+title: Backups and recovery
+description: Back up the live site, return to earlier code, or restore saved content.
+-->
 <div class="docs-shell container">
   <aside class="docs-sidebar">
     {render /guides-nav}
@@ -12,13 +16,13 @@
 
 <section id="recovery">
   <h2>Make a backup</h2>
-<p>From the site folder, save a backup outside the project:</p><pre tabindex="0" aria-label="Back up the live site"><code class="language-bash">itsy backup ../bookshop.itsy-backup</code></pre><p>It includes the active code, configuration, editable content, and managed media. Keep another copy somewhere safe. Credentials, sessions, and custom app storage are excluded.</p>
+<p>From the site folder, save a backup outside the project:</p><pre tabindex="0" aria-label="Back up the live site"><code class="language-bash">itsy backup ../bookshop.itsy-backup</code></pre><p>It includes the active code, configuration, Blog posts, and cover photos. Keep another copy somewhere safe. Credentials, sessions, and custom app storage are excluded.</p>
 </section>
 
 <section id="rollback">
   <h2>Roll back code</h2>
 <pre tabindex="0" aria-label="Choose an earlier code release"><code class="language-bash">itsy rollback --list
-itsy rollback</code></pre><p>Choose a release and confirm. Rollback restores its code and CSS while keeping current admin content.</p>
+itsy rollback</code></pre><p>Choose a release and confirm. Rollback restores its code and CSS while keeping current Blog posts and cover photos.</p>
 </section>
 
 <section id="restore">

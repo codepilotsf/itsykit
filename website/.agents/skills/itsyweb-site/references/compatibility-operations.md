@@ -30,15 +30,16 @@ extensionless config, old Contact config or removed theme features.
 
 Preserve server binary `/usr/local/bin/flea-server`, service/account `flea`,
 `/etc/flea`, `/var/lib/flea`, health path `/_flea/health`, protocol identifiers,
-cookies, owner DOM identifiers and locks. Keep `.flea-install.lock`, development
+cookies and locks. Keep `.flea-install.lock`, development
 locks, `flea-sync` baselines and recovery names; do not rename private state.
 Canonical release URLs use `https://itsyweb.dev/releases/` and `itsy-*` artifacts;
 legacy fleacms.com URLs and `flea-*` artifact aliases remain for released updaters.
 
-The current naming baseline is ItsyWeb 0.21.0, deployment protocol 29
-(`FLEA_DEPLOY=29` on the wire), app protocol 2. Earlier feature minimums
-(host indexing 27, SEO/redirects 28) do not relax the
-protocol-29 requirement for a new-layout deployment. `itsy update` updates only
+The published naming baseline is ItsyWeb 0.21.0 / deployment protocol 29.
+This website targets the subsequent page-editing removal candidate, requiring
+protocol 30 (`FLEA_DEPLOY=30` on the wire). App protocol remains 2. A source
+candidate is not a published CLI/server release. Wait for a matching release
+before deploying this website. `itsy update` updates only
 the local CLI/bundled servers; `itsy update-server` explicitly upgrades the saved
 branch's server executable after confirmation, briefly affecting every hosted
 site. It preserves old sites and does not migrate systemd policy/configuration.
@@ -68,18 +69,19 @@ public DNS, inbound TCP 80/443, a contact email and explicit Let's Encrypt terms
 acceptance. Use `itsy https` for an already deployed site; preserve other hosts.
 
 Normal `itsy deploy` publishes committed templates, config, assets and CSS,
-seeds new content IDs, and preserves live snips, metadata, collections, Blog and
-media. Preserve `deploy.branches` mappings; only the current branch is selected,
+seeds new Blog post IDs, and preserves live posts and cover photos. Page
+metadata and developer CSS travel with code. Preserve `deploy.branches` mappings;
+only the current branch is selected,
 with no main fallback. Deployment needs committed clean source. In a larger Git
 repository commit manually; the CLI will not offer its automatic commit there.
 
 Stop dev before authorized `itsy pull`. It retrieves content and referenced
 media, never CSS, templates, config, secrets or sessions, and never commits.
-Preserve local-only IDs and review/commit results. `itsy deploy --with-snips`
+Preserve local-only IDs and review/commit results. `itsy deploy --with-content`
 explicitly publishes reviewed local content; existing destinations need an exact
 pull baseline first. Conflicts require choices and unattended conflicts stop.
-Multisnip arrays and Blog posts compare as whole records. Removed theme flags
-`--with-theme`, `--theme-only`, `--snips-only` have no aliases; CSS travels with code.
+Blog posts compare as whole records. Removed page-content and theme flags have
+no aliases; CSS travels with code.
 
 `itsy status` validates locally, then automatically checks the current branch's
 saved remote without changing baselines. Without that mapping it finishes locally.

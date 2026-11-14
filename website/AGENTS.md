@@ -25,30 +25,31 @@ Do not write preview messages or sign-in codes into site files.
 
 Public pages, partials, layouts and assets belong in site/. Use main.layout.html
 as the default wrapper and *.layout.html for custom layouts. Root itsy.config.json
-holds configuration and deploy.branches; never put secrets there. Editable content
-lives in itsy/snips.json, uploads in itsy/media/, and ignored runtime in itsy/runtime/.
+holds configuration and deploy.branches; never put secrets there. Blog posts and
+cover-photo records live in itsy/snips.json, cover files in itsy/media/, and
+ignored runtime in itsy/runtime/. Ordinary page copy lives in HTML; title and
+description belong in one leading settings comment with optional layout.
 Mail templates live in root mailers/, named *.email.html and *.email.txt with
 main.layout.html. Keep public URLs site-relative; never expose private directories.
 
-Keep the explicit `{#if app.current_admin}` blocks in the layout: a csrf-token
-meta in head and `{render /admin/toolbar}` directly inside body. The reserved
-current_admin object is supplied per request, never configured in JSON. Keep the
-toolbar mount's version/revision attributes, declarative shadow-root shell and
-external script. The visible shell renders before editor initialization; do not
-replace it with an empty mount. Crossfades are
-ordinary css/navigation.css imported by global.css, not runtime-injected styles.
+Blog keeps `/admin` sign-in and `/admin/blog` management, with its own admin
+layout and CSRF controls. Preserve `{admin.csrf}`, form actions/names, exact-Origin
+checks, sessions and stale-version checks. Public layouts have no page editor
+mount or admin CSRF meta. Never configure `app.current_admin` in JSON. Crossfades
+remain ordinary css/navigation.css imported by global.css.
 
 Use `{#unless dotted.path}...{/unless}` for negative conditions. Like if, it
 supports `{:else}` and `{:else if dotted.path}`; conditions are dotted paths only.
 
-Use bare snip attributes to designate editable text, images or videos. Text
-extracts to {snip ID}; an img extracts to src="{snip ID.src}" and
-alt="{snip ID.alt}", a video to src and poster bindings. The generated JSON
-entry is the only source of editable values. Keep classes, dimensions, links
-and playback attributes in the template. Do not nest snips or use competing
-srcset/picture/source elements for a media snip. Local JPEG/PNG and optimized
-H.264 MP4 seeds are imported by dev. Do not invent IDs. Admins click media in
-Edit mode and use the same page Save/Cancel. No Photos/Videos library buttons.
+Write page copy as ordinary HTML and use itsy/data/ for structured lists. Use
+ordinary image/video tags and source-controlled assets in site/. Developer CSS
+and theme tokens remain in site/css/. Blog retains its post editor and cover
+uploads; page editing and browser theme controls are removed.
+
+This website requires the removal/metadata candidate described in README.md.
+The public 0.21.0 installer is insufficient. Use the rebuilt candidate for checks;
+protocol 30 deployment and a matching release are prerequisites for publication.
+Do not deploy or upgrade a server as part of local maintenance.
 
 At task start, read [.agents/skills/core/SKILL.md](.agents/skills/core/SKILL.md) once.
 For site authoring, read [itsyweb-site](.agents/skills/itsyweb-site/SKILL.md).

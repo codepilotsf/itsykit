@@ -69,8 +69,7 @@ fields. The last is a hidden spam trap: leave it blank and never redisplay it.
 Do not add submit-button names, subject fields, recipient controls, duplicate
 fields or hidden settings; unknown/repeated fields fail validation. Name/email/
 message are required, trimmed strings with the shown length limits. Keep form
-controls developer-managed, outside snip regions. Surrounding page copy may use
-optional snips or plain HTML.
+controls and surrounding page copy developer-managed in ordinary HTML.
 
 | Template value | Purpose |
 | --- | --- |
