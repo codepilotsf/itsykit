@@ -23,11 +23,14 @@
   --brand-2: #142b43;
   --accent: #a4dbff;
   /* Navy & Ice: shared dark surfaces and sharing artwork. */
-  --hero-bg: var(--brand-2);
+  --hero-bg: #0b2842;
   --hero-ink: #f5f9ff;
   --hero-muted: #c4d5e8;
   --hero-accent: var(--accent);
-  --hero-terminal: #0c1c2e;
+  --hero-terminal: #091b2e;
+  --hero-pane: #17374f;
+  --hero-border: #536e85;
+  --page-gutter: clamp(20px, 3.5vw, 56px);
   --hero-comment: #a3b9d0;
   --brand-2-light: #d8edfc;
   --brand-3: #347ba5;

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-14T20:30:00Z",
+  "title": "Design system: ItsyWeb",
+  "extensions": {
+    "sourceFiles": [
+      "site/css/theme.css",
+      "site/css/global.css",
+      "site/css/homepage.css"
+    ],
+    "motion": [
+      {
+        "name": "preview-refresh",
+        "value": "200ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "One source/result preview refresh, disabled for reduced motion."
+      },
+      {
+        "name": "tab-state",
+        "value": "160ms ease-out",
+        "purpose": "View tab colors, disabled for reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-workflow",
+        "value": "1100px"
+      },
+      {
+        "name": "stacked-sections",
+        "value": "800px"
+      },
+      {
+        "name": "docs-disclosure",
+        "value": "640px"
+      },
+      {
+        "name": "stacked-demo",
+        "value": "520px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "description": "Primary action as implemented on the homepage.",
+      "html": "<a class=\"ds-action\" href=\"/docs\">Build your first site</a>",
+      "css": ".ds-action{display:inline-flex;padding:13px 22px;min-height:48px;align-items:center;border:1px solid var(--accent,#a4dbff);border-radius:var(--rounded,.625rem);background:var(--accent,#a4dbff);color:var(--black,#142b43);font:600 .88rem Inter,system-ui,sans-serif;text-decoration:none}.ds-action:hover{filter:brightness(.94)}.ds-action:focus-visible{outline:2px solid var(--brand-1,#245f91);outline-offset:3px}",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Project view tab",
+      "kind": "nav",
+      "description": "Project view tab as implemented on the homepage.",
+      "html": "<a class=\"ds-project-tab\" role=\"tab\" aria-selected=\"true\" href=\"#html\">HTML</a>",
+      "css": ".ds-project-tab{display:flex;justify-content:center;padding:10px;min-height:48px;border-radius:var(--rounded,.625rem);background:var(--accent,#a4dbff);color:var(--hero-terminal,#091b2e);font:700 1rem Inter,system-ui,sans-serif;text-decoration:none}.ds-project-tab:hover{filter:brightness(.94)}.ds-project-tab:focus-visible{outline:2px solid var(--hero-terminal,#091b2e);outline-offset:-4px}",
+      "refersTo": "tab-selected"
+    },
+    {
+      "name": "Code pane",
+      "kind": "custom",
+      "description": "Code pane as implemented on the homepage.",
+      "html": "<div class=\"ds-code\"><div class=\"ds-code-label\">site/index.html</div><pre tabindex=\"0\"><code>&lt;h1&gt;Hello, web.&lt;/h1&gt;</code></pre></div>",
+      "css": ".ds-code{overflow:hidden;border:1px solid var(--hero-border,#536e85);border-radius:var(--rounded,.625rem);background:var(--hero-terminal,#091b2e);color:var(--hero-ink,#f5f9ff)}.ds-code-label{padding:10px 18px;background:var(--hero-pane,#17374f);font:600 .85rem Inter,system-ui,sans-serif}.ds-code pre{overflow:auto;margin:0;padding:17px 18px;font:1rem/1.75 ui-monospace,monospace}.ds-code pre:focus-visible{outline:2px solid var(--accent,#a4dbff);outline-offset:-3px}"
+    },
+    {
+      "name": "Project file tab",
+      "kind": "nav",
+      "description": "Project file tab as implemented on the homepage.",
+      "html": "<a class=\"ds-file\" role=\"tab\" aria-selected=\"true\" href=\"#agents\">AGENTS.md</a>",
+      "css": ".ds-file{display:flex;padding:6px 9px;border-radius:6px;background:var(--brand-2-light,#d8edfc);color:var(--black,#142b43);font:600 .84rem/1.4 Inter,system-ui,sans-serif;text-decoration:none}.ds-file:hover{background:var(--brand-1-light,#eaf4fc)}.ds-file:focus-visible{outline:2px solid var(--brand-1,#245f91);outline-offset:3px}"
+    },
+    {
+      "name": "Reading link",
+      "kind": "nav",
+      "description": "Reading link as implemented on the homepage.",
+      "html": "<a class=\"ds-link\" href=\"/docs/templates\">Pages, layouts and data</a>",
+      "css": ".ds-link{display:inline-flex;color:var(--brand-1,#245f91);font:600 .88rem/1.5 Inter,system-ui,sans-serif;text-decoration:none}.ds-link:hover{text-decoration:underline;text-underline-offset:4px}.ds-link:focus-visible{outline:2px solid var(--brand-1,#245f91);outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "One simple project, from source to live",
+    "overview": "The approved design uses the existing vector logo, Inter typography and navy/ice identity. Real HTML examples carry the visual focus. Pale reading surfaces separate explanations from the dark source and hosting demonstrations.",
+    "keyCharacteristics": [
+      "Readable source beside its rendered result.",
+      "Ice actions and selected states on navy.",
+      "Flat surfaces with thin borders.",
+      "A shared visual language for marketing and documentation."
+    ],
+    "rules": [],
+    "dos": [
+      "Do use the shared CSS tokens and existing SVG logo.",
+      "Do keep code readable, keyboard focus visible and demonstrations usable without scripts.",
+      "Do preserve documentation\u2019s reading structure and native disclosure."
+    ],
+    "donts": [
+      "Don\u2019t turn the homepage\u2019s composition into a requirement for every page.",
+      "Don\u2019t invent benchmarks, customer claims or a public source-repository link.",
+      "Don\u2019t imply that server setup provisions a cloud VM or that a coding agent is embedded in ItsyWeb."
+    ]
+  }
+}

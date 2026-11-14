@@ -1,145 +1,150 @@
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero-inner container">
-    <div class="hero-grid items-center">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> HTML, with the missing pieces</p>
-        <h1 id="hero-title">{snip a7Km2pQ9xB}</h1>
-        <p class="hero-description">{snip b8Ln3rR0yC}</p>
-        <div class="hero-actions flex flex-wrap items-center gap-md">
-          <a class="ui-button ui-brand-1" href="/docs#installation">Install ItsyWeb <span aria-hidden="true">↗</span></a>
-          <a class="quiet-link" href="#templates">See the HTML <span aria-hidden="true">↓</span></a>
+    <div class="hero-copy">
+      <h1 id="hero-title">{snip a7Km2pQ9xB}</h1>
+      <p class="hero-description">{snip b8Ln3rR0yC}</p>
+      <p class="hero-audience">Write it yourself or with your coding agent.</p>
+      <a class="ui-button ui-brand-1 hero-action" href="/docs">Build your first site {icon arrow-up-right}</a>
+    </div>
+
+    <div class="project-demo tab-group" data-tabs>
+      <nav class="demo-tabs" aria-label="Example project views" data-tab-list>
+        <a id="view-html" class="project-tab" href="#example-html" data-tab>{icon code-xml}<span>HTML</span></a>
+        <a id="view-develop" class="project-tab" href="#example-develop" data-tab>{icon terminal}<span>Develop</span></a>
+        <a id="view-publish" class="project-tab" href="#example-publish" data-tab>{icon upload}<span>Publish</span></a>
+      </nav>
+      <section class="demo-stage" id="example-html" aria-labelledby="view-html" data-tab-panel>
+        <div class="demo-pane source-pane">
+          <div class="pane-bar">{icon file}<span data-example-file>site/index.html</span></div>
+          <pre class="source-code" tabindex="0" aria-label="Example page HTML"><code><span class="source-line"><span class="line-number" aria-hidden="true">1</span><span class="syntax-tag">&lt;h1&gt;</span><span data-example-source>Hello, web.</span><span class="syntax-tag">&lt;/h1&gt;</span></span>
+<span class="source-line"><span class="line-number" aria-hidden="true">2</span>&#123;render /navigation&#125;</span></code></pre>
         </div>
-        <p class="hero-note">Single binary · No Go, Node or Python runtime · Apple Silicon macOS &amp; x86-64 Linux</p>
-      </div>
-      <figure class="hero-visual m-0">
-        <div class="terminal">
-          <div class="terminal-bar">
-            <span class="terminal-dot" aria-hidden="true"></span><span class="terminal-dot" aria-hidden="true"></span><span class="terminal-dot" aria-hidden="true"></span>
-            <span class="terminal-title">terminal — your files to your server</span>
+        <div class="demo-pane preview-pane" aria-label="Example rendered website">
+          <div class="pane-bar preview-bar"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="preview-address" data-example-address>http://localhost:3000</span></div>
+          <div class="example-page">
+            <p class="example-title" data-example-title>Hello, web.</p>
+            <nav class="example-links" aria-label="Example website pages">
+              <button type="button" disabled data-example-page="home" aria-current="page">Home</button>
+              <button type="button" disabled data-example-page="about">About</button>
+              <button type="button" disabled data-example-page="contact">Contact</button>
+            </nav>
           </div>
-          <pre class="terminal-body" tabindex="0" aria-label="Example terminal workflow"><code><span class="t-comment"># install the CLI</span>
-<span class="t-prompt">$</span> curl -fsSL https://itsyweb.dev/install.sh | bash
-
-<span class="t-comment"># start a site and edit your HTML</span>
-<span class="t-prompt">$</span> itsy new my-site &amp;&amp; cd my-site
-<span class="t-prompt">$</span> itsy dev
-
-<span class="t-comment"># stop dev, then prepare your Ubuntu server</span>
-<span class="t-prompt">$</span> itsy setup
-
-<span class="t-comment"># deploy committed files with automatic HTTPS</span>
-<span class="t-prompt">$</span> itsy deploy</code></pre>
         </div>
-        <figcaption>Bring an Ubuntu server, SSH access and a domain. ItsyWeb sets up the web server and handles HTTPS.</figcaption>
-      </figure>
+      </section>
+      <section class="demo-stage" id="example-develop" aria-labelledby="view-develop" data-tab-panel>
+        <div class="demo-pane source-pane">
+          <div class="pane-bar">{icon terminal}<span>Your terminal</span></div>
+          <pre class="source-code" tabindex="0" aria-label="Create and preview a site"><code><span class="syntax-comment"># create a site, then start the dev server</span>
+<span class="syntax-tag">$</span> itsy new my-site &amp;&amp; cd my-site
+<span class="syntax-tag">$</span> itsy dev</code></pre>
+        </div>
+        <div class="demo-pane demo-explanation">
+          <p class="demo-view-title">Save a file. See the change.</p>
+          <p>The local server reloads your browser when you save. Edit the HTML and CSS directly, or let your coding agent work in the same files.</p>
+          <a href="/docs/development">Local development guide {icon arrow-up-right}</a>
+        </div>
+      </section>
+      <section class="demo-stage" id="example-publish" aria-labelledby="view-publish" data-tab-panel>
+        <div class="demo-pane source-pane">
+          <div class="pane-bar">{icon upload}<span>From your computer to your server</span></div>
+          <pre class="source-code" tabindex="0" aria-label="Set up a server and deploy"><code><span class="syntax-comment"># prepare your Ubuntu host over SSH</span>
+<span class="syntax-tag">$</span> itsy setup
+<span class="syntax-comment"># commit your changes, then publish</span>
+<span class="syntax-tag">$</span> itsy deploy</code></pre>
+        </div>
+        <div class="demo-pane demo-explanation">
+          <p class="demo-view-title">Your site. Your server. HTTPS included.</p>
+          <p>Bring an Ubuntu server, SSH access and a domain. ItsyWeb installs its web server and deploys committed files, with automatic certificates and renewal.</p>
+          <a href="/docs/deployment">Server setup and deployment {icon arrow-up-right}</a>
+        </div>
+      </section>
     </div>
-    <ul class="hero-facts flex flex-wrap items-center">
-      <li>Layouts &amp; partials</li>
-      <li>Clean URLs</li>
-      <li>Deploy &amp; automatic HTTPS</li>
-    </ul>
-  </div>
-</section>
 
-<section class="feature-section developer-section container" id="templates" aria-labelledby="dev-title">
-  <div class="feature-grid items-center">
-    <div class="feature-copy">
-      <p class="eyebrow">KEEP WRITING HTML</p>
-      <h2 id="dev-title">A shared header shouldn't require a framework.</h2>
-      <p>You know HTML and CSS. You just want a header you can change once, a footer you don't have to paste into every page, and URLs without <code>.html</code> on the end.</p>
-      <p>ItsyWeb's server adds layouts, partials, variables, loops and conditions to your HTML files. Write a page, put the shared markup in a layout, and let the server put them together. There's no static site to generate first.</p>
-      <p>Create <code>site/about.html</code>. Link to <code>/about</code>. Keep styling it with CSS.</p>
-      <a class="quiet-link" href="/docs/templates#templates">Learn the template syntax <span aria-hidden="true">↗</span></a>
-    </div>
-    <div class="code-example">
-      <div class="code-label flex items-center justify-between"><span>layouts + pages</span><span>HTML</span></div>
-      <pre tabindex="0" aria-label="Shared layout and page example"><code><span class="code-muted">&lt;!-- site/main.layout.html --&gt;</span>
-&lt;header&gt;<span class="code-accent">&#123;render /navigation&#125;</span>&lt;/header&gt;
-&lt;main&gt;<span class="code-accent">&#123;slot&#125;</span>&lt;/main&gt;
-&lt;footer&gt;Made by our studio.&lt;/footer&gt;
-
-<span class="code-muted">&lt;!-- site/about.html → /about --&gt;</span>
-&lt;h1&gt;About our studio&lt;/h1&gt;
-&lt;p&gt;We make things for the web.&lt;/p&gt;</code></pre>
-      <div class="code-note">One layout for the shared markup. A partial in <code>site/_navigation.html</code>. Your page goes in <code>&#123;slot&#125;</code>.</div>
-    </div>
-  </div>
-</section>
-
-<section class="system-section" id="system" aria-labelledby="system-title">
-  <div class="system-layout container">
-    <div class="section-head">
-      <h2 id="system-title">The website still needs to run somewhere.</h2>
-      <p class="section-intro">Writing the HTML is only part of the job. ItsyWeb includes the local tools, the web server and the way to deploy. You don't have to assemble the rest yourself.</p>
-    </div>
-    <ul class="system-features" role="list">
-      <li class="system-feature"><h3>No frontend build step</h3><p>Edit HTML and CSS directly. No bundler, generated output directory or Node toolchain between your files and the website.</p></li>
-      <li class="system-feature"><h3>Preview as you work</h3><p><code>itsy dev</code> serves the site locally and reloads the browser when you save. Use LAN mode to check it on your phone.</p></li>
-      <li class="system-feature"><h3>Set up the server</h3><p>Point <code>itsy setup</code> at a blank Ubuntu host over SSH. It installs the bundled web server. No runtime or database to install by hand.</p></li>
-      <li class="system-feature"><h3>Deploy over SSH</h3><p>Publish a committed Git branch with <code>itsy deploy</code>. Different branches can have different destinations, and one server can host multiple sites.</p></li>
-      <li class="system-feature"><h3>HTTPS without the chores</h3><p>With your domain pointing at the server and ports 80 and 443 open, ItsyWeb requests and renews Let's Encrypt certificates and can redirect <code>www</code>.</p></li>
-      <li class="system-feature"><h3>Back up and roll back</h3><p>Download a site backup or return to an earlier code release. Recovery commands are part of the same tool.</p></li>
-    </ul>
-  </div>
-</section>
-
-<section class="workflow-section" aria-labelledby="workflow-title">
-  <div class="container">
-    <div class="workflow-heading flex flex-wrap items-end justify-between gap-md">
-      <div>
-        <p class="eyebrow">FROM HTML TO HTTPS</p>
-        <h2 id="workflow-title">Write the files. Put them online.</h2>
-        <p class="section-intro">A local site, your own server, and a short path between them.</p>
-      </div>
-      <a class="quiet-link" href="/docs">Read Getting Started <span aria-hidden="true">↗</span></a>
-    </div>
-    <ol class="workflow">
-      <li>
-        <span class="step-number">01</span><h3>Install</h3>
-        <p>One executable. No language runtime to install first.</p>
-        <div class="copy-code"><pre><code>curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
+    <ol class="workflow" aria-label="The complete ItsyWeb workflow">
+      <li class="workflow-install">
+        <h2><span class="step-number" aria-hidden="true">1</span>Install</h2>
+        <div class="copy-code"><pre tabindex="0" aria-label="Install ItsyWeb"><code>curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
+        <p>Apple Silicon Mac and x86-64 Linux</p><span class="step-connector" aria-hidden="true">{icon arrow-right}</span>
       </li>
-      <li>
-        <span class="step-number">02</span><h3>Create a site</h3>
-        <p>Start with HTML and CSS files you can open and understand.</p>
-        <pre><code>itsy new my-site
-cd my-site</code></pre>
-      </li>
-      <li>
-        <span class="step-number">03</span><h3>Write and preview</h3>
-        <p>Edit a page or layout. Save and see the browser reload.</p>
-        <pre><code>itsy dev</code></pre>
-      </li>
-      <li>
-        <span class="step-number">04</span><h3>Set up your server</h3>
-        <p>Install the bundled server on your Ubuntu host over SSH.</p>
-        <pre><code>itsy setup</code></pre>
-      </li>
-      <li>
-        <span class="step-number">05</span><h3>Deploy</h3>
-        <p>Commit your changes, publish the branch and enable HTTPS.</p>
-        <pre><code>itsy deploy</code></pre>
-      </li>
+      <li><h2><span class="step-number" aria-hidden="true">2</span>Create</h2><pre><code>itsy new my-site</code></pre><span class="step-connector" aria-hidden="true">{icon arrow-right}</span></li>
+      <li><h2><span class="step-number" aria-hidden="true">3</span>Develop</h2><pre><code>itsy dev</code></pre><span class="step-connector" aria-hidden="true">{icon arrow-right}</span></li>
+      <li><h2><span class="step-number" aria-hidden="true">4</span>Set up server</h2><pre><code>itsy setup</code></pre><p>Bring an Ubuntu server, SSH access and a domain.</p><span class="step-connector" aria-hidden="true">{icon arrow-right}</span></li>
+      <li><h2><span class="step-number" aria-hidden="true">5</span>Deploy + HTTPS</h2><pre><code>itsy deploy</code></pre><p>Deploy committed files.</p></li>
     </ol>
-    <div class="install-command items-center">
-      <div><h3>Try ItsyWeb</h3><p>0.21.0 · Apple Silicon Mac &amp; x86-64 Linux</p></div>
-      <div>
-        <div class="copy-code"><pre><code>curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div>
-        <a href="/docs/installation">Installation notes <span aria-hidden="true">↗</span></a>
+  </div>
+</section>
+
+<section class="agent-section" aria-labelledby="agent-title">
+  <div class="agent-grid container">
+    <h2 id="agent-title">Familiar files. Ready<br class="desktop-break" /> for your coding agent.</h2>
+    <div class="agent-project tab-group" data-tabs data-tab-orientation="vertical">
+      <nav class="project-files" aria-label="Example project files" data-tab-list>
+        <p class="project-root">{icon folder}<span>my-site</span></p>
+        <a id="file-agents" href="#agents-file" data-tab>{icon file}<span>AGENTS.md</span></a>
+        <p class="project-folder">{icon folder}<span>site</span></p>
+        <a id="file-index" class="nested-file" href="#index-file" data-tab>{icon file}<span>index.html</span></a>
+      </nav>
+      <div class="agent-file" id="agents-file" aria-labelledby="file-agents" data-tab-panel>
+        <div class="pane-bar">{icon file}<span>AGENTS.md</span></div>
+        <pre tabindex="0" aria-label="Illustrative project instructions"><code><span class="syntax-comment"># Coding agent instructions</span>
+
+This is an ItsyWeb project.
+Edit the HTML and CSS in `site/`.</code></pre>
+      </div>
+      <div class="agent-file" id="index-file" aria-labelledby="file-index" data-tab-panel>
+        <div class="pane-bar">{icon file}<span>site/index.html</span></div>
+        <pre tabindex="0" aria-label="Example index page"><code>&lt;h1&gt;Hello, web.&lt;/h1&gt;
+&lt;p&gt;A small website, in plain HTML.&lt;/p&gt;
+&#123;render /navigation&#125;</code></pre>
       </div>
     </div>
+    <div class="agent-explanation">
+      <p>Open the site folder in your editor or coding agent. Generated projects include <code>AGENTS.md</code> and portable skills for site authoring, design, and common additions. Give the agent a concrete task, then review the files and preview the result.</p>
+      <div><p>The files stay ordinary HTML, CSS and JSON. The instructions stay in Git, outside the public website. No plugin or account is needed to read them.</p><a class="quiet-link" href="/docs/agents">Work with your coding agent {icon arrow-up-right}</a></div>
+    </div>
   </div>
+</section>
+
+<section class="html-section container" id="templates" aria-labelledby="html-title">
+  <div class="section-heading"><h2 id="html-title">Skip the build pipeline.<br />Keep the HTML.</h2><p>You wanted to make a website, not maintain a toolchain. Write ordinary HTML and CSS, then add the shared pieces a small site needs.</p></div>
+  <div class="template-example">
+    <div class="template-source"><div class="pane-bar">{icon file}<span>site/main.layout.html</span></div><pre tabindex="0" aria-label="Shared layout example"><code>&lt;header&gt;<span class="syntax-tag">&#123;render /navigation&#125;</span>&lt;/header&gt;
+&lt;main&gt;<span class="syntax-tag">&#123;slot&#125;</span>&lt;/main&gt;
+&lt;footer&gt;Made by our studio.&lt;/footer&gt;</code></pre></div>
+    <div class="template-description"><h3>A shared header shouldn’t require a framework.</h3><p>Put shared markup in a layout or partial and change it once. Each page fills the layout’s <code>&#123;slot&#125;</code>. The server puts it together when someone visits; there is no static site to generate first.</p><a class="quiet-link" href="/docs/templates">Pages, layouts and data {icon arrow-up-right}</a></div>
+  </div>
+  <dl class="html-benefits">
+    <div><dt>Files become URLs</dt><dd>Create <code>site/about.html</code>. Link to <code>/about</code>. Clean URLs follow your files.</dd></div>
+    <div><dt>Bring in your data</dt><dd>Use JSON data, variables, loops and conditions in the HTML you already understand.</dd></div>
+    <div><dt>Keep your CSS</dt><dd>Style directly, with optional Prewind utilities and icons. No bundler or frontend build step.</dd></div>
+  </dl>
+</section>
+
+<section class="hosting-section" id="system" aria-labelledby="hosting-title">
+  <div class="hosting-grid container">
+    <div class="section-heading"><h2 id="hosting-title">The website still needs to run somewhere.</h2><p>Writing the HTML is only part of the job. ItsyWeb includes the local tools, the web server and the way to deploy. One executable, with no Go, Node or Python runtime or database to install by hand.</p><a class="quiet-link" href="/docs/deployment">Set up and deploy {icon arrow-up-right}</a></div>
+    <dl class="hosting-details">
+      <div><dt>Preview as you work</dt><dd><code>itsy dev</code> reloads the browser when you save. Use LAN mode to check the site on your phone.</dd></div>
+      <div><dt>Set up an Ubuntu host</dt><dd>Bring a supported Ubuntu LTS server, SSH access and a domain. <code>itsy setup</code> installs the bundled web server.</dd></div>
+      <div><dt>Deploy a Git branch</dt><dd>Publish committed files over SSH. Branches can have different destinations, and one server can host several sites.</dd></div>
+      <div><dt>Keep HTTPS running</dt><dd>With DNS pointing to your server and ports 80 and 443 open, ItsyWeb requests and renews Let’s Encrypt certificates. Optional <code>www</code> redirects are included.</dd></div>
+      <div><dt>Back up and recover</dt><dd>Download a site backup or return to an earlier code release with the same tool. <a href="/docs/recovery">Backups and recovery</a></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="extras-section container" aria-labelledby="extras-title">
+  <div class="section-heading"><h2 id="extras-title">Add what the site needs.</h2><p>Start with HTML. Keep the rest optional.</p></div>
+  <ul class="extras-links" role="list">
+    <li><a href="/docs/editing"><span><strong>On-page editing</strong><span>Let an admin update selected text and images.</span></span>{icon arrow-up-right}</a></li>
+    <li><a href="/docs/email"><span><strong>Contact and email</strong><span>Add a contact form and preview messages locally.</span></span>{icon arrow-up-right}</a></li>
+    <li><a href="/docs/blog"><span><strong>Blog</strong><span>Publish posts with drafts and cover photos.</span></span>{icon arrow-up-right}</a></li>
+    <li><a href="/docs/apps"><span><strong>Managed apps</strong><span>Add custom server-side behavior when you need it.</span></span>{icon arrow-up-right}</a></li>
+  </ul>
+  <p class="extras-note">Working with photos, videos or repeatable content? See <a href="/docs/media">media and collections</a>.</p>
 </section>
 
 <section class="closing" aria-labelledby="closing-title">
-  <div class="closing-inner container">
-    <div class="closing-grid items-center">
-      <h2 id="closing-title">Keep the HTML.<br /><span class="hero-green">Lose the extra machinery.</span></h2>
-      <div>
-        <p>If you'd otherwise build it in plain HTML, start there. Add the shared templates you need, preview it locally and deploy it to a server you control.</p>
-        <a class="ui-button ui-brand-1" href="/docs">Build your first site <span aria-hidden="true">↗</span></a>
-        <p class="release-note">0.21.0 is available to try. We'd like your feedback.</p>
-      </div>
-    </div>
-  </div>
+  <div class="closing-inner container"><div><h2 id="closing-title">Keep the HTML.<br />Lose the extra machinery.</h2><p>Build a small bookshop site with two pages, a shared layout, and your own CSS.</p></div><div><a class="ui-button ui-brand-1" href="/docs">Build your first site {icon arrow-up-right}</a><p class="release-note"><a href="/docs/release-notes">0.21.0</a> is available to try. <a href="/docs/installation">Installation notes</a></p></div></div>
 </section>
+<script src="/js/homepage.js" defer></script>

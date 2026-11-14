@@ -22,11 +22,12 @@
   .site-header .site-links > a:not(.ui-button),.site-header > nav > a { color:var(--black); }
   .site-header :focus-visible,.site-footer :focus-visible { outline-color:var(--brand-1); }
   .site-header .ui-button { background:var(--brand-2); color:var(--hero-ink); border-color:var(--brand-2); }
-  .site-header > nav { min-height:76px; column-gap:16px; }
+  .site-header > nav { --container-max:1600px; --container-padding:0 var(--page-gutter); min-height:66px; column-gap:16px; }
   .wordmark { display:inline-flex; align-items:center; text-decoration:none; }
   .itsy-logo { display:block; width:176px; height:auto; max-width:100%; }
   .site-links > a { text-decoration:none; font-size:.85rem; font-weight:600; }
   .site-links { flex-shrink:0; }
+  ::selection { background:var(--accent); color:var(--black); }
   .site-links .ui-button { white-space:nowrap; }
   .ui-brand-1 { background:var(--accent); color:var(--black); border-color:var(--accent); }
   .ui-button { border-radius:var(--rounded); font-size:.88rem; min-height:48px; padding:13px 22px; gap:20px; }
@@ -49,7 +50,7 @@
   .docs-content section { padding-top:45px; margin-top:40px; border-top:1px solid var(--light); scroll-margin-top:1rem; }
   .docs-content h2 { font-size:2rem; margin:0 0 18px; }
   .docs-content h3 { font-size:1.2rem; margin-top:28px; }
-  .docs-content pre { border:1px solid #424957; padding:22px; font-size:.91rem; line-height:1.75; white-space:pre; overflow-wrap:normal; }
+  .docs-content pre { border:1px solid var(--hero-border); padding:22px; font-size:.91rem; line-height:1.75; white-space:pre; overflow-wrap:normal; }
   .docs-content p,.docs-content li { color:var(--darker); }
   .notice { padding:20px 24px; border:1px solid var(--light); background:var(--brand-1-light); border-radius:var(--rounded); }
   .notice p { margin:0; }
@@ -79,6 +80,7 @@
     .site-header > nav { min-height:68px; }
     .itsy-logo { width:141px; height:auto; }
     .site-links { gap:14px; }
+    .site-links .nav-agents { display:none; }
     .site-links .ui-button { padding:10px 12px; min-height:42px; font-size:.75rem; gap:8px; }
     .site-links > a { font-size:.78rem; }
     .eyebrow { font-size:.61rem; }
