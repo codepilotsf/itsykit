@@ -1,0 +1,93 @@
+{
+  "title": "Five new ItsyWeb identities",
+  "question": "Which direction would you like to develop? Each changes the symbol, lettering and palette. These are concepts; the current website is unchanged.",
+  "options": [
+    {
+      "id": "little-weaver",
+      "kind": "grounded",
+      "label": "Little Weaver",
+      "thesis": "Warm, independent, personable.",
+      "palette": [
+        "#df3d26",
+        "#fff7e8"
+      ],
+      "materials": [
+        "flat graphic artwork",
+        "bespoke lettering"
+      ],
+      "viewport": "Large lockup with monochrome and small-size studies.",
+      "risk": "A playful mascot can feel less technical.",
+      "comp": ".impeccable/mocks/decision/logo-exploration-20261114/little-weaver.png"
+    },
+    {
+      "id": "printers-device",
+      "kind": "grounded",
+      "label": "Printer\u2019s Device",
+      "thesis": "Authored, editorial, enduring.",
+      "palette": [
+        "#651b3b",
+        "#f6dce5"
+      ],
+      "materials": [
+        "flat graphic artwork",
+        "bespoke lettering"
+      ],
+      "viewport": "Large lockup with monochrome and small-size studies.",
+      "risk": "Could feel more like publishing than software.",
+      "comp": ".impeccable/mocks/decision/logo-exploration-20261114/printers-device.png"
+    },
+    {
+      "id": "open-frame",
+      "kind": "grounded",
+      "label": "Open Frame",
+      "thesis": "Composed, architectural, systematic.",
+      "palette": [
+        "#064c3f",
+        "#def36a"
+      ],
+      "materials": [
+        "flat graphic artwork",
+        "bespoke lettering"
+      ],
+      "viewport": "Large lockup with monochrome and small-size studies.",
+      "risk": "Needs a distinctive silhouette to avoid generic geometry.",
+      "comp": ".impeccable/mocks/decision/logo-exploration-20261114/open-frame.png"
+    },
+    {
+      "id": "quickstroke",
+      "kind": "grounded",
+      "label": "Quickstroke",
+      "thesis": "Energetic, assertive, unconventional.",
+      "palette": [
+        "#ff612e",
+        "#30152c"
+      ],
+      "materials": [
+        "flat graphic artwork",
+        "bespoke lettering"
+      ],
+      "viewport": "Large lockup with monochrome and small-size studies.",
+      "risk": "The motion language may suggest a sports brand.",
+      "comp": ".impeccable/mocks/decision/logo-exploration-20261114/quickstroke.png"
+    },
+    {
+      "id": "small-assembly",
+      "kind": "grounded",
+      "label": "Small Assembly",
+      "thesis": "Resourceful, modular, web-native.",
+      "palette": [
+        "#172a29",
+        "#72ead0"
+      ],
+      "materials": [
+        "flat graphic artwork",
+        "bespoke lettering"
+      ],
+      "viewport": "Large lockup with monochrome and small-size studies.",
+      "risk": "Bitmap styling could feel like retro novelty.",
+      "comp": ".impeccable/mocks/decision/logo-exploration-20261114/small-assembly.png"
+    }
+  ],
+  "steer": true,
+  "reroll": true
+}

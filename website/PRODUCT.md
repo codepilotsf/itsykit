@@ -30,7 +30,7 @@ This website requires ItsyWeb 0.22.0 or newer and protocol 30. Earlier page-CMS 
 
 ## Brand Commitments
 
-Retain the approved ItsyWeb logo and mark. The existing navy and ice palette is the starting identity for this home-page composition exploration. The user authorized rethinking messaging and section order, then requested Impeccable and Mobbin in conjunction with the framework study.
+Use the owner-selected 8-bit ItsyWeb wordmark without a separate mark, with the Itsy lettering as the favicon. Retain the existing theme palette. The existing navy and ice palette is the starting identity for this home-page composition exploration. The user authorized rethinking messaging and section order, then requested Impeccable and Mobbin in conjunction with the framework study.
 
 ## Evidence on Hand
 

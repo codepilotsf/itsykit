@@ -53,7 +53,7 @@ components:
 
 **Creative North Star: "One simple project, from source to live"**
 
-The approved design uses the existing vector logo, Inter typography and navy/ice identity. Real HTML examples carry the visual focus. Pale reading surfaces separate explanations from the dark source and hosting demonstrations.
+The approved design uses the 8-bit ItsyWeb vector wordmark without a separate mark, Inter interface typography and the navy/ice identity. Real HTML examples carry the visual focus. Pale reading surfaces separate explanations from the dark source and hosting demonstrations.
 
 **Key Characteristics:**
 
@@ -84,7 +84,7 @@ The homepage uses tonal layering and thin borders rather than added shadows. Nav
 
 ## Shapes
 
-Actions and hero view controls use the default radius. Large demonstrations use the large radius, with gently curved inner panes and workflow steps. Preserve the supplied SVG brand assets and consistent library icons.
+Actions and hero view controls use the default radius. Large demonstrations use the large radius, with gently curved inner panes and workflow steps. Use the 8-bit wordmark as font-independent SVG geometry, with navy ink on pale surfaces and a pale reversal for dark surfaces. The favicon uses only the Itsy lettering. Keep consistent library icons.
 
 ## Components
 
@@ -104,7 +104,7 @@ Actions and hero view controls use the default radius. Large demonstrations use 
 
 ## Do's and Don'ts
 
-- Do use the shared CSS tokens and existing SVG logo.
+- Do use the shared CSS tokens and approved 8-bit SVG wordmark.
 - Do keep code readable, keyboard focus visible and demonstrations usable without scripts.
 - Do preserve documentation's reading structure and native disclosure.
 - Don't turn the homepage's composition into a requirement for every page.

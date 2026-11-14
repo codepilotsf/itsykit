@@ -1,0 +1,13 @@
+{
+  "images": {
+    "little-weaver": "/home/sean/.codex/generated_images/01a1dc62-e02a-70a0-bffb-8d76025ef916/exec-c5d9c977-7ed0-40e8-899a-57926c801c8d.png",
+    "printers-device": "/home/sean/.codex/generated_images/01a1dc62-e02a-70a0-bffb-8d76025ef916/exec-ca97fbef-199b-43c0-a401-307f2e9af0d0.png",
+    "open-frame": "/home/sean/.codex/generated_images/01a1dc62-e02a-70a0-bffb-8d76025ef916/exec-f5fbba2d-e1d6-45f4-90b7-f30f846d2d5d.png",
+    "quickstroke": "/home/sean/.codex/generated_images/01a1dc62-e02a-70a0-bffb-8d76025ef916/exec-b452f92e-ff62-4811-b45d-9790e12b57c4.png",
+    "small-assembly": "/home/sean/.codex/generated_images/01a1dc62-e02a-70a0-bffb-8d76025ef916/exec-26afbf81-d9f5-4bc1-baa9-ebf8a1c96399.png"
+  },
+  "revision": {
+    "id": "little-weaver",
+    "prompt": "Edit this ItsyWeb logo specimen. Change ONLY the eyes on the spider in every instance: replace the sharply angled aggressive eyes with two small round cream-white cutout eyes, spaced evenly and level, giving an inquisitive friendly expression. No angled brows, no angry squint, no fangs. Preserve the eight-legged spider silhouette, vermilion ink, exact ItsyWeb lettering, background, layout, size-test row and all other artwork precisely. This is one targeted character-expression refinement."
+  }
+}

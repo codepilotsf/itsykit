@@ -1,0 +1,28 @@
+{
+  "origin": "Owner-selected option 5, Small Assembly, using the lettering only; no separate mark.",
+  "source": "design/logo-exploration-20261114/small-assembly.png",
+  "approval": "Use number 5 without the mark; retain site theme colours; favicon uses the Itsy lettering.",
+  "method": "Font-independent rectilinear SVG contours reconstructed from long edges of the approved raster lettering. No font substitution or runtime image processing.",
+  "bounds": [
+    526,
+    262,
+    1672,
+    535
+  ],
+  "itsyBounds": [
+    526,
+    262,
+    1092,
+    535
+  ],
+  "size": {
+    "width": 1146,
+    "height": 273
+  },
+  "colors": {
+    "navy": "#142b43",
+    "pale": "#f5f9ff",
+    "ice": "#a4dbff"
+  },
+  "approved": true
+}

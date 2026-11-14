@@ -1,6 +1,6 @@
 # ItsyWeb
 
-<img src="site/images/logo.svg" alt="ItsyWeb" width="233" height="50">
+<img src="site/images/logo.svg" alt="ItsyWeb" width="233" height="56">
 
 Write HTML. Skip the build pipeline.
 
@@ -117,8 +117,10 @@ for intentional sync with `itsy pull` and `itsy deploy --with-content`.
 
 ## Website assets
 
-Keep the approved logo, light logo, and mark in `site/images/`. Their source and
-production record live in `design/itsy-web-logo/` and `.impeccable/mocks/decision/`.
+Keep the approved 8-bit wordmark, light variant and Itsy favicon in `site/images/`.
+Their source and production record live in `design/8-bit-wordmark/`; the selected
+concept is in `design/logo-exploration-20261114/`. The earlier woven-loop identity
+is retained as historical artwork, not the current logo.
 The SVGs need no fonts or build step.
 
 The sharing image is `site/images/social-preview.png`. To regenerate it, render
