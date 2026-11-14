@@ -12,9 +12,7 @@
 .env.*
 !.env.example
 /itsy/runtime/
-/itsy/media/*.mp4
 
 # Private release source snapshots and verification records; never deploy.
 /release-work/
 /itsy/runtime/
-/itsy/media/*.mp4
