@@ -2,8 +2,8 @@
 
 ## ItsyWeb 0.21.0 rollout
 
-The Kirin CLI and shared server are updated. Public publication is pending native
-Mac checks; see [the rollout receipt](release-0210-verification.md).
+Public 0.21.0, both native CLIs and the shared server are updated. All native
+release and public installation checks passed; see [the rollout receipt](release-0210-verification.md).
 
 Development builds produce `bin/itsy` and a retired `bin/flea` link. Canonical
 public artifacts are `itsy-darwin-arm64` and `itsy-linux-amd64`, hosted at
@@ -74,8 +74,8 @@ silently ignore them. Publication and server rollout remain separate operations.
 The agreed plan is in [next-steps.md](next-steps.md). Source remains private;
 public binaries will be free to use without an account or license key. The
 primary path is the implemented `website/site/install.sh`, intended for
-https://fleacms.com/install.sh, followed by `flea update` for local CLI updates.
-Remote updates use `flea update-server` (including `--recover`), without an alias.
+https://itsyweb.dev/install.sh, followed by `itsy update` for local CLI updates.
+Remote updates use `itsy update-server` (including `--recover`), without an alias.
 The public test release is hosted by the separate website repository at
 `/Users/sean/Projects/flea-website`. Its `RELEASES.md` records build provenance and
 actual public installer/update checks. Versioned binaries, SHA256SUMS,
@@ -89,7 +89,7 @@ CLI release targets are macOS ARM64 and Linux AMD64. Each uses a native runner
 for tests, race checks, vet and bundled CLI smoke tests. Linux ARM64 and macOS AMD64
 are outside the public release matrix. The pipeline has not been run remotely;
 manual verification must record any cross-compilation and remaining native gaps.
-Public artifacts are hosted in the website's versioned release directories without
+Public artifacts are hosted in the separate disk-backed download store without
 opening the source repository. The registry instructions below are historical.
 
 `scripts/release.sh client <arch>` now supports native Linux as well as Mac
@@ -133,7 +133,7 @@ installation and downloaded-artifact verification remain pending.
 The website/ directory is unpublished local website source. Confirm downloads,
 installation instructions and live deployment before publishing it.
 
-End users install only FleaCMS. Setup uses native SSH/SCP and extracts the
+End users install only ItsyWeb. Setup uses native SSH/SCP and extracts the
 matching bundled static Linux server; neither machine needs Go or source code.
 Both Linux architectures are gzip-compressed inside each CLI, with SHA-256 hashes.
 Each CLI/server also embeds a separate matching-platform Contact child. Build it

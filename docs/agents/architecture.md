@@ -12,7 +12,8 @@ with legacy config/data aliases. Installed server paths, wire identifiers and
 released artifact aliases retain their spelling. Canonical downloads use itsy-*;
 legacy flea-* aliases contain identical verified bytes. Already released updaters have a
 narrow read-only version probe; see docs/installation.md. Checksums are not
-independent signatures. Public-host and clean-machine verification remain pending.
+independent signatures. Public-host verification passed for 0.21.0; clean-machine acceptance remains
+unverified.
 
 Project files have explicit boundaries: `site/` supplies templates and public
 assets; `mailers/` supplies private `*.email.html`/`*.email.txt` templates and

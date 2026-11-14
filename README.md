@@ -2,8 +2,9 @@
 
 <img src="docs/branding/logo.svg" alt="ItsyWeb" width="249" height="54">
 
-Flea is now ItsyWeb. Use `itsy` for all commands. Run `flea update` to
-install the new command; other `flea` commands show the rename notice and stop.
+Flea is now ItsyWeb. Use `itsy` for all commands. Existing Flea users can run
+`flea update` twice or use the installer to install the new command. Other `flea`
+commands show the rename notice and stop.
 New sites use `itsy.config.json` and `itsy/`. Existing `.flea.config.json`
 and `flea/` continue working, with no conversion. Installed server paths stay
 compatible. Deploying the new layout requires a protocol-29 server; explicitly
@@ -11,9 +12,8 @@ run `itsy update-server` before deploying to an older server.
 
 ## Install
 
-The Kirin CLI and shared host run 0.21.0. Public publication is pending native Mac
-verification; the public channel still selects 0.20.5. See the
-[rollout status](docs/agents/release-0210-verification.md).
+ItsyWeb 0.21.0 is published. Native Mac/Linux installation and update checks
+passed; see [release verification](docs/agents/release-0210-verification.md).
 
 ItsyWeb 0.21.0 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
 setup and installer packaging respect `TMPDIR`, with private scratch directories

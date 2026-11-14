@@ -13,19 +13,19 @@ The native Linux tests, race checks, vet, browser checks and bundled builds pass
 Local projects use `itsy.config.json` and `itsy/`; existing names remain supported.
 Live content, recorded runtime/session state and host policies are preserved.
 See [the rollout receipt](release-0210-verification.md) for exact source, sites,
-checks and outstanding blockers.
+checks and remaining V1 acceptance limits.
 
-Finish native Mac ARM64 release verification before public publication. SSH to
-the online Mac currently times out; the public channel remains 0.20.5. Stage
-canonical `itsy-*` artifacts with byte-identical `flea-*` updater aliases, enable
-the canonical hosts' verified download catalogue, then deploy both website
-branches' installer/channel changes. Verify fresh install, reinstall, both old
-updater steps and already-current behavior on both native supported platforms.
-Do not overwrite historical version directories or rename installed services.
+Public 0.21.0 is published from immutable `v0.21.0`. Native Mac/Linux build,
+full tests/race/vet/browser, public install/reinstall and both legacy updater steps
+passed. All 22 hosted sites use the new filenames; all 34 HTTPS hosts pass.
+Customer designs, live content, sessions and host policies are preserved. Atlas
+uses its existing preview alias without DNS changes. Naves and current Kent
+source were brought from the Mac. Normal Mac/Kirin CLIs are updated.
 
-Finish held site deployments after resolving Atlas's DNS mismatch, the owner's
-choice about unpublished local designs, Kent's differing admin config and Naves's
-missing source. Preserve current published behavior and access while pending.
+Keep remaining V1 acceptance work distinct from this completed rename. Native
+ARM64 server, clean-Mac/notarization, native installer packaging and real-email
+acceptance remain open. Tag pipeline 843 awaits runners; native manual checks
+are recorded in the receipt.
 
 ## Previous release status (November 9, 2026)
 

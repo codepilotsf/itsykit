@@ -1,15 +1,15 @@
 # ItsyWeb 0.21.0 rollout verification
 
-Updated November 14, 2026. This is a partial rollout receipt, not a completed
-public release. The owner authorized the rename, Kirin updates and all existing
-hosted-site deployments. Public publication remains gated on native Mac checks.
+Updated November 14, 2026. The public test release and all 22 hosted-site updates are complete.
+The owner authorized the rename, Kirin/server deployments and public rollout,
+then chose to preserve existing customer designs and update only Atlas’s preview.
 
 ## Source and Linux checks
 
 Framework executable source: `04669d71d988b0425571834426f7a678723bb5ff` on `main`, pushed to the
-private framework repository. Website `main` is `b251dfa`, including the approved
-ItsyWeb naming/domain cutover and the compatible installer. No 0.21.0 release tag,
-public version directory or channel advance has been published.
+private framework repository. Immutable tag `v0.21.0` selects that tested source. Website source `6affc545`
+activates the approved naming/domain cutover, installer and 0.21.0 channel on both
+`main` and `t3/reframe-flea-html-focus`. Historical version directories are unchanged.
 
 Native Linux AMD64 used `go version go1.26.9 linux/amd64`. The final candidate passed:
 
@@ -41,9 +41,29 @@ e9f1f33e96f10a37cdc69b1a2ff0564ce4dc190101edf962bc896b27431d5823  itsy-server-li
 2ff6e2d0d7155d2f69e3c4e508f37285e59fa60c2c245e3002dba064129b936f  itsy-linux-amd64
 ```
 
+Native Mac ARM64 used Go 1.27.1 on Sean’s M5 Mac. The same committed source
+archive and verified Linux server pair were copied into a fresh private build
+folder. The native client release script passed full tests, full race tests,
+vet, real Contact/bundle checks, Chrome browser checks and fresh-site smoke.
+The final Mac executable passed ad-hoc signature verification. Its public hash is:
+
+```text
+1dcde316b29933b7e88882eef9dbee0a56cba3f5dc15cba367831bd6b1ee5e2a  itsy-darwin-arm64
+```
+
+Canonical and retired `flea-*` artifact aliases are byte-identical and have
+separate regular files/checksum entries. All four public binaries matched the
+manifest over HTTPS before channel activation. The 0.20.5 manifest remains
+available. Both native platforms then passed actual public fresh install,
+reinstall, `new`/`status`, retired-command stop, update from the released 0.20.5
+binary, second-update conversion/prominent notice and already-current checks.
+The normal Mac and Kirin CLIs match these public hashes. The Mac’s original CLI
+is retained privately and its interactive shell resolves the new `itsy` and
+retired `flea` entries in `~/.local/bin`.
+
 The ARM64 Linux server is cross-compiled, without native ARM64 acceptance.
-No Linux ARM64 CLI was built or published. Native Mac ARM64 checks, signing,
-public install/reinstall and both updater transition steps remain pending.
+No Linux ARM64 CLI was built or published. Tag pipeline 843 is pending runners;
+completed native manual runs supply the release evidence.
 
 ## Kirin and shared server
 
@@ -67,26 +87,37 @@ storage through a reviewed, task-only SSH wrapper. No Go build ran on production
 All 22 managed sites were backed up to private verified archives before the
 upgrade. Post-upgrade and post-deployment comparisons preserve the 34 configured
 hostnames, branch ownership, TLS names, redirects, downloads and indexing rules.
-Live content is byte-identical to the baseline across every site. Recorded
-runtime-file metadata and session hashes are unchanged. All 34 HTTPS root
+Customer live content is byte-identical to the baseline. Only the approved
+official-site branding/copy changed. Recorded runtime-file metadata and session
+hashes are unchanged. All 34 HTTPS root
 responses retain their expected status/routing/indexing. Site 4's varying HTML
 is its ordinary per-request visitor CSRF token.
 
-The following 13 sites have new immutable releases using `itsy.config.json`
-and `itsy/`, with live edits and custom branding preserved:
+All 22 sites now have active immutable releases using `itsy.config.json` and
+`itsy/`. The following table records the final observed sources; an independent
+CubiTalk publication was preserved:
 
-| Hosted site | Deployed source |
+| Hosted site | Active source |
 | --- | --- |
+| `atlas-main` | `880b1661` |
 | `battertonbrokerage-main` | `64f1b566` |
 | `battertonbrokerage-preview` | `522eba3e` |
 | `codepilot-site-1-main` | `b67c4019` |
 | `codepilot-site-2-main` | `27fd3c89` |
 | `codepilot-site-3` | `ff5668cc` |
+| `codepilot-site-4-main` | `45331e65` |
 | `codepilot-site-5` | `931ad79d` |
+| `codepilot-website-main` | `6585e3ad` |
 | `codepilot-website-staging` | `69619b9d` |
-| `cubitalk-website` | `84c32456` |
+| `cubitalk-website` | `d879987a` |
 | `dropr-preview` | `493d727c` |
+| `fleacms-website-main` | `6affc545` |
+| `gestalt-haus-main` | `8035f173` |
 | `gestalt-haus-preview` | `247e4d51` |
+| `itsy-web` | `6affc545` |
+| `kent-matheson-main` | `bd56e8fe` |
+| `naves-main` | `3cfb03c0` |
+| `oninopizza-main` | `adc9722d` |
 | `prewind-website` | `eb1bb09a` |
 | `sunlux-main` | `0b8f31a6` |
 | `t3docs-main` | `670df0b6` |
@@ -97,33 +128,42 @@ checks. Read-only status validated the converted sites. Existing unrelated files
 in the website root checkout were preserved. Dormant historical task worktrees
 were not rewritten. T3 project titles now say ItsyWeb and ItsyWeb Website.
 
-## Remaining rollout blockers
+## Completed final rollout
 
-- Native Mac release access: SSH to `sean@100.79.67.33` on the online Mac times
-  out. Enable Remote Login or provide a reachable native Mac build host. The
-  exact committed source archive and verified Linux server artifacts are ready
-  privately on Kirin. Do not substitute cross-compilation for native acceptance.
-- Public distribution: the stable channel still selects 0.20.5. The currently
-  served itsyweb.dev installer requests canonical `itsy-*` files, which are not
-  present in that historical release (HTTP 404). The old fleacms.com installer
-  and retained downloads remain available. Complete the native gate, publish the
-  four 0.21.0 files (canonical plus byte-identical legacy aliases), enable the new
-  hosts' validated download mapping, verify HTTPS hashes, then activate both
-  website branches' matching installer/latest.txt and native update checks.
-- Atlas: saved `atlastitlesurveys.com` resolves to 147.79.120.158 rather than this
-  server's expected addresses. Deployment stopped before upload/activation. The
-  existing Atlas release stays live; DNS/target selection needs resolution.
-- CodePilot main, Site 4, Gestalt main and Onino: local committed presentation
-  changes differ from the published sites. The owner's pending choice determines
-  whether to publish those changes or prepare naming-only updates from the
-  existing published source. Their compatible current releases remain intact.
-- Kent: the cloned GitLab source's public pages match the verified live backup,
-  but its admin email list is empty while the live site has an admin. Local paths
-  are converted; deployment is held to preserve access until current source/config
-  is identified or the intended alignment is confirmed.
-- Naves: no local/GitLab source was found; the usual CP Git URL denied access.
-  Its source path/URL is requested. The verified backup and compatible live
-  installation remain preserved.
+After Tailscale on the Mac was reconnected, SSH/native builds succeeded. Naves
+and the current Kent source were cloned from `/Users/sean/Projects/` into
+Kirin’s `Projects/naves` and `Projects/kent-matheson`. Their source matched the
+published runtime and Kent’s existing admin access was retained. The older,
+task-created Kent GitLab copy is retained privately, outside active Projects.
+
+For CodePilot main, Site 4, Gestalt main and Onino, the owner chose to preserve
+published designs. Isolated deployment checkouts used their exact published
+sources; Onino came from its fresh verified snapshot where the source commit
+was unavailable locally. Config, media and content were retained. Public source
+files differed only in naming identifiers, and the four rendered homepages
+matched the prior published HTML after normalizing visitor CSRF tokens. The
+unpublished designs in the original checkouts were preserved.
+
+Atlas now deploys through its existing `atlas.fleacms.com` alias, as explicitly
+selected by the owner. Its other host aliases and all public DNS were preserved.
+No DNS records were changed.
+
+The immutable download directory was uploaded and verified before channel
+activation. Under the deployment lock, a backed-up, validated host config added
+`itsyweb.dev` and `itsy.fleacms.com` to the existing download store. The initial
+readiness probe ran before catalogue startup finished; the prior configuration
+was restored. A retry waited for the exact new revision, then passed the native
+server readiness check. The server is healthy and no pending journal remains.
+
+Both website branches then activated 0.21.0. Fleacms.com’s approved branding/copy
+was published explicitly with `--with-snips` after pulling and reviewing its
+baseline; customer sites used ordinary deployment. Customer content hashes,
+runtime/session checks, TLS names, branch ownership, redirects and indexing
+match the pre-rollout baseline. Only the approved official-site copy changed.
+All 34 HTTPS root responses retain their expected routing/status/indexing. All
+four website aliases serve latest.txt = 0.21.0 and the exact canonical installer.
+Public homepage rendering and public docs version/protocol/download links were
+verified. Temporary browser tabs were closed.
 
 Private backups, source archive, hashes, statuses, inventory and deployment logs
 are in `/home/sean/itsyweb-releases/0.21.0/`, outside every served/deployed tree.
