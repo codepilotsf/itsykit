@@ -58,8 +58,8 @@ destination URLs, alongside `app`, never inside it:
 
 Check the installed README/runtime, rather than assuming support from this shared
 skill. The redirect feature requires deployment protocol 28; public 0.19.0 /
-protocol 27 and earlier ignore these site rules. This website candidate additionally
-requires protocol 30; upgrade the shared server explicitly before deployment.
+protocol 27 and earlier ignore these site rules. This website requires ItsyWeb 0.22.0 or newer and protocol 30; convert any old
+page-CMS sites with approval and verified backups before an explicit upgrade.
 If unavailable, save the mapping as a clearly labelled proposal and report the
 required runtime update. Do not claim working redirects or change installed
 binaries without authorization.

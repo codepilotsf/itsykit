@@ -22,8 +22,9 @@ new names; adapt paths to the selected existing layout.
 
 For installation, transition, deployment, pull or recovery, read
 [compatibility and operations](references/compatibility-operations.md).
-This site targets the page-editing removal candidate and deployment protocol 30.
-Public 0.21.0 does not provide that contract; server upgrades are explicit.
+This site requires ItsyWeb 0.22.0 or newer and deployment protocol 30.
+Older page-CMS sites require an explicitly approved, backed-up conversion before
+upgrading; a server upgrade does not convert their content.
 
 ## Load only relevant guidance
 

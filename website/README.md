@@ -11,14 +11,12 @@ Add Contact or Blog when you need them.
 This directory is the public website. The CLI, server, and canonical starter live
 in [../system/](../system/README.md). Both share one repository.
 
-## Candidate release dependency
+## Framework requirement
 
-This website now targets the framework candidate that removes page editing and
-adds page metadata settings comments. The published 0.21.0 installer does not
-provide this contract. Validate with the rebuilt framework candidate; do not
-deploy this website until a matching CLI/server release is available. Deployment
-requires protocol 30 and an explicitly authorized server upgrade. Keep public
-release links and historical release notes tied to their actual releases.
+This website requires ItsyWeb 0.22.0 and server protocol 30 for comment metadata
+and Blog-only content storage. Earlier installers cannot load it. Existing
+page-CMS sites need an explicitly approved conversion and verified backups before
+a shared-server upgrade. Keep historical release notes tied to their actual releases.
 
 ## Run this website
 
@@ -30,8 +28,7 @@ curl -fsSL https://itsyweb.dev/install.sh | bash
 ```
 
 If your terminal cannot find `itsy`, follow the PATH instructions printed by
-the installer. For this checkout, use the rebuilt candidate CLI described above
-in place of that public binary. From `website/`:
+the installer. Use version 0.22.0 or newer for this checkout. From `website/`:
 
 ```sh
 itsy dev

@@ -35,14 +35,14 @@ locks, `flea-sync` baselines and recovery names; do not rename private state.
 Canonical release URLs use `https://itsyweb.dev/releases/` and `itsy-*` artifacts;
 legacy fleacms.com URLs and `flea-*` artifact aliases remain for released updaters.
 
-The published naming baseline is ItsyWeb 0.21.0 / deployment protocol 29.
-This website targets the subsequent page-editing removal candidate, requiring
-protocol 30 (`FLEA_DEPLOY=30` on the wire). App protocol remains 2. A source
-candidate is not a published CLI/server release. Wait for a matching release
-before deploying this website. `itsy update` updates only
+This website requires ItsyWeb 0.22.0 or newer and protocol 30
+(`FLEA_DEPLOY=30` on the wire). App protocol remains 2. Existing page-CMS sites
+need an explicitly approved conversion with verified backups before a shared
+server upgrade; the upgrade validates installed sites and does not convert them.
+`itsy update` updates only
 the local CLI/bundled servers; `itsy update-server` explicitly upgrades the saved
 branch's server executable after confirmation, briefly affecting every hosted
-site. It preserves old sites and does not migrate systemd policy/configuration.
+site. It preserves compatible sites and does not migrate systemd policy/configuration.
 Never substitute setup/reinstallation for an upgrade.
 
 ## Local development

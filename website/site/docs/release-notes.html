@@ -15,6 +15,9 @@ description: Changes in the published releases, newest first.
     </header>
 
 <section id="release-notes">
+  <h2>0.22.0 · November 14, 2026</h2>
+<p>Page content now lives in ordinary HTML and JSON. One leading settings comment supplies the title, description and optional layout. The page editor, snips, collections and browser theme controls are removed. Blog retains its private editor, posts and cover uploads; Contact and developer-authored CSS remain supported.</p>
+<p>Deployment protocol 30 requires a matching server. Existing page-CMS sites need an explicitly approved conversion with verified backups before upgrading; there is no automatic migration. Use <code>itsy deploy --with-content</code> for explicit Blog synchronization. Normal deploys preserve live Blog content.</p>
   <h2>0.21.0 · November 14, 2026</h2>
 <p>Flea becomes ItsyWeb. New sites use <code>itsy.config.json</code> and <code>itsy/</code>; existing names remain supported. Deployment protocol 29 requires a server update. The app protocol remains 2.</p><p>See <a href="/docs/installation">Installation and updates</a> for the current upgrade steps.</p>
 </section>

@@ -46,9 +46,9 @@ ordinary image/video tags and source-controlled assets in site/. Developer CSS
 and theme tokens remain in site/css/. Blog retains its post editor and cover
 uploads; page editing and browser theme controls are removed.
 
-This website requires the removal/metadata candidate described in README.md.
-The public 0.21.0 installer is insufficient. Use the rebuilt candidate for checks;
-protocol 30 deployment and a matching release are prerequisites for publication.
+This website requires ItsyWeb 0.22.0 or newer, as described in README.md.
+Protocol 30 and a matching server are prerequisites for deployment. Existing
+page-CMS sites require an explicitly approved, backed-up conversion first.
 Do not deploy or upgrade a server as part of local maintenance.
 
 At task start, read [.agents/skills/core/SKILL.md](.agents/skills/core/SKILL.md) once.

@@ -36,7 +36,7 @@ hostname after confirmation and restarts the shared service. `allow` removes onl
 that imposed restriction. Policy survives deploy, sync, rollback and restore;
 site backups exclude it. `itsy server list` and status report effective policy.
 A production SEO origin does not automatically protect staging. Both systems
-require a supporting server; this website candidate requires protocol 30 and an
+require a supporting server; this website requires ItsyWeb 0.22.0 or newer, protocol 30 and an
 explicit authorized server upgrade, not merely changed site config.
 
 Verify locally: sitemap absolute production URLs, robots discovery, public
