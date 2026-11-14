@@ -1,4 +1,41 @@
-# Publishing FleaCMS downloads
+# Publishing ItsyWeb downloads
+
+## 0.21.0 published November 14, 2026
+
+Flea is now ItsyWeb. Immutable framework tag `v0.21.0` selects tested source
+`04669d71d988b0425571834426f7a678723bb5ff`. Website source `6affc545` was
+activated on both `main` and `t3/reframe-flea-html-focus`; both public channels
+select 0.21.0. The installer is byte-identical to the framework canonical copy,
+installs `itsy`, and retains `flea` for the notice and exact update exception.
+
+Native Linux AMD64 (Go 1.26.9) and Mac ARM64 (Go 1.27.1) passed full tests,
+race tests, vet, browser checks, real Contact/bundle checks and fresh-site smoke.
+The Mac executable passed ad-hoc signature verification. Canonical public hashes:
+
+```text
+1dcde316b29933b7e88882eef9dbee0a56cba3f5dc15cba367831bd6b1ee5e2a  itsy-darwin-arm64
+2ff6e2d0d7155d2f69e3c4e508f37285e59fa60c2c245e3002dba064129b936f  itsy-linux-amd64
+```
+
+The separate immutable store also serves byte-identical `flea-*` aliases for
+released updaters. All four files were verified over HTTPS before channel
+activation. Historical downloads remain intact. Both native platforms passed
+actual public fresh install, reinstall, `new`/`status`, retired-command stop,
+upgrade from 0.20.5, the second update’s prominent rename notice/conversion and
+already-current update. Normal Mac and Kirin CLIs match the manifest.
+
+Shared server 0.21.0/protocol 29 serves all 22 sites with the new file names.
+All 34 HTTPS hosts pass, with customer designs, live content, sessions, routing,
+TLS names, redirects and indexing retained. Atlas uses its approved preview
+alias without DNS changes. Fleacms.com’s reviewed branding/copy was explicitly
+published after a content pull; unrelated unpublished designs were retained.
+
+Activations: `itsy-web` = `20261114-162135-0b132a7a2b3aebb2a0fa4042`,
+`fleacms-website-main` = `20261114-162329-8ce1e6d0136d4a1b30334990`.
+Tag pipeline 843 awaits runners; completed native manual
+checks provide release evidence. Native ARM64 server, clean-Mac/notarization,
+installer packaging and real-email acceptance remain unverified. Private source,
+artifacts, prior CLIs and evidence are under `itsyweb-releases/0.21.0` on Kirin/Mac.
 
 ## 0.20.5 published November 9, 2026
 
