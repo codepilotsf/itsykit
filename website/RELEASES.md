@@ -1,5 +1,37 @@
 # Publishing ItsyWeb downloads
 
+## Installer PATH deployment, November 14, 2026
+
+Installer change `47cd929`, integrated with current docs in source `8ce42b7`, is
+pushed on `t3/installer-path-setup`. The committed website snapshot was deployed
+using the existing `t3/reframe-flea-html-focus` mapping in a disposable checkout;
+both saved mappings remain intact. Active `itsy-web` release:
+`20261114-201848-93046a9bafde673307b95270`, for itsyweb.dev and itsy.fleacms.com.
+No CLI binary release, channel change or server upgrade was performed; latest.txt
+remains 0.21.0. Normal code deployment keeps live editable content.
+
+The live installer is byte-identical to source, SHA-256:
+`deb56fba7c8c248daa24d637521205f17495c607d59bd105b8c0aebf16740d63`.
+Both live guides contain the reviewed immediate-use install command. Browser
+checks confirmed the updated introduction, rendered command and exact copy-button
+output without a separate version-check step.
+
+Full Go tests (with umask 022), vet, bundled build, Bash syntax and isolated
+Bash/Zsh installer regressions passed before deployment. After merging the newer
+docs, the focused installer suite and real built-CLI install/new/status smoke
+passed again. Actual public Linux installation in a temporary HOME with spaces
+passed same-terminal `itsy new my-site`, initial Git commit and status, plus
+site creation/status in fresh interactive and login Bash shells. Reinstall left
+profile bytes unchanged; the installed binary matches the public checksum.
+The real HOME/startup files were not used for installation tests. Post-deploy
+status confirmed reachable hosting and code matching source. Existing live content
+differs from the local snapshot without a pull baseline; no content sync was run.
+
+Host preflight passed with service 0.21.0 active, swap enabled and disk/memory
+headroom. The deployment admin process used the existing 320 MiB Go memory target;
+no persistent host settings changed. Native macOS checks for the new PATH behavior
+remain pending; Zsh startup modes were exercised on Linux with offline fixtures.
+
 ## 0.21.0 published November 14, 2026
 
 Flea is now ItsyWeb. Immutable framework tag `v0.21.0` selects tested source

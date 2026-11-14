@@ -15,7 +15,7 @@ description: Build a small bookshop website with two pages, shared templates, an
 <p>This guide walks you through a small bookshop website, from your first page to a shared layout and a few personal touches. As you save changes, ItsyWeb reloads the browser so you can see your site take shape. A little HTML and CSS is all you need to follow along.</p>
 <section id="installation">
   <h2>1. Install ItsyWeb</h2>
-<p>On an Apple Silicon Mac or x86-64 Linux computer, open a terminal and run:</p><div class="copy-code"><pre tabindex="0" aria-label="Install ItsyWeb"><code class="language-bash">curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div><p>The installer downloads and checks the command for your computer. There is no Go, Node, or database to set up.</p>
+<p>On an Apple Silicon Mac or x86-64 Linux computer, open a terminal and run:</p><div class="copy-code"><pre tabindex="0" aria-label="Install ItsyWeb"><code class="language-bash">(set -o pipefail; curl -fsSL https://itsyweb.dev/install.sh | bash) &amp;&amp; export PATH="$&#123;ITSY_INSTALL_DIR:-$&#123;FLEA_INSTALL_DIR:-$HOME/.local/bin&#125;&#125;:$PATH"</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div><p>This command works in Bash and Zsh. It makes <code>itsy</code> available now and configures future terminals. There is no Go, Node, or database to set up.</p>
 </section>
 
 <section id="create-a-site">
@@ -24,7 +24,6 @@ description: Build a small bookshop website with two pages, shared templates, an
 <pre tabindex="0" aria-label="Create the bookshop site"><code class="language-bash">itsy new little-bookshop
 cd little-bookshop
 itsy dev</code></pre><p>When prompted, enter <strong>Little Bookshop</strong> as the site name and skip the optional admin email. Open the Website URL printed in the terminal to see your new site. Leave this terminal running while you work; it serves the pages and watches for changes.</p>
-<p>If your terminal says <code>itsy</code> is not found, follow the PATH instructions printed by the installer, then try again.</p>
 </section>
 
 <section id="homepage">

@@ -24,11 +24,11 @@ For a new site on the published test release, Apple Silicon macOS and x86-64
 Linux downloads are available through:
 
 ```sh
-curl -fsSL https://itsyweb.dev/install.sh | bash
+(set -o pipefail; curl -fsSL https://itsyweb.dev/install.sh | bash) && export PATH="${ITSY_INSTALL_DIR:-${FLEA_INSTALL_DIR:-$HOME/.local/bin}}:$PATH"
 ```
 
-If your terminal cannot find `itsy`, follow the PATH instructions printed by
-the installer. Use version 0.22.0 or newer for this checkout. From `website/`:
+Run this command in Bash or Zsh. It configures this terminal and future shells.
+Use version 0.22.0 or newer for this checkout. From `website/`:
 
 ```sh
 itsy dev

@@ -19,14 +19,15 @@ itsy_install() (
   # The published checksum list decides which platforms have been verified.
   fetch() { curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 15 --max-time 180 "$@"; }
   hash() {
-    if command -v shasum >/dev/null; then shasum -a 256 "$1" | awk '{print $1}'
-    elif command -v sha256sum >/dev/null; then sha256sum "$1" | awk '{print $1}'
+    if command -v shasum >/dev/null; then shasum -a 256 < "$1" | awk '{print $1}'
+    elif command -v sha256sum >/dev/null; then sha256sum < "$1" | awk '{print $1}'
     else fail 'A SHA-256 tool (shasum or sha256sum) is required.'; fi
   }
   version=$(fetch --max-filesize 128 "$base/latest.txt") || fail 'No release is available. Your installation was not changed.'
   [[ ${#version} -le 64 && "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || fail 'Invalid release version.'
   destination=${ITSY_INSTALL_DIR:-${FLEA_INSTALL_DIR:-"$HOME/.local/bin"}}
   [[ "$destination" == /* ]] || fail 'ITSY_INSTALL_DIR must be an absolute directory.'
+  [[ "$destination" != *:* && "$destination" != *$'\n'* ]] || fail 'ITSY_INSTALL_DIR cannot contain a colon or newline because it must be added to PATH.'
   mkdir -p "$destination" || fail 'Choose a writable ITSY_INSTALL_DIR. No sudo is needed.'
   [[ ! -L "$destination/itsy" ]] || fail 'The existing itsy is a symlink. Use itsy update or choose another directory.'
   [[ ! -e "$destination/itsy" || -f "$destination/itsy" ]] || fail 'The itsy installation target is not a regular file.'
@@ -63,9 +64,55 @@ itsy_install() (
   mv -f -- "$stage/itsy" "$destination/itsy"
   mv -f -- "$stage/flea" "$destination/flea" || fail 'itsy is installed, but the retired flea command could not be replaced.'
   printf '\nInstalled ItsyWeb %s in %s/itsy\n' "$version" "$destination"
+
+  # This Bash child cannot change the invoking shell's PATH. The documented
+  # command exports it there; these guarded entries configure future terminals.
+  local profile login_profile quoted block marker
+  local profiles=()
+  path_failure() {
+    printf '\nItsyWeb is installed, but %s\n' "$1" >&2
+    printf 'Fix the startup file and rerun the installer, or add %s to PATH in your shell.\n' "$destination" >&2
+    exit 1
+  }
+  case "${SHELL##*/}" in
+    bash)
+      # Bash reads only the first existing login profile in this order.
+      login_profile="$HOME/.profile"
+      for profile in "$HOME/.bash_profile" "$HOME/.bash_login" "$HOME/.profile"; do
+        if [[ -e "$profile" || -L "$profile" ]]; then login_profile="$profile"; break; fi
+      done
+      profiles=("$HOME/.bashrc" "$login_profile")
+      ;;
+    zsh)
+      profiles=("${ZDOTDIR:-$HOME}/.zshrc" "${ZDOTDIR:-$HOME}/.zprofile")
+      ;;
+    *) path_failure 'automatic PATH setup supports Bash and Zsh. Open one of those shells and rerun with SHELL set to its absolute path, or configure your shell manually.' ;;
+  esac
+  # POSIX single-quoted literals also work in .profile and safely preserve
+  # spaces, quotes, dollar signs and other shell metacharacters in custom paths.
+  quoted="'${destination//\'/\'\\\'\'}'"
+  marker="# ItsyWeb PATH: $quoted"
+  block=$(printf '%s\ncase ":${PATH-}:" in\n  *:%s:*) ;;\n  *) export PATH=%s:"${PATH-}" ;;\nesac' "$marker" "$quoted" "$quoted")
+  # Preflight all profiles before appending to any of them. Follow regular
+  # symlink targets without replacing links or rewriting existing contents.
+  for profile in "${profiles[@]}"; do
+    [[ "$profile" == /* ]] || path_failure "the startup file path must be absolute: $profile."
+    if [[ -e "$profile" || -L "$profile" ]]; then
+      [[ -f "$profile" && -r "$profile" && -w "$profile" ]] || path_failure "the startup file is not a readable, writable regular file: $profile."
+    else
+      [[ -d "${profile%/*}" && -w "${profile%/*}" ]] || path_failure "the startup directory does not exist or is not writable: ${profile%/*}."
+    fi
+  done
+  for profile in "${profiles[@]}"; do
+    if ! grep -Fqx -- "$marker" "$profile" 2>/dev/null; then
+      printf '\n%s\n' "$block" >> "$profile" || path_failure "the startup file could not be updated: $profile."
+      printf 'Added PATH setup to %s\n' "$profile"
+    fi
+  done
+  printf 'PATH is configured for future %s terminals.\n' "${SHELL##*/}"
   case ":$PATH:" in
     *":$destination:"*) printf '\nGet started: itsy new my-site\n' ;;
-    *) printf '\nAdd this directory to PATH in your shell profile, then open a new terminal:\n  export PATH=%q:"$PATH"\n' "$destination" ;;
+    *) printf '\nFor this terminal, finish the export in the install command or run:\n  export PATH=%s:"$PATH"\n\nGet started: itsy new my-site\n' "$quoted" ;;
   esac
 )
 itsy_install
