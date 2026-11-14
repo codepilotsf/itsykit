@@ -54,7 +54,7 @@ func devAdmin(root, name string, public *site.Server, logger *log.Logger, previe
 				sender = mailer.NewResend(mail)
 			}
 			store := &editstore.Store{Root: root, ContentPath: sitefiles.Path(root, filepath.Join("itsy", "snips.json")), Emails: current.Emails, Publish: public.Publish}
-			options := editor.Options{Emails: current.Emails, SessionPath: sitefiles.Path(root, filepath.Join("itsy", "runtime", "sessions.json")), SessionIdleDays: current.SessionIdleDays, Name: name, Sender: sender, Backend: store, Local: true, Logger: logger, Render: public.RenderAdmin, Public: public.ServeOwner}
+			options := editor.Options{Emails: current.Emails, SessionPath: sitefiles.Path(root, filepath.Join("itsy", "runtime", "sessions.json")), SessionIdleDays: current.SessionIdleDays, Name: name, Sender: sender, Backend: store, Local: true, Logger: logger, Render: public.RenderAdmin}
 			options.RenderEmail = public.RenderEmail
 			options.ReloadScript = public.AdminReload
 			if err := editor.PruneSessions(options); err != nil {
@@ -74,7 +74,7 @@ func devAdmin(root, name string, public *site.Server, logger *log.Logger, previe
 		if adminPath {
 			dashboard.ServeHTTP(w, r)
 		} else {
-			dashboard.ServePublic(w, r, public)
+			public.ServeHTTP(w, r)
 		}
 	})
 }

@@ -110,5 +110,5 @@ func ReadPhoto(root, name string) ([]byte, error) {
 // is the stable private runtime directory for custom-app storage; empty defaults
 // to the site tree (development).
 func LoadWithMedia(root string, content *snips.Store, mediaRoot, runtimeRoot string) (*Project, error) {
-	return loadProject(root, content, mediaRoot, runtimeRoot, false)
+	return loadProject(root, content, mediaRoot, runtimeRoot)
 }

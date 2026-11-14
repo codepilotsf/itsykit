@@ -1,5 +1,17 @@
 # QA checklist
 
+## Current source candidate scope (November 14, 2026; unreleased)
+
+Use `itsy new`, `itsy dev` and `itsy status` for current acceptance. Page snips,
+extraction, toolbar/Theme, page images/video editing, collections and saved page
+metadata are removed. Related checklist instructions and dated results below
+are historical/superseded; preserve Sean’s answers and release receipts. Current
+acceptance covers comment title/description/layout defaults, ordinary HTML/JSON
+and static assets, Blog login/drafts/publish/unpublish/covers/saved reload and
+content preservation, Contact/public CSRF, deployment/backup/recovery boundaries,
+and required full/race/vet/build checks. Protocol 30 is unreleased; local success
+does not authorize rollout or establish production acceptance.
+
 Current platform matrix from 0.18.0: Apple Silicon macOS and x86-64 Linux CLIs.
 Both bundle x86-64 and cross-compiled ARM64 Linux servers; record native ARM64
 server acceptance separately. Linux ARM64 CLI downloads are discontinued.

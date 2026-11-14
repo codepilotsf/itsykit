@@ -81,7 +81,7 @@ func TestIconAttributesScopeAndEscaping(t *testing.T) {
 	root := fixture(t)
 	put(t, root, iconCacheDir+"/search.svg", testIconSVG)
 	put(t, root, "_card.html", `{icon search class="inline {app.site_name}" aria-label="{member.name}" size="1em" stroke-width='3' data-note="a}b &amp; c"}`)
-	put(t, root, "index.html", `{#each snip.team.members as member}{render card}{/each}{icon search aria-label="{app.unsafe}"}{icon search}`)
+	put(t, root, "index.html", `{#each data.team.members as member}{render card}{/each}{icon search aria-label="{app.unsafe}"}{icon search}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
 	if err != nil {
@@ -117,8 +117,8 @@ func TestBadIconDirectives(t *testing.T) {
 
 func TestIconsDoNotParseContentOrRawElements(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "itsy/snips/content.json", `{"text":"{icon search}<svg onload=alert(1)>"}`)
-	put(t, root, "index.html", `<script>const icon="{icon search}";</script><style>/* {icon search} */</style>{snip.content.text}`)
+	put(t, root, "itsy/data/content.json", `{"text":"{icon search}<svg onload=alert(1)>"}`)
+	put(t, root, "index.html", `<script>const icon="{icon search}";</script><style>/* {icon search} */</style>{data.content.text}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
 	if err != nil {

@@ -51,8 +51,7 @@ func compare(known bool, base, local, remote map[string]string) Comparison {
 	return c
 }
 
-// CompareContent compares active editable values, collections, metadata and media
-// libraries. Developer labels, page ownership and retained archives are excluded.
+// CompareContent compares Blog posts and library photos as whole records.
 func CompareContent(base, local, remote *snips.Store) Comparison {
 	return compare(base != nil, contentValues(base), contentValues(local), contentValues(remote))
 }
@@ -65,36 +64,8 @@ func contentValues(s *snips.Store) map[string]string {
 	for _, p := range s.Blog {
 		put("blog:"+p.ID, p)
 	}
-	entries, _ := s.Index()
-	for id, e := range entries {
-		e.Label = ""
-		put("snip:"+id, e)
-	}
 	for id, v := range s.Media {
 		put("media:"+id, v)
-	}
-	for id, v := range s.Videos {
-		put("video:"+id, v)
-	}
-	page := func(path string, p *snips.Page) {
-		if p == nil {
-			return
-		}
-		if p.Title != "" {
-			put("title:"+path, p.Title)
-		}
-		if p.Description != "" {
-			put("description:"+path, p.Description)
-		}
-		for name, items := range p.Multisnips {
-			if len(items) > 0 {
-				put("collection:"+path+":"+name, items)
-			}
-		}
-	}
-	page("shared", &s.Shared)
-	for path, p := range s.Pages {
-		page(path, p)
 	}
 	return values
 }

@@ -51,8 +51,8 @@ func TestQARollbackPreservesLiveStateAndOtherSites(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	content.Page("/").Snips["a7Km2pQ9xB"] = snips.Entry{Content: "Owner edit after deploy"}
-	content.Page("/").Title = "Owner title"
+	content.Blog[0].Body = "Owner edit after deploy"
+	content.Blog[0].Title = "Owner title"
 	if e = snips.WriteFile(before.Content["example.test"], content); e != nil {
 		t.Fatal(e)
 	}
@@ -77,7 +77,7 @@ func TestQARollbackPreservesLiveStateAndOtherSites(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if state.Snips.Page("/").Title != "Owner title" || state.Snips.Page("/").Snips["a7Km2pQ9xB"].Content != "Owner edit after deploy" {
+	if state.Snips.Blog[0].Title != "Owner title" || state.Snips.Blog[0].Body != "Owner edit after deploy" {
 		t.Fatal("live edits lost", state)
 	}
 	p, e := site.Load(after.Sites["example.test"])

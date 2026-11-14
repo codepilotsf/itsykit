@@ -25,7 +25,7 @@ itsy server remove [ssh-target] [site-name]
 ## Rollback
 
 Rollback republishes earlier code as a new release while preserving current admin
-snips, multisnips and photos. Styles come from the selected code release. It moves all of this site's aliases together;
+Blog content, multiBlog content and photos. Styles come from the selected code release. It moves all of this site's aliases together;
 other sites, HTTPS policy, hostname indexing policy and redirects stay unchanged.
 It asks for confirmation
 and refuses if the active release changed after review. Incompatible old templates
@@ -40,7 +40,7 @@ automatic migration or guessing from directory timestamps is performed.
 ## Backup and restore
 
 Backup downloads a verified, bounded snapshot of the active site's code, public
-configuration, live snips, multisnips, photos and source CSS under the deployment lock.
+configuration, live Blog content, multiBlog content, photos and source CSS under the deployment lock.
 It refuses existing output files and creates new files with private permissions.
 Keep backups outside the website directory and copy them to separate storage.
 Backups can contain admin addresses and content; handle them as private data.

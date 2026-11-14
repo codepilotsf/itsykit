@@ -37,7 +37,7 @@ func TestSourceExcerptWindow(t *testing.T) {
 
 func TestDiagnosticSourceLocations(t *testing.T) {
 	for _, tc := range []struct{ file, source, location string }{
-		{"index.html", "<section snip>\n<p snip>Nested</p>\n</section>", "index.html:2"},
+		{"index.html", "<section>\n<p snip>Removed</p>\n</section>", "index.html:2"},
 		{"index.html", "<!-- flea\nlayout: /main.layout.html\nunknown: value\n-->\n<p>Hi</p>", "index.html:3"},
 		{"_copy.html", "<p>Copy</p>\n{#if bad expression}", "_copy.html:2"},
 	} {
@@ -194,10 +194,10 @@ func TestJSONDiagnosticDoesNotExposeSourceValues(t *testing.T) {
 
 func TestProductionRenderAndErrorTemplateFailuresAreLogged(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "index.html", `{#each snip.team.members as member}{member.name}{/each}`)
+	put(t, root, "index.html", `{#each data.team.members as member}{member.name}{/each}`)
 	p := mustLoad(t, root)
 	// Simulate an unexpected runtime failure, including a broken custom fallback.
-	p.Snips["team"]["members"] = "wrong type"
+	p.Data["team"]["members"] = "wrong type"
 	p.Errors[500] = p.Pages["/"]
 	var logs bytes.Buffer
 	s := NewProductionServer(p, log.New(&logs, "", 0))

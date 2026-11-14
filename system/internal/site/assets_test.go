@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"image"
 	"image/png"
+	"itsy/internal/media"
+	"itsy/internal/snips"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -154,8 +156,12 @@ func TestManagedPhotoStreamsValidatedFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	put(t, root, "portrait.png", b.String())
-	put(t, root, "index.html", `<img snip src="/portrait.png" alt="Photo">`)
-	if err := ExtractSnips(root); err != nil {
+	photo, data, err := media.Process(b.Bytes(), "Portrait", "Photo")
+	if err != nil {
+		t.Fatal(err)
+	}
+	put(t, root, "itsy/media/"+photo.File, string(data))
+	if err := SaveContent(root, &snips.Store{Media: map[string]media.Photo{"Abcdef1234": photo}}); err != nil {
 		t.Fatal(err)
 	}
 	p := mustLoad(t, root)

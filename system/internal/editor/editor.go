@@ -12,50 +12,25 @@ import (
 
 	"itsy/internal/devaccess"
 	"itsy/internal/mailer"
-	"itsy/internal/media"
 	"itsy/internal/snips"
 )
 
 type Document struct {
 	Store     *snips.Store
-	Routes    []string
 	Version   string
 	BlogMount string
 }
 type Update struct {
-	Version, Route, ID, Content, Title, Description string
-	Page                                            *PageEdit
-	Blog                                            *BlogEdit
-	BlogResult                                      *BlogResult
-	// Result is filled from the committed snapshot while the save lock is held.
-	Result *PageResult
+	Version    string
+	Blog       *BlogEdit
+	BlogResult *BlogResult
+	// BlogResult is filled under the publication lock.
 }
-type PageResult struct {
-	Page   PageEdit               `json:"page"`
-	Media  map[string]snips.Entry `json:"media"`
-	Photos map[string]media.Photo `json:"photos"`
-}
-type ContentEdit struct {
-	ID      string `json:"id"`
-	Content string `json:"content"`
-}
-type PageEdit struct {
-	Version     string                       `json:"version"`
-	Route       string                       `json:"route"`
-	Title       string                       `json:"title"`
-	Description string                       `json:"description"`
-	Changes     []ContentEdit                `json:"changes"`
-	Multisnips  map[string][]snips.MultiItem `json:"multisnips,omitempty"`
-	Media       []MediaEdit                  `json:"media,omitempty"`
-}
-type MediaEdit struct {
-	Library     bool   `json:"library,omitempty"`
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Alt         string `json:"alt"`
-	ClearPoster bool   `json:"clear_poster,omitempty"`
-	Data        []byte `json:"-"`
-	PosterData  []byte `json:"-"`
+type CoverUpload struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Alt  string `json:"alt"`
+	Data []byte `json:"-"`
 }
 type Backend interface {
 	Read() (Document, error)
@@ -67,7 +42,6 @@ type Options struct {
 	SessionIdleDays int
 	Render          func(string, map[string]any) ([]byte, error)
 	ReloadScript    func() string
-	Public          func(http.ResponseWriter, *http.Request, func([]byte, *snips.Store, string) ([]byte, bool))
 	Emails          []string
 	Name            string
 	Sender          mailer.Sender
@@ -108,6 +82,12 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if serveEditorAsset(w, r) {
 		return
 	}
+	switch r.URL.Path {
+	case "/admin", "/admin/", "/admin/code", "/admin/verify", "/admin/logout", "/admin/activity", "/admin/blog", "/admin/blog/edit", "/admin/blog/save":
+	default:
+		http.NotFound(w, r)
+		return
+	}
 	w.Header().Set("X-Frame-Options", "DENY")
 	w.Header().Set("Content-Security-Policy", "default-src 'none'; style-src 'self' https: 'unsafe-inline'; font-src 'self' https: data:; img-src 'self' https: data:; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")
 	if len(h.allowed) == 0 && !h.options.Local {
@@ -139,7 +119,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "POST" {
-		pageUpload := (r.URL.Path == "/admin/page" || r.URL.Path == "/admin/blog/save") && strings.HasPrefix(strings.ToLower(r.Header.Get("Content-Type")), "multipart/form-data")
+		pageUpload := r.URL.Path == "/admin/blog/save" && strings.HasPrefix(strings.ToLower(r.Header.Get("Content-Type")), "multipart/form-data")
 		scheme := "https"
 		if h.options.Local {
 			scheme = "http"
@@ -181,7 +161,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				defer r.MultipartForm.RemoveAll()
 			}
 			if err != nil {
-				http.Error(w, "This upload is invalid or exceeds 40 MiB total. Choose images up to 8 MiB and videos up to 25 MiB.", 400)
+				http.Error(w, "This upload is invalid or exceeds 40 MiB total. Choose a JPEG or PNG up to 8 MiB.", 400)
 				return
 			}
 		}
@@ -217,7 +197,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case "/admin/verify":
 			h.verifyCode(w, r)
 			return
-		case "/admin/logout", "/admin/activity", "/admin/page", "/admin/blog/save":
+		case "/admin/logout", "/admin/activity", "/admin/blog/save":
 			if !logged || !equal(s.csrf, r.FormValue("csrf")) {
 				http.Error(w, "Your session expired. Please sign in again.", 403)
 				return
@@ -248,10 +228,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				h.saveBlog(w, r)
 				return
 			}
-			if r.URL.Path == "/admin/page" {
-				h.savePage(w, r)
-				return
-			}
 		default:
 			http.NotFound(w, r)
 			return
@@ -266,10 +242,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h.showBlog(w, r, s)
-		return
-	}
-	if r.URL.Path == "/admin/editor-context" && logged {
-		h.readEditorContext(w, r, s)
 		return
 	}
 	if r.URL.Path != "/admin" && r.URL.Path != "/admin/" {
@@ -289,12 +261,21 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !h.renew(w, r) {
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	d, err := h.options.Backend.Read()
+	if err != nil {
+		http.Error(w, "Could not read site content.", 503)
+		return
+	}
+	if d.BlogMount != "" {
+		http.Redirect(w, r, "/admin/blog", http.StatusSeeOther)
+		return
+	}
+	h.page(w, view{Mode: "setup", Message: "Blog is not enabled", Instructions: "Blog is not enabled. Website pages are edited in HTML.", Email: s.email, CSRF: s.csrf})
 }
 
 type view struct {
-	Instructions                                     string
-	Mode, Name, Email, CSRF, Version, Message, Draft string
+	Instructions               string
+	Mode, Email, CSRF, Message string
 }
 
 func (h *Handler) page(w http.ResponseWriter, v view) {
@@ -302,7 +283,7 @@ func (h *Handler) page(w http.ResponseWriter, v view) {
 		http.Error(w, "Admin pages are not configured.", 500)
 		return
 	}
-	data, err := h.options.Render(v.Mode, map[string]any{"name": h.options.Name, "email": v.Email, "csrf": v.CSRF, "version": v.Version, "message": v.Message, "instructions": v.Instructions, "draft": v.Draft})
+	data, err := h.options.Render(v.Mode, map[string]any{"name": h.options.Name, "email": v.Email, "csrf": v.CSRF, "message": v.Message, "instructions": v.Instructions})
 	if err != nil {
 		if h.options.Logger != nil {
 			h.options.Logger.Printf("Admin page could not be rendered: %v", err)

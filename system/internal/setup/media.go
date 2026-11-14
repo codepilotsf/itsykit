@@ -18,7 +18,7 @@ import (
 // Fetch a coherent photo snapshot using the same private backup transport. The
 // reviewed state digest prevents mixing photos from one revision with another.
 func fetchPhotos(ctx context.Context, s DeploySettings, remote syncstate.Snapshot, ssh func(context.Context, string, bool, io.Writer) error, isRoot bool, temp string) (string, error) {
-	if len(remote.Snips.ImageAssets()) == 0 && len(remote.Snips.VideoAssets()) == 0 {
+	if len(remote.Snips.ImageAssets()) == 0 {
 		return "", nil
 	}
 	f, err := os.CreateTemp(temp, "photos-backup-")
@@ -48,12 +48,7 @@ func fetchPhotos(ctx context.Context, s DeploySettings, remote syncstate.Snapsho
 }
 
 func installPhotos(root, source string, store *snips.Store) error {
-	if len(store.VideoAssets()) > 0 {
-		if err := site.IgnoreSessionFiles(root); err != nil {
-			return err
-		}
-	}
-	if len(store.ImageAssets()) == 0 && len(store.VideoAssets()) == 0 {
+	if len(store.ImageAssets()) == 0 {
 		return nil
 	}
 	dir := sitefiles.Path(root, filepath.Join("itsy", "media"))
@@ -88,5 +83,5 @@ func installPhotos(root, source string, store *snips.Store) error {
 			return e
 		}
 	}
-	return site.InstallVideos(source, dir, store)
+	return nil
 }

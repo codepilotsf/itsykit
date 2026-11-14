@@ -12,4 +12,3 @@
 .env.*
 !.env.example
 /itsy/runtime/
-/itsy/media/*.mp4

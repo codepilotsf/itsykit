@@ -31,16 +31,16 @@ func TestCustomLayout(t *testing.T) {
 	}
 }
 
-func TestCustomLayoutExtractionPreservesSettings(t *testing.T) {
+func TestCustomLayoutLoadPreservesSettings(t *testing.T) {
 	root := fixture(t)
 	put(t, root, "custom.layout.html", `<html><body>{slot}</body></html>`)
 	const settings = "<!-- flea\nlayout: /custom.layout.html\n-->\n"
-	put(t, root, "custom.html", settings+`<h1 snip="Heading">Editable</h1>`)
-	if _, err := LoadEditing(context.Background(), root); err != nil {
+	put(t, root, "custom.html", settings+`<h1>Ordinary</h1>`)
+	if _, err := LoadDev(context.Background(), root); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(filepath.Join(root, "site", "custom.html"))
-	if err != nil || !strings.HasPrefix(string(data), settings) || !strings.Contains(string(data), "{snip ") {
+	if err != nil || !strings.HasPrefix(string(data), settings) || !strings.Contains(string(data), "<h1>Ordinary</h1>") {
 		t.Fatal(string(data), err)
 	}
 }
@@ -74,5 +74,20 @@ func TestLayoutsCannotNestOrBeIncluded(t *testing.T) {
 	put(t, root, "index.html", `{render custom}`)
 	if _, err := Load(root); err == nil {
 		t.Fatal("layout included as partial")
+	}
+}
+
+func TestMetadataSettingsDiagnostics(t *testing.T) {
+	for _, value := range []string{"title:\ntitle: Second", "description:\ndescription:", "title no colon", "Title: Wrong case", "unknown: text", "title: text\n-->\n<!-- itsy\ndescription: second"} {
+		root := fixture(t)
+		put(t, root, "index.html", "<!-- itsy\n"+value+"\n-->\nBody")
+		if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "index.html:") {
+			t.Fatal(value, err)
+		}
+	}
+	root := fixture(t)
+	put(t, root, "index.html", "<!-- itsy\ntitle: Unclosed")
+	if _, err := Load(root); err == nil {
+		t.Fatal("unclosed settings accepted")
 	}
 }

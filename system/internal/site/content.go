@@ -10,7 +10,7 @@ import (
 
 var localContentMu sync.Mutex
 
-// LockContent coordinates dev extraction and browser saves within this process.
+// LockContent coordinates dev reloads and Blog saves within this process.
 // Running multiple dev processes against the same project is unsupported.
 // Acquire this before Server.reloadMu to keep publication and disk writes ordered.
 func LockContent() func() {

@@ -97,9 +97,6 @@ func (s *Server) Watch(ctx context.Context, root string, logger *log.Logger) err
 				last = project.signature
 				s.mu.RUnlock()
 				if logger != nil {
-					if project.SnipsUpdated {
-						logger.Printf("Snips updated in %s.", sitefiles.ResolveAt(root, "itsy/snips.json"))
-					}
 					for _, warning := range project.Warnings {
 						logger.Printf("Warning: %s", warning)
 					}

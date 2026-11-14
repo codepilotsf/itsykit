@@ -106,7 +106,7 @@ func TestCSRFFailedRenderDoesNotSetCookie(t *testing.T) {
 	inputs, _ := s.formRender(r)
 	inputs.appName = "contact"
 	inputs.appData = map[string]any{"data": map[string]any{"bad": "not an array"}}
-	if _, err := p.renderRequest(p.Pages["/"], "/", nil, false, inputs); err == nil {
+	if _, err := p.renderRequest(p.Pages["/"], "/", nil, inputs); err == nil {
 		t.Fatal("expected failure")
 	}
 	// Invalid origin cannot issue a token, even if forwarded headers claim TLS.
@@ -128,7 +128,7 @@ func TestAppRenderBound(t *testing.T) {
 		items[i] = strings.Repeat("x", appRenderLimit/4)
 	}
 	inputs := &renderInputs{appName: "contact", appData: map[string]any{"data": map[string]any{"items": items}}}
-	body, err := p.renderRequest(p.Pages["/"], "/", nil, false, inputs)
+	body, err := p.renderRequest(p.Pages["/"], "/", nil, inputs)
 	if err == nil || len(body) > appRenderLimit {
 		t.Fatal("unbounded app rendering", len(body), err)
 	}

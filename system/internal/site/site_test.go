@@ -30,7 +30,7 @@ func fixture(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
 	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test","url":"javascript:alert(1)","unsafe":"\"/><script>alert(1)</script>"}}`)
-	put(t, root, "itsy/snips/team.json", `{"text":"<b>{app.site_name}</b>","members":[{"name":"Ada","children":[{"name":"Bea"}]},{"name":"Cy","children":[]}],"empty":[],"false":false,"zero":0,"blank":""}`)
+	put(t, root, "itsy/data/team.json", `{"text":"<b>{app.site_name}</b>","members":[{"name":"Ada","children":[{"name":"Bea"}]},{"name":"Cy","children":[]}],"empty":[],"false":false,"zero":0,"blank":""}`)
 	put(t, root, "index.html", "<h1>{app.site_name}</h1>")
 	put(t, root, "about/index.html", "About")
 	put(t, root, "css/main.css", "body{color:red}")
@@ -121,7 +121,7 @@ func TestCollisionsAndSymlinks(t *testing.T) {
 			}
 		})
 	}
-	for _, name := range []string{"link.txt", "nested", "itsy/snips/link.json", "itsy.config.json"} {
+	for _, name := range []string{"link.txt", "nested", "itsy/data/link.json", "itsy.config.json"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
 			target := filepath.Join(t.TempDir(), "secret")
@@ -151,7 +151,7 @@ func TestRenderingScopeAndEscaping(t *testing.T) {
 	root := fixture(t)
 	put(t, root, "main.layout.html", `<html><title>{app.site_name}</title><body>{slot}</body></html>`)
 	put(t, root, "_member.html", `[{member.name}:{app.site_name}:{#each member.children as member}{member.name}/{app.site_name}{/each}:{member.name}]`)
-	put(t, root, "index.html", `{#each snip.team.members as member}{render member}{/each}<p>{app.unsafe}</p><div title="{app.unsafe}"></div><a href="{app.url}">link</a>{snip team}{#if snip.team.false}BAD{/if}{#if snip.team.zero}BAD{/if}{#if snip.team.blank}BAD{/if}{#if snip.team.empty}BAD{/if}{#each snip.team.empty as x}BAD{/each}{#each snip.missing as x}BAD{/each}`)
+	put(t, root, "index.html", `{#each data.team.members as member}{render member}{/each}<p>{app.unsafe}</p><div title="{app.unsafe}"></div><a href="{app.url}">link</a>{data.team.text}{#if data.team.false}BAD{/if}{#if data.team.zero}BAD{/if}{#if data.team.blank}BAD{/if}{#if data.team.empty}BAD{/if}{#each data.team.empty as x}BAD{/each}{#each data.missing as x}BAD{/each}`)
 	p := mustLoad(t, root)
 	b, err := p.render(p.Pages["/"], "/")
 	if err != nil {
@@ -235,10 +235,10 @@ func TestRawElements(t *testing.T) {
 
 func TestInvalidTemplatesAndData(t *testing.T) {
 	cases := map[string]string{
-		"missing partial": `{render missing}`, "unclosed each": `{#each snip.team.members as m}`,
+		"missing partial": `{render missing}`, "unclosed each": `{#each data.team.members as m}`,
 		"unmatched": `{/if}`, "empty if": `{#if }x{/if}`, "empty each": `{#each }`,
-		"non-array": `{#each app.site_name as item}x{/each}`, "reserved alias": `{#each snip.team.members as app}{/each}`,
-		"bad alias": `{#each snip.team.members as x-y}{/each}`, "slot": `{slot}`, "unclosed directive": `{app.site_name`,
+		"non-array": `{#each app.site_name as item}x{/each}`, "reserved alias": `{#each data.team.members as app}{/each}`,
+		"bad alias": `{#each data.team.members as x-y}{/each}`, "slot": `{slot}`, "unclosed directive": `{app.site_name`,
 		"missing snip": `{snip missing}`, "unclosed script": `<script>{anything}`,
 	}
 	for name, source := range cases {
@@ -260,7 +260,7 @@ func TestInvalidTemplatesAndData(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
-	for _, name := range []string{"itsy.config.json", "itsy/snips/team.json"} {
+	for _, name := range []string{"itsy.config.json", "itsy/data/team.json"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
 			put(t, root, name, "{bad}")
@@ -348,9 +348,9 @@ func TestErrorPageLayouts(t *testing.T) {
 
 func TestRenderingFailureFallback(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "index.html", `{#each snip.team.members as m}{m.name}{/each}`)
+	put(t, root, "index.html", `{#each data.team.members as m}{m.name}{/each}`)
 	p := mustLoad(t, root)
-	p.Snips["team"]["members"] = "wrong type"
+	p.Data["team"]["members"] = "wrong type"
 	w := request(NewServer(p), "GET", "/")
 	if w.Code != 500 || !strings.HasPrefix(w.Body.String(), "Try later") {
 		t.Fatal(w)
@@ -383,8 +383,8 @@ func TestWatchChangesAndRecovery(t *testing.T) {
 	}
 	for _, edit := range []struct{ name, body, url, want string }{
 		{"itsy.config.json", `{"app":{"site_name":"Renamed"}}`, "/", "Renamed"},
-		{"index.html", `{snip.team.text}`, "/", "&lt;b&gt;"},
-		{"itsy/snips/team.json", `{"text":"new content"}`, "/", "new content"},
+		{"index.html", `{data.team.text}`, "/", "&lt;b&gt;"},
+		{"itsy/data/team.json", `{"text":"new content"}`, "/", "new content"},
 		{"css/main.css", "new css", "/css/main.css", "new css"},
 	} {
 		put(t, root, edit.name, edit.body)

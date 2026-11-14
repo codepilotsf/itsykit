@@ -9,7 +9,7 @@ import (
 )
 
 // WriteFile replaces a managed content snapshot, never templates/configuration.
-// The caller must hold the appropriate deployment or local extraction lock.
+// The caller must hold the appropriate deployment or local content lock.
 func WriteFile(name string, store *Store) error {
 	data, err := store.Bytes()
 	if err != nil {

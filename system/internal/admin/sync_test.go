@@ -33,9 +33,9 @@ func TestSyncVersionAndOwnerPreservation(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	entry := current.Page("/").Snips["a7Km2pQ9xB"]
-	entry.Content = "Owner edit"
-	current.Page("/").Snips["a7Km2pQ9xB"] = entry
+	entry := current.Blog[0]
+	entry.Body = "Owner edit"
+	current.Blog[0] = entry
 	if e = snips.WriteFile(c.Content["example.test"], current); e != nil {
 		t.Fatal(e)
 	}
@@ -47,7 +47,7 @@ func TestSyncVersionAndOwnerPreservation(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if fresh.Snips.Page("/").Snips["a7Km2pQ9xB"].Content != "Owner edit" {
+	if fresh.Snips.Blog[0].Body != "Owner edit" {
 		t.Fatal("lost concurrent edit")
 	}
 	css := ":root {--brand-1: #123456;}"
@@ -60,7 +60,7 @@ func TestSyncVersionAndOwnerPreservation(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if fresh.Snips.Page("/").Snips["a7Km2pQ9xB"].Content != "Owner edit" {
+	if fresh.Snips.Blog[0].Body != "Owner edit" {
 		t.Fatal("normal deploy replaced owner content")
 	}
 	c, _, e = host.Load(m.ConfigPath, nil)

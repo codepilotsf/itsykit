@@ -1,12 +1,7 @@
 package cli
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"image"
-	"image/png"
-	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -36,24 +31,7 @@ func TestLANDevWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	enableTestContact(t, root)
-	var photo bytes.Buffer
-	if err := png.Encode(&photo, image.NewRGBA(image.Rect(0, 0, 8, 8))); err != nil {
-		t.Fatal(err)
-	}
-	video, err := os.ReadFile("../video/testdata/valid.mp4")
-	if err != nil {
-		t.Fatal(err)
-	}
-	for name, data := range map[string][]byte{
-		"site/images/lan.png": photo.Bytes(),
-		"site/images/lan.mp4": video,
-		"site/lan-media.html": []byte(`<h1 snip>LAN media</h1><img snip src="/images/lan.png" alt="Seed"><video snip controls src="/images/lan.mp4"></video>`),
-	} {
-		if err := os.WriteFile(filepath.Join(root, name), data, 0644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	p, err := site.LoadEditing(context.Background(), root)
+	p, err := site.LoadDev(context.Background(), root)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,110 +104,12 @@ func TestLANDevWorkflow(t *testing.T) {
 	if session.Secure || !session.HttpOnly || session.SameSite != http.SameSiteStrictMode {
 		t.Fatal("unexpected dev cookie policy")
 	}
-	w = req("GET", "/", nil, session)
-	csrfMatch := regexp.MustCompile(`name="csrf-token" content="([^"]+)"`).FindStringSubmatch(w.Body.String())
-	if len(csrfMatch) != 2 || !strings.Contains(w.Body.String(), "itsy-owner-root") {
-		t.Fatal("LAN owner shell missing", w.Code)
+	w = req("GET", "/admin", nil, session)
+	csrfMatch := regexp.MustCompile(`name="csrf" value="([^"]+)"`).FindStringSubmatch(w.Body.String())
+	if len(csrfMatch) != 2 {
+		t.Fatal("missing admin CSRF", w.Body.String())
 	}
 	csrf := csrfMatch[1]
-	metadata := func(route string) editor.PageEdit {
-		t.Helper()
-		w := req("GET", "/admin/editor-context?route="+url.QueryEscape(route), url.Values{"csrf": {csrf}}, session)
-		var data struct {
-			Page editor.PageEdit `json:"page"`
-		}
-		if err := json.Unmarshal(w.Body.Bytes(), &data); err != nil || w.Code != 200 {
-			t.Fatal("editor context", w.Code, err)
-		}
-		return data.Page
-	}
-	edit := metadata("/")
-	edit.Title = "Saved from another device"
-	data, _ := json.Marshal(edit)
-	values := url.Values{"csrf": {csrf}, "edit": {string(data)}}
-	if w := request(h, "POST", "/admin/page", values, session, "http://evil.test"); w.Code != 403 {
-		t.Fatal("foreign origin accepted", w.Code)
-	}
-	if w := req("POST", "/admin/page", url.Values{"csrf": {"wrong"}, "edit": {string(data)}}, session); w.Code != 403 {
-		t.Fatal("bad CSRF accepted", w.Code)
-	}
-	if w := req("POST", "/admin/page", values, session); w.Code != 200 {
-		t.Fatal("page save", w.Code, w.Body.String())
-	}
-	if w := req("POST", "/admin/page", values, session); w.Code != 409 {
-		t.Fatal("stale save accepted", w.Code)
-	}
-	if w := req("GET", "/", nil, nil); !strings.Contains(w.Body.String(), edit.Title) || strings.Contains(w.Body.String(), "itsy-owner-root") {
-		t.Fatal("anonymous publication failed")
-	}
-	// The same authenticated LAN endpoint must support bounded multipart media.
-	mediaEdit := metadata("/lan-media")
-	var imageID, videoID string
-	for id, entry := range p.Content.Pages["/lan-media"].Snips {
-		switch entry.Type {
-		case "image":
-			imageID = id
-		case "video":
-			videoID = id
-		}
-	}
-	if imageID == "" || videoID == "" {
-		t.Fatal("media seeds not extracted")
-	}
-	mediaEdit.Media = []editor.MediaEdit{{ID: imageID, Name: "LAN photo", Alt: "Uploaded from LAN"}, {ID: videoID, Name: "LAN video"}}
-	data, _ = json.Marshal(mediaEdit)
-	var upload bytes.Buffer
-	parts := multipart.NewWriter(&upload)
-	if err := parts.WriteField("csrf", csrf); err != nil {
-		t.Fatal(err)
-	}
-	if err := parts.WriteField("edit", string(data)); err != nil {
-		t.Fatal(err)
-	}
-	for _, file := range []struct {
-		id, name string
-		data     []byte
-	}{{imageID, "photo.png", photo.Bytes()}, {videoID, "video.mp4", video}} {
-		part, err := parts.CreateFormFile("media-"+file.id, file.name)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if _, err = part.Write(file.data); err != nil {
-			t.Fatal(err)
-		}
-	}
-	if err := parts.Close(); err != nil {
-		t.Fatal(err)
-	}
-	r := httptest.NewRequest("POST", origin+"/admin/page", bytes.NewReader(upload.Bytes()))
-	r.RemoteAddr = "100.79.67.33:54321"
-	r.Header.Set("Origin", origin)
-	r.Header.Set("Content-Type", parts.FormDataContentType())
-	r.Header.Set("X-CSRF-Token", csrf)
-	r.AddCookie(session)
-	w = httptest.NewRecorder()
-	h.ServeHTTP(w, r)
-	if w.Code != 200 {
-		t.Fatal("LAN media upload", w.Code, w.Body.String())
-	}
-	if w := req("GET", "/lan-media", nil, nil); !strings.Contains(w.Body.String(), "Uploaded from LAN") {
-		t.Fatal("uploaded media not published")
-	}
-	// Collections retain the normal version checks and publication semantics.
-	team := metadata("/team")
-	items := team.Multisnips["team"]
-	if len(items) < 2 {
-		t.Fatal("missing starter collection")
-	}
-	items[0], items[1] = items[1], items[0]
-	items[0].Fields["name"] = "LAN team member"
-	data, _ = json.Marshal(team)
-	if w := req("POST", "/admin/page", url.Values{"csrf": {csrf}, "edit": {string(data)}}, session); w.Code != 200 {
-		t.Fatal("collection save", w.Code, w.Body.String())
-	}
-	if w := req("GET", "/team", nil, nil); !strings.Contains(w.Body.String(), "LAN team member") {
-		t.Fatal("collection not published")
-	}
 	for _, method := range []string{"GET", "POST"} {
 		if w := req(method, "/admin/theme", url.Values{"csrf": {csrf}}, session); w.Code != 404 {
 			t.Fatal("removed Theme endpoint", method, w.Code)

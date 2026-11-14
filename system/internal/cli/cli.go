@@ -31,7 +31,7 @@ import (
 const usage = `_________
  ItsyWeb
 ‾‾‾‾‾‾‾‾‾
-Small websites. Plain HTML. Editable content.
+Small websites. Plain HTML. Optional Blog.
 
 Usage
   itsy <command>
@@ -45,7 +45,7 @@ Build your site
   email            Set up email delivery
 
 Publish your site
-  pull             Bring live snips and media into your local site
+  pull             Bring live Blog content and media into your local site
   setup            Install ItsyWeb on your server
   deploy           Publish the current Git branch
   rollback         Restore previous code, keeping live content
@@ -145,7 +145,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "backup", "restore":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintf(out, "Usage: itsy %s <backup-file>\n\nUse this branch's saved destination. Backups include code, snips and theme,\nnot credentials, certificates or sessions. Restore replaces live site data\nafter confirmation. Backup refuses to overwrite an existing file.\n\n", args[0])
+			fmt.Fprintf(out, "Usage: itsy %s <backup-file>\n\nUse this branch's saved destination. Backups include code, Blog content and CSS,\nnot credentials, certificates or sessions. Restore replaces live site data\nafter confirmation. Backup refuses to overwrite an existing file.\n\n", args[0])
 			return 0
 		}
 		if len(args) != 2 || strings.HasPrefix(args[1], "-") {
@@ -167,7 +167,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags.SetOutput(errOut)
 		list := flags.Bool("list", false, "list retained releases")
 		flags.Usage = func() {
-			fmt.Fprint(out, "Usage: itsy rollback [--list] [release-id]\n\nRestore previous code for this branch. Keep live snips. Styles come from the selected release.\nWithout an ID, use the preceding release. Confirmation is required.\n\n")
+			fmt.Fprint(out, "Usage: itsy rollback [--list] [release-id]\n\nRestore previous code for this branch. Keep live Blog content. Styles come from the selected release.\nWithout an ID, use the preceding release. Confirmation is required.\n\n")
 		}
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
@@ -276,7 +276,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet("pull", flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintln(flags.Output(), "Usage: itsy pull\n\nPull live snips and media into your local site. Stop dev first.\nReview and commit changes afterwards. Configuration and sessions stay local.")
+			fmt.Fprintln(flags.Output(), "Usage: itsy pull\n\nPull live Blog content and media into your local site. Stop dev first.\nReview and commit changes afterwards. Configuration and sessions stay local.")
 			fmt.Fprintln(flags.Output())
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
@@ -315,7 +315,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags.BoolVar(&s.AgreeTOS, "agree-tos", s.AgreeTOS, "accept Let's Encrypt terms: https://letsencrypt.org/repository/")
 		flags.BoolVar(&s.WWWRedirect, "www-redirect", true, "redirect WWW to the primary domain")
 		configure := flags.Bool("configure", false, "confirm and save changes to this branch's deployment settings")
-		withSnips := flags.Bool("with-snips", false, "also publish reviewed snip changes (pull first)")
+		withContent := flags.Bool("with-content", false, "also publish reviewed Blog changes (pull first)")
 		expectedIPs := flags.String("expected-ips", "", "expected DNS destination IPs for NAT or proxy setups")
 		if err := flags.Parse(args[1:]); err != nil {
 			if err == flag.ErrHelp {
@@ -329,7 +329,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		}
 		provided := map[string]bool{}
 		flags.Visit(func(f *flag.Flag) {
-			if f.Name != "configure" && f.Name != "with-snips" {
+			if f.Name != "configure" && f.Name != "with-content" {
 				provided[f.Name] = true
 			}
 		})
@@ -342,8 +342,8 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		if err != nil {
 			return fail(err)
 		}
-		s.WithSnips = *withSnips
-		if args[0] == "https" && *withSnips {
+		s.WithContent = *withContent
+		if args[0] == "https" && *withContent {
 			return fail(fmt.Errorf("use these options with itsy deploy"))
 		}
 		if err := setup.Deploy(ctx, ".", s, args[0] == "https", os.Stdin, out, errOut); err != nil {
@@ -486,7 +486,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		return 0
 	case "status":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprintln(out, "Usage: itsy status\n\nShow local validation and Git state, then check this branch's saved remote.\nCompares deployed code, editable content and theme over SSH.\nRun this command from your site folder.")
+			fmt.Fprintln(out, "Usage: itsy status\n\nShow local validation and Git state, then check this branch's saved remote.\nCompares deployed code and Blog content over SSH.\nRun this command from your site folder.")
 			fmt.Fprintln(out)
 			return 0
 		}
@@ -542,7 +542,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		defer unlock()
-		p, err := site.LoadEditing(ctx, ".")
+		p, err := site.LoadDev(ctx, ".")
 		if err != nil {
 			return fail(err)
 		}
@@ -551,12 +551,10 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			return fail(err)
 		}
 		if changed {
-			updated := p.SnipsUpdated
-			p, err = site.LoadEditing(ctx, ".")
+			p, err = site.LoadDev(ctx, ".")
 			if err != nil {
 				return fail(err)
 			}
-			p.SnipsUpdated = p.SnipsUpdated || updated
 		}
 		if err := prepareLocalSessions(ctx, p); err != nil {
 			return fail(err)
@@ -602,9 +600,6 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			}
 			previewSender, sender = preview, preview
 			logger.Print("Email preview is on. Messages open in your browser and are not sent.")
-		}
-		if p.SnipsUpdated {
-			logger.Printf("Snips updated in %s.", sitefiles.ResolveAt(p.Root, "itsy/snips.json"))
 		}
 		for _, warning := range p.Warnings {
 			logger.Printf("Warning: %s", warning)

@@ -241,5 +241,5 @@ func (h *Handler) verifyCode(w http.ResponseWriter, r *http.Request) {
 	}
 	h.cookie(w, "session", t, int(h.sessionDuration().Seconds()))
 	h.cookie(w, "login", "", -1)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }

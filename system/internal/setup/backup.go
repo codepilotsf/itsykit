@@ -131,7 +131,7 @@ func restoreSite(ctx context.Context, root, file string, in io.Reader, out, errO
 		if !live.Exists {
 			return fmt.Errorf("deploy this branch before restoring its backup")
 		}
-		fmt.Fprintf(out, "Restore %s: replace live code, configuration, snips and theme with this backup.\n", r.settings.Domain)
+		fmt.Fprintf(out, "Restore %s: replace live code, configuration, Blog content and CSS with this backup.\n", r.settings.Domain)
 		answer, e := ask(ctx, in, out, "Type RESTORE to continue", "")
 		if e != nil {
 			return e

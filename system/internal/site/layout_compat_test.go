@@ -16,7 +16,7 @@ func TestCurrentAndLegacySiteLayouts(t *testing.T) {
 		for _, data := range []string{"itsy", "flea"} {
 			t.Run(config+"/"+data, func(t *testing.T) {
 				root := fixture(t)
-				put(t, root, "index.html", `<p snip>Editable copy</p><img snip src="/images/seed.png" alt="Seed">{team.text}`)
+				put(t, root, "index.html", `<p>Ordinary copy</p><img src="/images/seed.png" alt="Seed">{data.team.text}`)
 				var seed bytes.Buffer
 				if err := png.Encode(&seed, image.NewRGBA(image.Rect(0, 0, 8, 4))); err != nil {
 					t.Fatal(err)
@@ -37,24 +37,12 @@ func TestCurrentAndLegacySiteLayouts(t *testing.T) {
 						t.Fatal(err)
 					}
 				}
-				p, err := LoadEditing(context.Background(), root)
+				p, err := LoadDev(context.Background(), root)
 				if err != nil {
 					t.Fatal(err)
 				}
-				if !p.SnipsUpdated || p.RuntimeRoot != filepath.Join(root, data, "runtime") || p.MediaRoot != filepath.Join(root, data, "media") {
+				if p.RuntimeRoot != filepath.Join(root, data, "runtime") || p.MediaRoot != filepath.Join(root, data, "media") {
 					t.Fatal("wrong site paths", p.RuntimeRoot, p.MediaRoot)
-				}
-				photos := p.Content.ImageAssets()
-				if len(photos) != 1 {
-					t.Fatal("photo not extracted", photos)
-				}
-				for _, photo := range photos {
-					if _, err := ReadPhoto(p.MediaRoot, photo.File); err != nil {
-						t.Fatal("legacy media not installed", err)
-					}
-					if got := request(NewProductionServer(p, nil), "GET", "/media/"+photo.File).Code; got != 200 {
-						t.Fatal("legacy media not served", got)
-					}
 				}
 				if err := SetSiteName(root, "Compatible"); err != nil {
 					t.Fatal(err)
@@ -103,7 +91,7 @@ func TestCurrentAndLegacySiteLayouts(t *testing.T) {
 func TestCurrentAndLegacyLayoutComments(t *testing.T) {
 	for _, name := range []string{"itsy", "flea"} {
 		body, layout, err := pageSettings("index.html", "<!-- "+name+"\nlayout: /admin.layout.html\n-->\n<p>Body</p>")
-		if err != nil || layout != "admin.layout.html" || !strings.Contains(body, "<p>Body</p>") {
+		if err != nil || layout.Layout != "admin.layout.html" || !strings.Contains(body, "<p>Body</p>") {
 			t.Fatal(name, body, layout, err)
 		}
 	}

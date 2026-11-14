@@ -9,7 +9,7 @@ func TestBlogValidationAndPreservation(t *testing.T) {
 		p := valid
 		mutate(&p)
 		s.Blog = []BlogPost{p}
-		if _, err := s.Index(); err == nil {
+		if err := s.Validate(); err == nil {
 			t.Fatal(p)
 		}
 	}
@@ -18,13 +18,27 @@ func TestBlogValidationAndPreservation(t *testing.T) {
 	changed := valid
 	changed.Title = "Admin edit"
 	remote.Blog = []BlogPost{changed}
-	merged, err := Merge(seed, remote, map[string]string{})
+	merged, err := Merge(seed, remote)
 	if err != nil || merged.Blog[0].Title != "Admin edit" {
 		t.Fatal(merged, err)
 	}
 	seed.Blog = nil
-	merged, err = Merge(seed, remote, map[string]string{})
+	merged, err = Merge(seed, remote)
 	if err != nil || len(merged.Blog) != 1 {
 		t.Fatal("removed source must retain live posts", err)
+	}
+}
+
+func TestRemovedPageContentFieldsFailWithoutDiscardingBlog(t *testing.T) {
+	for _, field := range []string{"pages", "shared", "archive", "videos"} {
+		data := []byte(`{"blog":[{"id":"Abcdef1234","title":"Keep","slug":"keep","status":"draft","body":"Body","excerpt":""}],"` + field + `":{}}`)
+		if _, err := Decode(data); err == nil {
+			t.Fatal("old field silently discarded", field)
+		}
+	}
+	for _, data := range []string{`{"blog":[],"blog":[]}`, `{} {}`, `null`} {
+		if _, err := Decode([]byte(data)); err == nil {
+			t.Fatal("invalid content accepted", data)
+		}
 	}
 }

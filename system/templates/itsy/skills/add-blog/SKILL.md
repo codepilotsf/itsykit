@@ -36,8 +36,8 @@ Blog CSS; the matching ItsyWeb runtime supplies `/admin/assets/blog.js`. Preserv
 the template's script reference, the site's layout and existing admin
 authentication/CSRF/version controls. Never reset the existing site or
 replace its entire layout/styles. Add the listing link to the existing navigation
-(often `site/_navigation.html`). `/admin/blog` is the admin entry point; preserve
-the existing toolbar include, or add an admin-only link if needed.
+(often `site/_navigation.html`). `/admin/blog` is the admin entry point; keep the private admin templates. `/admin` leads signed-in admins to Blog
+when enabled. Public navigation uses an ordinary `/admin` link.
 
 Restart the site's dev server after app configuration changes.
 
@@ -52,7 +52,7 @@ Restart the site's dev server after app configuration changes.
 | `post.published_at`, `post.published_label` | RFC3339 date and readable label |
 | `blog.data.post.cover` | Optional photo object: `src`, `alt`, `width`, `height` |
 | `blog.data.post.body` | Sanitized rich HTML, with the exact directive below |
-| `page.title`, `page.description` | Default to post title/excerpt; Page details can override |
+| `page.title`, `page.description` | Use post title/excerpt; template comments cannot override |
 
 Listing template:
 
@@ -99,8 +99,7 @@ drafts unless publication is requested. A future date does not schedule publishi
 Agents may edit the top-level `blog` array in `itsy/snips.json`. Merge records,
 preserving `pages`, `shared`, `archive`, `media`, videos and other posts. For a new
 post generate a unique, secure-random ten-character case-sensitive alphanumeric
-ID; check existing IDs and keep it stable through edits. This differs from snip
-IDs, which dev extracts automatically. The following is a format example, not a
+ID; check existing IDs and keep it stable through edits. Ordinary pages do not use generated content IDs. The following is a format example, not a
 record to overwrite or an ID to reuse:
 
 ```json
@@ -137,7 +136,7 @@ Review the JSON and diff, and stop any task-owned dev server before handoff.
 Normal deploy preserves existing live posts by ID and seeds new IDs. When an
 existing live post must be changed in source, pull the intended destination first
 (with dev stopped), retain other live content, and use reviewed
-`itsy deploy --with-snips` only when deployment is authorized. The flag includes
+`itsy deploy --with-content` only when deployment is authorized. The flag includes
 Blog and media; whole-record conflicts require resolution. A plain Git merge and
 normal deploy do not replace existing live posts. Report setup and checks, and
 whether any posts were actually published.

@@ -277,30 +277,13 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	// Ensure the watcher has begun before the first edit.
 	time.Sleep(100 * time.Millisecond)
-	seedContent, err := os.ReadFile(filepath.Join(root, "itsy", "snips.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	edit("itsy/snips.json", strings.Replace(string(seedContent), "Welcome to ItsyWeb.", "Smoke test changed", 1))
+	edit("index.html", "<!-- itsy\ntitle: Smoke metadata\ndescription: Literal {app.site_name}: text\n-->\n<h1>Smoke test changed</h1>")
 	wait("/", 200, "Smoke test changed")
-	edit("test.html", `<section snip="intro"><p>Extracted <em>live</em></p></section>`)
-	wait("/test", 200, "Extracted <em>live</em>")
-	extracted, err := os.ReadFile(filepath.Join(root, "site", "test.html"))
-	if err != nil || !strings.Contains(string(extracted), `{snip `) || strings.Contains(string(extracted), `{snip "`) {
-		t.Fatalf("region was not extracted: %s %v", extracted, err)
-	}
-	// Removal is reconciled on save, and undo restores the archived content.
-	edit("test.html", `<h1>Region removed</h1>`)
-	wait("/test", 200, "Region removed")
-	saved, err := os.ReadFile(filepath.Join(root, "itsy", "snips.json"))
-	if err != nil || !strings.Contains(string(saved), `"archive"`) {
-		t.Fatal("missing archive after removal", err)
-	}
-	edit("test.html", string(extracted))
-	wait("/test", 200, "Extracted <em>live</em>")
-	if _, err := os.Stat(filepath.Join(root, "itsy", ".snips.lock")); !os.IsNotExist(err) {
-		t.Fatal("dev created lock file", err)
-	}
+	wait("/", 200, "Smoke metadata")
+	edit("test.html", `<p snip>Removed</p>`)
+	wait("/test", 500, "no longer supported")
+	edit("test.html", `<p>Ordinary HTML</p>`)
+	wait("/test", 200, "Ordinary HTML")
 	edit("css/global.css", "/* updated asset */")
 	wait("/css/global.css", 200, "updated asset")
 	edit("itsy.config.json", `{"app":{"site_name":"Changed config"}}`)
@@ -335,7 +318,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	if !strings.Contains(stderr.String(), "missing partial") || !strings.Contains(stderr.String(), "Site valid again") {
 		t.Fatalf("missing error/recovery diagnostics: %s", stderr.String())
 	}
-	for _, line := range []string{"GET /\n", "404 GET /about\n", "500 GET /\n", "Snips updated in itsy/snips.json.\n"} {
+	for _, line := range []string{"GET /\n", "404 GET /about\n", "500 GET /\n"} {
 		if !strings.Contains(stderr.String(), line) {
 			t.Errorf("missing request log %q", line)
 		}

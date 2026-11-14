@@ -33,7 +33,7 @@ func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	content.Page("/").Snips["a7Km2pQ9xB"] = snips.Entry{Content: "Saved owner text"}
+	content.Blog[0].Body = "Saved owner text"
 	if e = snips.WriteFile(c.Content["example.test"], content); e != nil {
 		t.Fatal(e)
 	}
@@ -49,7 +49,7 @@ func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if p.Content.Page("/").Snips["a7Km2pQ9xB"].Content != "Saved owner text" || string(p.AssetData["/css/theme.css"]) != css {
+	if p.Content.Blog[0].Body != "Saved owner text" || string(p.AssetData["/css/theme.css"]) != css {
 		t.Fatal("backup used stale release seeds")
 	}
 	file := filepath.Join(t.TempDir(), "site.flea-backup")
@@ -60,7 +60,7 @@ func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	content.Page("/").Snips["a7Km2pQ9xB"] = snips.Entry{Content: "Newer live text"}
+	content.Blog[0].Body = "Newer live text"
 	if e = snips.WriteFile(c.Content["example.test"], content); e != nil {
 		t.Fatal(e)
 	}
@@ -104,7 +104,7 @@ func TestQABackupLiveOverlaysRestoreStaleAndRecovery(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if restored.Snips.Page("/").Snips["a7Km2pQ9xB"].Content != "Saved owner text" {
+	if restored.Snips.Blog[0].Body != "Saved owner text" {
 		t.Fatal("restore did not restore backup snips")
 	}
 	restoredConfig, _, e := host.Load(m.ConfigPath, nil)

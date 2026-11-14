@@ -12,18 +12,18 @@ func TestBlogThreeWaySync(t *testing.T) {
 		return s
 	}
 	base, local, remote := store("Base"), store("Local"), store("Remote")
-	if _, err := MergeSnips(base, local, remote, nil); err == nil {
+	if _, err := MergeContent(base, local, remote, nil); err == nil {
 		t.Fatal("conflict not detected")
 	}
-	merged, err := MergeSnips(base, local, base, nil)
+	merged, err := MergeContent(base, local, base, nil)
 	if err != nil || merged.Blog[0].Title != "Local" {
 		t.Fatal(merged, err)
 	}
-	merged, err = MergeSnips(base, base, remote, nil)
+	merged, err = MergeContent(base, base, remote, nil)
 	if err != nil || merged.Blog[0].Title != "Remote" {
 		t.Fatal(merged, err)
 	}
-	merged, err = MergeSnips(base, snips.NewStore(), remote, nil)
+	merged, err = MergeContent(base, snips.NewStore(), remote, nil)
 	if err != nil || len(merged.Blog) != 1 {
 		t.Fatal("omission deleted a post", err)
 	}

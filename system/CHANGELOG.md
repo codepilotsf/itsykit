@@ -6,6 +6,14 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Remove the page CMS, snips/extraction, collections and page media/metadata editing.
+  Keep Blog posts, rich admin editing, cover uploads and content preservation.
+- Add title/description defaults in leading HTML settings comments; comments own
+  ordinary-page metadata. Fresh sites contain ordinary HTML and empty Blog storage.
+- Require protocol 30 and use deploy --with-content for explicit Blog sync. Old
+  page-CMS content fails validation without automatic migration or data deletion.
+
+
 - Consolidate framework and current public website history into the CP Git
   `itsyweb` repository, with sibling `system/` and `website/` directories.
   Run framework build scripts and Go checks from `system/`.

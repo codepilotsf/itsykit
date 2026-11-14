@@ -37,9 +37,6 @@ func appSettings(config map[string]json.RawMessage) (map[string]json.RawMessage,
 			return nil, fmt.Errorf("itsy.config.json: app.site_name must be a nonempty string")
 		}
 	}
-	if _, exists := app["current_admin"]; exists {
-		return nil, fmt.Errorf("app.current_admin is reserved for the authenticated request")
-	}
 	return app, nil
 }
 

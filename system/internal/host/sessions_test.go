@@ -77,10 +77,10 @@ func TestManagedSessionsSurviveReleaseChange(t *testing.T) {
 			w := httptest.NewRecorder()
 			handler.ServeHTTP(w, r)
 			if host == "example.test" {
-				if w.Code != 303 || w.Header().Get("Location") != "/" {
+				if w.Code != 200 || !strings.Contains(w.Body.String(), "Blog is not enabled") {
 					t.Fatal(revision, w.Code, w.Body.String())
 				}
-			} else if w.Code == 303 {
+			} else if strings.Contains(w.Body.String(), "Blog is not enabled") {
 				t.Fatal("session crossed aliases")
 			}
 		}

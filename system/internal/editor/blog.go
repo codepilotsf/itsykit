@@ -18,7 +18,7 @@ type BlogEdit struct {
 	Version string         `json:"version"`
 	Post    snips.BlogPost `json:"post"`
 	Action  string         `json:"action"`
-	Upload  *MediaEdit     `json:"upload,omitempty"`
+	Upload  *CoverUpload   `json:"upload,omitempty"`
 }
 type BlogResult struct {
 	Version string         `json:"version"`
@@ -136,7 +136,7 @@ func (h *Handler) saveBlog(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	if edit.Upload != nil && (len(edit.Upload.Data) == 0 || !snips.ValidID(edit.Upload.ID) || edit.Upload.ID != edit.Post.Cover || !edit.Upload.Library || edit.Upload.ClearPoster) {
+	if edit.Upload != nil && (len(edit.Upload.Data) == 0 || !snips.ValidID(edit.Upload.ID) || edit.Upload.ID != edit.Post.Cover) {
 		http.Error(w, "Invalid cover photo.", 400)
 		return
 	}

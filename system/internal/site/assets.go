@@ -108,7 +108,5 @@ func (p *Project) closeAssetFiles() {
 	for _, a := range p.assetFiles {
 		a.file.Close()
 	}
-	for _, v := range p.videos {
-		v.file.Close()
-	}
+
 }

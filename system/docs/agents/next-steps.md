@@ -6,6 +6,18 @@ This is the working plan, not a claim that planned commands or releases exist.
 Use [checklist.md](checklist.md) for manual results, [CHANGELOG.md](../../CHANGELOG.md)
 for completed changes, and [README.md](../../README.md) for current usage.
 
+## Current candidate scope (November 14, 2026; unreleased)
+
+Page snips, extraction, page text/media/metadata editing, collections and user
+theme editing are removed. All such tasks and acceptance requests in the prior
+plan below are superseded, including planned Markdown integration with snips.
+Keep dated rollout records and owner answers as historical evidence, not current
+requirements. Current work covers ordinary HTML/JSON, title/description/layout
+comments, static assets, optional Blog drafts/publishing/covers/storage/sync,
+Contact/authentication, and preserved deployment/recovery safety. Protocol 30 and
+`deploy --with-content` require a separately authorized release/server upgrade.
+No production change follows from this source candidate.
+
 ## ItsyWeb 0.21.0 rollout (November 14, 2026)
 
 The Kirin CLI and shared server now run 0.21.0, with deployment protocol 29.

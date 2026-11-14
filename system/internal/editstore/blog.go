@@ -35,23 +35,13 @@ func (s *Store) applyBlog(p *site.Project, edit editor.BlogEdit) error {
 	edit.Post.Body = body
 	if edit.Upload != nil {
 		v := edit.Upload
-		if !snips.ValidID(v.ID) || v.ID != edit.Post.Cover || !v.Library || len(v.Data) == 0 || v.ClearPoster || len(v.PosterData) != 0 || !utf8.ValidString(v.Name+v.Alt) || utf8.RuneCountInString(v.Name) > 200 || utf8.RuneCountInString(v.Alt) > 1000 {
+		if !snips.ValidID(v.ID) || v.ID != edit.Post.Cover || len(v.Data) == 0 || !utf8.ValidString(v.Name+v.Alt) || utf8.RuneCountInString(v.Name) > 200 || utf8.RuneCountInString(v.Alt) > 1000 {
 			return fmt.Errorf("invalid blog cover upload")
-		}
-		index, err := p.Content.Index()
-		if err != nil {
-			return err
 		}
 		if _, ok := p.Content.Media[v.ID]; ok {
 			return fmt.Errorf("photo ID is already used")
 		}
-		if _, ok := index[v.ID]; ok {
-			return fmt.Errorf("photo ID is already used")
-		}
-		if _, ok := p.Content.Archive[v.ID]; ok {
-			return fmt.Errorf("photo ID is already used")
-		}
-		photo, err := s.saveSnipPhoto(v.Data, v.Name, v.Alt)
+		photo, err := s.saveCoverPhoto(v.Data, v.Name, v.Alt)
 		if err != nil {
 			return err
 		}

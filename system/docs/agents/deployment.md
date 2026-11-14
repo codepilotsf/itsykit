@@ -22,7 +22,7 @@ and cancellation. Preserve confirmation, native SSH and upgrade safeguards.
 
 Read docs/recovery.md for commands, data boundaries and limits.
 Rollback selects reachable per-site receipts, never directory ordering or the
-whole-server previous config. It republishes code while retaining live editable
+whole-server previous config. It republishes code while retaining live Blog
 state and current host policy. Backup captures live overlays under deploy.lock;
 restore checks an expected state digest and requires explicit CLI confirmation.
 Keep credentials, certificates, sessions and deployment mappings out of backups.
@@ -155,7 +155,7 @@ snapshot/archive and validate its destination routes on both sides. Protocol 28
 requires matching clients/servers because older servers silently ignore these
 rules. Keep server updates separate from site deployment.
 Deploy packages committed site/ pages/assets/partials, itsy.config.json,
-mailers/, itsy/snips.json, itsy/media/, itsy/data/, legacy itsy/snips/, itsy/icons/,
+mailers/, itsy/Blog content.json, itsy/media/, itsy/data/, legacy itsy/Blog content/, itsy/icons/,
 and each custom app's `itsy/apps/<name>/app.json` with exactly the executables it
 declares. Validate the actual packaged snapshot locally and the extracted release
 remotely. Reject symlinks, hard links, special files, duplicate/traversing
@@ -198,14 +198,11 @@ server.json, restarts, and probes the active revision/hostname. Failure restores
 the prior config; interrupted operations require flea-server -recover.
 Retain releases and server.previous.json; rollback uses per-site history receipts.
 Automatic pruning is deferred.
-On normal deployment, rich snips are committed seeds only. Preserve remote content by ID and remote
-page metadata, seed new IDs, and restore reintroduced IDs from archived content.
-Store content outside releases in sites/<name>/content/<release-id>.json;
-host.Config.Content maps hostnames to absolute snapshots. Activation journals
-switch both paths; failed activation leaves old content intact. After successful
-verification, prune unreferenced active IDs into archive, retaining prior snapshots.
-Scan lexical references in all templates, including unused partials and false/empty
-branches; never prune based on rendered output. No automatic archive pruning.
+Normal deployment preserves live Blog posts and cover photos by stable ID and
+seeds source-only IDs. Store snapshots outside releases in
+`sites/<name>/content/<release-id>.json`; host.Config.Content selects the active
+file. Failed activation leaves old content untouched. Retain every live record
+and photo; there is no page metadata, reference scan or removed-ID archive model.
 Code/structured-data deploys still replace snapshots. Browser saves share the
 deployment lock, check the active release and content version, and publish a new
 validated Project. Manual remote content edits need restart and must not overlap deployment.
@@ -278,7 +275,7 @@ server readiness. Removal never prunes retained content or media.
 
 Protocol 24 publishes committed `site/css/theme.css` with the code release on
 normal deploy. No live theme overlay or CSS sync plan exists. Rollback selects
-the target release's CSS while retaining current snips; backup/restore includes
+the target release's CSS while retaining current Blog content; backup/restore includes
 CSS as source. Servers with a removed `themes` mapping must be reviewed before
 upgrade: preserve remote customizations explicitly in Git using the old runtime
 first. No migration, compatibility mapping or automatic theme deletion is added.
@@ -286,6 +283,6 @@ first. No migration, compatibility mapping or automatic theme deletion is added.
 ## Blog
 
 Read [Blog](../blog.md) for the optional built-in blog, JSON and template contract.
-Posts share the snip/media snapshot, atomic save and preservation/synchronization
+Posts share the Blog/media snapshot, atomic save and preservation/synchronization
 paths. Drafts remain outside public routes and template data. The blog admin uses
 existing login, exact Origin, CSRF, upload bounds and content-version checks.
