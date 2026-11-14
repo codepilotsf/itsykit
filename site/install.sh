@@ -25,24 +25,28 @@ itsy_install() (
   }
   version=$(fetch --max-filesize 128 "$base/latest.txt") || fail 'No release is available. Your installation was not changed.'
   [[ ${#version} -le 64 && "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || fail 'Invalid release version.'
-  destination=${ITSY_INSTALL_DIR:-"$HOME/.local/bin"}
+  destination=${ITSY_INSTALL_DIR:-${FLEA_INSTALL_DIR:-"$HOME/.local/bin"}}
   [[ "$destination" == /* ]] || fail 'ITSY_INSTALL_DIR must be an absolute directory.'
   mkdir -p "$destination" || fail 'Choose a writable ITSY_INSTALL_DIR. No sudo is needed.'
   [[ ! -L "$destination/itsy" ]] || fail 'The existing itsy is a symlink. Use itsy update or choose another directory.'
-  [[ ! -e "$destination/itsy" || -f "$destination/itsy" ]] || fail 'The installation target is not a regular file.'
-  mkdir "$destination/.itsy-install.lock" 2>/dev/null || fail "Installation is busy or not writable. Check $destination/.itsy-install.lock."
+  [[ ! -e "$destination/itsy" || -f "$destination/itsy" ]] || fail 'The itsy installation target is not a regular file.'
+  if [[ -L "$destination/flea" ]]; then
+    [[ $(readlink "$destination/flea") == itsy ]] || fail 'The existing flea link belongs to another installation. Choose another directory.'
+  fi
+  [[ ! -e "$destination/flea" || -f "$destination/flea" ]] || fail 'The installation target is not a regular file.'
+  mkdir "$destination/.flea-install.lock" 2>/dev/null || fail "Installation is busy or not writable. Check $destination/.flea-install.lock."
   locked=true
   cleanup() {
     if [[ -n "$stage" ]]; then
-      rm -f -- "$stage/itsy" "$stage/SHA256SUMS" "$stage/version"
+      rm -f -- "$stage/itsy" "$stage/SHA256SUMS" "$stage/version" "$stage/flea"
       rmdir "$stage" 2>/dev/null || true
     fi
-    if [[ "$locked" == true ]]; then rmdir "$destination/.itsy-install.lock" 2>/dev/null || true; fi
+    if [[ "$locked" == true ]]; then rmdir "$destination/.flea-install.lock" 2>/dev/null || true; fi
   }
   trap cleanup EXIT
   trap 'exit 130' INT
   trap 'exit 143' TERM
-  stage=$(mktemp -d "$destination/.itsy-download.XXXXXXXX") || fail 'Could not stage the download.'
+  stage=$(mktemp -d "$destination/.flea-download.XXXXXXXX") || fail 'Could not stage the download.'
   fetch --max-filesize 8192 --output "$stage/SHA256SUMS" "$base/$version/SHA256SUMS" || fail 'Could not retrieve release checksums.'
   [[ $(wc -c < "$stage/SHA256SUMS") -le 8192 ]] || fail 'Release checksum list is too large.'
   expected=$(awk -v name="$file" '$2 == name && NF == 2 {print $1}' "$stage/SHA256SUMS")
@@ -55,7 +59,9 @@ itsy_install() (
   chmod 755 "$stage/itsy"
   "$stage/itsy" version > "$stage/version" || fail 'The downloaded CLI cannot run on this machine.'
   [[ $(cat "$stage/version") == "ItsyWeb $version" ]] || fail 'The downloaded CLI has an unexpected version.'
+  ln -s itsy "$stage/flea" || fail 'Could not prepare the retired flea command.'
   mv -f -- "$stage/itsy" "$destination/itsy"
+  mv -f -- "$stage/flea" "$destination/flea" || fail 'itsy is installed, but the retired flea command could not be replaced.'
   printf '\nInstalled ItsyWeb %s in %s/itsy\n' "$version" "$destination"
   case ":$PATH:" in
     *":$destination:"*) printf '\nGet started: itsy new my-site\n' ;;
