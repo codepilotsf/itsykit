@@ -7,22 +7,37 @@
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>On-page editing</h1>
-      <p>Make selected content editable, enable admin access, and sync live changes.</p>
+      <p>Let an admin edit selected content on the website while you keep control of its HTML and design.</p>
     </header>
-<section id="optional-features"><h2>When you need more than templates</h2><p>The HTML, development and deployment workflow works without these features. Add on-page editing when someone else needs to change content, or enable an app when the site needs a blog, a contact form or custom server-side behavior.</p><p>These guides cover that extra functionality. You can leave ordinary page content in HTML and come back here when you need it.</p></section>
 
-<section id="editable-content"><h2>Optional on-page editing</h2><p>Use snips only for content an admin should change in the browser. Layouts, partials and ordinary HTML pages do not need them. Leave developer-managed text in the template.</p><p>A <strong>snip</strong> is a piece of content the admin can change. Mark an element with a bare <code>snip</code> attribute:</p><pre tabindex="0" aria-label="Code example"><code class="language-markup">&lt;section snip&gt;
-  &lt;h2&gt;Made just around the corner.&lt;/h2&gt;
-  &lt;p&gt;Visit our studio on Saturday.&lt;/p&gt;
-&lt;/section&gt;</code></pre><p>Dev extracts the inner HTML into JSON and replaces it with a generated snip directive. Let ItsyWeb generate the ID and keep it unchanged. The JSON entry becomes the source of the editable value.</p><p>Classes, layout and other attributes stay in the template. Don't nest snips or put template directives inside a new editable region. Use dedicated image and video snips for media.</p><p>Admins can format text and edit page titles and descriptions using Page details. Changes are published with the page's Save button.</p></section>
+<section id="editable-content">
+  <h2>Make text editable</h2>
+<p>Add a bare <code>snip</code> attribute to an element:</p><pre tabindex="0" aria-label="An editable text region"><code class="language-markup">&lt;section snip&gt;
+  &lt;h2&gt;A good place to find your next read.&lt;/h2&gt;
+  &lt;p&gt;Drop in and browse our shelves.&lt;/p&gt;
+&lt;/section&gt;</code></pre><p>Save while dev is running. ItsyWeb moves the content to <code>itsy/snips.json</code> and replaces it in the template with a generated reference. Keep that reference unchanged.</p>
+<p>Mark whole content regions, without nesting snips. Leave navigation, form controls, and template instructions outside them.</p>
+</section>
 
-<section id="admin-editing"><h2>Hand over the editing</h2><p>Add an approved admin from your site folder:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy admin admin@example.com</code></pre><p>This adds the address to <code>admin.emails</code>. Admins visit <code>/admin</code> and sign in with an emailed code. All approved admins have the same editing access.</p><p>Editing starts enabled. Click text or media, make changes, then use <strong>Save</strong> or <strong>Cancel</strong>. Both keep editing on. Save updates the page in place without reloading it; Cancel returns to the latest successful save.</p><p>New local sites preview email in the browser without sending it. Production needs HTTPS and real email delivery. Commit and deploy admin-list changes before sharing the live sign-in link.</p><p>Sessions have a default 30-day idle window. Set <code>admin.session_idle_days</code> to a value from 1 to 365. An empty admin list disables live sign-in.</p></section>
+<section id="admin-editing">
+  <h2>Add an admin</h2>
+<pre tabindex="0" aria-label="Add an admin"><code class="language-bash">itsy admin admin@example.com</code></pre><p>The admin signs in at <code>/admin</code> with an emailed code. Dev previews the email locally; the live site needs HTTPS and <a href="/docs/email#delivery">email delivery</a>.</p>
+<p>Commit and deploy the admin-list change before sharing the live sign-in link.</p>
+</section>
 
-<section id="content-sync"><h2>Sync optional editable content</h2><h3>Keep admin changes</h3><p>Normal deployment preserves live editable content and publishes committed CSS. To bring those edits into your local project, stop dev and run:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy pull</code></pre><p>Pull retrieves live content and referenced media. Review and commit the result.</p><p>To deliberately publish local content edits, first establish a pull baseline, then run:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy deploy --with-snips</code></pre><p>Conflicts require an explicit choice between the live and local changes.</p></section>
+<section id="save-and-cancel">
+  <h2>Edit and save</h2>
+<p>Sign in, click the content, and make your changes. Use <strong>Save</strong> to publish or <strong>Cancel</strong> to return to the last save. <strong>Page details</strong> edits the page title and description.</p>
+<p>Styles stay in your source CSS. Admins edit the content you've designated.</p>
+</section>
+
+<section id="content-sync">
+  <h2>Bring live edits into your project</h2>
+<p>Normal deployment preserves admin edits. To download the current content and referenced media, stop dev and run:</p><pre tabindex="0" aria-label="Download live content"><code class="language-bash">itsy pull</code></pre><p>Review and commit the result. To publish intentional local content changes after a pull:</p><pre tabindex="0" aria-label="Publish reviewed local content"><code class="language-bash">itsy deploy --with-snips</code></pre><p>If both sides changed, ItsyWeb asks which version to keep.</p>
+</section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/media">Continue to Photos, videos and collections</a></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
-
 <script src="/js/guides.js" defer></script>

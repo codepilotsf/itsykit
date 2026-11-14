@@ -7,324 +7,60 @@
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Managed apps</h1>
-      <p>Understand app mounts, build a local executable, and work with app-owned sessions.</p>
+      <p>Add custom server-side behavior with a local executable that exchanges JSON with ItsyWeb.</p>
     </header>
-<section id="apps"><h2>Apps</h2><p><strong>Blog</strong> is a built-in content application available from 0.15.0; see <a href="/docs/blog#blog">Blog setup</a>. The service contract below applies to apps such as Contact, rather than Blog’s content storage and admin editor.</p><p>An <strong>app</strong> is a small, separate JSON service mounted at a public URL. ItsyWeb owns the public page, the HTML form, the redirect, the template values and the email; the app owns its own logic and validates its own fields. Values an app returns are request-local and are never written into your site.</p><p><strong>Contact ships with ItsyWeb.</strong> You can also register your own managed local app package. See <a href="/docs/apps#custom-apps">Building a custom app</a>.</p><h3 id="apps-chapter-1">What you can use</h3><ul><li><strong>Contact</strong> sends a visitor's message to one email address. Its configuration, form and templates are in <a href="/docs/email#email">Email &amp; contact forms</a>.</li><li><strong>Custom apps</strong> are managed local executables registered under <code>apps.&lt;name&gt;</code> with a validated package. They can own their own sessions.</li><li>Remote services, public read-only routes declared in config, databases and uploads are <strong>not</strong> part of the shipped contract.</li><li>There is no public SDK. ItsyWeb's Go packages are private, but an app is an ordinary executable that speaks the documented HTTP/JSON contract.</li></ul><h3 id="apps-chapter-2">Enable Contact</h3><p>Merge this into <code>itsy.config.json</code>, keeping your other settings:</p><pre tabindex="0" aria-label="Code example"><code class="language-json">&#123;
-  "apps": &#123;
-    "contact": &#123;
-      "mount": "/contact",
-      "email": &#123;"to": "owner@example.com"&#125;
-    &#125;
+
+<section id="apps">
+  <h2>How apps fit</h2>
+<p>ItsyWeb serves the HTML and handles form protection. Your app handles its logic and returns data for the template. The bundled <a href="/docs/email">Contact app</a> uses this model; Blog has its own built-in content editor.</p>
+<p>Custom apps run as managed local executables. You provide their code and storage behavior.</p>
+</section>
+
+<section id="custom-apps">
+  <h2>Register an app</h2>
+<p>Build an executable that implements the contract below. Place its files in <code>itsy/apps/example/</code> with an <code>app.json</code> manifest:</p><pre tabindex="0" aria-label="itsy/apps/example/app.json"><code class="language-json">&#123;
+  "name": "example",
+  "version": "0.1.0",
+  "protocol": 2,
+  "executable": &#123;
+    "darwin-arm64": "example-darwin-arm64",
+    "linux-amd64": "example-linux-amd64"
   &#125;
-&#125;</code></pre><p><code>mount</code> is required: a canonical public path such as <code>/contact</code> or <code>/deep/contact</code>. <code>email.to</code> is required. Optional <code>email.from</code> overrides the server sender and must be authorized by your mail provider. Credentials never belong here. Remove the <code>apps.contact</code> entry to disable the app.</p><p>Create <code>site/contact/index.html</code> and a mount-relative <code>site/contact/thank-you.html</code>. Do not also create <code>site/contact.html</code>. The starter includes both pages but leaves the app disabled until you choose a recipient. Restart dev after changing app settings.</p><h3 id="apps-chapter-3">How a submission flows</h3><ol><li>The visitor submits an ordinary HTML form to the mount.</li><li>ItsyWeb checks CSRF, exact Origin, method, content type and size, then converts the fields to flat JSON.</li><li>ItsyWeb calls the app's mount-relative route with its own private credential. Browser cookies and authorization are never forwarded.</li><li>The app returns JSON. ItsyWeb redirects, re-renders with errors, or shows a safe unavailable message.</li></ol><div class="notice"><p>App values appear under the app name, such as <code>contact.data.name</code>, <code>contact.invalid.email</code>, <code>contact.error</code> and <code>contact.flash.notice</code>. They are escaped values, never template source.</p></div></section>
+&#125;</code></pre><p>Include a binary for your development computer and server. Add the app to your existing configuration:</p><pre tabindex="0" aria-label="Register a managed app"><code class="language-json">&#123;"apps": &#123;"example": &#123;"mount": "/example"&#125;&#125;&#125;</code></pre><p>Create <code>site/example/index.html</code>. ItsyWeb launches the app and passes requests below this mount to it. Restart dev after rebuilding the executable or changing app settings.</p>
+</section>
 
-<section id="custom-apps"><h2>Building a custom app</h2><p>You can write an independent HTTP service that speaks the current <strong>Itsy App Protocol (version 2)</strong> in any language, then register it as a managed local executable. It receives flat JSON and returns a small JSON envelope. This section documents the contract so you can build, mount and test one.</p><div class="notice"><p><strong>Custom apps are available from 0.17.0.</strong> Add an <code>apps.&lt;name&gt;</code> entry with a <code>mount</code>, and put a validated package at <code>itsy/apps/&lt;name&gt;/</code> containing <code>app.json</code> and the executables it names. There is no install command, no package registry, no <code>url</code> or port key and no public SDK. ItsyWeb launches only this confined local executable; remote services are not supported. Deploying an app package requires server protocol 28, so update the server first; a protocol-25 server refuses the package.</p></div><h3 id="custom-apps-chapter-1">Register a package</h3><p>Build your service for the server platform, then create a package. The manifest's <code>name</code> must match the config key, <code>protocol</code> must be <code>2</code>, and <code>executable</code> maps a <code>&lt;goos&gt;-&lt;goarch&gt;</code> key to one filename in the same directory. Build for every platform you run (your development host and the server) and list each one:</p><pre tabindex="0" aria-label="Code example"><code class="language-none">itsy/apps/session/app.json
-&#123;"name":"session","version":"0.1.0","protocol":2,"executable":&#123;"darwin-arm64":"session-darwin-arm64","linux-amd64":"session-linux-amd64"&#125;&#125;
-itsy/apps/session/session-darwin-arm64
-itsy/apps/session/session-linux-amd64</code></pre><p>Enable it in <code>itsy.config.json</code>:</p><pre tabindex="0" aria-label="Code example"><code class="language-json">&#123;
-  "apps": &#123;
-    "session": &#123;"mount": "/session"&#125;
-  &#125;
-&#125;</code></pre><p>Create a page at the mount, such as <code>site/session/index.html</code>. A <code>GET</code> reads from the app; a <code>POST</code> submits a form that includes <code>&#123;csrf&#125;</code>. ItsyWeb strips the mount, so <code>/session/login</code> calls service route <code>/login</code>. Restart <code>itsy dev</code> after changing app settings or rebuilding the executable. At handshake time ItsyWeb verifies the running service, so the manifest is not trusted as proof of compatibility.</p><h3 id="custom-apps-chapter-2">Two boundaries</h3><p>Keep the browser-to-ItsyWeb form boundary separate from the ItsyWeb-to-app call. The form is URL-encoded and bounded to 32 KiB; only <code>POST</code> carries a body. ItsyWeb strips the configured mount and forwards the rest of the path unchanged, so the mount itself becomes <code>/</code>.</p><h3 id="custom-apps-chapter-3">Request JSON</h3><p>There is no request envelope. The body is a flat object of form names:</p><pre tabindex="0" aria-label="Code example"><code class="language-json">&#123;"name":"Alex","email":"alex@example.com","message":"Hello"&#125;</code></pre><ul><li>A name submitted once is a string. A repeated name is an array of strings.</li><li>An empty field stays <code>""</code>; a missing field is absent.</li><li>Names are literal: <code>address.city</code> and <code>items[0]</code> stay those exact keys, with no nesting.</li><li>Values are always strings or arrays of strings. The app converts types itself.</li><li>ItsyWeb verifies and removes its own <code>_csrf</code> field before forwarding. An app must not define it.</li><li>The JSON body is bounded to 192 KiB.</li></ul><h3 id="custom-apps-chapter-4">Response envelope</h3><p>The service replies with one JSON object using only these keys:</p><ul><li><code>data</code> (object): app-owned values, rendered as <code>contact.data.*</code>.</li><li><code>invalid</code> (object of string to string): validation messages, <code>contact.invalid.*</code>.</li><li><code>error</code> (string): one operational failure message, <code>contact.error</code>.</li><li><code>flash</code> (object of string to string): temporary messages, <code>contact.flash.*</code>.</li><li><code>redirect</code> (string): a mount-relative destination, handled by ItsyWeb and not shown in templates.</li><li><code>session</code> (object or <code>null</code>): an app-owned session instruction, not shown in templates. See <a href="/docs/apps#custom-app-sessions">App-owned sessions</a>.</li></ul><p>Only these keys are reserved. Unknown keys, an explicit <code>null</code> (except for <code>session</code>, where <code>null</code> clears the cookie), duplicate keys, a non-object body, a wrong content type or an oversized body are treated as a service failure. <code>invalid</code> and <code>flash</code> values must be strings; values inside <code>data</code> may be any JSON. Flash is limited to 4,096 bytes and responses to 1 MiB.</p><h3 id="custom-apps-chapter-5">Statuses and browser outcomes</h3><ul><li><code>200</code> with no <code>invalid</code> and no <code>error</code>: success. With <code>redirect</code>, the browser gets a <code>303</code>.</li><li><code>422</code> with at least one <code>invalid</code> and no <code>error</code>: the page re-renders with status <code>422</code>.</li><li><code>503</code> with an <code>error</code> and no <code>invalid</code>: the page re-renders with status <code>503</code>.</li><li>Any other status or a malformed response becomes a safe <code>503</code> with a generic message.</li></ul><p>Success:</p><pre tabindex="0" aria-label="Code example"><code class="language-json">&#123;"redirect":"thank-you","flash":&#123;"notice":"Your message was sent."&#125;&#125;</code></pre><p>Validation:</p><pre tabindex="0" aria-label="Code example"><code class="language-json">&#123;"data":&#123;"email":"invalid"&#125;,"invalid":&#123;"email":"Enter a valid email address."&#125;&#125;</code></pre><p>Failure:</p><pre tabindex="0" aria-label="Code example"><code class="language-json">&#123;"error":"We couldn't confirm delivery. Please try again later."&#125;</code></pre><h3 id="custom-apps-chapter-6">Launch contract</h3><p>ItsyWeb launches a managed app itself; a site configures only <code>apps.&lt;name&gt;.mount</code> and never a port, descriptor or token. The child receives three inherited descriptors:</p><ul><li><strong>fd 3</strong>: an already-bound <code>127.0.0.1:0</code> TCP listener, so there is no port race and no port in config.</li><li><strong>fd 4</strong>: one JSON object with exactly five string keys: <code>&#123;"Name":"&lt;app&gt;","Token":"&lt;64 hex&gt;","Storage":"&lt;private dir&gt;","CapabilityURL":"","CapabilityToken":""&#125;</code>. A custom app gets empty capability values; the bundled Contact app gets a non-empty capability URL and token. Unknown fields are rejected, so declare all five.</li><li><strong>fd 5</strong>: a parent-liveness pipe; EOF means shut down.</li></ul><p>The child environment is only <code>LANG=C</code>, and its standard output and error are discarded so private payloads are never logged. The executable is re-opened through a confined root at launch, checked against the size and SHA-256 recorded when the site loaded, and copied to a private file before it runs; a swap after validation cannot change what runs. One child runs per site and app with bounded backoff; an unavailable app only affects its own routes.</p><h3 id="custom-apps-chapter-7">Handshake and transport</h3><p>Before any app call, ItsyWeb performs a private handshake:</p><pre tabindex="0" aria-label="Code example"><code class="language-none">GET /_itsy/handshake
-Authorization: Bearer &lt;app-token&gt;</code></pre><p>The service must return <code>200</code> with JSON like:</p><pre tabindex="0" aria-label="Code example"><code class="language-json">&#123;"name":"example","version":"0.1.0","protocol":2&#125;</code></pre><p>ItsyWeb checks the name and <code>protocol: 2</code>; <code>version</code> is the app's own release. A manifest alone is not proof. Every call carries the bearer token; browser cookies and authorization are never forwarded. Responses must be <code>application/json</code>, redirects are not followed, and POSTs are never retried. The handshake deadline is 2 seconds and ordinary calls 15 seconds; at most four calls run per app and 64 process-wide, with no waiting queue.</p><h3 id="custom-app-sessions">App-owned sessions</h3><p>A custom app can own its own server-side sessions; ItsyWeb stores no session data. ItsyWeb reads its own per-app cookie and sends the opaque token to the app as the <code>X-Itsy-Session</code> request header, never as a browser cookie or authorization header. The app's reply may add a <code>session</code> key: omit it to leave the cookie unchanged, use <code>null</code> to clear it, or set <code>&#123;"token":"...","max_age":86400&#125;</code> to set or rotate it. Tokens are 16 to 512 cookie-safe printable ASCII bytes and <code>max_age</code> is 1 second to 30 days. A malformed session value is rejected and no cookie changes. ItsyWeb owns the cookie name, <code>Secure</code>, <code>HttpOnly</code>, <code>SameSite=Lax</code>, <code>Path=/</code> and the <code>__Host-</code> prefix. The cookie is isolated by app, and by site through host-only scoping, so a production cookie is never sent to another site's host; a malformed or duplicate cookie, including a valid cookie with a malformed duplicate of the same name, is ignored. The token never appears in templates, logs, URLs or public JSON. Store session state in the private directory ItsyWeb passes to the app at launch. It is stable per-site runtime state outside every release, excluded from releases and backups, and never pruned by ItsyWeb, so it survives a release change; back it up yourself. An app session never grants admin or editor access.</p><h3 id="custom-apps-chapter-9">A complete managed sample</h3><p>This standard-library program is a whole managed app: it reads the inherited descriptors, answers the handshake, serves a page, and owns a session cookie. Copy it into an empty directory with <code>go.mod</code>, build it for every platform you run, and register the package as shown above. It imports no ItsyWeb package.</p><pre tabindex="0" aria-label="Code example"><code class="language-go">// A complete managed Itsy app using only the standard library. Build it for
-// every platform you run, place the files under itsy/apps/&lt;name&gt;/, and register
-// the package under apps.&lt;name&gt; in itsy.config.json. Itsy launches it and speaks
-// the contract below; it never imports a Itsy package.
-package main
+<section id="app-requests">
+  <h2>Requests and template data</h2>
+<p>A custom app receives GET requests for pages that exist under its mount. A form POST needs <code>&#123;csrf&#125;</code> and sends its fields as flat JSON:</p><pre tabindex="0" aria-label="A form submission sent to the app"><code class="language-json">&#123;"name": "Sam"&#125;</code></pre><p>Repeated fields become arrays of strings. ItsyWeb strips the mount from the path: <code>/example/greet</code> calls <code>/greet</code>. Its own CSRF field is removed before forwarding.</p>
+<p>Return <code>application/json</code>. A 200 response can supply template values:</p><pre tabindex="0" aria-label="A successful app response"><code class="language-json">&#123;"data": &#123;"message": "Hello, Sam"&#125;&#125;</code></pre><p>The page can display <code>&#123;example.data.message&#125;</code>. App data is escaped and never interpreted as template code.</p>
+<p>The response accepts six keys:</p>
+<dl class="file-list"><dt>data</dt><dd>An object of template values.</dd><dt>invalid</dt><dd>Field names mapped to validation messages.</dd><dt>error</dt><dd>A failure message for the page.</dd><dt>flash</dt><dd>Named messages for the rendered page.</dd><dt>redirect</dt><dd>A mount-relative path, such as <code>thank-you</code>.</dd><dt>session</dt><dd>A cookie instruction, described below.</dd></dl>
+<p>Use 422 with <code>invalid</code> for field errors, or 503 with <code>error</code> for an operational failure. A successful redirect becomes a browser 303. Other responses become a generic unavailable page.</p>
+<p>Forms are limited to 32 KiB and JSON responses to 1 MiB. Unknown envelope keys are rejected; only <code>session</code> accepts an explicit <code>null</code>.</p>
+</section>
 
-import (
-	"context"
-	"crypto/rand"
-	"crypto/subtle"
-	"encoding/hex"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"path/filepath"
-	"sync"
-	"syscall"
-	"time"
-)
+<section id="launch">
+  <h2>Launch and handshake</h2>
+<p>The process receives three inherited file descriptors:</p>
+<dl class="file-list"><dt>3</dt><dd>A bound loopback TCP listener for your HTTP server.</dd><dt>4</dt><dd>The launch configuration as JSON.</dd><dt>5</dt><dd>A parent-liveness pipe. Shut down when it reaches EOF.</dd></dl><pre tabindex="0" aria-label="Launch configuration"><code class="language-json">&#123;
+  "Name": "example",
+  "Token": "&lt;private bearer token&gt;",
+  "Storage": "&lt;private storage directory&gt;",
+  "CapabilityURL": "",
+  "CapabilityToken": ""
+&#125;</code></pre><p>The last two values are empty for custom apps. Read configuration from these descriptors rather than environment variables.</p>
+<p>Require <code>Authorization: Bearer &lt;Token&gt;</code> on every request. Answer <code>GET /_flea/handshake</code> with status 200:</p><pre tabindex="0" aria-label="Handshake response"><code class="language-json">&#123;"name": "example", "version": "0.1.0", "protocol": 2&#125;</code></pre><p>The name and protocol must match the package. The handshake path retains the Flea spelling.</p>
+</section>
 
-const (
-	protocol      = 2
-	version       = "0.1.0"
-	sessionHeader = "X-Itsy-Session"
-	maxAge        = 3600
-	maxSessions   = 1000
-)
-
-// fd 4 is one JSON object with exactly these five string keys. A custom app
-// receives empty capability values; unknown fields are rejected.
-type launchConfig struct &#123;
-	Name, Token, Storage, CapabilityURL, CapabilityToken string
-&#125;
-
-func main() &#123;
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-	if err := run(ctx); err != nil &#123;
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	&#125;
-&#125;
-
-func run(ctx context.Context) error &#123;
-	configFile := os.NewFile(4, "app-credentials")
-	var cfg launchConfig
-	decoder := json.NewDecoder(io.LimitReader(configFile, 4097))
-	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&amp;cfg)
-	var extra any
-	end := decoder.Decode(&amp;extra)
-	configFile.Close()
-	if err != nil || end != io.EOF || len(cfg.Token) != 64 &#123;
-		return errors.New("invalid launch configuration")
-	&#125;
-	name := cfg.Name
-	if name == "" &#123;
-		name = "example"
-	&#125;
-
-	listenerFile := os.NewFile(3, "app-listener")
-	listener, err := net.FileListener(listenerFile)
-	listenerFile.Close()
-	if err != nil &#123;
-		return errors.New("app listener is unavailable")
-	&#125;
-	defer listener.Close()
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	alive := os.NewFile(5, "app-parent")
-	defer alive.Close()
-	go func() &#123; _, _ = io.Copy(io.Discard, alive); cancel() &#125;()
-
-	app := newHandler(name, cfg.Token, cfg.Storage)
-	server := &amp;http.Server&#123;
-		ReadHeaderTimeout: 2 * time.Second,
-		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      15 * time.Second,
-		IdleTimeout:       30 * time.Second,
-		MaxHeaderBytes:    16 &lt;&lt; 10,
-		Handler:           app,
-	&#125;
-	done := make(chan error, 1)
-	go func() &#123; done &lt;- server.Serve(listener) &#125;()
-	select &#123;
-	case err := &lt;-done:
-		return err
-	case &lt;-ctx.Done():
-	&#125;
-	shutdown, finish := context.WithTimeout(context.Background(), 2*time.Second)
-	defer finish()
-	if err := server.Shutdown(shutdown); err != nil &#123;
-		server.Close()
-	&#125;
-	&lt;-done
-	return nil
-&#125;
-
-// handler is a tiny session service. The "login" action is a demonstration
-// only: it checks no credentials and is never real authentication.
-type handler struct &#123;
-	name    string
-	token   string
-	path    string
-	mu      sync.Mutex
-	tokens  map[string]int64
-&#125;
-
-func newHandler(name, token, storage string) *handler &#123;
-	h := &amp;handler&#123;name: name, token: token, tokens: map[string]int64&#123;&#125;&#125;
-	if storage != "" &#123;
-		h.path = filepath.Join(storage, "sessions.json")
-		if data, err := os.ReadFile(h.path); err == nil &#123;
-			_ = json.Unmarshal(data, &amp;h.tokens)
-		&#125;
-	&#125;
-	return h
-&#125;
-
-func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) &#123;
-	if len(r.Header.Values("Authorization")) != 1 ||
-		subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), []byte("Bearer "+h.token)) != 1 &#123;
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	&#125;
-	if r.URL.RawPath != "" || r.URL.RawQuery != "" &#123;
-		writeJSON(w, 400, map[string]any&#123;"error": "Unsupported request."&#125;)
-		return
-	&#125;
-	if r.URL.Path == "/_itsy/handshake" &amp;&amp; r.Method == http.MethodGet &#123;
-		writeJSON(w, 200, map[string]any&#123;"name": h.name, "version": version, "protocol": protocol&#125;)
-		return
-	&#125;
-	if r.URL.Path != "/" &#123;
-		writeJSON(w, 404, map[string]any&#123;"error": "Unsupported request."&#125;)
-		return
-	&#125;
-	switch r.Method &#123;
-	case http.MethodGet:
-		token := r.Header.Get(sessionHeader)
-		body := map[string]any&#123;"data": map[string]any&#123;"authenticated": h.valid(token)&#125;&#125;
-		if token != "" &amp;&amp; !h.valid(token) &#123;
-			body["session"] = nil
-		&#125;
-		writeJSON(w, 200, body)
-	case http.MethodPost:
-		h.post(w, r)
-	default:
-		w.Header().Set("Allow", "GET, POST")
-		writeJSON(w, 405, map[string]any&#123;"error": "Use GET or POST."&#125;)
-	&#125;
-&#125;
-
-func (h *handler) post(w http.ResponseWriter, r *http.Request) &#123;
-	if r.Header.Get("Content-Type") != "application/json" &#123;
-		writeJSON(w, 400, map[string]any&#123;"error": "Send JSON."&#125;)
-		return
-	&#125;
-	var fields map[string]any
-	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 192&lt;&lt;10))
-	if err := decoder.Decode(&amp;fields); err != nil &#123;
-		writeJSON(w, 400, map[string]any&#123;"error": "Invalid body."&#125;)
-		return
-	&#125;
-	action, _ := fields["action"].(string)
-	switch action &#123;
-	case "login":
-		token, err := h.create()
-		if err != nil &#123;
-			writeJSON(w, 503, map[string]any&#123;"error": "Could not start a session."&#125;)
-			return
-		&#125;
-		writeJSON(w, 200, map[string]any&#123;"data": map[string]any&#123;"authenticated": true&#125;, "session": map[string]any&#123;"token": token, "max_age": maxAge&#125;&#125;)
-	case "logout":
-		if err := h.drop(r.Header.Get(sessionHeader)); err != nil &#123;
-			writeJSON(w, 503, map[string]any&#123;"error": "Could not end the session."&#125;)
-			return
-		&#125;
-		writeJSON(w, 200, map[string]any&#123;"data": map[string]any&#123;"authenticated": false&#125;, "session": nil&#125;)
-	default:
-		writeJSON(w, 422, map[string]any&#123;"data": fields, "invalid": map[string]string&#123;"action": "Use login or logout."&#125;&#125;)
-	&#125;
-&#125;
-
-func (h *handler) valid(token string) bool &#123;
-	if token == "" &#123;
-		return false
-	&#125;
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	h.expire()
-	_, ok := h.tokens[token]
-	return ok
-&#125;
-
-func (h *handler) expire() &#123;
-	now := time.Now().Unix()
-	for token, expiry := range h.tokens &#123;
-		if expiry &lt;= now &#123;
-			delete(h.tokens, token)
-		&#125;
-	&#125;
-&#125;
-
-func (h *handler) create() (string, error) &#123;
-	var raw [32]byte
-	if _, err := rand.Read(raw[:]); err != nil &#123;
-		return "", err
-	&#125;
-	token := hex.EncodeToString(raw[:])
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	h.expire()
-	if len(h.tokens) &gt;= maxSessions &#123;
-		return "", errors.New("full")
-	&#125;
-	h.tokens[token] = time.Now().Add(maxAge * time.Second).Unix()
-	if err := h.save(); err != nil &#123;
-		delete(h.tokens, token)
-		return "", err
-	&#125;
-	return token, nil
-&#125;
-
-func (h *handler) drop(token string) error &#123;
-	if token == "" &#123;
-		return nil
-	&#125;
-	h.mu.Lock()
-	defer h.mu.Unlock()
-	previous, ok := h.tokens[token]
-	if !ok &#123;
-		return nil
-	&#125;
-	delete(h.tokens, token)
-	if err := h.save(); err != nil &#123;
-		h.tokens[token] = previous
-		return err
-	&#125;
-	return nil
-&#125;
-
-// save writes durably and returns any failure so the request can fail closed.
-func (h *handler) save() error &#123;
-	if h.path == "" &#123;
-		return nil
-	&#125;
-	data, err := json.Marshal(h.tokens)
-	if err != nil &#123;
-		return err
-	&#125;
-	dir := filepath.Dir(h.path)
-	f, err := os.CreateTemp(dir, ".sessions-")
-	if err != nil &#123;
-		return err
-	&#125;
-	temp := f.Name()
-	defer os.Remove(temp)
-	if _, err = f.Write(data); err == nil &#123;
-		err = f.Sync()
-	&#125;
-	if closeErr := f.Close(); err == nil &#123;
-		err = closeErr
-	&#125;
-	if err != nil &#123;
-		return err
-	&#125;
-	if err = os.Rename(temp, h.path); err != nil &#123;
-		return err
-	&#125;
-	directory, err := os.Open(dir)
-	if err != nil &#123;
-		return err
-	&#125;
-	defer directory.Close()
-	return directory.Sync()
-&#125;
-
-func writeJSON(w http.ResponseWriter, status int, body any) &#123;
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "no-store")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(body)
-&#125;
-</code></pre><h3 id="custom-apps-chapter-10">Try the contract locally</h3><p>A compatible service can be tested without ItsyWeb. The essential flow is: require a bearer token, answer <code>GET /_itsy/handshake</code> with the identity above, and answer <code>POST /</code> with an envelope. For example, a local service could answer a handshake:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">curl -s http://127.0.0.1:8787/_itsy/handshake \
-  -H "Authorization: Bearer $APP_TOKEN"</code></pre><p>and a form submission:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">curl -s -X POST http://127.0.0.1:8787/ \
-  -H "Authorization: Bearer $APP_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '&#123;"name":"Alex"&#125;'</code></pre><p>This proves the wire contract, authentication and statuses. It does not mount the service in a site.</p><h3 id="custom-apps-chapter-11">What remains planned</h3><p>Remote (non-local) services, public read-only routes declared in configuration, databases, storage helpers and file uploads remain planned. ItsyWeb supervises only a confined local executable; it does not download packages or run arbitrary commands.</p></section>
+<section id="custom-app-sessions">
+  <h2>App-owned sessions</h2>
+<p>Your app owns session state. ItsyWeb passes the opaque session token in <code>X-Flea-Session</code>. On a successful response, set or rotate it with:</p><pre tabindex="0" aria-label="Set an app session"><code class="language-json">&#123;"session": &#123;"token": "&lt;your opaque token&gt;", "max_age": 86400&#125;&#125;</code></pre><p>Use a cookie-safe token of 16 to 512 characters and a lifetime of up to 30 days. Omit <code>session</code> to leave it unchanged, or return <code>session: null</code> to clear it.</p>
+<p>ItsyWeb handles the host-only, Secure, HttpOnly cookie. An app session does not grant admin access.</p>
+<p>The provided storage directory survives deployments. It is private and excluded from site backups, so arrange backups for your app's data.</p>
+</section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/agents">Continue to Working with coding agents</a></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
-
 <script src="/js/guides.js" defer></script>

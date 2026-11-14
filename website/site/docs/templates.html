@@ -7,27 +7,51 @@
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Pages, layouts and data</h1>
-      <p>Map files to URLs, share markup with layouts and partials, and use JSON data.</p>
+      <p>Create pages, share markup, and bring JSON data into your HTML.</p>
     </header>
-<section id="project-structure"><h2>A folder you can follow</h2><dl class="file-list"><dt>site/</dt><dd>Public HTML, CSS, images and other assets.</dd><dt>site/main.layout.html</dt><dd>The shared page wrapper.</dd><dt>itsy/snips.json</dt><dd>Editable content and page metadata.</dd><dt>itsy/data/</dt><dd>Optional JSON data you maintain in code.</dd><dt>itsy/media/</dt><dd>Managed photos and videos.</dd><dt>mailers/</dt><dd>Private email templates.</dd><dt>itsy.config.json</dt><dd>Site settings and branch deployment destinations.</dd><dt>itsy/runtime/</dt><dd>Private, Git-ignored runtime state.</dd><dt>itsy/skills/</dt><dd>Portable instructions for coding agents.</dd></dl><p>Public URLs leave off <code>site/</code>. For example, <code>site/images/logo.svg</code> is served at <code>/images/logo.svg</code>. Keep secrets out of configuration, templates and Git.</p></section>
 
-<section id="templates"><h2>HTML, with reusable pieces</h2><p>Keep page content in HTML files. The server handles the shared pieces when it serves a page, so you do not need to run a static site generator after changing your header.</p><h3 id="templates-chapter-1">Add a page</h3><p>Create <code>site/about.html</code> for <code>/about</code>. You can use <code>site/about/index.html</code> instead, but not both. Link to extensionless URLs without a trailing slash. Explicit <code>.html</code> URLs and trailing slashes return 404 unless you configure an exact <a href="/docs/redirects#redirects">redirect</a>. Assets keep their paths: <code>site/images/logo.svg</code> is <code>/images/logo.svg</code>. Files and directories beginning with <code>_</code> or <code>.</code> are private.</p><h3 id="templates-chapter-2">Share a layout</h3><p>The default wrapper is <code>site/main.layout.html</code>. Put <code>&#123;slot&#125;</code> where the page content belongs.</p><pre tabindex="0" aria-label="Code example"><code class="language-markup">&lt;header&gt;Our studio&lt;/header&gt;
+<section id="templates">
+  <h2>Pages and URLs</h2>
+<p>Put public pages and assets in <code>site/</code>. Page URLs leave off the file extension:</p>
+<dl class="file-list"><dt>site/index.html</dt><dd><code>/</code></dd><dt>site/visit.html</dt><dd><code>/visit</code></dd><dt>site/books/index.html</dt><dd><code>/books</code></dd><dt>site/images/shop.jpg</dt><dd><code>/images/shop.jpg</code></dd></dl>
+<p>Link to <code>/visit</code>, without <code>.html</code> or a trailing slash. Files beginning with an underscore are private templates.</p>
+</section>
+
+<section id="layouts">
+  <h2>Layouts</h2>
+<p><code>site/main.layout.html</code> supplies the document around each page. The page appears at <code>&#123;slot&#125;</code>:</p><pre tabindex="0" aria-label="The layout slot"><code class="language-markup">&lt;header&gt;Little Bookshop&lt;/header&gt;
 &lt;main&gt;&#123;slot&#125;&lt;/main&gt;
-&lt;footer&gt;Thanks for stopping by.&lt;/footer&gt;</code></pre><p>For a different wrapper, put this comment at the very start of a page:</p><pre tabindex="0" aria-label="Code example"><code class="language-markup">&lt;!-- itsy
-layout: /custom.layout.html
---&gt;</code></pre><p>Preserve the generated layout's <code>app.current_admin</code> conditional blocks, CSRF meta tag and admin toolbar include. They allow the optional editor to work if you enable admin access later; they do not require you to make your page content editable.</p><h3 id="templates-chapter-3">Reuse a partial</h3><p>Put navigation, a card or any other shared markup in a private partial. Include it wherever you need it; editing the partial updates every page that uses it.</p><p>Create <code>site/_card.html</code>, then include it with <code>&#123;render card&#125;</code>. Relative names resolve beside the calling template. <code>&#123;render /shared/card&#125;</code> selects <code>site/shared/_card.html</code>.</p><h3 id="templates-chapter-4">Settings and structured data</h3><p>Public settings live under <code>app</code> in <code>itsy.config.json</code>. Use <code>&#123;app.site_name&#125;</code> in your templates. A file named <code>itsy/data/team.json</code> is available as <code>data.team</code>.</p><pre tabindex="0" aria-label="Code example"><code class="language-markup">&#123;#if app.phone&#125;
-  &lt;p&gt;Call &#123;app.phone&#125;&lt;/p&gt;
-&#123;/if&#125;
+&lt;footer&gt;Independent books. Curious readers.&lt;/footer&gt;</code></pre><p>This illustrates the shared pieces. When editing the generated layout, keep its HTML document, admin conditionals, CSRF meta tag, and toolbar include.</p>
+<p>Create <code>site/shop.layout.html</code> with its own <code>&#123;slot&#125;</code>, then select it at the start of a page:</p><pre tabindex="0" aria-label="Select a custom layout"><code class="language-markup">&lt;!-- itsy
+layout: /shop.layout.html
+--&gt;</code></pre>
+</section>
 
-&#123;#each data.team.members as member&#125;
-  &lt;p&gt;&#123;member.name&#125;&lt;/p&gt;
+<section id="partials">
+  <h2>Partials</h2>
+<p>Save reusable markup in an underscore-prefixed file, such as <code>site/_hours.html</code>. Include it with:</p><pre tabindex="0" aria-label="Render a partial"><code class="language-markup">&#123;render hours&#125;</code></pre><p>Names resolve beside the calling template. Use <code>&#123;render /shared/hours&#125;</code> for <code>site/shared/_hours.html</code>.</p>
+</section>
+
+<section id="data">
+  <h2>Settings and JSON data</h2>
+<p>Public settings live under <code>app</code> in <code>itsy.config.json</code>. For example, <code>&#123;app.site_name&#125;</code> displays the site name.</p>
+<p>Save lists and other structured data in <code>itsy/data/</code>. Create <code>itsy/data/books.json</code>:</p><pre tabindex="0" aria-label="itsy/data/books.json"><code class="language-json">&#123;"items": [&#123;"title": "A Field Guide to Birds"&#125;, &#123;"title": "The Quiet Garden"&#125;]&#125;</code></pre><p>Loop over it in a page or partial:</p><pre tabindex="0" aria-label="Display a list"><code class="language-markup">&#123;#each data.books.items as book&#125;
+  &lt;p&gt;&#123;book.title&#125;&lt;/p&gt;
 &#123;:else&#125;
-  &lt;p&gt;Meet the team soon.&lt;/p&gt;
-&#123;/each&#125;</code></pre><p>Conditions take dotted paths, not JavaScript expressions. Use <code>&#123;#unless app.phone&#125;...&#123;/unless&#125;</code> for a negative condition. Both support <code>&#123;:else&#125;</code> and <code>&#123;:else if dotted.path&#125;</code>.</p><h3 id="templates-chapter-5">Page titles and descriptions</h3><p>Page metadata lives under the route in <code>pages</code> in <code>itsy/snips.json</code>. Update its <code>title</code> and <code>description</code> fields. The layout can use <code>&#123;page.title&#125;</code>, <code>&#123;page.description&#125;</code> and <code>&#123;page.path&#125;</code>. Ordinary page text can stay directly in your HTML.</p></section>
+  &lt;p&gt;New books are on their way.&lt;/p&gt;
+&#123;/each&#125;</code></pre><p>Use conditions to show content when a value is present:</p><pre tabindex="0" aria-label="Display a setting conditionally"><code class="language-markup">&#123;#if app.phone&#125;
+  &lt;a href="tel:&#123;app.phone&#125;"&gt;&#123;app.phone&#125;&lt;/a&gt;
+&#123;/if&#125;</code></pre><p><code>&#123;#unless app.phone&#125;</code> does the opposite. Conditions use values such as <code>app.phone</code>, rather than JavaScript expressions.</p>
+</section>
+
+<section id="page-details">
+  <h2>Page titles and descriptions</h2>
+<p>Each route has a record under <code>pages</code> in <code>itsy/snips.json</code>. Set its <code>title</code> and <code>description</code>. Layouts read them with <code>&#123;page.title&#125;</code> and <code>&#123;page.description&#125;</code>.</p>
+<p>Ordinary page text can stay in HTML. Use <a href="/docs/editing">on-page editing</a> for content an admin should change.</p>
+</section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/styling">Continue to CSS and icons</a></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
-
 <script src="/js/guides.js" defer></script>

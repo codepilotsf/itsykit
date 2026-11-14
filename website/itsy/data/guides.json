@@ -6,10 +6,6 @@
       "first": true,
       "chapters": [
         {
-          "id": "before-you-begin",
-          "title": "Before you begin"
-        },
-        {
           "id": "installation",
           "title": "1. Install ItsyWeb"
         },
@@ -18,32 +14,28 @@
           "title": "2. Create a site"
         },
         {
-          "id": "your-files",
-          "title": "3. Find your files"
-        },
-        {
           "id": "homepage",
-          "title": "4. Write the homepage"
+          "title": "3. Write the homepage"
         },
         {
           "id": "add-a-page",
-          "title": "5. Add a second page"
+          "title": "4. Add a second page"
         },
         {
           "id": "shared-layout",
-          "title": "6. Change the shared layout"
+          "title": "5. Change the shared layout"
         },
         {
           "id": "partials",
-          "title": "7. Reuse a partial"
+          "title": "6. Reuse a partial"
         },
         {
           "id": "styles",
-          "title": "8. Add a little CSS"
+          "title": "7. Make it yours"
         },
         {
           "id": "check-and-save",
-          "title": "9. Check and save your work"
+          "title": "8. Check your work"
         }
       ]
     },
@@ -53,31 +45,23 @@
       "first": false,
       "chapters": [
         {
-          "id": "project-structure",
-          "title": "A folder you can follow"
-        },
-        {
           "id": "templates",
-          "title": "HTML, with reusable pieces"
+          "title": "Pages and URLs"
         },
         {
-          "id": "templates-chapter-1",
-          "title": "Add a page"
+          "id": "layouts",
+          "title": "Layouts"
         },
         {
-          "id": "templates-chapter-2",
-          "title": "Share a layout"
+          "id": "partials",
+          "title": "Partials"
         },
         {
-          "id": "templates-chapter-3",
-          "title": "Reuse a partial"
+          "id": "data",
+          "title": "Settings and JSON data"
         },
         {
-          "id": "templates-chapter-4",
-          "title": "Settings and structured data"
-        },
-        {
-          "id": "templates-chapter-5",
+          "id": "page-details",
           "title": "Page titles and descriptions"
         }
       ]
@@ -89,10 +73,14 @@
       "chapters": [
         {
           "id": "styling",
-          "title": "Your CSS, your design"
+          "title": "Your styles"
         },
         {
-          "id": "styling-chapter-1",
+          "id": "utilities",
+          "title": "Prewind utilities"
+        },
+        {
+          "id": "icons",
           "title": "Icons"
         }
       ]
@@ -103,28 +91,47 @@
       "first": false,
       "chapters": [
         {
-          "id": "quickstart",
-          "title": "Your first HTML site"
-        },
-        {
-          "id": "quickstart-chapter-1",
-          "title": "Edit a page"
-        },
-        {
-          "id": "quickstart-chapter-2",
-          "title": "Check and save"
-        },
-        {
-          "id": "quickstart-chapter-3",
-          "title": "Other ways to start"
+          "id": "dev",
+          "title": "Run the local server"
         },
         {
           "id": "lan-testing",
           "title": "Test on another device"
         },
         {
-          "id": "lan-testing-chapter-1",
-          "title": "Sign-in codes and email previews"
+          "id": "status",
+          "title": "Check the project"
+        },
+        {
+          "id": "email-preview",
+          "title": "Preview email"
+        },
+        {
+          "id": "starting-options",
+          "title": "Start with examples"
+        }
+      ]
+    },
+    {
+      "url": "/docs/deployment",
+      "title": "Server setup and deployment",
+      "first": false,
+      "chapters": [
+        {
+          "id": "server",
+          "title": "Set up the server"
+        },
+        {
+          "id": "deployment",
+          "title": "Publish the site"
+        },
+        {
+          "id": "destinations",
+          "title": "Use another destination"
+        },
+        {
+          "id": "live-content",
+          "title": "Keep live content"
         }
       ]
     },
@@ -134,20 +141,20 @@
       "first": false,
       "chapters": [
         {
-          "id": "optional-features",
-          "title": "When you need more than templates"
-        },
-        {
           "id": "editable-content",
-          "title": "Optional on-page editing"
+          "title": "Make text editable"
         },
         {
           "id": "admin-editing",
-          "title": "Hand over the editing"
+          "title": "Add an admin"
+        },
+        {
+          "id": "save-and-cancel",
+          "title": "Edit and save"
         },
         {
           "id": "content-sync",
-          "title": "Sync optional editable content"
+          "title": "Bring live edits into your project"
         }
       ]
     },
@@ -158,19 +165,15 @@
       "chapters": [
         {
           "id": "media",
-          "title": "Editable photos & videos"
-        },
-        {
-          "id": "media-chapter-1",
           "title": "Photos"
         },
         {
-          "id": "media-chapter-2",
+          "id": "videos",
           "title": "Videos"
         },
         {
           "id": "collections",
-          "title": "Admin-managed collections"
+          "title": "Collections"
         }
       ]
     },
@@ -181,15 +184,23 @@
       "chapters": [
         {
           "id": "email",
-          "title": "Email & contact forms"
+          "title": "Enable Contact"
         },
         {
-          "id": "email-chapter-1",
-          "title": "A contact form"
+          "id": "contact-form",
+          "title": "Create the form"
         },
         {
-          "id": "email-chapter-2",
-          "title": "Email templates"
+          "id": "preview",
+          "title": "Try it locally"
+        },
+        {
+          "id": "delivery",
+          "title": "Send real email"
+        },
+        {
+          "id": "mail-templates",
+          "title": "Customize the message"
         }
       ]
     },
@@ -200,58 +211,23 @@
       "chapters": [
         {
           "id": "blog",
-          "title": "Enable a blog"
+          "title": "Enable the blog"
         },
         {
-          "id": "blog-chapter-1",
-          "title": "1. Enable it in your site configuration"
+          "id": "publishing",
+          "title": "Write and publish"
         },
         {
-          "id": "blog-chapter-2",
-          "title": "2. Add the templates"
+          "id": "blog-templates",
+          "title": "Customize the templates"
         },
         {
-          "id": "blog-chapter-3",
-          "title": "3. Preview, commit and deploy"
+          "id": "blog-data",
+          "title": "Posts in JSON"
         },
         {
-          "id": "blog-chapter-4",
-          "title": "Create and publish posts"
-        },
-        {
-          "id": "blog-chapter-5",
-          "title": "Post JSON for agents and developers"
-        },
-        {
-          "id": "blog-chapter-6",
-          "title": "Template values"
-        },
-        {
-          "id": "blog-chapter-7",
-          "title": "Keep live edits when deploying"
-        }
-      ]
-    },
-    {
-      "url": "/docs/deployment",
-      "title": "Server setup and deployment",
-      "first": false,
-      "chapters": [
-        {
-          "id": "deployment",
-          "title": "Put your site online"
-        },
-        {
-          "id": "server",
-          "title": "Set up the server"
-        },
-        {
-          "id": "deployment-chapter-2",
-          "title": "Deploy a branch"
-        },
-        {
-          "id": "deployment-chapter-3",
-          "title": "Temporary packaging storage"
+          "id": "blog-deployment",
+          "title": "Deploy and sync"
         }
       ]
     },
@@ -262,27 +238,15 @@
       "chapters": [
         {
           "id": "seo-discovery",
-          "title": "Sitemaps, canonical URLs and page exclusions"
+          "title": "Set your production address"
         },
         {
-          "id": "seo-update",
-          "title": "1. Check your CLI and server"
+          "id": "exclude",
+          "title": "Exclude a page"
         },
         {
-          "id": "seo-configure",
-          "title": "2. Set the production address"
-        },
-        {
-          "id": "seo-check",
-          "title": "3. Check locally, then deploy"
-        },
-        {
-          "id": "seo-discovery-chapter-4",
-          "title": "What ItsyWeb includes and preserves"
-        },
-        {
-          "id": "seo-search-console",
-          "title": "Optional: tell Google where the sitemap is"
+          "id": "check",
+          "title": "Check and publish"
         },
         {
           "id": "indexing",
@@ -297,15 +261,15 @@
       "chapters": [
         {
           "id": "redirects",
-          "title": "Preserve old links with 301 redirects"
+          "title": "Map old paths to new pages"
         },
         {
-          "id": "redirects-chapter-1",
-          "title": "Inventory the original website with an agent"
+          "id": "check-redirects",
+          "title": "Check the result"
         },
         {
-          "id": "redirects-chapter-2",
-          "title": "Validate before deploying"
+          "id": "migration-inventory",
+          "title": "Migrating a larger site"
         }
       ]
     },
@@ -316,67 +280,23 @@
       "chapters": [
         {
           "id": "apps",
-          "title": "Apps"
-        },
-        {
-          "id": "apps-chapter-1",
-          "title": "What you can use"
-        },
-        {
-          "id": "apps-chapter-2",
-          "title": "Enable Contact"
-        },
-        {
-          "id": "apps-chapter-3",
-          "title": "How a submission flows"
+          "title": "How apps fit"
         },
         {
           "id": "custom-apps",
-          "title": "Building a custom app"
+          "title": "Register an app"
         },
         {
-          "id": "custom-apps-chapter-1",
-          "title": "Register a package"
+          "id": "app-requests",
+          "title": "Requests and template data"
         },
         {
-          "id": "custom-apps-chapter-2",
-          "title": "Two boundaries"
-        },
-        {
-          "id": "custom-apps-chapter-3",
-          "title": "Request JSON"
-        },
-        {
-          "id": "custom-apps-chapter-4",
-          "title": "Response envelope"
-        },
-        {
-          "id": "custom-apps-chapter-5",
-          "title": "Statuses and browser outcomes"
-        },
-        {
-          "id": "custom-apps-chapter-6",
-          "title": "Launch contract"
-        },
-        {
-          "id": "custom-apps-chapter-7",
-          "title": "Handshake and transport"
+          "id": "launch",
+          "title": "Launch and handshake"
         },
         {
           "id": "custom-app-sessions",
           "title": "App-owned sessions"
-        },
-        {
-          "id": "custom-apps-chapter-9",
-          "title": "A complete managed sample"
-        },
-        {
-          "id": "custom-apps-chapter-10",
-          "title": "Try the contract locally"
-        },
-        {
-          "id": "custom-apps-chapter-11",
-          "title": "What remains planned"
         }
       ]
     },
@@ -387,11 +307,15 @@
       "chapters": [
         {
           "id": "agents",
-          "title": "AI-assisted development"
+          "title": "Work in the project"
         },
         {
-          "id": "agents-chapter-1",
-          "title": "Use the skills in an existing project"
+          "id": "feature-skills",
+          "title": "Add a feature"
+        },
+        {
+          "id": "existing-projects",
+          "title": "Existing projects"
         }
       ]
     },
@@ -402,11 +326,19 @@
       "chapters": [
         {
           "id": "installation",
-          "title": "Install ItsyWeb"
+          "title": "Install"
         },
         {
           "id": "updates",
-          "title": "Keep ItsyWeb up to date"
+          "title": "Update the CLI"
+        },
+        {
+          "id": "server-updates",
+          "title": "Update an existing server"
+        },
+        {
+          "id": "from-flea",
+          "title": "Moving from Flea"
         }
       ]
     },
@@ -417,22 +349,18 @@
       "chapters": [
         {
           "id": "recovery",
-          "title": "Backups & recovery"
-        },
-        {
-          "id": "recovery-chapter-1",
           "title": "Make a backup"
         },
         {
-          "id": "recovery-chapter-2",
+          "id": "rollback",
           "title": "Roll back code"
         },
         {
-          "id": "recovery-chapter-3",
+          "id": "restore",
           "title": "Restore a backup"
         },
         {
-          "id": "recovery-chapter-4",
+          "id": "reset",
           "title": "Reset a local project"
         }
       ]
@@ -444,127 +372,19 @@
       "chapters": [
         {
           "id": "release-notes",
-          "title": "Release notes"
+          "title": "0.21.0"
         },
         {
-          "id": "release-notes-chapter-1",
-          "title": "0.21.0 · November 14, 2026"
+          "id": "version-020",
+          "title": "0.20 releases"
         },
         {
-          "id": "release-notes-chapter-2",
-          "title": "0.20.5 · November 9, 2026"
+          "id": "version-019-010",
+          "title": "0.19 to 0.10"
         },
         {
-          "id": "release-notes-chapter-3",
-          "title": "0.20.4 · November 9, 2026"
-        },
-        {
-          "id": "release-notes-chapter-4",
-          "title": "0.20.3 · November 9, 2026"
-        },
-        {
-          "id": "release-notes-chapter-5",
-          "title": "0.20.2 · November 2, 2026"
-        },
-        {
-          "id": "release-notes-chapter-6",
-          "title": "0.20.1 · November 2, 2026"
-        },
-        {
-          "id": "release-notes-chapter-7",
-          "title": "0.20.0 · October 30, 2026"
-        },
-        {
-          "id": "release-notes-chapter-8",
-          "title": "0.19.0 · October 24, 2026"
-        },
-        {
-          "id": "release-notes-chapter-9",
-          "title": "0.18.0 · October 21, 2026"
-        },
-        {
-          "id": "release-notes-chapter-10",
-          "title": "0.17.0 · October 18, 2026"
-        },
-        {
-          "id": "release-notes-chapter-11",
-          "title": "0.16.1 · October 18, 2026"
-        },
-        {
-          "id": "release-notes-chapter-12",
-          "title": "0.16.0 · October 13, 2026"
-        },
-        {
-          "id": "release-notes-chapter-13",
-          "title": "0.15.1 · October 13, 2026"
-        },
-        {
-          "id": "release-notes-chapter-14",
-          "title": "0.15.0 · October 13, 2026"
-        },
-        {
-          "id": "release-notes-chapter-15",
-          "title": "0.14.0 · October 13, 2026"
-        },
-        {
-          "id": "release-notes-chapter-16",
-          "title": "0.13.0 · October 12, 2026"
-        },
-        {
-          "id": "release-notes-chapter-17",
-          "title": "0.12.0 · October 12, 2026"
-        },
-        {
-          "id": "release-notes-chapter-18",
-          "title": "0.11.0 · October 12, 2026"
-        },
-        {
-          "id": "release-notes-chapter-19",
-          "title": "0.10.0 · October 5, 2026"
-        },
-        {
-          "id": "release-notes-chapter-20",
-          "title": "0.9.0 · October 5, 2026"
-        },
-        {
-          "id": "release-notes-chapter-21",
-          "title": "0.8.1 · October 3, 2026"
-        },
-        {
-          "id": "release-notes-chapter-22",
-          "title": "0.8.0 · October 3, 2026"
-        },
-        {
-          "id": "release-notes-chapter-23",
-          "title": "0.7.1 · October 3, 2026"
-        },
-        {
-          "id": "release-notes-chapter-24",
-          "title": "0.7.0 · October 3, 2026"
-        },
-        {
-          "id": "release-notes-chapter-25",
-          "title": "0.6.2 · October 1, 2026"
-        },
-        {
-          "id": "release-notes-chapter-26",
-          "title": "0.6.1 · October 1, 2026"
-        },
-        {
-          "id": "release-notes-chapter-27",
-          "title": "0.6.0 · October 1, 2026"
-        },
-        {
-          "id": "release-notes-chapter-28",
-          "title": "0.5.0 · September 29, 2026"
-        },
-        {
-          "id": "release-notes-chapter-29",
-          "title": "0.4.1 · September 29, 2026"
-        },
-        {
-          "id": "release-notes-chapter-30",
-          "title": "0.3.0 · September 29, 2026"
+          "id": "earlier-releases",
+          "title": "Earlier releases"
         }
       ]
     },
@@ -575,15 +395,11 @@
       "chapters": [
         {
           "id": "overview",
-          "title": "HTML doesn't need a build pipeline."
-        },
-        {
-          "id": "limitations",
-          "title": "Where ItsyWeb fits"
+          "title": "A small website, in ordinary files"
         },
         {
           "id": "support",
-          "title": "Need a hand?"
+          "title": "Get help"
         }
       ]
     }

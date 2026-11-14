@@ -7,17 +7,35 @@
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Server setup and deployment</h1>
-      <p>Set up an Ubuntu host and publish committed source with automatic HTTPS.</p>
+      <p>Publish your site to an Ubuntu server with automatic HTTPS.</p>
     </header>
-<section id="deployment"><h2>Put your site online</h2><p>ItsyWeb hosts multiple sites on one Ubuntu server. You'll need an Ubuntu host you control, SSH access, a domain pointing to that server, and inbound TCP ports 80 and 443 for HTTPS. ItsyWeb configures the web server on that host; it does not rent a server or create DNS records for you.</p><h3 id="server">Set up the server</h3><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy setup</code></pre><p>Run this from your computer and point it at a blank Ubuntu server over SSH. ItsyWeb installs the bundled server there and prepares the host to serve your sites. There is nothing to install by hand &mdash; no Go, Node, Python or database on the host. Use a server with ports 80 and 443 available for HTTPS.</p><h3 id="deployment-chapter-2">Deploy a branch</h3><p>Save your files, check the site with <code>itsy status</code>, and review and commit the changes.</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy deploy</code></pre><p>The first run asks for the server, domain and HTTPS preferences. It saves that branch's destination in <code>itsy.config.json</code> and offers to commit your reviewed files. Deployment publishes committed source and requires a clean working tree.</p><p>Each branch has its own destination. Use <code>itsy deploy -configure</code> to change it, or <code>itsy https -configure</code> to revisit just the HTTPS settings. Configuring a destination does not create DNS records.</p><p>ItsyWeb requests and renews Let's Encrypt certificates when HTTPS is enabled. There is no separate certificate tool to configure.</p><p>If you also use the optional on-page editor, see <a href="/docs/editing#content-sync">syncing live content</a> before publishing content changes.</p><h3 id="deployment-chapter-3">Temporary packaging storage</h3><p>From 0.20.1, local packaging respects <code>TMPDIR</code>. If your Linux computer has a small RAM-backed <code>/tmp</code>, first check that <code>/var/tmp</code> is disk-backed, then use private scratch for one deployment:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">(
-  scratch=$(mktemp -d /var/tmp/itsy-job.XXXXXXXX) || exit 1
-  trap 'rmdir -- "$scratch"' EXIT
-  TMPDIR="$scratch" itsy deploy
-)</code></pre><p>The selected directory must exist and be writable. An invalid explicit setting fails without falling back elsewhere. Keep worktrees and retained screenshots or logs outside disposable scratch.</p></section>
-    <nav class="guide-next" aria-label="Next guide"><a href="/docs/seo">Continue to Search engines and SEO</a></nav>
+
+<section id="server">
+  <h2>Set up the server</h2>
+<p>You'll need a supported Ubuntu LTS server, SSH access, and a domain pointing to it. Allow inbound TCP ports 80 and 443, then run this from your computer:</p><pre tabindex="0" aria-label="Set up the server"><code class="language-bash">itsy setup</code></pre><p>Follow the prompts to install ItsyWeb on the server. One server can host several sites.</p>
+</section>
+
+<section id="deployment">
+  <h2>Publish the site</h2>
+<p>Review and commit your project changes, then deploy from the site folder:</p><pre tabindex="0" aria-label="Commit and deploy your site"><code class="language-bash">itsy status
+git add .
+git commit -m "Prepare site for publishing"
+itsy deploy</code></pre><p>The first deployment asks for the server, domain, and HTTPS preferences. It saves the destination for this Git branch in <code>itsy.config.json</code>. Commit the saved settings when prompted; in a larger repository, commit them manually and run deploy again.</p>
+<p>ItsyWeb publishes the committed files and manages the Let's Encrypt certificate and renewal.</p>
+</section>
+
+<section id="destinations">
+  <h2>Use another destination</h2>
+<p>Each branch can have its own destination, such as a staging domain. To change the current branch's saved destination:</p><pre tabindex="0" aria-label="Change a deployment destination"><code class="language-bash">itsy deploy --configure</code></pre>
+</section>
+
+<section id="live-content">
+  <h2>Keep live content</h2>
+<p>Normal deployment updates templates, assets, and CSS while preserving admin edits. To bring those edits into your local project, use <a href="/docs/editing#content-sync">content sync</a>.</p>
+</section>
+    <nav class="guide-next" aria-label="Next guide"><a href="/docs/editing">Continue to On-page editing</a></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
-
 <script src="/js/guides.js" defer></script>

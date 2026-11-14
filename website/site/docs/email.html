@@ -7,20 +7,59 @@
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Email and contact forms</h1>
-      <p>Preview email locally, configure delivery, and add the bundled Contact form.</p>
+      <p>Add a contact form, preview messages locally, and configure delivery when the site goes live.</p>
     </header>
-<section id="email"><h2>Email &amp; contact forms</h2><p>New sites set <code>dev.email_preview</code> to <code>true</code>. Local sign-in and contact emails open as private browser previews without Resend credentials. Preview messages expire and disappear when dev stops.</p><p>For real delivery, run:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy email</code></pre><p>Local credentials belong in the private, Git-ignored <code>.env</code> file. For real local delivery, set the preview toggle to false and restart dev. Production ignores the preview toggle and needs server-side mail configuration.</p><h3 id="email-chapter-1">A contact form</h3><p>Enable the bundled Contact app under <code>apps.contact</code> in <code>itsy.config.json</code>, with a <code>mount</code> and the recipient in <code>email.to</code>. This replaces the removed top-level <code>contact</code> settings and the old <code>/_itsy/contact</code> route: there is no alias or automatic migration, and deploy with a current server; 0.20.0 uses deployment protocol 28. Create <code>site/contact/index.html</code> and a mount-relative <code>site/contact/thank-you.html</code>. The form includes an explicit CSRF control and posts to the mount:</p><pre tabindex="0" aria-label="Code example"><code class="language-markup">&lt;form method="post" action="/contact"&gt;
+
+<section id="email">
+  <h2>Enable Contact</h2>
+<p>Add this entry under <code>apps</code> in <code>itsy.config.json</code>, using your recipient address:</p><pre tabindex="0" aria-label="Contact configuration"><code class="language-json">&#123;
+  "apps": &#123;
+    "contact": &#123;
+      "mount": "/contact",
+      "email": &#123;"to": "hello@example.com"&#125;
+    &#125;
+  &#125;
+&#125;</code></pre><p>Keep your other settings and restart dev after changing app configuration.</p>
+</section>
+
+<section id="contact-form">
+  <h2>Create the form</h2>
+<p>Create <code>site/contact/index.html</code>:</p><pre tabindex="0" aria-label="site/contact/index.html"><code class="language-markup">&lt;h1&gt;Contact us&lt;/h1&gt;
+&lt;form method="post" action="/contact"&gt;
   &#123;csrf&#125;
-  &lt;label&gt;Name &lt;input name="name" required maxlength="100" /&gt;&lt;/label&gt;
-  &lt;label&gt;Email &lt;input type="email" name="email" required /&gt;&lt;/label&gt;
-  &lt;label&gt;Message &lt;textarea name="message" required maxlength="5000"&gt;&lt;/textarea&gt;&lt;/label&gt;
-  &lt;div hidden&gt;&lt;label&gt;Leave empty &lt;input name="website" tabindex="-1" autocomplete="off" /&gt;&lt;/label&gt;&lt;/div&gt;
+  &#123;#if contact.error&#125;&lt;p role="alert"&gt;&#123;contact.error&#125;&lt;/p&gt;&#123;/if&#125;
+  &lt;label&gt;Name &lt;input name="name" required maxlength="100"
+    value="&#123;contact.data.name&#125;"&gt;&lt;/label&gt;
+  &lt;p&gt;&#123;contact.invalid.name&#125;&lt;/p&gt;
+  &lt;label&gt;Email &lt;input type="email" name="email" required maxlength="254"
+    value="&#123;contact.data.email&#125;"&gt;&lt;/label&gt;
+  &lt;p&gt;&#123;contact.invalid.email&#125;&lt;/p&gt;
+  &lt;label&gt;Message &lt;textarea name="message" required maxlength="5000"&gt;&#123;contact.data.message&#125;&lt;/textarea&gt;&lt;/label&gt;
+  &lt;p&gt;&#123;contact.invalid.message&#125;&lt;/p&gt;
+  &lt;div hidden&gt;&lt;label&gt;Leave empty &lt;input name="website" tabindex="-1" autocomplete="off"&gt;&lt;/label&gt;&lt;/div&gt;
   &lt;button type="submit"&gt;Send message&lt;/button&gt;
-&lt;/form&gt;</code></pre><p>Success redirects to the mount's <code>thank-you</code> page with a visitor-bound notice. Messages are emailed, not stored, and validation re-renders the form with safe values on error. There is no general-purpose form backend.</p><h3 id="email-chapter-2">Email templates</h3><p>Customize <code>mailers/*.email.html</code> and <code>*.email.txt</code>. HTML emails share <code>mailers/main.layout.html</code>. Keep its slot and use escaped <code>app.*</code> and <code>email.*</code> values.</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy email preview sign-in</code></pre><p>This renders a sample without sending an email.</p></section>
+&lt;/form&gt;</code></pre><p>Keep <code>&#123;csrf&#125;</code> and the field names. Contact validates the submission and emails it to your recipient; it doesn't store messages.</p>
+<p>Create <code>site/contact/thank-you.html</code> with your confirmation message. Successful submissions redirect there. The example starter already includes both pages.</p>
+</section>
+
+<section id="preview">
+  <h2>Try it locally</h2>
+<p>New sites preview outgoing email in a private browser page during dev. Submit your form to inspect the message without sending it.</p>
+</section>
+
+<section id="delivery">
+  <h2>Send real email</h2>
+<p>Run <code>itsy email</code> to configure local Resend delivery. To test it, set <code>dev.email_preview</code> to <code>false</code> in your config and restart dev.</p>
+<p>Production always uses real delivery. Deployment prompts for server email settings when needed. Use a sender on a verified domain, and keep credentials out of Git.</p>
+</section>
+
+<section id="mail-templates">
+  <h2>Customize the message</h2>
+<p>Edit the HTML and text templates in <code>mailers/</code>. They use <code>app.*</code> and <code>email.*</code> values; HTML messages share <code>mailers/main.layout.html</code>.</p><pre tabindex="0" aria-label="Render a sample Contact email"><code class="language-bash">itsy email preview contact</code></pre><p>This prints a sample HTML message without sending it.</p>
+</section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/blog">Continue to Blog</a></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
-
 <script src="/js/guides.js" defer></script>

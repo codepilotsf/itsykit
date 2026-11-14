@@ -7,32 +7,38 @@
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Local development</h1>
-      <p>Create projects, use live reload, and test from another device on your network.</p>
+      <p>Preview changes as you work, check your site, and test it on another device.</p>
     </header>
-<section id="quickstart"><h2>Your first HTML site</h2>
-<p>Create a project and start the local server:</p>
-<pre tabindex="0" aria-label="Create and preview a site"><code class="language-bash">itsy new my-site
-cd my-site
-itsy dev</code></pre>
-<p>Enter a site name when prompted. The admin email is optional; skip it to start with the HTML workflow. Open the Website URL printed in the terminal.</p>
-<h3 id="quickstart-chapter-1">Edit a page</h3><p>Replace the contents of <code>site/index.html</code> with your own markup:</p>
-<pre tabindex="0" aria-label="A plain HTML homepage"><code class="language-markup">&lt;h1&gt;Hello, from our little corner.&lt;/h1&gt;
-&lt;p&gt;A website made with HTML and CSS.&lt;/p&gt;</code></pre>
-<p>Save the file and the browser reloads. The default <code>site/main.layout.html</code> supplies the document wrapper, header and footer. Edit those once to change them across the site. Your page markup goes where the layout has <code>&#123;slot&#125;</code>.</p>
-<p>Create <code>site/about.html</code> and visit <code>/about</code>. There's no route configuration or generated output directory. See <a href="/docs/templates#templates">pages, layouts and partials</a> for the template syntax, then <a href="/docs/deployment#deployment">put the site online</a>.</p>
-<h3 id="quickstart-chapter-2">Check and save</h3>
-<pre tabindex="0" aria-label="Validate a site"><code class="language-bash">itsy status</code></pre>
-<p>Status validates the project without rewriting it, shows page, asset and editable-area counts, and reports Git state. When the current branch has a saved deployment, it also checks that destination over SSH. The remote report separates website reachability, deployed code and editable content; a previous pull baseline is needed to identify which side changed. Without a saved destination, status finishes locally.</p>
-<p>New projects have a Git repository on <code>main</code> with an <code>Initial site</code> commit. Review and commit your changes before deploying. The creation command prints instructions to connect and push to your remote repository; it does not create a remote for you. Use <code>--skip-git</code> to skip Git setup. A failed initial commit leaves the usable site and instructions to retry.</p>
-<h3 id="quickstart-chapter-3">Other ways to start</h3>
-<p>Already in an empty project folder? Run <code>itsy new .</code>. Relative and absolute directory paths work too. ItsyWeb creates a missing directory when its parent exists. Existing directories must be completely empty, including hidden files and <code>.git</code>; files and directory symlinks are refused. The folder name supplies the default site name. Use <code>itsy new --starter my-site</code> or <code>-s</code> for example pages instead of the clean homepage.</p>
-<p>Dev starts at port 3000 and explains occupied ports before trying 3001, 3002 and so on. An explicit <code>--port</code> stays fixed; <code>--port 0</code> lets the operating system choose. Running <code>itsy dev</code> again replaces this site's running dev server, including when changing ports or LAN mode. Pull and reset are never interrupted. Stop any dev process started with an older binary manually once.</p></section>
 
-<section id="lan-testing"><h2>Test on another device</h2><p>To use a phone, tablet or another computer on the same trusted network, start dev with:</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy dev --lan</code></pre><p><code>itsy dev -l</code> does the same thing. ItsyWeb prints <strong>Network</strong> and <strong>Hostname</strong> URLs for detected private/Tailscale IPv4 addresses and this computer's name/local alias. Open a printed URL, such as <code>http://studio:3000</code>, when that name resolves to the dev computer. Its <code>/admin</code> link opens sign-in. Exact Host/port and peer checks remain required. Without the flag, dev stays accessible only on your computer using the printed Website URL.</p><p>This is the full dev site: approved admins can sign in, edit text and collections, upload photos and videos, and save changes. Contact forms, browser reloads and dev diagnostics work over the network too. Each device signs in separately.</p><h3 id="lan-testing-chapter-1">Sign-in codes and email previews</h3><p>With email preview enabled, messages still open on the computer running ItsyWeb. Enter the code on your other device. To share a private preview, replace its loopback IP with the printed network IP, keeping the port and random path. Anyone with that link and network access can read the message, so keep it private. There is no public inbox.</p><div class="notice"><p>LAN mode uses <strong>unencrypted HTTP</strong>. Use it only on a trusted network, never forward the development port, and restart dev after changing networks. VPN addresses may also appear. Your firewall must allow the selected port; guest Wi-Fi can block connections between devices. Use <code>--port 3001</code> if you need a different port.</p></div></section>
-    <nav class="guide-next" aria-label="Next guide"><a href="/docs/editing">Continue to On-page editing</a></nav>
+<section id="dev">
+  <h2>Run the local server</h2>
+<pre tabindex="0" aria-label="Start development"><code class="language-bash">itsy dev</code></pre><p>Run this from your project folder and open the Website URL it prints. Saving HTML, CSS, or content reloads the browser. Press <strong>Ctrl-C</strong> to stop.</p>
+<p>Dev starts on port 3000 and chooses another if needed. To use a particular port:</p><pre tabindex="0" aria-label="Choose a development port"><code class="language-bash">itsy dev --port 4000</code></pre><p>Running dev again replaces this project's existing dev server.</p>
+</section>
+
+<section id="lan-testing">
+  <h2>Test on another device</h2>
+<pre tabindex="0" aria-label="Preview on your network"><code class="language-bash">itsy dev --lan</code></pre><p>Open a printed Network or Hostname URL on a phone or computer on the same trusted network. The full site works there, including forms and admin editing.</p>
+<p>LAN previews use HTTP. Keep the development port private. Each device signs in separately; local email previews open on the computer running dev.</p>
+</section>
+
+<section id="status">
+  <h2>Check the project</h2>
+<pre tabindex="0" aria-label="Check your site"><code class="language-bash">itsy status</code></pre><p>Status validates the site and shows its Git state. If the current branch has a saved deployment, it also checks that live site. It doesn't change your files.</p>
+</section>
+
+<section id="email-preview">
+  <h2>Preview email</h2>
+<p>New sites open sign-in and Contact emails as private browser previews during development. You can use the sign-in code without configuring an email provider. Production uses real email delivery.</p>
+</section>
+
+<section id="starting-options">
+  <h2>Start with examples</h2>
+<p>To explore a site with Team and Contact example pages:</p><pre tabindex="0" aria-label="Create an example site"><code class="language-bash">itsy new --starter example-site</code></pre><p>Use <code>itsy new .</code> to create a site in your current empty folder. For other options, run <code>itsy new --help</code>.</p>
+</section>
+    <nav class="guide-next" aria-label="Next guide"><a href="/docs/deployment">Continue to Server setup and deployment</a></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
-
 <script src="/js/guides.js" defer></script>

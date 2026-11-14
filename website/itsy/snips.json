@@ -14,87 +14,87 @@
     },
     "/docs": {
       "title": "Getting Started",
-      "description": "Build your first ItsyWeb site, step by step: two HTML pages, shared navigation, a layout, a partial, and a little CSS.",
+      "description": "Build a small bookshop website with two pages, shared templates, and your own CSS.",
       "snips": {}
     },
     "/docs/installation": {
       "title": "Installation and updates",
-      "description": "Install a supported CLI, update an existing installation, and check version requirements.",
+      "description": "Install the CLI once, then use it to create, preview, and publish your sites.",
       "snips": {}
     },
     "/docs/development": {
       "title": "Local development",
-      "description": "Create projects, use live reload, and test from another device on your network.",
+      "description": "Preview changes as you work, check your site, and test it on another device.",
       "snips": {}
     },
     "/docs/templates": {
       "title": "Pages, layouts and data",
-      "description": "Map files to URLs, share markup with layouts and partials, and use JSON data.",
+      "description": "Create pages, share markup, and bring JSON data into your HTML.",
       "snips": {}
     },
     "/docs/styling": {
       "title": "CSS and icons",
-      "description": "Customize theme tokens, write CSS, and use the built-in icon syntax.",
+      "description": "Style your site with CSS and the included Prewind utilities. No build command needed.",
       "snips": {}
     },
     "/docs/deployment": {
       "title": "Server setup and deployment",
-      "description": "Set up an Ubuntu host and publish committed source with automatic HTTPS.",
+      "description": "Publish your site to an Ubuntu server with automatic HTTPS.",
       "snips": {}
     },
     "/docs/redirects": {
       "title": "Migration redirects",
-      "description": "Map old paths directly to their replacements with exact 301 redirects.",
+      "description": "Keep old links working when you move a page or bring an existing site to ItsyWeb.",
       "snips": {}
     },
     "/docs/seo": {
       "title": "Search engines and SEO",
-      "description": "Configure sitemaps, canonical URLs, Search Console, and staging indexing policy.",
+      "description": "Give search engines your production URLs and keep selected pages out of search results.",
       "snips": {}
     },
     "/docs/recovery": {
       "title": "Backups and recovery",
-      "description": "Back up a site, recover code or content, and understand what each operation preserves.",
+      "description": "Back up the live site, return to earlier code, or restore saved content.",
       "snips": {}
     },
     "/docs/editing": {
       "title": "On-page editing",
-      "description": "Make selected content editable, enable admin access, and sync live changes.",
+      "description": "Let an admin edit selected content on the website while you keep control of its HTML and design.",
       "snips": {}
     },
     "/docs/media": {
       "title": "Photos, videos and collections",
-      "description": "Add editable media and lists that admins can manage on the page.",
+      "description": "Make photos, videos, and repeatable lists editable on the page.",
       "snips": {}
     },
     "/docs/email": {
       "title": "Email and contact forms",
-      "description": "Preview email locally, configure delivery, and add the bundled Contact form.",
+      "description": "Add a contact form, preview messages locally, and configure delivery when the site goes live.",
       "snips": {}
     },
     "/docs/blog": {
       "title": "Blog",
-      "description": "Enable a blog, customize its templates, and create and publish posts.",
+      "description": "Add a blog with drafts, cover photos, and on-page publishing.",
       "snips": {}
     },
     "/docs/apps": {
       "title": "Managed apps",
-      "description": "Understand app mounts, build a local executable, and work with app-owned sessions.",
+      "description": "Add custom server-side behavior with a local executable that exchanges JSON with ItsyWeb.",
       "snips": {}
     },
     "/docs/agents": {
       "title": "Working with coding agents",
-      "description": "Use the bundled site, import, Blog, and Contact instructions with a coding agent.",
+      "description": "Use a coding agent to build pages or add features using the project’s own instructions.",
       "snips": {}
     },
     "/docs/release-notes": {
       "title": "Release notes",
-      "description": "Read the changes and upgrade requirements for each published release.",
+      "description": "Changes in the published releases, newest first.",
       "snips": {}
     },
     "/docs/support": {
       "title": "About ItsyWeb and support",
-      "description": "Understand where ItsyWeb fits, its current limits, and how to report a problem.",
+      "description": "ItsyWeb is for websites you want to build with HTML and CSS, with the tools to run them included.",
       "snips": {}
     }
   },

@@ -7,75 +7,54 @@
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Blog</h1>
-      <p>Enable a blog, customize its templates, and create and publish posts.</p>
+      <p>Add a blog with drafts, cover photos, and on-page publishing.</p>
     </header>
+
 <section id="blog">
-      <h2>Enable a blog</h2>
-      <p>Blog is an optional built-in content application. It adds a public post list and individual post pages, plus a basic admin editor using ItsyWeb’s existing sign-in, rich text and photo library. No database or extra service is required.</p>
-      <div class="notice"><p><strong>Requires ItsyWeb 0.15.0 or newer and a current server.</strong> The public installer downloads 0.21.0, which includes Blog, and 0.21.0 uses server protocol 29. Enable it explicitly in each site; a CLI update does not change existing project files.</p></div>
-      <h3 id="blog-chapter-1">1. Enable it in your site configuration</h3>
-      <p>Merge this into <code>itsy.config.json</code>, preserving your other settings and apps:</p>
-      <pre tabindex="0" aria-label="Blog configuration"><code class="language-json">&#123;
-  "apps": &#123;
-    "blog": &#123;
-      "mount": "/blog"
-    &#125;
-  &#125;
-&#125;</code></pre>
-      <p>The mount owns <code>/blog</code> and its entire URL subtree, so ordinary pages and assets cannot occupy those URLs. Removing the Blog configuration disables its routes without deleting stored posts.</p>
-      <h3 id="blog-chapter-2">2. Add the templates</h3>
-      <p>Sites created with ItsyWeb 0.15.0 include these private templates. For an existing site, generate a fresh temporary site with the matching CLI and copy these files, preserving your site’s custom layout:</p>
-      <ul><li><code>site/blog/_index.html</code> for the public list.</li><li><code>site/blog/_post.html</code> for individual posts.</li><li><code>site/admin/blog.html</code> and <code>site/admin/blog-edit.html</code> for the admin screens.</li></ul>
-      <p>Copy the Blog rules from the fresh site’s <code>site/css/global.css</code> into your own stylesheet. Keep your existing styles and layout. If you choose another mount, move the two public templates under that directory while keeping their private filenames. Add an admin link to <code>/admin/blog</code>, or visit it directly.</p>
-      <h3 id="blog-chapter-3">3. Preview, commit and deploy</h3>
-      <pre tabindex="0" aria-label="Preview and deploy Blog"><code class="language-bash">itsy dev
-# Check your site locally, then stop dev and commit the changes.
-itsy deploy</code></pre>
-      <p>Both the local CLI and the destination server need the matching version. An explicit <code>itsy update-server</code> updates the shared server and briefly restarts every site on that host; back up first. Updating a server does not add Blog templates or enable Blog on existing sites.</p>
-      <h3 id="blog-chapter-4">Create and publish posts</h3>
-      <p>Sign in at <code>/admin</code>, then open <code>/admin/blog</code>. Choose <strong>New post</strong>, enter a title, slug, excerpt and rich body, and optionally select or upload a cover photo. <strong>Save</strong> creates a draft. <strong>Publish</strong> makes it public; <strong>Unpublish</strong> makes it private again. Saving an already published post updates it immediately. Cancel discards unsaved changes.</p>
-      <p>Published posts appear at <code>/blog</code> and <code>/blog/&lt;slug&gt;</code>. Draft text stays out of public routes and template data, and a draft URL returns 404. Photo files are public assets, including covers attached to drafts. Covers use the existing JPEG/PNG photo processing; inline body photos are not supported.</p>
-      <p>Leave the publication date empty to assign it when first publishing, or enter an RFC3339 date such as <code>2026-10-13T14:00:00Z</code>. A future date publishes immediately, not on a schedule. Lists show the newest publication dates first. Changing a slug changes the URL without creating a redirect automatically. Add an explicit <a href="/docs/redirects#redirects">migration redirect</a> for the old slug when needed.</p>
-      <h3 id="blog-chapter-5">Post JSON for agents and developers</h3>
-      <p>The <a href="/docs/agents#agents">add-blog agent skill</a> documents this setup and the supported template values.</p>
-      <p>Posts use the optional top-level <code>blog</code> array in <code>itsy/snips.json</code>. Preserve the existing <code>pages</code>, <code>shared</code>, <code>archive</code> and <code>media</code> values. Here is one draft post:</p>
-      <pre tabindex="0" aria-label="Blog post JSON"><code class="language-json">&#123;
-  "blog": [
-    &#123;
-      "id": "a7Km2pQ9xB",
-      "title": "Welcome",
-      "slug": "welcome",
-      "excerpt": "Our first article.",
-      "body": "&lt;p&gt;Welcome to our website.&lt;/p&gt;",
-      "status": "draft"
-    &#125;
-  ]
-&#125;</code></pre>
-      <p>Keep the ten-character, case-sensitive alphanumeric ID stable through edits. Slugs must be unique across drafts and published posts, using lowercase letters, digits and separating hyphens, up to 100 characters. Titles are required and limited to 200 characters; excerpts to 500. The limit is 200 posts and 1 MiB per body, within the existing 5 MiB content file. Status is <code>draft</code> or <code>published</code>; published records require <code>published_at</code>. An optional <code>cover</code> references an existing ID in the <code>media</code> map, never a filename or URL.</p>
-      <h3 id="blog-chapter-6">Template values</h3>
-      <p>The listing template can iterate published posts:</p>
-      <pre tabindex="0" aria-label="Blog listing template"><code class="language-markup">&#123;#each blog.data.posts as post&#125;
+  <h2>Enable the blog</h2>
+<p>Add Blog under <code>apps</code> in <code>itsy.config.json</code>, keeping your other settings:</p><pre tabindex="0" aria-label="Blog configuration"><code class="language-json">&#123;"apps": &#123;"blog": &#123;"mount": "/blog"&#125;&#125;&#125;</code></pre><p>Current generated sites include the Blog templates. For an older site, copy the Blog templates and styles from a fresh site while preserving your layout:</p>
+<ul><li><code>site/blog/_index.html</code> and <code>_post.html</code></li><li><code>site/admin/blog.html</code> and <code>blog-edit.html</code></li><li>The Blog rules in <code>site/css/global.css</code></li></ul>
+<p>Restart dev and link to <code>/blog</code> from your navigation.</p>
+</section>
+
+<section id="publishing">
+  <h2>Write and publish</h2>
+<p>Sign in at <code>/admin</code> and open <code>/admin/blog</code>. Choose <strong>New post</strong>, add a title, slug, excerpt, and body, then save the draft. You can also choose a cover photo.</p>
+<p><strong>Publish</strong> makes the post public; <strong>Unpublish</strong> makes it a draft again. Saving a published post updates it immediately. Publication dates control ordering, not scheduled publishing.</p>
+<p>Draft text stays private. Uploaded photos remain public assets, including draft covers.</p>
+</section>
+
+<section id="blog-templates">
+  <h2>Customize the templates</h2>
+<p>The listing template receives published posts:</p><pre tabindex="0" aria-label="A blog listing"><code class="language-markup">&#123;#each blog.data.posts as post&#125;
   &lt;article&gt;
     &lt;h2&gt;&lt;a href="&#123;post.url&#125;"&gt;&#123;post.title&#125;&lt;/a&gt;&lt;/h2&gt;
     &lt;p&gt;&#123;post.excerpt&#125;&lt;/p&gt;
   &lt;/article&gt;
-&#123;:else&#125;&lt;p&gt;No posts yet.&lt;/p&gt;
-&#123;/each&#125;</code></pre>
-      <p>The post template receives <code>blog.data.post</code>, including title, excerpt, URL, publication date, body and an optional cover object with <code>src</code>, <code>alt</code>, <code>width</code> and <code>height</code>. The listing URL is <code>blog.data.url</code>.</p>
-      <pre tabindex="0" aria-label="Blog post template"><code class="language-markup">&lt;h1&gt;&#123;blog.data.post.title&#125;&lt;/h1&gt;
-&lt;time datetime="&#123;blog.data.post.published_at&#125;"&gt;
-  &#123;blog.data.post.published_label&#125;
-&lt;/time&gt;
-&lt;div&gt;&#123;blog.data.post.body&#125;&lt;/div&gt;</code></pre>
-      <p>Only the exact <code>&#123;blog.data.post.body&#125;</code> directive renders sanitized rich HTML, and only in ordinary element content. Other values remain escaped. Never put the body directive in an attribute, script or textarea. Braces inside a post body are ordinary text, not template source.</p>
-      <h3 id="blog-chapter-7">Keep live edits when deploying</h3>
-      <p>Normal <code>itsy deploy</code> preserves live posts by ID and seeds new source-only IDs. Before an agent edits existing live posts in Git, run <code>itsy pull</code>. Publish reviewed source changes with <code>itsy deploy --with-snips</code>; this existing flag includes Blog records and cover metadata. Conflicting edits require a whole-post choice, and noninteractive conflicts stop.</p>
-      <p>Omitting a post from source never deletes its live record. Unpublish it to remove its public page. Backups include live posts and covers; rollback keeps current content while selecting earlier code. Comments, categories, tags, search, scheduling and revision history are deferred.</p>
-    </section>
-    <nav class="guide-next" aria-label="Next guide"><a href="/docs/deployment">Continue to Server setup and deployment</a></nav>
+&#123;/each&#125;</code></pre><p>The post template receives <code>blog.data.post</code>:</p><pre tabindex="0" aria-label="A blog post"><code class="language-markup">&lt;h1&gt;&#123;blog.data.post.title&#125;&lt;/h1&gt;
+&lt;div&gt;&#123;blog.data.post.body&#125;&lt;/div&gt;</code></pre><p>The body renders sanitized rich HTML. Keep it in element content, as shown above.</p>
+</section>
+
+<section id="blog-data">
+  <h2>Posts in JSON</h2>
+<p>Posts live in the <code>blog</code> array in <code>itsy/snips.json</code>. An agent can add a draft like this while preserving the file's other records:</p><pre tabindex="0" aria-label="A draft post record"><code class="language-json">&#123;
+  "id": "a7Km2pQ9xB",
+  "title": "Notes from the bookshop",
+  "slug": "notes-from-the-bookshop",
+  "excerpt": "What we've been reading.",
+  "body": "&lt;p&gt;Our latest finds from the shelves.&lt;/p&gt;",
+  "status": "draft"
+&#125;</code></pre><p>Use a unique ten-character alphanumeric ID and keep it stable. Published records also need <code>published_at</code>, such as <code>2026-11-14T10:00:00Z</code>.</p>
+</section>
+
+<section id="blog-deployment">
+  <h2>Deploy and sync</h2>
+<p>Normal deployment preserves live posts. Pull before editing them in source, then publish reviewed changes with <code>itsy deploy --with-snips</code>.</p>
+<p>Changing a slug changes its URL. Add a <a href="/docs/redirects">redirect</a> when an old address should keep working.</p>
+</section>
+    <nav class="guide-next" aria-label="Next guide"><a href="/docs/seo">Continue to Search engines and SEO</a></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
 <script src="/js/prism-go.js" defer></script>
-
 <script src="/js/guides.js" defer></script>
