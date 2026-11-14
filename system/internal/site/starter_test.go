@@ -3,16 +3,13 @@ package site
 import (
 	"context"
 	"html"
-	"itsy/internal/snips"
-	"itsy/internal/viewer"
 	"itsy/templates"
-	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
 )
 
-func TestStarterEditableCopyAndNavigation(t *testing.T) {
+func TestStarterOrdinaryCopyAndNavigation(t *testing.T) {
 	theme, err := templates.Files.ReadFile("site/css/theme.css")
 	if err != nil {
 		t.Fatal(err)
@@ -26,18 +23,9 @@ func TestStarterEditableCopyAndNavigation(t *testing.T) {
 	if err := os.CopyFS(root, templates.Files); err != nil {
 		t.Fatal(err)
 	}
-	p, err := LoadEditing(context.Background(), root)
+	p, err := LoadDev(context.Background(), root)
 	if err != nil {
 		t.Fatal(err)
-	}
-	// Contact has six editable headings/paragraphs; form labels stay in HTML.
-	for route, minimum := range map[string]int{"/": 9, "/team": 2, "/contact": 6, "/contact/thank-you": 2} {
-		if page := p.Content.Pages[route]; page == nil || len(page.Snips) < minimum {
-			t.Errorf("%s lacks editable starter copy", route)
-		}
-	}
-	if len(p.Content.Shared.Snips) == 0 {
-		t.Error("missing shared footer snip")
 	}
 	s := NewProductionServer(p, nil)
 	thankYou := html.UnescapeString(request(s, "GET", "https://example.test/contact/thank-you").Body.String())
@@ -55,13 +43,6 @@ func TestStarterEditableCopyAndNavigation(t *testing.T) {
 	}
 	if strings.Count(body, `href="/admin"`) != 2 {
 		t.Fatal("visitors need desktop and mobile Admin links")
-	}
-	r := httptest.NewRequest("GET", "https://example.test/contact", nil)
-	r = r.WithContext(viewer.With(r.Context(), viewer.Admin{Email: "owner@example.test", CSRF: "test"}))
-	w := httptest.NewRecorder()
-	s.ServeOwner(w, r, func(b []byte, _ *snips.Store, _ string) ([]byte, bool) { return b, true })
-	if w.Code != 200 || strings.Contains(w.Body.String(), `href="/admin"`) {
-		t.Fatal("signed-in navigation must not offer Admin", w.Code)
 	}
 	if _, err = Load(root); err != nil {
 		t.Fatal(err)

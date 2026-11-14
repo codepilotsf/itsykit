@@ -173,7 +173,7 @@ func TestSEOBlogSnapshotsAndAppBoundaries(t *testing.T) {
 		{ID: "abcdefghij", Slug: "published", Title: "Public", Status: "published", PublishedAt: "2026-10-01T12:00:00Z"},
 		{ID: "klmnopqrst", Slug: "private-draft", Title: "Private", Status: "draft"},
 	}
-	p, err := LoadWithSnips(root, content)
+	p, err := LoadWithContent(root, content)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -200,7 +200,7 @@ func TestSEOBlogSnapshotsAndAppBoundaries(t *testing.T) {
 	}
 	next.Blog[0].Status = "draft"
 	next.Blog[1].Status, next.Blog[1].PublishedAt = "published", "2026-10-02T12:00:00Z"
-	updated, err := LoadWithSnips(root, next)
+	updated, err := LoadWithContent(root, next)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -56,14 +56,14 @@ dependencies, trust boundaries, loading, transactions or publication.
 | Task | Required guide and references |
 | --- | --- |
 | Find code ownership and entry points | [Repository map](docs/agents/repository.md) |
-| Site structure, config, templates, extraction, snips, starter/import conventions | [Templates and content](docs/agents/templates.md) |
+| Site structure, config, templates, metadata, JSON data, starter/import conventions | [Templates and content](docs/agents/templates.md) |
 | App model, JSON contract, custom managed packages, app-owned sessions | [Flea apps](docs/apps.md); [Contact](apps/contact/README.md) |
-| Images, videos, collections, multipart saves and media transport | [Media and collections](docs/agents/media-collections.md); applicable [photos](docs/photos.md), [videos](docs/videos.md), [multisnips](docs/multisnips.md) |
-| Pull and explicit snip sync; source CSS | [Synchronization and styling](docs/agents/sync-theme.md) |
+| Blog covers, multipart saves and media transport | [Media and collections](docs/agents/media-collections.md); [photos](docs/photos.md) and static [videos](docs/videos.md) |
+| Pull and explicit Blog sync; source CSS | [Synchronization and styling](docs/agents/sync-theme.md) |
 | HTML/CSS, Prewind, icons, starter styling | [Styling and icons](docs/agents/styling.md); `../prewind/README.md` |
 | CLI help/dev, file watching, routing, diagnostics, contact, email rendering | [Runtime](docs/agents/runtime.md); [email templates](docs/email-templates.md) when relevant |
 | SSH/setup, deploy, host/TLS, archives, rollback, backup, restore, server site administration, upgrade | [Deployment](docs/agents/deployment.md); [recovery](docs/recovery.md) |
-| Owner toolbar, authentication, sessions, onboarding, mail configuration, editor prototype | [Editor](docs/agents/editor.md); media guide for those modes |
+| Blog editor, authentication, sessions, onboarding, mail configuration | [Editor](docs/agents/editor.md); media guide for those modes |
 | Versions, packaging and releases | [RELEASING.md](docs/agents/releasing.md) and version rules below |
 
 ## CLI and site naming
@@ -78,7 +78,7 @@ selected files; never silently rename or migrate a site. These naming aliases
 are the owner-approved exception to the general no-compatibility rule.
 Installed server paths/accounts, wire identifiers, development/install locks,
 release URLs and public artifact names retain their spelling for compatibility.
-Protocol 29 is required before deploying the new site layout; an explicit
+Protocol 30 is required before deploying the new site layout; an explicit
 `itsy update-server` can upgrade the server while preserving old sites.
 
 ## Site and UI essentials
@@ -123,7 +123,7 @@ reject file targets and directory symlinks without writing or prompting to overw
 see the runtime guide for failure recovery and remote setup. It defaults to a
 clean layout/index. `--starter`/`-s` adds demo pages and a six-person fictional team. `itsy reset` confirms before resetting all local files
 except `.git`, with a private sibling recovery copy; it never deploys.
-Starter navigation links Team and Contact, with editable page copy and footer.
+Starter navigation links Team and Contact, with ordinary HTML page copy and footer.
 Keep form controls developer-managed; see the templates guide for starter scope.
 Contact is enabled only by apps.contact (mount and email.to); its starter form
 uses `{csrf}` and mount-relative `thank-you`. See apps/contact/README.md for the
@@ -136,18 +136,12 @@ all driven by theme tokens. Styles are developer-managed; normal deployment publ
 Use Prewind's global-first conventions and supported utilities, not assumed
 Tailwind classes. Use `container` without `max-w-full`, theme tokens and fluid
 spacing. Preserve vendored CSS/JS. Use `{icon name}` and the flat
-`itsy/icons/name.svg` cache; never generate toolbar SVG paths in JavaScript.
+`itsy/icons/name.svg` cache; keep icon geometry in validated SVG files.
 
-Owner edits happen on the page with explicit Save/Cancel. The Edit switch defaults on
-and persists per tab across pages. The second row slides beneath the top bar and
-collapses outside Edit. Save/Cancel remain on the second toolbar row
-and keep editing on. Page Save updates in place from the committed server receipt,
-rebasing Cancel without reloading or replacing editable wrappers. Use green 2px dashed shadow-root overlays with 6px
-corners, never layout-changing borders on content. Keep keyboard focus visible on controls.
-Collection photos use a thumbnail picker with private upload previews; keep
-dialog Done separate from publishing with page Save changes.
-The declarative toolbar and its icons render before bootstrap; do not recreate
-its shell. Preserve drafts after errors and during source reloads.
+Blog admin editing uses private templates, explicit Save/Publish/Unpublish and
+cover photos. Ordinary pages use HTML/JSON and leading comment metadata. There
+is no page CMS or theme editor. Keep authentication, CSRF, snapshot versions and
+content preservation; see the editor and Blog guides.
 
 Host indexing belongs to optional server `indexing` policy, never site `app`
 values. Preserve it on deploy/sync/code recovery; removal clears only owned hosts.

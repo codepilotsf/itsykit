@@ -70,8 +70,6 @@ func serveDevError(w http.ResponseWriter, r *http.Request, p *Project, code int,
 			v.Hint = "Check the leading itsy settings comment and the selected layout file. Layout paths start at the site root, and a layout needs {slot} for the page content."
 		case strings.Contains(v.Detail, "route collision"):
 			v.Hint = "Two HTML files map to the same URL. Keep just one: about.html and about/index.html both become /about."
-		case strings.Contains(v.Detail, "snip") && (strings.Contains(v.Detail, "nested") || strings.Contains(v.Detail, "closing") || strings.Contains(v.Detail, "unclosed")):
-			v.Hint = "Editable snip regions cannot be nested. Give each region balanced opening and closing tags, then save the HTML file."
 		case strings.Contains(v.Detail, "expression") || strings.Contains(v.Detail, "directive"):
 			v.Hint = "Check the template expression. ItsyWeb uses dotted names such as {app.site_name}, {render footer} for partials, and balanced {#if} or {#each} blocks."
 		}

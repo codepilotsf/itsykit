@@ -44,42 +44,6 @@ var rawClose = map[string]*regexp.Regexp{
 // compile translates the deliberately small ItsyWeb language to html/template.
 // Go's contextual escaping also protects URL and attribute contexts.
 func (p *Project) compile(source, file string, stack []string, aliases map[string]string) (string, error) {
-	mediaBindings, mediaErr := scanMediaBindings(file, source)
-	if mediaErr != nil {
-		return "", mediaErr
-	}
-	mediaInsert := map[int]string{}
-	mediaExpressions := map[string]bool{}
-	index := p.contentIndex
-	for _, b := range mediaBindings {
-		if b.id == "" {
-			continue
-		}
-		entry, ok := index[b.id]
-		expected := "image"
-		if b.tag == "video" {
-			expected = "video"
-		}
-		if !ok || entry.Type != expected {
-			return "", sourceError(file, source, b.start, fmt.Errorf("missing or incorrect %s snip %s", expected, b.id))
-		}
-		at := b.start + strings.IndexAny(source[b.start:b.end], " \t\r\n/>")
-		mediaInsert[at] = b.id
-		for _, value := range b.attrs {
-			if m := mediaRef.FindStringSubmatch(value); m != nil {
-				mediaExpressions[value] = true
-			}
-		}
-	}
-	ms, err := multisnipBlocks(file, source)
-	if err != nil {
-		return "", err
-	}
-	for _, b := range ms {
-		if _, err := definition(source[b.bodyStart:b.bodyEnd]); err != nil {
-			return "", fmt.Errorf("%s: %w", file, err)
-		}
-	}
 	var out strings.Builder
 	type block struct {
 		kind, alias, previous string
@@ -101,6 +65,9 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 		if !pathPattern.MatchString(path) {
 			return "", fmt.Errorf("unsupported expression %q", path)
 		}
+		if path == "snip" || strings.HasPrefix(path, "snip.") {
+			return "", fmt.Errorf("snip data is no longer supported; use data.*")
+		}
 		parts := strings.SplitN(path, ".", 2)
 		if variable, ok := aliases[parts[0]]; ok {
 			if len(parts) == 1 {
@@ -119,9 +86,6 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 	lexer := newBraceLexer(source)
 	lexer.aliases = aliases
 	for i := 0; i < len(source); {
-		if id, ok := mediaInsert[i]; ok {
-			out.WriteString(`[[NW if (lookup $ "__ownerPreview") NW]] data-snip-media="` + id + `"[[NW end NW]]`)
-		}
 		if strings.HasPrefix(source[i:], "<!--") {
 			end := strings.Index(source[i+4:], "-->")
 			if end < 0 {
@@ -211,29 +175,9 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 				return "", err
 			}
 		case token == "snip" || strings.HasPrefix(token, "snip ") || strings.HasPrefix(token, "snip\t") || strings.HasPrefix(token, "snip\n"):
-			name := strings.TrimSpace(token[4:])
-			if m := mediaRef.FindStringSubmatch("{" + token + "}"); m != nil {
-				if !mediaExpressions["{"+token+"}"] {
-					return fail(i, fmt.Errorf("media snip references require img/video attribute bindings"))
-				}
-				rendered = "[[NW snipField " + strconv.Quote(m[1]) + " " + strconv.Quote(m[2]) + " NW]]"
-				break
-			}
-			if !namePattern.MatchString(name) {
-				return fail(i, fmt.Errorf("use an unquoted snip ID, for example {snip a7Km2pQ9xB}"))
-			}
-			if _, ok := p.rich[name]; ok {
-				rendered = "[[NW richSnip " + strconv.Quote(name) + " (lookup $ \"__ownerPreview\") NW]]"
-				break
-			}
-			data, ok := p.Snips[name]
-			if !ok {
-				return fail(i, fmt.Errorf("missing snip %q", name))
-			}
-			if _, ok := data["text"].(string); !ok {
-				return fail(i, fmt.Errorf("snip %q requires a string 'text' field for {snip}; use dotted paths for structured data", name))
-			}
-			rendered = "[[NW lookup $ " + strconv.Quote("snip."+name+".text") + " NW]]"
+			return fail(i, fmt.Errorf("page snips are no longer supported; use ordinary HTML or data.*"))
+		case strings.HasPrefix(token, "#multisnip ") || token == "/multisnip":
+			return fail(i, fmt.Errorf("multisnips are no longer supported; use JSON data and #each"))
 		case strings.HasPrefix(token, "#if ") || strings.HasPrefix(token, "#unless "):
 			kind, path, _ := strings.Cut(token[1:], " ")
 			expr, err := lookup(strings.TrimSpace(path))
@@ -245,34 +189,12 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 				expr = "not " + expr
 			}
 			rendered = "[[NW if " + expr + " NW]]"
-		case strings.HasPrefix(token, "#multisnip "):
-			for _, b := range blocks {
-				if b.kind == "each" {
-					return fail(i, fmt.Errorf("multisnips cannot be nested in a loop"))
-				}
-			}
-			name := strings.TrimSpace(strings.TrimPrefix(token, "#multisnip "))
-			if !namePattern.MatchString(name) || aliases["snip"] != "" {
-				return fail(i, fmt.Errorf("invalid or nested multisnip"))
-			}
-			variable := fmt.Sprintf("$multi%d", len(blocks))
-			blocks = append(blocks, block{kind: "multisnip", alias: "snip", previous: name, start: i})
-			aliases["snip"] = variable
-			rendered = "[[NW multiBoundary " + strconv.Quote(name) + " false (lookup $ \"__ownerPreview\") NW]][[NW range " + variable + " := multiRows $ " + strconv.Quote(name) + " NW]][[NW multiItemBoundary " + variable + " false NW]]"
-		case token == "/multisnip":
-			if len(blocks) == 0 || blocks[len(blocks)-1].kind != "multisnip" {
-				return fail(i, fmt.Errorf("unmatched /multisnip"))
-			}
-			b := blocks[len(blocks)-1]
-			blocks = blocks[:len(blocks)-1]
-			rendered = "[[NW multiItemBoundary " + aliases["snip"] + " true NW]][[NW end NW]][[NW multiBoundary " + strconv.Quote(b.previous) + " true (lookup $ \"__ownerPreview\") NW]]"
-			delete(aliases, "snip")
 		case strings.HasPrefix(token, "#each "):
 			parts := strings.Split(token[6:], " as ")
 			if len(parts) != 2 || !aliasPattern.MatchString(parts[1]) {
 				return fail(i, fmt.Errorf("expected {#each dotted.path as alias}"))
 			}
-			if parts[1] == "app" || parts[1] == "page" || parts[1] == "snip" || parts[1] == "data" {
+			if parts[1] == "app" || parts[1] == "page" || parts[1] == "data" {
 				return fail(i, fmt.Errorf("loop alias %q is reserved", parts[1]))
 			}
 			expr, err := lookup(strings.TrimSpace(parts[0]))
@@ -316,14 +238,6 @@ func (p *Project) compile(source, file string, stack []string, aliases map[strin
 			restoreAlias(b.alias, b.previous)
 			rendered = "[[NW end NW]]"
 		default:
-			if strings.HasPrefix(token, "snip.") && aliases["snip"] != "" {
-				if parts := strings.Split(strings.TrimPrefix(token, "snip."), "."); len(parts) == 2 {
-					rendered = "[[NW multiPhoto " + aliases["snip"] + " " + strconv.Quote(parts[0]) + " " + strconv.Quote(parts[1]) + " NW]]"
-					break
-				}
-				rendered = "[[NW multiValue " + aliases["snip"] + " " + strconv.Quote(strings.TrimPrefix(token, "snip.")) + " (lookup $ \"__ownerPreview\") NW]]"
-				break
-			}
 			expr, err := lookup(token)
 			if err != nil {
 				return fail(i, err)

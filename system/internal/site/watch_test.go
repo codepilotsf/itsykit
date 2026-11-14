@@ -64,9 +64,9 @@ func TestDirectoryWatchLifecycle(t *testing.T) {
 	wait("/renamed/deep", "", 404)
 	put(t, root, "renamed/deep/index.html", "recreated")
 	wait("/renamed/deep", "recreated", 200)
-	// Extraction-generated writes must settle instead of creating a reload loop.
-	put(t, root, "rich.html", `<h1 snip="Heading">Extract me</h1>`)
-	wait("/rich", "Extract me", 200)
+	// Watch updates settle; ignored files must not create a reload loop.
+	put(t, root, "rich.html", `<h1>Ordinary content</h1>`)
+	wait("/rich", "Ordinary content", 200)
 	time.Sleep(400 * time.Millisecond)
 	s.mu.RLock()
 	revision := s.revision

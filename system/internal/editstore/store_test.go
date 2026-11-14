@@ -1,129 +1,41 @@
 package editstore
 
 import (
-	"context"
 	"encoding/json"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
-	"time"
 
 	"itsy/internal/editor"
 	"itsy/internal/site"
+	"itsy/internal/snips"
 	"itsy/internal/state"
 	"itsy/templates"
 )
-
-func TestLocalSavesDuringDevReloads(t *testing.T) {
-	s, public := fixture(t, false)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	watchDone := make(chan struct{})
-	go func() { defer close(watchDone); public.Watch(ctx, s.Root, nil) }()
-	done := make(chan error, 1)
-	go func() {
-		for i := 0; i < 15; i++ {
-			doc, err := s.Read()
-			if err == nil {
-				err = s.Save(editor.Update{Version: doc.Version, ID: "abcdefghij", Content: strings.Repeat("x", i+1)})
-			}
-			if err != nil {
-				done <- err
-				return
-			}
-			time.Sleep(100 * time.Millisecond)
-		}
-		done <- nil
-	}()
-	select {
-	case err := <-done:
-		if err != nil {
-			t.Fatal(err)
-		}
-	case <-time.After(8 * time.Second):
-		t.Fatal("local save and reload deadlocked")
-	}
-	cancel()
-	select {
-	case <-watchDone:
-	case <-time.After(3 * time.Second):
-		t.Fatal("watcher did not stop")
-	}
-	if _, err := os.Stat(filepath.Join(s.Root, "itsy", ".snips.lock")); !os.IsNotExist(err) {
-		t.Fatal("local lock file created", err)
-	}
-}
-
-func TestMetadataWithoutSnips(t *testing.T) {
-	s, public := fixture(t, false)
-	if err := os.WriteFile(filepath.Join(s.Root, "site", "about.html"), []byte(`<h1>About</h1><p>{page.title}</p><p>{page.description}</p>`), 0644); err != nil {
-		t.Fatal(err)
-	}
-	doc, err := s.Read()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !strings.Contains(strings.Join(doc.Routes, ","), "/about") {
-		t.Fatal(doc.Routes)
-	}
-	if err := s.Save(editor.Update{Version: doc.Version, Route: "/about", Title: "About us", Description: "Our story"}); err != nil {
-		t.Fatal(err)
-	}
-	w := httptest.NewRecorder()
-	public.ServeHTTP(w, httptest.NewRequest("GET", "/about", nil))
-	if w.Code != 200 || !strings.Contains(w.Body.String(), "About us") || !strings.Contains(w.Body.String(), "Our story") {
-		t.Fatal(w.Code, w.Body.String())
-	}
-	doc, err = s.Read()
-	if err != nil || doc.Store.Pages["/about"].Title != "About us" {
-		t.Fatal(doc, err)
-	}
-}
 
 func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 	t.Helper()
 	root := t.TempDir()
 	files := map[string]string{
-		"itsy.config.json": `{"app":{"site_name":"Editor test"},"admin":{"emails":["owner@example.test"]}}`,
-		"site/index.html":  `<h1>{snip abcdefghij}</h1><p>{page.title}</p><p>{page.description}</p>`,
-		"itsy/snips.json":  `{"pages":{"/":{"snips":{"abcdefghij":{"label":"Heading","content":"Original"}}}},"shared":{"snips":{}}}`,
+		"itsy.config.json": `{"app":{"site_name":"Editor test"},"admin":{"emails":["owner@example.test"]},"apps":{"blog":{"mount":"/blog"}}}`,
+		"site/index.html":  `<h1>Original</h1><p>{page.title}</p><p>{page.description}</p>`,
+		"itsy/snips.json":  `{}`,
 	}
+	files["site/blog/_index.html"] = `{#each blog.data.posts as post}{post.title}{/each}`
+	files["site/blog/_post.html"] = `{blog.data.post.body}`
 	layout, err := templates.Files.ReadFile("site/admin.layout.html")
 	if err != nil {
 		t.Fatal(err)
 	}
 	files["site/admin.layout.html"] = string(layout)
-	files["site/main.layout.html"] = `<html><head>{#if app.current_admin}<meta name="csrf-token" content="{app.current_admin.csrf_token}">{/if}</head><body>{#if app.current_admin}{render /admin/toolbar}{/if}{slot}</body></html>`
-	toolbar, err := templates.Files.ReadFile("site/admin/_toolbar.html")
-	if err != nil {
-		t.Fatal(err)
-	}
-	files["site/admin/_toolbar.html"] = string(toolbar)
-	for _, name := range []string{"index", "code", "setup", "error"} {
+	files["site/main.layout.html"] = `<html><head></head><body>{slot}</body></html>`
+	for _, name := range []string{"index", "code", "setup", "error", "blog", "blog-edit"} {
 		data, err := templates.Files.ReadFile("site/admin/" + name + ".html")
 		if err != nil {
 			t.Fatal(err)
 		}
 		files["site/admin/"+name+".html"] = string(data)
-	}
-	// Keep reload tests offline: their toolbar references the canonical icon cache.
-	// Missing icons would let LoadEditing perform network I/O under the content lock.
-	icons, err := templates.Files.ReadDir("itsy/icons")
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, icon := range icons {
-		if icon.IsDir() {
-			continue
-		}
-		name := "itsy/icons/" + icon.Name()
-		body, err := templates.Files.ReadFile(name)
-		if err != nil {
-			t.Fatal(err)
-		}
-		files[name] = string(body)
 	}
 	for name, body := range files {
 		file := filepath.Join(root, name)
@@ -158,48 +70,13 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 	}
 	return s, public
 }
-func TestSavesPublishSanitizedContentAndRejectStaleForms(t *testing.T) {
-	for _, remote := range []bool{false, true} {
-		t.Run(map[bool]string{false: "local", true: "remote"}[remote], func(t *testing.T) {
-			s, public := fixture(t, remote)
-			doc, err := s.Read()
-			if err != nil {
-				t.Fatal(err)
-			}
-			u := editor.Update{Version: doc.Version, ID: "abcdefghij", Content: `Hello <em>owner</em><script>alert(1)</script>{app.site_name}`}
-			if err := s.Save(u); err != nil {
-				t.Fatal(err)
-			}
-			if err := s.Save(u); err == nil {
-				t.Fatal("stale edit overwritten")
-			}
-			w := httptest.NewRecorder()
-			public.ServeHTTP(w, httptest.NewRequest("GET", "/", nil))
-			if w.Code != 200 || !strings.Contains(w.Body.String(), "Hello <em>owner</em>") || strings.Contains(w.Body.String(), "<script>") || !strings.Contains(w.Body.String(), "{app.site_name}") {
-				t.Fatal(w.Body.String())
-			}
-			doc, err = s.Read()
-			if err != nil {
-				t.Fatal(err)
-			}
-			if err := s.Save(editor.Update{Version: doc.Version, Route: "/", Title: `<script>title</script>`, Description: "Details"}); err != nil {
-				t.Fatal(err)
-			}
-			w = httptest.NewRecorder()
-			public.ServeHTTP(w, httptest.NewRequest("GET", "/", nil))
-			if strings.Contains(w.Body.String(), "<script>") || !strings.Contains(w.Body.String(), "&lt;script&gt;title") {
-				t.Fatal(w.Body.String())
-			}
-		})
-	}
-}
 func TestDeploymentLockRecoveryAndReleaseChecks(t *testing.T) {
 	s, _ := fixture(t, true)
 	doc, err := s.Read()
 	if err != nil {
 		t.Fatal(err)
 	}
-	u := editor.Update{Version: doc.Version, ID: "abcdefghij", Content: "Edited"}
+	u := editor.Update{Version: doc.Version, Blog: &editor.BlogEdit{}}
 	unlock, err := state.Lock(filepath.Join(filepath.Dir(s.ConfigPath), "deploy.lock"))
 	if err != nil {
 		t.Fatal(err)
@@ -227,14 +104,8 @@ func TestDeploymentLockRecoveryAndReleaseChecks(t *testing.T) {
 }
 func TestRejectUnknownTargetsAndChangedAccess(t *testing.T) {
 	s, _ := fixture(t, false)
-	doc, err := s.Read()
-	if err != nil {
+	if _, err := s.Read(); err != nil {
 		t.Fatal(err)
-	}
-	for _, u := range []editor.Update{{Version: doc.Version, ID: "../../private"}, {Version: doc.Version, Route: "/missing"}, {Version: doc.Version, Route: "/", Title: strings.Repeat("x", 201)}} {
-		if err := s.Save(u); err == nil {
-			t.Fatal("invalid edit accepted", u)
-		}
 	}
 	if err := os.WriteFile(filepath.Join(s.Root, "itsy.config.json"), []byte(`{"app":{"site_name":"Changed"},"admin":{"emails":[]}}`), 0644); err != nil {
 		t.Fatal(err)
@@ -244,7 +115,7 @@ func TestRejectUnknownTargetsAndChangedAccess(t *testing.T) {
 	}
 }
 
-func TestSnipSavePreservesSourceCSSAndRejectsChangedStyles(t *testing.T) {
+func TestBlogSavePreservesSourceCSSAndRejectsChangedStyles(t *testing.T) {
 	for _, remote := range []bool{false, true} {
 		t.Run(map[bool]string{false: "local", true: "remote"}[remote], func(t *testing.T) {
 			s, public := fixture(t, remote)
@@ -260,7 +131,7 @@ func TestSnipSavePreservesSourceCSSAndRejectsChangedStyles(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if err := s.Save(editor.Update{Version: doc.Version, ID: "abcdefghij", Content: "Updated text"}); err != nil {
+			if err := s.Save(blogUpdate(doc.Version)); err != nil {
 				t.Fatal(err)
 			}
 			w := httptest.NewRecorder()
@@ -275,9 +146,13 @@ func TestSnipSavePreservesSourceCSSAndRejectsChangedStyles(t *testing.T) {
 			if err := os.WriteFile(cssPath, []byte(":root { --brand-1: #654321; }"), 0644); err != nil {
 				t.Fatal(err)
 			}
-			if err := s.Save(editor.Update{Version: doc.Version, ID: "abcdefghij", Content: "Stale draft"}); err == nil {
+			if err := s.Save(blogUpdate(doc.Version)); err == nil {
 				t.Fatal("accepted content draft after source CSS changed")
 			}
 		})
 	}
+}
+
+func blogUpdate(version string) editor.Update {
+	return editor.Update{Version: version, Blog: &editor.BlogEdit{Action: "save", Post: snips.BlogPost{ID: "Abcdef1234", Title: "Post", Slug: "post", Status: "draft", Body: "<p>Text</p>"}}}
 }

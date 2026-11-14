@@ -237,6 +237,6 @@ as reload diagnostics. Capture the actual HTTP status, including partial content
 ## Blog
 
 Read [Blog](../blog.md) for the optional built-in blog, JSON and template contract.
-Posts share the snip/media snapshot, atomic save and preservation/synchronization
+Posts share the Blog/media snapshot, atomic save and preservation/synchronization
 paths. Drafts remain outside public routes and template data. The blog admin uses
 existing login, exact Origin, CSRF, upload bounds and content-version checks.

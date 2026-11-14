@@ -1,80 +1,57 @@
-# Flea CMS site requirements
+# ItsyWeb site requirements
 
-Read README.md before changing templates. Preserve existing custom layouts,
-content and assets. There is no frontend build step or Node requirement.
-`flea new` is minimal; `--starter`/`-s` adds example pages. The shared navigation
-partial drives desktop links and the native mobile popover. `flea reset` replaces
-all local files/settings except Git history after confirmation and keeps a private
-sibling backup. Never run it as an incidental cleanup step or deploy automatically.
+Read README.md and AGENTS.md. Preserve custom layouts, copy, assets and contracts.
+Use plain HTML/JSON, no frontend build step. `itsy new` is minimal; `--starter`
+adds ordinary HTML demo pages. Never reset or deploy without explicit authority.
+`itsy dev` loads templates and watches source changes without extracting content.
+Stop task-owned servers at handoff. New sites use local email previews without
+real delivery; production ignores this option. LAN mode retains exact host,
+Origin and CSRF checks; never forward the development port.
 
-Starting dev again replaces the same site's existing dev server; pull/reset
-remain exclusive. Stop any preview process you start before handing control back
-unless the user asks to leave it running.
+Pages are ordinary developer-authored HTML. Structured lists and objects live
+in `itsy/data/*.json`, accessed through `data.*`; use `#each` for repeated content.
+Images and videos are ordinary static files under `site/`, referenced by their
+public URLs. CSS, Prewind and theme tokens remain developer-managed and deploy
+with code. No page toolbar, page text/media editor, collection editor, extraction,
+legacy named snips or user-editable theme exists.
 
-New sites enable dev.email_preview in .flea.config.json. Local sign-in/contact
-mail opens in the browser without Resend credentials. Preview mode and sender
-details require a dev restart after changes; production ignores the toggle.
-Do not write preview messages or sign-in codes into site files.
-`flea dev --lan`/`-l` enables full HTTP development on a trusted private IPv4
-network or shared address space (100.64.0.0/10, including Tailscale). Hostnames
-must match a detected interface address, computer name or local alias at the
-selected port. Default dev remains loopback-only. Email previews open on the host
-computer; enter the code on the other device. Never forward the development port.
+Optional Blog keeps its rich post editor and cover-photo library. Its existing
+private file is `itsy/snips.json`, now containing only optional `blog` and `media`
+fields. An empty site uses `{}`. Old page-CMS fields and pending extraction state
+are rejected without rewriting them. Back up and explicitly convert old sites
+before using this incompatible runtime; no migration or deletion is automatic.
 
-Public pages, partials, layouts and assets belong in site/. Use main.layout.html
-as the default wrapper and *.layout.html for custom layouts. Root .flea.config.json
-holds configuration and deploy.branches; never put secrets there. Editable content
-lives in flea/snips.json, uploads in flea/media/, and ignored runtime in flea/runtime/.
-Mail templates live in root mailers/, named *.email.html and *.email.txt with
-main.layout.html. Keep public URLs site-relative; never expose private directories.
+Ordinary page metadata belongs in one leading HTML settings comment, before markup:
 
-Optional top-level `seo.url` is the production HTTPS origin for automatic
-sitemaps, robots discovery and missing response canonical tags. Use exact
-`seo.exclude` page paths for crawlable noindex exclusions. Do not infer the
-production domain from staging or dev, add duplicate canonical markup, or
-overwrite custom robots/sitemap files during an import. Custom files require
-their own sitemap discovery/exclusions. Keep server host indexing separate;
-see README.md for the complete site configuration and supported server requirement.
+```html
+<!-- itsy
+title: Visit the bookshop
+description: Find our opening hours and plan a visit.
+layout: /custom.layout.html
+-->
+<h1>Visit the bookshop</h1>
+```
 
-Top-level config `redirects` maps exact old paths to existing local public URLs
-for 301 GET/HEAD responses. It requires deployment protocol 28; older runtimes
-ignore it. For a site migration or URL inventory, use the `fleacms-site` migration
-reference and preserve custom config/rules. Sources may include `.html` or trailing
-slashes, but cannot shadow live routes or managed app subtrees. No external,
-wildcard or query-specific mappings; preserve queries unless the target replaces
-them. Validate and verify locally before claiming redirects work.
+Each value is single-line plain text, without surrounding quotation marks. Split
+at the first colon; later colons and braces stay literal. `layout` is optional and
+must name an existing site-relative private `*.layout.html` file. The existing
+`<!-- flea` spelling is also supported. Unknown and duplicate settings fail
+validation, including duplicate empty values. This is not YAML.
 
-Keep the explicit `{#if app.current_admin}` blocks in the layout: a csrf-token
-meta in head and `{render /admin/toolbar}` directly inside body. The reserved
-current_admin object is supplied per request, never configured in JSON. Keep the
-toolbar mount's version/revision attributes, declarative shadow-root shell and
-external script. The visible shell renders before editor initialization; do not
-replace it with an empty mount. Crossfades are
-ordinary css/navigation.css imported by global.css, not runtime-injected styles.
+`{page.title}` and `{page.description}` render with contextual escaping, for
+example `<title>{page.title}</title>` and
+`<meta name="description" content="{page.description}">`. Missing or empty title
+uses `Home` at `/`, otherwise the final URL component with hyphens replaced by
+spaces and its first letter capitalized. Missing or empty description is empty.
+Comment values are never compiled as template source or copied into JSON.
+Blog posts use their saved title and excerpt instead of template comment metadata.
+There are no saved ordinary-page metadata overrides or page metadata editor.
 
-Use `{#unless dotted.path}...{/unless}` for negative conditions. Like if, it
-supports `{:else}` and `{:else if dotted.path}`; conditions are dotted paths only.
-
-`{csrf}` renders the complete hidden input required inside a Contact form.
-Enable apps.contact with mount and email.to in .flea.config.json; optional
-email.from overrides the server sender. Post to the mount, such as /contact.
-Use contact.data.*, contact.invalid.*, contact.error and contact.flash.*.
-Contact needs the mount's index.html and thank-you.html. No old contact config or
-/_flea/contact alias exists. Restart dev after app settings change. Do not replace
-admin CSRF controls. Optional Blog is also bundled. Custom managed apps are
-local executables under `flea/apps/<name>/` with a validated `app.json`, enabled
-by `apps.<name>.mount`; they own their sessions and private runtime storage.
-Remote services, package registries, arbitrary installs and config-declared read
-routes are not supported. Follow the Blog requirements below when it is enabled.
-
-Use bare snip attributes to designate editable text, images or videos. Text
-extracts to {snip ID}; an img extracts to src="{snip ID.src}" and
-alt="{snip ID.alt}", a video to src and poster bindings. The generated JSON
-entry is the only source of editable values. Keep classes, dimensions, links
-and playback attributes in the template. Do not nest snips or use competing
-srcset/picture/source elements for a media snip. Local JPEG/PNG and optimized
-H.264 MP4 seeds are imported by dev. Do not invent IDs. Admins click media in
-Edit mode and use the same page Save/Cancel. No Photos/Videos library buttons.
+Contact keeps its app configuration, public `{csrf}` input and thank-you route.
+Private admin forms keep `{admin.csrf}`. `/admin` leads to Blog after sign-in when
+enabled; no public page toolbar or admin CSRF meta is needed. Custom managed apps
+retain confined packages, separate sessions and private runtime state. SEO and
+redirect config remain developer-owned; see README. Runtime protocol 30 is required.
 
 ## Styling: Prewind first
 
@@ -108,16 +85,13 @@ custom CSS with its reason and approval. Verify the preserved layout behavior
 in the browser, not only in screenshots.
 
 Styles are developer-managed in `site/css/theme.css` using Prewind. Ordinary
-`flea deploy` publishes committed CSS. There is no browser Theme editor or CSS
-synchronization; `flea pull` retrieves snips and media only.
+`itsy deploy` publishes committed CSS. There is no browser Theme editor or CSS
+synchronization; `itsy pull` retrieves Blog posts and cover photos only.
 
 ## Optional Blog
 
-`apps.blog.mount` enables private `_index.html` and `_post.html` templates below
-the mount directory. Posts are the `blog` array in `flea/snips.json`, sharing
-content/media deployment semantics. Keep stable ten-character alphanumeric IDs.
-Use `blog.data.posts` and `blog.data.post` published-only views; only the exact
-`{blog.data.post.body}` token renders sanitized HTML, in ordinary element content.
-Drafts have no public route. The private `/admin/blog` supports explicit Publish
-and Unpublish; published saves apply immediately. Preserve live posts with normal
-deploy; pull before `--with-snips` source updates. Omitted IDs never delete posts.
+Enable `apps.blog.mount`, use private `_index.html`/`_post.html` templates under
+that mount and keep private admin templates. Read `itsy/skills/add-blog/SKILL.md`.
+Posts and cover photos live only in `itsy/snips.json` (`blog` and `media`). Keep
+stable IDs and exact saved metadata. Pull before editing live records locally;
+normal deploy preserves live content, `--with-content` explicitly synchronizes it.

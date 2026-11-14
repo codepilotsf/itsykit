@@ -26,7 +26,7 @@ func TestServerIndexingWorkflow(t *testing.T) {
 						if nonroot {
 							uid = "1000"
 						}
-						fmt.Fprintf(c.out, "FLEA_UID=%s\nFLEA_DEPLOY=29\n", uid)
+						fmt.Fprintf(c.out, "FLEA_UID=%s\nFLEA_DEPLOY=30\n", uid)
 						return nil
 					case strings.Contains(text, "mktemp"):
 						fmt.Fprintln(c.out, "/tmp/flea-state.ABCDE12345")

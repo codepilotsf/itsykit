@@ -27,12 +27,12 @@ func prepareLocalSessions(ctx context.Context, p *site.Project) error {
 			return cmd
 		}
 		if out, err := git("rev-parse", "--show-toplevel").CombinedOutput(); err == nil {
-			tracked, err := git("ls-files", "--", "itsy/runtime/", "itsy/media/*.mp4", "flea/runtime/", "flea/media/*.mp4").Output()
+			tracked, err := git("ls-files", "--", "itsy/runtime/", "flea/runtime/").Output()
 			if err != nil {
 				return fmt.Errorf("Could not check Git tracking for session files.")
 			}
 			if len(tracked) > 0 {
-				return fmt.Errorf("Session files or video files are tracked by Git. Remove itsy/runtime/ and itsy/media/*.mp4 from Git tracking before starting dev.")
+				return fmt.Errorf("Session files are tracked by Git. Remove itsy/runtime/ from Git tracking before starting dev.")
 			}
 		} else if !strings.Contains(string(out), "not a git repository") {
 			return fmt.Errorf("Could not check this site's Git repository before storing sessions.")

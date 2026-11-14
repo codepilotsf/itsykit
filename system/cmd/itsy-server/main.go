@@ -30,7 +30,7 @@ func main() {
 	history := flag.Bool("history", false, "list site release history (root only)")
 	rollback := flag.String("rollback", "", "restore retained code, preserving live content (root only)")
 	expectedRelease := flag.String("expected-release", "", "reviewed active release ID")
-	export := flag.Bool("export-state", false, "export admin-editable state (root only)")
+	export := flag.Bool("export-state", false, "export Blog content state (root only)")
 	listSites := flag.Bool("list-sites", false, "list managed sites (read-only)")
 	siteInfo := flag.String("site-info", "", "print reviewed state for one managed site (read-only)")
 	setIndexing := flag.String("set-indexing", "", "set one registered hostname indexing policy (root only)")
@@ -116,7 +116,7 @@ func main() {
 			var id string
 			id, err = admin.System().Rollback(ctx, *name, *branch, *rollback, *expectedRelease)
 			if err == nil {
-				fmt.Println("Rolled back code. Live snips and theme preserved. Release " + id)
+				fmt.Println("Rolled back code. Live Blog content preserved; CSS comes from the selected release. Release " + id)
 			}
 		}
 	} else if *export {

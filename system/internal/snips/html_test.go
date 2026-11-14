@@ -55,22 +55,3 @@ func TestStyledSpansSurvive(t *testing.T) {
 		t.Fatal("not idempotent", again, err)
 	}
 }
-func TestMergePreservesMovesArchivesAndRestores(t *testing.T) {
-	remote := NewStore()
-	remote.Page("/old").Title = "Owner title"
-	remote.Page("/old").Snips["a7Km2pQ9xB"] = Entry{Label: "old", Content: "Owner edit"}
-	remote.Shared.Snips["b8Ln3rR0yC"] = Entry{Content: "Removed owner edit"}
-	seed := NewStore()
-	seed.Page("/new").Snips["a7Km2pQ9xB"] = Entry{Label: "new", Content: "Local stale"}
-	out, err := Merge(seed, remote, map[string]string{"a7Km2pQ9xB": "/new"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if out.Pages["/new"].Snips["a7Km2pQ9xB"].Content != "Owner edit" || out.Archive["b8Ln3rR0yC"].Content != "Removed owner edit" || out.Pages["/old"].Title != "Owner title" {
-		t.Fatal(out)
-	}
-	restored, err := Merge(seed, out, map[string]string{"b8Ln3rR0yC": ""})
-	if err != nil || restored.Shared.Snips["b8Ln3rR0yC"].Content != "Removed owner edit" {
-		t.Fatal(restored, err)
-	}
-}

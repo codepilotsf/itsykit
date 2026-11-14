@@ -19,8 +19,7 @@ For another mount, move the two public example templates to that directory,
 keeping their private names. Blog is disabled when its app entry is absent;
 content remains stored. Older sites must copy the blog and admin templates and
 blog CSS from a fresh site, preserving their custom layouts. Add an admin link to
-`/admin/blog` or use the URL directly. The fresh site's admin toolbar links there
-when Blog is enabled.
+`/admin/blog` or use the URL directly. `/admin` redirects signed-in admins there when Blog is enabled.
 
 ## Write and publish
 
@@ -43,14 +42,12 @@ stable IDs to break ties. Changing a slug changes the URL; no redirect is create
 
 ## Agent and developer format
 
-Posts live in the optional top-level `blog` array in `itsy/snips.json`, alongside
-existing pages, shared snips, archive and media. Preserve those other fields.
+Posts live in the optional top-level `blog` array in `itsy/snips.json`, alongside the optional `media` cover-photo library. These are the only
+supported fields; ordinary pages own their content and metadata in HTML.
 The existing single-file transaction keeps posts and cover metadata together.
 
 ```json
 {
-  "pages": {},
-  "shared": {"snips": {}},
   "blog": [
     {
       "id": "a7Km2pQ9xB",
@@ -96,8 +93,8 @@ only, including when an admin views a public page. A draft slug returns 404.
 The current post is `blog.data.post` on a published post route; elsewhere it is
 empty. It provides the same fields, plus body and an optional cover object with
 `src`, `alt`, `width` and `height`. `blog.data.url` is the listing URL. Page title
-and description default to the post title and excerpt; existing Page details
-can override SEO metadata. Mounted pages retain the 2 MiB app rendering limit.
+and description come from the post title and excerpt, overriding template comment
+metadata. No ordinary-page saved metadata or Page details editor exists. Mounted pages retain the 2 MiB app rendering limit.
 
 ```html
 <h1>{blog.data.post.title}</h1>
@@ -115,16 +112,16 @@ are never compiled as template source, so braces inside a post are ordinary text
 
 ## Deploy, pull and recovery
 
-Normal `flea deploy` preserves live posts by ID and seeds new source-only IDs.
-Use `flea pull` before editing existing live posts in Git. Deploy reviewed changes
-with `flea deploy --with-snips`; this existing flag includes blog content and cover
+Normal `itsy deploy` preserves live posts by ID and seeds new source-only IDs.
+Use `itsy pull` before editing existing live posts in Git. Deploy reviewed changes
+with `itsy deploy --with-content`; this flag includes Blog content and cover
 metadata. Explicit synchronization compares each post as a whole record. Changes
 on both sides conflict and require a choice; noninteractive conflicts stop. An
-omitted local ID is never a deletion request. `flea status` counts blog differences.
+omitted local ID is never a deletion request. `itsy status` counts blog differences.
 
 Backups include live posts and photos. Restore restores that content; rollback
 keeps current live posts while selecting earlier code. A missing/incompatible
-blog template fails validation rather than discarding posts. Protocol 25 requires
+blog template fails validation rather than discarding posts. Protocol 30 requires
 a matching server for the new content and routing contract. There is no migration.
 
 Comments, tags, categories, search, scheduling, revisions and inline body photos

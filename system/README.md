@@ -7,8 +7,10 @@ Flea is now ItsyWeb. Use `itsy` for all commands. Existing Flea users can run
 commands show the rename notice and stop.
 New sites use `itsy.config.json` and `itsy/`. Existing `.flea.config.json`
 and `flea/` continue working, with no conversion. Installed server paths stay
-compatible. Deploying the new layout requires a protocol-29 server; explicitly
-run `itsy update-server` before deploying to an older server.
+compatible. This source candidate removes the page CMS and adds comment metadata;
+those changes require protocol 30 and are unreleased. Published installations need
+a separately authorized release/server upgrade and explicit source conversion.
+The installer and published release receipts are unchanged.
 
 ## Source layout
 
@@ -61,10 +63,10 @@ including hidden files. The folder name still supplies the default site name,
 which you can change when `itsy dev` first asks for it.
 
 ItsyWeb is a small website server for people who like HTML and CSS. Sites stay in
-ordinary files, with browser-editable content and Git-based deployment to Ubuntu.
+ordinary files, with optional Blog administration and Git-based deployment to Ubuntu.
 No Node, Docker, database, or separate web server is needed.
 
-By default, you get a clean layout, mobile menu, editable homepage, default
+By default, you get a clean layout, mobile menu, ordinary HTML homepage, default
 styling, and admin/email support files. No demo pages or contact configuration.
 
 Want examples to work from?
@@ -118,12 +120,10 @@ Dev starts at port 3000. If another process occupies it, ItsyWeb explains the
 conflict and tries 3001, 3002 and so on until it binds an available port.
 Use `itsy dev --port 4000` to require a specific port, or `--port 0` to let the
 operating system choose one. Your browser reloads
-automatically. Change the welcome text in `itsy/snips.json`, or give the site
+automatically. Change the welcome text in `site/index.html`, or give the site
 your own colors and fonts in `site/css/theme.css`. Press Ctrl-C to stop the server.
 Admin sign-in pages also refresh when their templates or layout change in dev.
-Signed-in pages reload too, including newly extracted snips, and retain edit
-mode when there are no unsaved changes. Drafts and open dialogs
-pause reloads so they are not lost. Cancel a draft to accept pending source changes.
+Ordinary pages reload after source changes. Blog drafts remain in the admin editor.
 
 To test from a phone or another computer on the same trusted network, run
 `itsy dev --lan` (or `itsy dev -l`). Open a printed Network or Hostname URL on that device, such as
@@ -158,17 +158,17 @@ Run these from your site's folder:
 | `itsy version` | Show the installed version. |
 
 The preview server is local to your machine. Use `-port 0` to choose an available
-port automatically. `itsy status` prints local validation, page/asset/editable-area
+port automatically. `itsy status` prints local validation, page/asset/Blog-post
 counts and Git state first. If the current branch has a saved destination, it then
 checks the remote over native SSH automatically. There is no remote flag. It shows
-website reachability, deployed commit, editable content separately; styles travel with code.
+website reachability, deployed commit and Blog content separately; styles travel with code.
 A terminal shows a spinner while checking; redirected output uses a plain progress
 line. Remote checks have a one-minute deadline and use the usual SSH/sudo credentials.
 
 Content changes are classified as local, remote or conflicting only
 when a previous `itsy pull` recorded a baseline for that exact destination and
 scope. Otherwise, status reports differences with unknown direction. Content
-comparison includes active editable areas, page metadata, collections and media
+comparison includes Blog posts and library photos
 libraries; developer labels and retained archives are excluded. Status never
 pulls, saves deployment settings, updates baselines or publishes anything.
 Without a named branch or saved destination, it finishes locally without network
@@ -182,7 +182,7 @@ T3docs
 
 Local
   Files        Valid configuration, templates and content
-  Site         1 page, 7 assets, 2 editable areas
+  Site         1 page, 7 assets, 0 blog posts
   Git          main, no uncommitted changes
 
 Checking remote...
@@ -210,9 +210,9 @@ below. When you're ready to publish, see [deploy a site](#deploy-a-site) and
 my-site/
   itsy.config.json       App, admin, apps and deploy.branches settings
   itsy/
-    snips.json           Rich content and page metadata
+    snips.json           Blog posts and cover-photo library
     media/               Managed photos and optimized videos
-    runtime/             Private sessions and extraction recovery
+    runtime/             Private sessions and app runtime
     skills/              Portable agent instructions
     data/                Optional developer-managed JSON
     icons/               Downloaded Lucide cache
@@ -225,7 +225,7 @@ my-site/
   site/
     main.layout.html     Optional global wrapper
     admin.layout.html    Sign-in page wrapper
-    admin/               Editable sign-in templates and toolbar partial
+    admin/               Private sign-in and Blog admin templates
     _404.html            Optional not-found page using the layout
     _500.html            Optional standalone error document
     index.html           /
@@ -240,7 +240,7 @@ Start with `site/index.html` for your home page. Add `site/about.html` and it's
 available at `/about`. Put shared markup in `site/main.layout.html`, styles in
 `site/css/`, and developer-supplied images in `site/images/`.
 
-Every site needs `itsy.config.json`; JSON snips are optional. The starter gives
+Every site needs `itsy.config.json`; Blog content JSON is optional. The starter gives
 you a welcome page, a layout with a header and footer, error pages, an SVG logo,
 and CSS you can make your own. It loads Google Fonts and Prewind from external
 services.
@@ -262,9 +262,7 @@ deploying: protocol 27 requires the new structure.
 
 ## Templates
 
-The signed-in formatting row slides out beneath the top bar in Edit and collapses
-when Edit is off. Reduced-motion preferences disable these transitions. Text formatting
-also requires an editable region to be focused. Pasting a complete six-digit
+Pasting a complete six-digit
 sign-in code submits it automatically. Typing and partial pastes still allow Enter
 or the Sign in button.
 
@@ -297,8 +295,8 @@ layout: /admin.layout.html
 Paths are relative to `site/` and must name a `*.layout.html` file. All layout
 files are private, even when no page selects them.
 The layout uses `{slot}` for the page and can include relative partials. Without
-the comment, `main.layout.html` remains the default. One block is allowed; `layout`
-is currently the only setting. Unknown/duplicate settings, missing layouts,
+the comment, `main.layout.html` remains the default. One block is allowed; `layout`, `title` and `description`
+are supported settings. Unknown/duplicate settings, missing layouts,
 traversal paths, settings in partials, and nested layouts are validation errors.
 Selected layouts cannot also be included as partials. Ordinary comments stay inert.
 
@@ -323,10 +321,10 @@ This affects link navigation, not the automatic dev refresh after saving a file.
 
 Partials are underscore-prefixed HTML files anywhere under site/. `{render footer}` includes `_footer.html` beside the calling template. `{render /foo/bar/footer}` includes `foo/bar/_footer.html`. Relative directory paths, including `./` and `../`, resolve from the calling template; nested renders resolve from the partial containing them. Paths are unquoted and omit the filename's underscore and `.html`. Paths escaping site/ are rejected. The root `main.layout.html`, `_404.html`, and `_500.html` are reserved, not partials. This replaces the former `{partial "name"}` syntax and `_partials/` convention.
 
-Missing and recursive includes fail validation, even in unused partials. Includes inherit the surrounding loop aliases. `page.path` is the canonical route. `page.title` and `page.description` come from that route's metadata in `itsy/snips.json`. Without a title, the default is `Home` at `/`, otherwise the final route component with hyphens replaced by spaces and its first letter capitalized. Description defaults to empty. Metadata is contextually escaped.
+Missing and recursive includes fail validation, even in unused partials. Includes inherit the surrounding loop aliases. `page.path` is the canonical route. `page.title` and `page.description` come from the page settings comment; see the metadata example below.
 
 ```html
-<h1>{snip.home.title}</h1>
+<h1>{data.home.title}</h1>
 {#if app.email}
   <a href="mailto:{app.email}">Email us</a>
 {:else if app.phone}
@@ -334,21 +332,19 @@ Missing and recursive includes fail validation, even in unused partials. Include
 {:else}
   <p>Contact details coming soon.</p>
 {/if}
-{#each snip.home.services as service}
+{#each data.home.services as service}
   <article><h2>{service.name}</h2><p>{service.description}</p></article>
 {/each}
 ```
 
-Values and conditions accept dotted paths only. Missing values render empty. Missing/null values, false, zero, empty strings, empty arrays, and empty objects are false in conditions. Empty or missing/null collections render no loop body; other non-array collections are errors. Nested loops and alias shadowing work; the outer alias is restored afterward. `app`, `page`, `data`, and legacy `snip` are reserved root names and remain accessible inside loops. Aliases start with a letter and contain letters, digits, or underscores.
+Values and conditions accept dotted paths only. Missing values render empty. Missing/null values, false, zero, empty strings, empty arrays, and empty objects are false in conditions. Empty or missing/null collections render no loop body; other non-array collections are errors. Nested loops and alias shadowing work; the outer alias is restored afterward. `app`, `page`, `data`,  are reserved root names and remain accessible inside loops. Aliases start with a letter and contain letters, digits, or underscores.
 
-`{snip a7Km2pQ9xB}` renders sanitized rich HTML from `itsy/snips.json`, only in HTML element content. Ordinary dotted-path values remain contextually escaped, including attributes and URLs. Legacy `{snip notice}` still reads the escaped `text` field from `itsy/snips/notice.json`; legacy structured snips remain supported during migration. JSON content is never parsed as template syntax. There is no unrestricted raw-HTML directive.
-
-There are no expressions, comparisons, functions, filters, array indexes, or arbitrary code execution. Ordinary literal braces and JSON are preserved; see the recognition rules below. Script/style bodies and their opening tags are left untouched by the ItsyWeb parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; snip JSON is treated as data.
+There are no expressions, comparisons, functions, filters, array indexes, or arbitrary code execution. Ordinary literal braces and JSON are preserved; see the recognition rules below. Script/style bodies and their opening tags are left untouched by the ItsyWeb parser, so they do not support interpolation. The internal delimiter `[[NW` is reserved and rejected in template source. Developers are trusted to author HTML, JavaScript, CSS, and public assets; JSON values are treated as data.
 
 ### Literal braces and syntax recognition
 
-ItsyWeb recognizes exact command words (`snip`, `icon`, `render`, `slot`, `csrf`,
-`#if`, `#unless`, `#each`, `#multisnip`, `:else` and their closing commands),
+ItsyWeb recognizes exact command words (`icon`, `render`, `slot`, `csrf`,
+`#if`, `#unless`, `#each`, `:else` and their closing commands),
 followed by whitespace, a brace or the end of input. Recognizable commands retain
 argument, nesting and file/line validation. The retired `flea` command remains
 rejected. Prefixes and unknown phrases such as `{rendering header}` or
@@ -381,15 +377,13 @@ To display exact ItsyWeb syntax literally, use HTML entities:
 `&#123;app.site_name&#125;`. Entities are never decoded and recompiled as commands.
 Literal source is copied without changing bytes; Go `html/template` retains its
 normal contextual escaping and HTML normalization. JSON/content values are never
-recursively compiled. These rules apply to developer templates, not the separate
-sanitized editable-content contract: new snip authoring content still requires
-entity-encoded braces. Comments and complete script/style elements, including
+recursively compiled. Comments and complete script/style elements, including
 their opening tags, retain their existing inert treatment.
 
 Loops can include an empty-list fallback:
 
 ```html
-{#each snip.team.members as member}
+{#each data.team.members as member}
   <p>{member.name}</p>
 {:else}
   <p>No members yet.</p>
@@ -403,10 +397,8 @@ valid in conditions. A final `{:else}` cannot be followed by another branch.
 Use `{#unless dotted.path}` for the inverse of an if condition:
 
 ```html
-{#unless app.current_admin}
-  <a href="/admin">Admin sign-in</a>
-{:else}
-  <p>You are signed in.</p>
+{#unless app.email}
+  <p>Contact us by phone.</p>
 {/unless}
 ```
 
@@ -434,121 +426,44 @@ custom packages and app-owned sessions, and
 
 ## JSON configuration and content
 
-Editing starts on after sign-in and remembers your choice as you browse in the
-same tab. Its on state is green; thicker green dashed boundaries with rounded
-corners show editable content. Cancel and Save sit
-at the right of the second toolbar row and keep editing on.
+Pages are ordinary developer-authored HTML. Structured lists and objects live
+in `itsy/data/*.json`, accessed through `data.*`; use `#each` for repeated content.
+Images and videos are ordinary static files under `site/`, referenced by their
+public URLs. CSS, Prewind and theme tokens remain developer-managed and deploy
+with code. No page toolbar, page text/media editor, collection editor, extraction,
+legacy named snips or user-editable theme exists.
 
-Collections are repeatable groups such as team cards. While Editing is on,
-arrange them directly on-page: drag handles reorder items, X removes
-one, and an Add tile creates another. Keyboard users can focus a handle and use
-arrows or Home/End. Photo fields accept existing library images or new JPEG/PNG
-uploads, saved with the page. Text and photo selection remain on-page, using the same Save
-changes/Cancel controls. See [multisnips](docs/multisnips.md) for authoring/storage.
+Optional Blog keeps its rich post editor and cover-photo library. Its existing
+private file is `itsy/snips.json`, now containing only optional `blog` and `media`
+fields. An empty site uses `{}`. Old page-CMS fields and pending extraction state
+are rejected without rewriting them. Back up and explicitly convert old sites
+before using this incompatible runtime; no migration or deletion is automatic.
 
-### Editable snip regions
-
-Editable content uses `snip`, `{snip ID}`, and `itsy/snips.json` with `snips`
-JSON keys. Existing sites using `flea` content markers or `fleas.json` need these
-renamed explicitly; there is no compatibility layer. Keep IDs and saved content
-unchanged. The CLI, `flea.config.json`, and `<!-- itsy` settings comments retain
-their names.
-
-While `itsy dev` is running, add an editable region to a template:
+Ordinary page metadata belongs in one leading HTML settings comment, before markup:
 
 ```html
-<h1 snip>Welcome to <em>ItsyWeb</em></h1>
+<!-- itsy
+title: Visit the bookshop
+description: Find our opening hours and plan a visit.
+layout: /custom.layout.html
+-->
+<h1>Visit the bookshop</h1>
 ```
 
-On save, dev extracts the inner HTML and rewrites only that region:
+Each value is single-line plain text, without surrounding quotation marks. Split
+at the first colon; later colons and braces stay literal. `layout` is optional and
+must name an existing site-relative private `*.layout.html` file. The existing
+`<!-- flea` spelling is also supported. Unknown and duplicate settings fail
+validation, including duplicate empty values. This is not YAML.
 
-```html
-<h1>{snip a7Km2pQ9xB}</h1>
-```
-
-IDs are cryptographically random, case-sensitive, 10-character alphanumeric
-strings, checked against active and archived local IDs. IDs never contain braces,
-quotes or whitespace. Use `{snip ID}` without quotes. Quoted markers are rejected;
-HTML comments do not render snips. The bare attribute needs no name or value.
-An optional attribute value supplies a descriptive label, never an identity.
-The attribute is only an authoring marker: extraction removes it, preserving
-the element and its other attributes. The directive identifies the content from
-then on. Redundant attributes around existing directives are removed on the next
-dev load/save without changing the ID or saved content. Stored labels remain
-unless you explicitly supply a new label. Inline editing uses the rendered
-directive boundaries, not a persistent HTML attribute.
-Reusing an ID intentionally shares content. IDs referenced from
-multiple routes, layouts, or partials are grouped under `shared`.
-
-Images and videos use the same authoring attribute, outside text snips:
-
-```html
-<img snip src="/images/team.jpg" alt="Our team" class="rounded-lg">
-<video snip src="/videos/intro.mp4" poster="/images/intro.jpg" controls></video>
-```
-
-Dev imports these local files and replaces their source/alt/poster values with
-bindings such as `src="{snip ID.src}"`. The generated typed JSON entry is the
-source of truth. Classes, dimensions and playback attributes stay in the template.
-With Editing on, admins click the media, then Save or Cancel with the page.
-JPEG/PNG images and optimized H.264 MP4 videos are supported. Nested snips,
-srcset/picture combinations and competing video source elements are rejected.
-See [images](docs/photos.md) and [videos](docs/videos.md) for details.
-
-Private `itsy/snips.json` stores rich content, typed media and page metadata:
-
-```json
-{
-  "pages": {
-    "/": {
-      "title": "Home",
-      "description": "Welcome to our site.",
-      "snips": {
-        "a7Km2pQ9xB": {
-          "content": "Welcome to <em>ItsyWeb</em>"
-        }
-      }
-    }
-  },
-  "shared": {"snips": {}}
-}
-```
-
-Use a `div` or `section` region for multiple paragraphs. Formatting includes
-paragraphs, emphasis, lists, headings h2–h6, blockquotes, code, and safe links.
-Scripts, styles, event handlers, images, forms, embedded content, SVG/MathML,
-and arbitrary attributes are removed. Allowed link schemes are HTTP, HTTPS,
-mailto, tel, and relative URLs; protocol-relative links are removed. Rich snips
-cannot appear in attributes, script/style interpolation, textarea, title, or
-select contexts. Ordinary `{data.name.field}` values remain escaped text.
-
-New text regions must have explicit balanced closing tags, cannot nest, and cannot
-contain ItsyWeb directives. Use HTML entities for literal braces during initial
-extraction. Existing JSON content can contain braces: it is never template code.
-Snip files are limited to 5 MiB and each rich content value to 1 MiB.
-
-Extraction happens only in dev, including startup. Status is read-only. Deploy
-rejects unextracted regions and asks you to run dev and commit the resulting
-files. Every relevant save rescans all templates, extracts new regions, updates
-labels and route ownership, and moves unreferenced IDs to `archive`. Undoing a
-removal restores archived content by ID. Existing referenced content and page
-metadata are preserved. Dev prints `Snips updated in itsy/snips.json.` when it writes
-changes. Missing IDs and malformed regions are reported in the terminal.
-
-Local content writes are coordinated in memory. A separate OS lock prevents dev,
-pull and reset from writing concurrently. Starting dev again gracefully stops
-the previous dev server before taking that lock; a crash releases it automatically.
-Server-side deployment/content locks are unchanged.
-A `itsy/runtime/.snips-pending.json` recovery record saves the content and
-before/after templates before any replacement. Dev resumes interrupted writes;
-if files were independently edited, it stops rather than overwriting them.
-Reconcile those files with the recovery record and restart dev. Do not delete
-the recovery record without preserving its content.
-
-Developer-managed structured JSON belongs in `itsy/data/*.json`, available as
-`{data.team.members}` and in `{#each data.team.members as member}` loops. It is
-deployed with code, not treated as admin-editable rich content. Legacy
-`itsy/snips/*.json` remains supported; new sites no longer generate that directory.
+`{page.title}` and `{page.description}` render with contextual escaping, for
+example `<title>{page.title}</title>` and
+`<meta name="description" content="{page.description}">`. Missing or empty title
+uses `Home` at `/`, otherwise the final URL component with hyphens replaced by
+spaces and its first letter capitalized. Missing or empty description is empty.
+Comment values are never compiled as template source or copied into JSON.
+Blog posts use their saved title and excerpt instead of template comment metadata.
+There are no saved ordinary-page metadata overrides or page metadata editor.
 
 ### Site settings
 
@@ -570,217 +485,33 @@ Other fields within `app` are available to templates. `admin.emails` controls ad
 access as described below. Top-level `redirects` defines permanent URL redirects
 as described under routing. Unknown top-level settings are ignored; `deploy`
 settings are used only by the CLI. JSON comments and trailing commas are errors.
-Rich snips live in `itsy/snips.json`; structured data lives in `itsy/data/*.json`.
-Use `{app.site_name}`, `{app.email}`, or your own `{app.phone}` in any page or
-layout. Keep secrets out of `app`. Page-specific values stay in `page.*`, and
-structured files stay in `data.*`; admin configuration is not exposed through `app`.
+Structured data lives in `itsy/data/*.json` and uses `data.*`. Blog storage is
+separate from developer-owned data and ordinary page HTML.
 
-New sites start with an empty `app` object. Until a name is saved, the folder name
-supplies its title-cased default (`my-project` becomes `My Project`). The first
-interactive `itsy dev` asks `Site name [My Project]:`; Enter accepts the default.
-It saves `app.site_name` and does not ask again. Noninteractive dev uses the default
-without writing or prompting. Set and commit a nonempty name before deployment.
-There is no `site.*` alias or old-configuration fallback.
-Legacy named snips in `itsy/snips/*.json` remain supported but are not browser-editable.
+## Blog administration
 
-## Admin editing
+`/admin` is the email-code sign-in entry point. After verification it returns to
+`/admin`; authenticated admins go to `/admin/blog` when Blog is enabled. Without
+Blog they see a status page with Sign out, not an editor for website pages.
+`/admin/blog/edit` creates or edits a post, and `/admin/blog/save` saves, publishes
+or unpublishes it. New posts save as drafts. Only published posts enter public
+routes. Save on a published post updates it immediately; Unpublish returns it
+to a private draft. See [Blog](docs/blog.md).
 
-Repeatable, page-local content is documented in [Multisnips](docs/multisnips.md).
-For developer-editable sign-in/contact messages and offline previews, see
-[Email templates](docs/email-templates.md).
+Keep `site/admin.layout.html` and the private sign-in/Blog templates. Admin forms
+use their own hidden `csrf` field from `{admin.csrf}`. Blog multipart saves also
+send `X-CSRF-Token`. Exact Origin, host-bound HttpOnly/SameSite sessions, production
+HTTPS, upload bounds and snapshot versions remain required. Public layouts need
+only an ordinary `/admin` link. They have no toolbar mount, `app.current_admin`
+state or admin CSRF meta. Public Contact forms retain the separate `{csrf}` input.
+The removed `/admin/page`, `/admin/editor-context`, `/admin/theme`, `editor.js`,
+`editor.css` and `toolbar.html` endpoints return 404. Only Blog's `blog.js` asset
+includes the pinned Squire and DOMPurify libraries.
 
 ### Developer-managed styling
 
-Edit `site/css/theme.css` for colors, fonts and fluid sizing. Keep Prewind and
-site-wide CSS conventions; no frontend build step is needed. Browser editing
-changes content, not styles. Normal deployment publishes committed CSS and
-rollback restores the selected release's styles.
-
-Sign in at `/admin`, then browse your site normally. Choose Edit in the admin
-bar to change the current page. Page details edits its title and description,
-including pages with no editable text. There is no sidebar or page dropdown.
-
-New sites include editable `admin/index.html`, `code.html`,
-`setup.html`, and `error.html`. These are ordinary ItsyWeb HTML templates using
-`admin.layout.html`, with a full-width header, no footer, and independently
-styled sign-in forms. Your public `main.layout.html` is separate.
-Existing sites need the admin templates, admin layout, and updated styles copied
-from a freshly generated site; there is no embedded fallback.
-
-Change the markup directly, keeping form actions, field names, and hidden
-`{admin.csrf}` values intact. Dynamic values use escaped `admin.*` data.
-The entire directory is excluded from public routes and asset serving: the
-login handler selects the page and enforces access, not the HTML file.
-
-Admin pages
-allow HTTPS styles, fonts, and images, but block scripts and embedded frames.
-Layout navigation that requires JavaScript will not run on admin pages.
-Use `Referrer-Policy: same-origin` for admin forms; `no-referrer` can cause
-browsers to omit their origin and fail the exact-origin security check.
-
-From your site's folder, run `itsy admin` and enter an email, or provide it directly:
-
-```sh
-itsy admin admin@example.com
-```
-
-This creates or appends to `admin.emails` in `itsy.config.json`, preserves other
-settings, and skips addresses already present (case-insensitive). It accepts up
-to 20 admins and does not send email, commit, or deploy. Missing or invalid local
-mail settings start the email wizard automatically only when preview mode is off.
-Local access updates through
-the dev watcher; commit and deploy to update the live site. You can also edit JSON:
-
-```json
-{
-  "app": {"site_name": "My site"},
-  "admin": {
-    "emails": ["admin@example.com", "editor@example.com"],
-    "session_idle_days": 30
-  }
-}
-```
-
-The starter has an empty list. Local `/admin` shows instructions for adding the
-first admin; production admin access stays disabled until you configure it.
-There is no registration, password, or user-management screen. All listed addresses
-have the same editing access. Up to 20 unique addresses are supported; matching is
-case-insensitive. Only the developer can change the list.
-
-To view or remove admins, edit `admin.emails` in `itsy.config.json`. Dev reloads the
-list automatically. Removed admins lose access; other admins stay signed in.
-Access or email-setting changes clear pending codes, not valid sessions.
-Commit and deploy for the live site.
-
-After login, ItsyWeb returns you to the homepage with an admin bar. Choose **Edit**
-to change the page's existing `snip` regions. Prose containers support
-H1–H4, bold, italic, underline, strikethrough, links, lists, and left/center/right
-alignment; individual headings and paragraphs support inline marks and links,
-without nested headings or lists. Cancel restores the page.
-
-Save publishes all changed regions and page details together without reloading
-the page. Editing stays on, and Cancel restores your most recent save. Save stays
-disabled until something changes. Shared content is marked in the toolbar and
-updates everywhere its ID appears. Repeated instances on the page stay in sync.
-The link dialog edits the current URL, offers Remove link and a new-tab switch,
-and defaults bare domains to HTTPS. There are no undo/redo toolbar buttons.
-The old dashboard and its save route have been removed; `/admin` is for sign-in.
-
-Visitors receive no editing bar or editing markers. Signed-in pages disable site
-JavaScript. During dev, clean pages reload after source changes; unsaved edits,
-active saves and open dialogs defer reload to protect drafts. Site layouts are not
-rewritten; fixed-position headers and unusual layouts still need browser checks.
-
-Reusable toggle styling is in `css/ui.css`: use a native checkbox with
-`role="switch"` and an associated label. Its appearance and keyboard behavior
-need no JavaScript.
-
-After deploying, share your site's URL with `/admin` added, along with the email
-address you approved. ItsyWeb does not send invitations. Admins do not create a
-separate account: they enter that email and request a sign-in code. If no email
-arrives, they should check spam and ask you to check access and delivery settings.
-
-Visit `https://your-domain/admin`. Enter an approved email, then its six-digit code.
-Paste the full code into any of the six boxes, or type it one digit at a time.
-The email displays the code prominently and includes a plain-text alternative.
-Codes expire after 10 minutes, allow five attempts, and work once. Sessions survive
-browser closure, server restarts, and deployments. Cookies are host-only,
-HttpOnly, Secure in production, and SameSite=Strict. POST requests require the same
-Origin and a CSRF token. Login requests have per-address, client-IP and per-site
-limits (3, 10 and 40 per 15 minutes). Unlisted addresses receive the same generic
-response but no email. Forwarded IP/TLS headers are not trusted.
-
-### Staying signed in
-
-`admin.session_idle_days` controls how long an admin stays signed in without
-activity. The default is **30 days** (omitted or zero); set 1–365 days. Opening an
-admin page or submitting an authenticated form renews that browser's session.
-Typing, clicking, and scrolling also renew it, at most once a minute. An idle or
-hidden tab does not keep a session alive. Each browser/device has its own session.
-Changing this setting applies automatically in dev and on deployment in production;
-a shorter window also applies to existing sessions.
-
-ItsyWeb manages one private JSON file per site:
-
-- Development: `<project>/itsy/runtime/sessions.json`
-- Production: `/var/lib/flea/sites/<site>/itsy/runtime/sessions.json`, outside releases
-
-These are independent local and live sessions, not files to copy between environments.
-The file contains hashed session tokens, admin addresses, host binding, CSRF values,
-and activity/expiration timestamps. Raw login tokens stay in browser cookies.
-ItsyWeb creates it on first sign-in with owner-only permissions, locks updates, and
-saves atomically. Expired or revoked entries are removed during use/startup.
-Malformed or unwritable session storage blocks sign-in rather than resetting it.
-Pending email codes are held only in memory and expire on restart.
-
-Session files are never publicly served or included in deployment archives.
-The starter ignores `/itsy/runtime/sessions.json` and `/itsy/runtime/.sessions-*`; dev ensures those
-rules exist and refuses already tracked session files. Do not commit, edit, or
-copy session state. To sign everyone out, stop the server and delete only that
-site's `itsy/runtime/sessions.json`, then start it again. Logout removes just the current
-browser's session. Removing an admin revokes their sessions. Session files stay
-private; status reports site and deployment information.
-
-The production service can write the site's private `itsy/` directory, not its
-release directory or configuration. Deployment protocol 27 requires the updated
-server and these permissions; there is no compatibility fallback for older servers.
-Custom-app storage lives under `itsy/runtime/apps/<name>/` in that private
-directory, outside the immutable release.
-
-### Editing content
-
-The toolbar is explicitly included in the layout. Add this inside `<head>`:
-
-```html
-{#if app.current_admin}
-  <meta name="csrf-token" content="{app.current_admin.csrf_token}" />
-{/if}
-```
-
-And place this at the start of `<body>`:
-
-```html
-{#if app.current_admin}
-  {render /admin/toolbar}
-{/if}
-```
-
-`admin/_toolbar.html` contains a readable declarative shadow-root toolbar shell
-and an external editor script. Both toolbar rows render with the page, before
-editor requests finish; initialization attaches behavior without replacing them.
-Keep its version/revision attributes: they bind edits and reloads to the page
-you actually received. Dialog HTML, CSS and JavaScript load as separate cached
-assets; content metadata is fetched through an authenticated, CSRF-checked JSON
-endpoint. No runtime-injected toolbar, inline libraries/styles or content JSON
-are inserted into page source. The shell is inert until initialization succeeds.
-For existing sites, copy the current starter `site/admin/_toolbar.html` partial;
-do not replace your customized layout.
-The editor stays where the partial is placed; use a direct child of `<body>`.
-
-`app.current_admin` is absent for visitors and contains `email`, `csrf_token`,
-`version` and the dev-only `revision` for authenticated page requests. It cannot
-be set in config. CSRF tokens are deliberately visible in signed-in source, not
-session cookies. Responses containing admin data are private and never cached.
-Sign-in forms retain their explicit hidden CSRF fields. Signed-in pages permit
-the external editor script; other site scripts and inline scripts remain blocked.
-
-Existing sites must add these blocks and copy `admin/_toolbar.html` from the
-starter. For transitions, copy `css/navigation.css` and link it in your layout head.
-ItsyWeb never rewrites your customized layout or provides an implicit fallback.
-
-Edit content directly on the page. Spans and CSS classes on supported content tags
-are preserved, including `<span class="text-brand-one">Brand text</span>`.
-There is no HTML-source editor; author custom markup in the template before snip
-extraction, or in the snip's JSON content. The HTML allowlist removes unsupported markup
-on save. Only left/center/right text alignment is allowed as CSS; new-tab links
-receive `noopener noreferrer`. Page details remain escaped. Saving validates the site, atomically writes
-the managed content file, and updates the live serving snapshot without restart.
-Stale drafts, including drafts predating a template change, are rejected instead of
-overwriting newer edits. A failed save leaves the draft in your browser with an
-error message; copy it before reloading. Archived snips,
-templates, access settings, deployment settings, and structured JSON are not editable.
-One Save publishes the current page's changed content and metadata. Cancel restores
-the page, and leaving with unsaved changes triggers a browser warning.
+Edit `site/css/theme.css` and ordinary stylesheets. Prewind/tokens, static assets
+and committed CSS deployment remain supported. There is no theme editor or overlay.
 
 ### Email credentials
 
@@ -945,7 +676,7 @@ Use literal lowercase Lucide names directly in templates, layouts, and partials:
 <a href="/">{icon arrow-left size="18"} Home</a>
 {icon search class="text-dark" size="24" aria-label="Search"}
 {icon check width="20" height="20" stroke-width="3"}
-{#each snip.home.items as item}
+{#each data.home.items as item}
   {icon info aria-label="{item.title}"}
 {/each}
 ```
@@ -975,7 +706,7 @@ template again (or restart dev) to retry. More than 256 new icons in one load
 requires restarting dev to resolve the next batch. Only literal names are
 supported; dynamic icon names, custom sources, and automatic version upgrades
 are not supported. Icons referenced in unused partials or conditional branches
-are resolved too. Script/style contents and snip strings are never scanned as icons.
+are resolved too. Script/style contents and JSON strings are never scanned as icons.
 
 Defaults: 24 by 24, `viewBox="0 0 24 24"`, no fill, `currentColor` stroke,
 stroke width 2, rounded joins and caps, and `focusable="false"`.
@@ -1006,7 +737,7 @@ signs cannot be redirect sources. Standard percent encoding is decoded once by
 Go's HTTP parser and then validated; encoded private names are still private.
 Filenames that cannot produce an accepted URL fail validation.
 
-Files and directories beginning with `_` or `.` are private, including configuration and snips. `/admin` is reserved and cannot be a page or asset. `/_flea/reload` is a development-only version endpoint, not a filesystem route. Symlinks and nonregular files in the included site tree are rejected. Reads use confined directory handles with file identity checks. Requests serve only validated route maps, never request-derived filesystem paths.
+Files and directories beginning with `_` or `.` are private, including configuration and Blog content. `/admin` is reserved and cannot be a page or asset. `/_flea/reload` is a development-only version endpoint, not a filesystem route. Symlinks and nonregular files in the included site tree are rejected. Reads use confined directory handles with file identity checks. Requests serve only validated route maps, never request-derived filesystem paths.
 
 Assets larger than 64 KiB and managed photos stream from pinned file handles,
 keeping their full contents off the Go heap. Smaller assets and theme CSS remain
@@ -1166,48 +897,30 @@ disk-backed scratch space (check that `/var/tmp` is disk-backed first):
 This affects only this invocation. See [development storage](docs/development-storage.md)
 for builds, persistent artifacts and cleanup limits.
 
-### Snip synchronization
+### Blog content synchronization
 
-Commit `itsy/snips.json` with your site. It seeds the first deployment. Subsequent
-plain `itsy deploy` preserves existing live snips and page metadata while publishing
-committed templates, assets, configuration and CSS, including `site/css/theme.css`.
-Keep snip IDs stable. Removed IDs are archived; incompatible rich content fails
-validation rather than being stripped.
-
-Before local content work, stop dev and run:
+Commit `itsy/snips.json` when seeding Blog posts or cover metadata. Normal
+`itsy deploy` preserves live posts and photos by stable ID and adds source-only
+IDs. Omitting an ID never deletes a live post or photo. Publish code/CSS normally.
 
 ```sh
 itsy pull
+# Review and commit local Blog content and photos.
+itsy deploy --with-content
 ```
 
-Pull retrieves snips and referenced media from the current branch's destination.
-It never copies CSS, source templates, configuration, credentials or sessions,
-and never commits. Commit pending snip/media edits first; review and commit the
-result afterward. Dev and pull cannot run together on the same project.
+`pull` retrieves Blog posts and cover photos from this branch's saved destination,
+keeps local-only IDs and never pulls CSS, templates, configuration or sessions.
+Stop dev first; selected local files must be committed. Explicit publication
+requires a destination-scoped pull baseline for existing sites. Posts and photos
+compare as whole records; conflicting edits require an explicit choice and stop
+noninteractively. The expected remote digest is checked under the deployment lock.
+`itsy status` reports content differences read-only. `--with-snips` is removed
+without an alias. This contract requires deployment protocol 30.
 
-To intentionally publish local snip/metadata changes:
-
-```sh
-itsy deploy --with-snips
-```
-
-Existing deployments require a pull baseline, stored privately in Git metadata
-under `flea-sync` and keyed by destination, branch and local project. Fresh
-checkouts must pull first; first deployments seed content without a baseline.
-Snips merge by ID, metadata by field and multisnips as whole arrays. Conflicts
-require an explicit choice of live, local or cancel; unattended conflicts stop.
-Activation checks the reviewed snapshot under the deployment lock. Pull again
-after publication to refresh the baseline. Pull validates before writing and
-advances the baseline last; disk failures report any partial local update.
-
-Theme editing, remote CSS overlays, `--with-theme`, `--theme-only` and
-`--snips-only` have been removed. No aliases or automatic conversion are provided.
-Protocol 25 rejects server configurations with the removed `themes` mapping.
-Before a live upgrade, use the previous runtime to back up any saved remote CSS
-and explicitly preserve needed customizations in Git. Review server configuration
-and toolbar updates separately; do not reset a server or delete retained files.
-Existing custom toolbars must remove their Theme control, as in the starter's
-`site/admin/_toolbar.html`. Snip editing remains available.
+Backups include Blog content and library photos. Rollback preserves current
+content while selecting earlier code/CSS. Restore requires an expected snapshot
+and explicit confirmation. Retained files are never pruned automatically.
 
 You'll need Git, SSH access to a supported Ubuntu server, and a domain pointing
 at that server (or an IP address for an HTTP-only site). For HTTPS, allow inbound
@@ -1317,7 +1030,7 @@ that firewall ports are open. DNS names must point at the server for ACME.
 Deploy resolves referenced icons in a temporary snapshot, validates it, and
 uploads it over native SSH/SCP. Only files under `site/`, private `mailers/`,
 the runtime portion of `itsy.config.json`, managed `itsy/media/`,
-`itsy/snips.json`, `itsy/data/`, legacy `itsy/snips/`, and
+`itsy/snips.json`, `itsy/data/`, and
 `itsy/icons/` are included. Repository files and other private workspace files are
 excluded. Archives are limited to 256 MiB uncompressed and 10,000 entries;
 symlinks, hard links, special files, duplicates, and traversal paths are rejected.
@@ -1353,24 +1066,11 @@ sudo /usr/local/bin/flea-server -recover
 Further deployments refuse to proceed until recovery succeeds. Do not delete
 the recovery journal to bypass that check.
 
-Normal snip deployment preserves remote content by ID and existing page metadata.
-Local content seeds only missing IDs. Code and structured data are still replaced.
-Content lives outside code releases at
-`/var/lib/flea/sites/<site>/content/<release-id>.json`; the server config's
-`content` map selects the active snapshot for each hostname. Aliases pointing to
-the same release must select the same content snapshot; conflicting paths are
-rejected. Valid aliases share one loaded site snapshot. The existing lock
-and recovery journal switch code and content together. Failed activation leaves
-the previous content snapshot untouched.
-
-After successful activation, unreferenced IDs are removed from active page/shared
-snip maps and retained in the content snapshot's `archive` map. References are
-scanned from template source, including false branches, empty loops, and unused
-partials. Reintroducing an archived ID restores its last remote content, not a
-stale local seed. Archives and old snapshots are not automatically deleted.
-Page metadata is retained even when a page disappears. There is no rollback command
-yet. Browser saves share the deployment lock and update the live snapshot. Manual
-content edits require a service restart and must not run concurrently with deployment.
+Normal deployment preserves live Blog posts and cover photos by ID. Content stays
+outside code releases at `/var/lib/flea/sites/<site>/content/<release-id>.json`.
+Aliases of one release must select one content snapshot. The deployment lock and
+recovery journal switch code/content together; failed activation leaves previous
+content untouched. Backups and rollback retain their documented safety checks.
 
 ## Enable HTTPS
 
@@ -1551,7 +1251,7 @@ sudo systemctl restart flea
 ```
 
 Existing installations are not upgraded by rerunning setup. Deployment requires
-the current server executable (deployment protocol 27, unquoted snip syntax).
+the current server executable (deployment protocol 30).
 For an older installation,
 update the executable and systemd unit deliberately, preserve server.json and all
 sites, and create `/var/lib/flea/certs` owned by `flea:flea` with mode
@@ -1682,53 +1382,13 @@ bash scripts/build.sh
 go test ./internal/cli -run TestExecutableWorkflow -count=1 -v
 ```
 
-The executable smoke test builds the binary, creates a fresh starter, runs status, starts dev on an available loopback port, checks pages/assets/private URLs, edits snips/config/assets/templates, checks invalid-edit errors and recovery, and sends an interrupt to verify clean shutdown. Tests need permission to bind a local TCP listener.
+The executable smoke test builds the binary, creates a fresh starter, runs status, starts dev on an available loopback port, checks pages/assets/private URLs, edits HTML metadata/config/assets/templates, checks invalid-edit errors and recovery, and sends an interrupt to verify clean shutdown. Tests need permission to bind a local TCP listener.
 
 ## Current limitations
 
-Developers designate editable images/videos with a bare `snip` attribute. Dev
-imports local seeds and writes typed JSON entries, generating src/alt/poster
-bindings while preserving layout attributes. Admins click the media in Edit mode
-and use the page's Save/Cancel. There are no Photos/Videos topbar modes.
-Nested media/text snips and competing srcset/picture/source markup are errors.
-Video requires H.264 plus optional AAC-LC, fast start,
-25 MiB/file; no conversion or external service. Metadata is committed, video bytes
-are Git-ignored and transferred separately during deployment/pull. See
-[videos](docs/videos.md) for storage, validation, fresh-clone recovery and limits.
-
-Routine HTTPS deployments report "Checking site health and HTTPS...". The server
-shows DNS/ports and certificate setup guidance only when enabling HTTPS for a
-domain not already configured; all readiness and certificate checks still run.
-
-For hosting ItsyWeb's own release binaries independently of website deployments,
-see [disk-backed download hosting](docs/agents/download-hosting.md). This optional host
-setting does not change ordinary site assets or the 256 MiB site archive limit.
-
-New sites include AGENTS.md and portable skills in `itsy/skills/`
-(`add-blog`, `add-contact-form`, `import-brochure` and `itsyweb-site`). These are
-developer instructions, not a runtime dependency or an automatically installed agent integration. They are
-excluded from serving and deployment. Generated `AGENTS.md` routes requests such
-as "add a blog" and "add a contact form" to focused skills documenting setup,
-post/form fields and supported template values. Agents read these instructions;
-there is no runtime keyword listener or required plugin.
-For substantial imports and redesigns, they guide an agent through two design
-directions and a sample-page review before the full build, unless you explicitly
-delegate those choices. Small maintenance edits do not require a new design review.
-
-Editable regions, short IDs, sanitized HTML, page metadata, content-preserving
-deployment, and archived orphan pruning are implemented. Deployment protocol 27
-requires an updated server binary; older servers are refused before upload.
-Local extraction preserves unreferenced content until deployment. There is no
-Markdown renderer or schema migration engine. Inline rich-text editing and
-explicit `itsy pull` synchronization are supported. Keep backups before manual edits.
-
-This release provides local development, SSH setup/deployment, automatic HTTPS,
-email-code authentication, inline editing, multisnips, developer-managed styles and a JPEG/PNG
-image/video snips. Rollback, site backups/restoration and executable-only server upgrades
-are supported; see [recovery](docs/recovery.md). Release pruning and remote logs
-commands, general-purpose forms, general field schemas, per-edit revision history
-and adaptive video streaming remain deferred. Deployment briefly restarts the service
-and preserves remote admin content. Developer-managed images may remain in `images/`.
-Unrestricted raw HTML is unsupported. Real Ubuntu installation, live Resend
-delivery and live CA verification remain pending; automated tests use fake email
-delivery and local HTTP/TLS. This is not a production security certification.
+Ordinary pages use HTML, partials, layouts, escaped JSON values and comment
+metadata. Blog supports drafts, explicit publishing, rich bodies and cover photos;
+inline body photos, scheduling, revisions and comments are not implemented.
+Static images/videos remain ordinary public assets. Email and live Ubuntu/TLS
+acceptance require separately authorized real environments. No page CMS,
+extraction, user theme editing, migration or automatic retained-file pruning exists.

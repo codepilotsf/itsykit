@@ -10,16 +10,16 @@ func TestElseBranches(t *testing.T) {
 		{`{#unless app.missing}yes{:else}no{/unless}`, "yes"},
 		{`{#unless app.site_name}no{:else}yes{/unless}`, "yes"},
 		{`{#unless app.site_name}no{:else if app.site_name}yes{:else}no{/unless}`, "yes"},
-		{`{#unless snip.team.false}a{/unless}{#unless snip.team.zero}b{/unless}{#unless snip.team.blank}c{/unless}{#unless snip.team.empty}d{/unless}`, "abcd"},
-		{`{#each snip.team.members as member}{#unless member.children}{member.name}{/unless}{/each}`, "Cy"},
+		{`{#unless data.team.false}a{/unless}{#unless data.team.zero}b{/unless}{#unless data.team.blank}c{/unless}{#unless data.team.empty}d{/unless}`, "abcd"},
+		{`{#each data.team.members as member}{#unless member.children}{member.name}{/unless}{/each}`, "Cy"},
 		{`{#unless app.missing}{#if app.site_name}{app.unsafe}{/if}{/unless}`, `&#34;/&gt;&lt;script&gt;alert(1)&lt;/script&gt;`},
 		{`{#if app.site_name}yes{:else}no{/if}`, "yes"},
-		{`{#if snip.team.false}no{:else if snip.team.zero}no{:else if app.site_name}yes{:else}no{/if}`, "yes"},
-		{`{#if snip.missing}no{:else}fallback{/if}`, "fallback"},
-		{`{#each snip.team.empty as item}no{:else}{app.site_name}{/each}`, "Test"},
-		{`{#each snip.missing as item}no{:else}missing{/each}`, "missing"},
-		{`{#each snip.team.members as item}{#each item.children as item}{item.name}{:else}{render fallback}{/each}:{item.name};{/each}`, "Bea:Ada;Cy:Test:Cy;"},
-		{`{#if snip.missing}no{:else}<a href="{app.url}">{app.unsafe}</a>{/if}`, `<a href="#ZgotmplZ">&#34;/&gt;&lt;script&gt;alert(1)&lt;/script&gt;</a>`},
+		{`{#if data.team.false}no{:else if data.team.zero}no{:else if app.site_name}yes{:else}no{/if}`, "yes"},
+		{`{#if data.missing}no{:else}fallback{/if}`, "fallback"},
+		{`{#each data.team.empty as item}no{:else}{app.site_name}{/each}`, "Test"},
+		{`{#each data.missing as item}no{:else}missing{/each}`, "missing"},
+		{`{#each data.team.members as item}{#each item.children as item}{item.name}{:else}{render fallback}{/each}:{item.name};{/each}`, "Bea:Ada;Cy:Test:Cy;"},
+		{`{#if data.missing}no{:else}<a href="{app.url}">{app.unsafe}</a>{/if}`, `<a href="#ZgotmplZ">&#34;/&gt;&lt;script&gt;alert(1)&lt;/script&gt;</a>`},
 	} {
 		t.Run(tc.source, func(t *testing.T) {
 			root := fixture(t)
@@ -41,7 +41,7 @@ func TestInvalidElseBranches(t *testing.T) {
 		`{#unless app.site_name}{:else}{:else}{/unless}`, `{#unless app.site_name}`,
 		`{:else}`, `{:else if app.site_name}`, `{#if app.site_name}{:else}{:else}{/if}`,
 		`{#if app.site_name}{:else}{:else if app.site_name}{/if}`,
-		`{#each snip.team.empty as x}{:else if app.site_name}{/each}`,
+		`{#each data.team.empty as x}{:else if app.site_name}{/each}`,
 		`{#if app.site_name}{:else if }{/if}`, `{#if app.site_name}{:else if app.site_name == true}{/if}`,
 		`{#if app.site_name}{:else}{/each}`, `{#if app.site_name}{:else}`,
 	} {

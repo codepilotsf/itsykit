@@ -192,12 +192,12 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 				return config, nil, fmt.Errorf("site %s: admin requires a managed content snapshot; deploy this site first", host)
 			}
 			store := &editstore.Store{Root: root, ContentPath: contentPath, ConfigPath: configPath, Emails: project.Admin.Emails, Publish: public.Publish}
-			dashboard := editor.New(editor.Options{Emails: project.Admin.Emails, SessionPath: managedSessionPath(contentPath), SessionIdleDays: project.Admin.SessionIdleDays, Name: fmt.Sprint(project.App["site_name"]), Sender: sender, Backend: store, Logger: logger, Render: public.RenderAdmin, Public: public.ServeOwner, RenderEmail: public.RenderEmail})
+			dashboard := editor.New(editor.Options{Emails: project.Admin.Emails, SessionPath: managedSessionPath(contentPath), SessionIdleDays: project.Admin.SessionIdleDays, Name: fmt.Sprint(project.App["site_name"]), Sender: sender, Backend: store, Logger: logger, Render: public.RenderAdmin, RenderEmail: public.RenderEmail})
 			handlers[host] = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if editor.IsPath(r.URL.Path) {
 					dashboard.ServeHTTP(w, r)
 				} else {
-					dashboard.ServePublic(w, r, public)
+					public.ServeHTTP(w, r)
 				}
 			})
 		}

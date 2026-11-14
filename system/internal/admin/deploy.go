@@ -267,9 +267,6 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 		if loadErr != nil {
 			return "", fmt.Errorf("invalid release %s: %w", dest, loadErr)
 		}
-		if err = project.CheckExtractedSnips(); err != nil {
-			return "", err
-		}
 		remote, e := m.snapshot(c, o.Name, o.Branch)
 		if e != nil {
 			return "", e

@@ -1,6 +1,6 @@
 ---
 name: import-brochure
-description: Import or redesign an existing small brochure, portfolio or artist website into a ItsyWeb site, preserving content and navigation with local assets and editable snips. Use for a requested site import or visual redesign of one small site. Work it interactively — the owner chooses the direction and approves a sample page before you build everything.
+description: Import or redesign an existing small brochure, portfolio or artist website into a ItsyWeb site, preserving content and navigation with local assets and ordinary HTML/JSON. Use for a requested site import or visual redesign of one small site. Work it interactively — the owner chooses the direction and approves a sample page before you build everything.
 ---
 
 # Import or redesign a brochure site
@@ -98,21 +98,14 @@ discard legal pages, accessibility text, downloads or form destinations.
   `/about`, never both. Links omit `.html`. Check route and asset-path collisions
   with `itsy status` before treating the route map as complete.
 - `site/main.layout.html` wraps pages through `{slot}`. Keep header/footer inline
-  unless reuse justifies a partial. Keep the `app.current_admin` blocks, the CSRF
-  meta and the toolbar include intact.
+  unless reuse justifies a partial. Public layouts need only an ordinary `/admin`
+  link. Keep private admin CSRF forms and public Contact `{csrf}`.
 - Site-wide public values use `{app.*}` in `itsy.config.json`; developer-managed
   lists use `itsy/data/*.json` read as `data.*`. Credentials belong in ignored
   `.env`.
-- Mark editable text with bare `snip`. Do not nest snips or mark navigation,
-  buttons or layout wrappers. Dev replaces attributes with `{snip ID}` and writes
-  `itsy/snips.json`; never invent IDs. Pre-populate `pages[route].title` and
-  `.description` for every route so `{page.title}` renders.
-- Repeatable cards use `<article multisnip="name">` with `snip="field"` children;
-  seed complete adjacent elements with identical markup outside editable fields.
-- Admin-editable image snips require local JPEG/PNG seeds; video snips require
-  supplied optimized H.264 MP4. Keep media outside rich-text snips, preserve
-  playback/layout attributes, and do not combine media snips with picture/srcset
-  or competing source children. Dev generates the typed bindings; never invent IDs.
+- Write copy directly in HTML and page titles/descriptions in one leading itsy
+  settings comment. Repeated cards use developer JSON and #each. Static images
+  and videos remain ordinary public assets under site/.
 - Keep supported contact-form contracts intact. Explain unsupported integrations
   instead of presenting a nonfunctional substitute as complete. Do not send test
   mail without permission.
@@ -122,11 +115,11 @@ discard legal pages, accessibility text, downloads or form destinations.
 ### Galleries larger than the media library
 
 ItsyWeb's photo library is capped at **100 records / 64 MiB**, so a portfolio of
-hundreds of images cannot be image snips. For large galleries:
+large image sets use ordinary static assets. For large galleries:
 
 - Keep images as developer-managed assets under `site/images/` and drive the
   gallery from `itsy/data/<page>.json` with `{#each}` loops.
-- Make the surrounding copy editable with text snips; leave the artwork itself
+- Keep surrounding copy in ordinary HTML; leave the artwork itself
   developer-managed.
 - Precompute per-image `span` (grid width), `w`/`h`, captions and a curated hero
   into the data file so templates stay simple.
@@ -139,10 +132,10 @@ hundreds of images cannot be image snips. For large galleries:
 
 ## Verify the result
 
-- Run one `itsy dev` process to extract authoring regions and download icons, then
+- Run one `itsy dev` process to validate templates and download icons, then
   stop it. Run `itsy status` and fix what it reports.
 - Sweep every route: expect HTTP 200, the right `<title>`, exactly one `<h1>`, and
-  **zero** unresolved `{snip}`/`{data}`/`{app}`/`{page}`/`{icon}` tokens.
+  **zero** unresolved `{data}`/`{app}`/`{page}`/`{icon}` tokens.
 - Check each configured old URL without following redirects: GET/HEAD return 301
   and the correct `Location`, followed by the intended content in one hop. Report
   retained, redirected and unresolved URLs and the inventory's coverage limits.
@@ -160,9 +153,9 @@ hundreds of images cannot be image snips. For large galleries:
 
 ## Pitfalls learned the hard way
 
-- **Avoid competing writers.** Dev intentionally watches edits and extracts snips.
-  For bulk template/content rewrites, stop it first, edit, then restart and review
-  extraction. Do not attribute corruption to the watcher without reproducing it.
+- **Avoid competing writers.** Coordinate bulk source changes with the owner of
+  an existing dev server. Dev does not extract or rewrite page content.
+
 - **Review diffs after edits.** Use the environment's supported editing tool with
   unique context, keep one writer per file, and check for duplicate HTML or damaged
   template/CSS tokens. Do not assume whole-file rewrites or shell heredocs are safer.

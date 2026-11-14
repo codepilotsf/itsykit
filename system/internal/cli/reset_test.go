@@ -20,7 +20,7 @@ func TestCleanAndStarterCreation(t *testing.T) {
 		}
 	}
 	for _, name := range []string{"clean", "full", "short"} {
-		p, err := site.LoadEditing(context.Background(), name)
+		p, err := site.LoadDev(context.Background(), name)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -29,14 +29,14 @@ func TestCleanAndStarterCreation(t *testing.T) {
 			if !os.IsNotExist(err) {
 				t.Fatal("clean has team page")
 			}
-			if len(p.Content.Pages) != 1 {
+			if len(p.Content.Blog) != 0 {
 				t.Fatal("clean has demo content")
 			}
 		} else {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(p.Content.Pages["/team"].Multisnips["team"]) != 6 {
+			if strings.Count(string(mustRead(t, filepath.Join(name, "site/team.html"))), "<article ") != 6 {
 				t.Fatal("starter must have six fictional team members")
 			}
 		}
@@ -121,4 +121,13 @@ func TestResetRejectsNonSitesAndLinks(t *testing.T) {
 	if err := resetSite(real, strings.NewReader("y\n"), io.Discard); err == nil {
 		t.Fatal("reset worktree")
 	}
+}
+
+func mustRead(t *testing.T, p string) []byte {
+	t.Helper()
+	b, e := os.ReadFile(p)
+	if e != nil {
+		t.Fatal(e)
+	}
+	return b
 }

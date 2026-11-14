@@ -30,15 +30,14 @@ func TestPlanRequiresScopedBaseline(t *testing.T) {
 	}
 }
 
-func TestPullPreservesNewLocalSnipsAndScopesBaseline(t *testing.T) {
+func TestPullPreservesNewLocalPostsAndScopesBaseline(t *testing.T) {
 	root := repoSite(t)
 	local := snips.NewStore()
-	local.Page("/").Snips["a7Km2pQ9xB"] = snips.Entry{Content: "Seed"}
-	local.Page("/").Snips["b8Ln3rR0yC"] = snips.Entry{Content: "Local new"}
+	local.Blog = []snips.BlogPost{{ID: "a7Km2pQ9xB", Title: "Seed", Slug: "seed", Status: "draft"}, {ID: "b8Ln3rR0yC", Title: "Local new", Slug: "local", Status: "draft"}}
 	if e := site.SaveContent(root, local); e != nil {
 		t.Fatal(e)
 	}
-	os.WriteFile(filepath.Join(root, "site", "index.html"), []byte(`<p>{snip a7Km2pQ9xB}</p><p>{snip b8Ln3rR0yC}</p>`), 0644)
+	os.WriteFile(filepath.Join(root, "site", "index.html"), []byte(`<p>Ordinary content</p>`), 0644)
 	s := DeploySettings{Target: "root@server", Name: "demo", Domain: "example.test", Branch: "main"}
 	if e := saveDeploymentConfig(root, DeploymentConfig{Branches: map[string]DeploySettings{"main": s}}); e != nil {
 		t.Fatal(e)
@@ -57,7 +56,7 @@ func TestPullPreservesNewLocalSnipsAndScopesBaseline(t *testing.T) {
 		t.Fatal(e)
 	}
 	remote := snips.NewStore()
-	remote.Page("/").Snips["a7Km2pQ9xB"] = snips.Entry{Content: "Owner change"}
+	remote.Blog = []snips.BlogPost{{ID: "a7Km2pQ9xB", Title: "Owner change", Slug: "seed", Status: "draft"}}
 	run := func(ctx context.Context, c command) error {
 		for _, arg := range c.args {
 			if arg == "-O" {
@@ -82,7 +81,7 @@ func TestPullPreservesNewLocalSnipsAndScopesBaseline(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if p.Content.Page("/").Snips["a7Km2pQ9xB"].Content != "Owner change" || p.Content.Page("/").Snips["b8Ln3rR0yC"].Content != "Local new" {
+	if p.Content.Blog[0].Title != "Owner change" || p.Content.Blog[1].Title != "Local new" {
 		t.Fatal(p.Content)
 	}
 	css, e := os.ReadFile(cssPath)

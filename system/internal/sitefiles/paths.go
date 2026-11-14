@@ -30,7 +30,7 @@ func Included(name string) bool {
 	if name == "itsy" || name == "itsy/snips.json" {
 		return true
 	}
-	for _, directory := range []string{"site", "mailers", "itsy/data", "itsy/snips", "itsy/icons", "itsy/media"} {
+	for _, directory := range []string{"site", "mailers", "itsy/data", "itsy/icons", "itsy/media"} {
 		if name == directory || strings.HasPrefix(name, directory+"/") {
 			return true
 		}

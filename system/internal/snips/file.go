@@ -25,7 +25,7 @@ func ReadFile(name string) (*Store, error) {
 		return nil, err
 	}
 	if !info.Mode().IsRegular() {
-		return nil, fmt.Errorf("snips must be a regular file")
+		return nil, fmt.Errorf("Blog content must be a regular file")
 	}
 	f, err := current.Open(base)
 	if err != nil {
@@ -34,7 +34,7 @@ func ReadFile(name string) (*Store, error) {
 	defer f.Close()
 	actual, err := f.Stat()
 	if err != nil || !os.SameFile(info, actual) {
-		return nil, fmt.Errorf("snip file changed")
+		return nil, fmt.Errorf("content file changed")
 	}
 	data, err := io.ReadAll(io.LimitReader(f, 5<<20+1))
 	if err != nil {

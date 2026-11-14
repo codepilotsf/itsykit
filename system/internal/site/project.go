@@ -19,19 +19,16 @@ import (
 // Project is a validated serving snapshot. After publishing it to a Server,
 // callers must not mutate its maps or Content; reload builds a new Project.
 type Project struct {
-	syncOnly       bool
-	videos         map[string]videoAsset
 	MediaRoot      string
 	emails         map[string]emailTemplates
 	layouts        map[string]bool
+	pageSettings   map[string]pageConfig
 	adminTemplates map[string]*template.Template
 	Admin          AdminAccess
 	Dev            DevSettings
 	Apps           map[string]MiniApp
 	appPackages    map[string]appPackage
 	Content        *snips.Store
-	rich           map[string]template.HTML
-	contentIndex   map[string]snips.Entry
 	Root           string
 	// RuntimeRoot is the stable, private per-site runtime directory. Production
 	// supplies the managed sibling of admin session state so custom-app storage
@@ -39,7 +36,7 @@ type Project struct {
 	RuntimeRoot        string
 	App                map[string]any
 	SiteNameConfigured bool
-	Snips              map[string]map[string]any
+	Data               map[string]map[string]any
 	Partials           map[string]string
 	Pages              map[string]*template.Template
 	Assets             map[string]string
@@ -50,7 +47,6 @@ type Project struct {
 	signature          string
 	icons              map[string]string
 	Warnings           []string
-	SnipsUpdated       bool // A dev extraction changed templates or the active content index.
 	missingIcons       map[string]string
 	csrfTemplates      map[*template.Template]bool
 	seo                seoSettings
@@ -62,19 +58,15 @@ type Project struct {
 }
 
 func Load(root string) (*Project, error) {
-	return LoadWithSnips(root, nil)
+	return LoadWithContent(root, nil)
 }
 
-// LoadWithSnips loads a code release with a separately managed content snapshot.
-func LoadWithSnips(root string, content *snips.Store) (*Project, error) {
-	return loadProject(root, content, "", "", false)
+// LoadWithContent loads a code release with a separately managed content snapshot.
+func LoadWithContent(root string, content *snips.Store) (*Project, error) {
+	return loadProject(root, content, "", "")
 }
 
-// LoadSyncSource validates metadata/templates for pull before ignored video files
-// are available. Its result is deliberately not an HTTP serving snapshot.
-func LoadSyncSource(root string) (*Project, error) { return loadProject(root, nil, "", "", true) }
-
-func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot string, syncOnly bool) (*Project, error) {
+func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot string) (*Project, error) {
 	root, err := filepath.Abs(root)
 	if err != nil {
 		return nil, err
@@ -87,7 +79,7 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 	if runtimeRoot == "" {
 		runtimeRoot = sitefiles.Path(root, filepath.Join("itsy", "runtime"))
 	}
-	p := &Project{Root: root, RuntimeRoot: runtimeRoot, Snips: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
+	p := &Project{Root: root, RuntimeRoot: runtimeRoot, Data: map[string]map[string]any{}, Partials: map[string]string{}, Pages: map[string]*template.Template{}, Assets: map[string]string{}, Errors: map[int]*template.Template{}, files: map[string]string{}}
 	loaded := false
 	defer func() {
 		if !loaded {
@@ -96,7 +88,6 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 	}()
 	p.assetFiles = map[string]fileAsset{}
 	p.MediaRoot = mediaRoot
-	p.syncOnly = syncOnly
 	if p.MediaRoot == "" {
 		p.MediaRoot = sitefiles.Path(root, filepath.Join("itsy", "media"))
 	}
@@ -146,9 +137,6 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 	if err != nil {
 		return nil, err
 	}
-	if _, exists := p.App["current_admin"]; exists {
-		return nil, fmt.Errorf("app.current_admin is reserved for the authenticated request; remove it from config")
-	}
 	if err := config.Admin.validate(); err != nil {
 		return nil, err
 	}
@@ -173,42 +161,23 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 		return nil, err
 	}
 	if content == nil {
-		content, err = readSnipStore(boundary)
+		content, err = readContentStore(boundary)
 		if err != nil {
 			return nil, err
 		}
 	}
-	p.Content = content
-	p.rich = map[string]template.HTML{}
-	contentIndex, err := content.Index()
-	if err != nil {
+	if err := content.Validate(); err != nil {
 		return nil, err
 	}
-	p.contentIndex = contentIndex
-	for id, entry := range contentIndex {
-		if entry.Type != "" {
-			continue
-		}
-		clean, e := snips.Sanitize(entry.Content)
-		if e != nil {
-			return nil, fmt.Errorf("snip %s: %w", id, e)
-		}
-		p.rich[id] = template.HTML(clean)
-	}
+	p.Content = content
 	p.AssetData = map[string][]byte{}
 	views, err := boundary.OpenRoot("site")
 	if err != nil {
 		return nil, fmt.Errorf("open site directory: %w", err)
 	}
 	defer views.Close()
-	// Legacy snips and structured data intentionally share a namespace.
-	for _, source := range []struct{ directory, kind string }{
-		{"itsy/snips", "snip"},
-		{"itsy/data", "data"},
-	} {
-		if err := loadDataDirectory(boundary, source.directory, source.kind, p.Snips); err != nil {
-			return nil, err
-		}
+	if err := loadDataDirectory(boundary, "itsy/data", "data", p.Data); err != nil {
+		return nil, err
 	}
 	err = fs.WalkDir(views.FS(), ".", func(path string, d fs.DirEntry, e error) error {
 		if e != nil {
@@ -232,6 +201,9 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 			if bytes.Contains(data, []byte("[[NW")) {
 				return fmt.Errorf("%s: reserved template delimiter [[NW", rel)
 			}
+			if err := checkRemovedPageMarkup(rel, string(data)); err != nil {
+				return err
+			}
 			p.files[rel] = string(data)
 		}
 		if strings.HasPrefix(d.Name(), "_") && strings.HasSuffix(rel, ".html") && rel != "main.layout.html" && rel != "_404.html" && rel != "_500.html" {
@@ -252,12 +224,6 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 				return nil, err
 			}
 		}
-	}
-	if _, err = p.SnipReferences(); err != nil {
-		return nil, err
-	}
-	if err = p.checkContentStructure(); err != nil {
-		return nil, err
 	}
 	for name, text := range p.Partials {
 		if _, err = p.compile(text, name, []string{name}, map[string]string{}); err != nil {
@@ -341,11 +307,6 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 	if err = p.loadMedia(); err != nil {
 		return nil, err
 	}
-	if !syncOnly {
-		if err = p.loadVideos(); err != nil {
-			return nil, err
-		}
-	}
 	if err = p.validateApps(boundary); err != nil {
 		return nil, err
 	}
@@ -389,10 +350,11 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 }
 
 func (p *Project) buildTemplate(file string, layout bool) (*template.Template, error) {
-	text, selected, err := pageSettings(file, p.files[file])
+	text, settings, err := pageSettings(file, p.files[file])
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
 	}
+	selected := settings.Layout
 	if selected == "" {
 		selected = "main.layout.html"
 	}
@@ -402,6 +364,7 @@ func (p *Project) buildTemplate(file string, layout bool) (*template.Template, e
 	}
 	source := body
 	if wrapper, ok := p.files[selected]; layout && ok {
+		wrapper, _, _ = pageSettings(selected, wrapper)
 		compiled, e := p.compile(wrapper, selected, nil, map[string]string{})
 		if e != nil {
 			return nil, e
@@ -414,12 +377,7 @@ func (p *Project) buildTemplate(file string, layout bool) (*template.Template, e
 	if err := checkCSRFContexts(source); err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
 	}
-	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"csrfField": csrfField, "blogBody": blogBody, "snipField": p.snipField, "multiPhoto": multiPhoto, "multiRows": p.multiRows, "multiValue": multiValue, "multiBoundary": multiBoundary, "multiItemBoundary": multiItemBoundary, "lookup": lookup, "collection": collection, "richSnip": func(id string, owner bool) template.HTML {
-		if owner {
-			return template.HTML("<!--snip-start:"+id+"-->") + p.rich[id] + template.HTML("<!--snip-end:"+id+"-->")
-		}
-		return p.rich[id]
-	}}).Parse(source)
+	t, err := template.New(file).Delims("[[NW", "NW]]").Funcs(template.FuncMap{"csrfField": csrfField, "blogBody": blogBody, "lookup": lookup, "collection": collection}).Parse(source)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
 	}
@@ -437,14 +395,10 @@ func (p *Project) render(t *template.Template, route string) ([]byte, error) {
 }
 
 func (p *Project) renderWithBody(t *template.Template, route string, admin map[string]any) ([]byte, error) {
-	return p.renderPage(t, route, admin, false)
+	return p.renderRequest(t, route, admin, nil)
 }
 
-func (p *Project) renderPage(t *template.Template, route string, admin map[string]any, owner bool) ([]byte, error) {
-	return p.renderRequest(t, route, admin, owner, nil)
-}
-
-func (p *Project) renderRequest(t *template.Template, route string, admin map[string]any, owner bool, inputs *renderInputs) ([]byte, error) {
+func (p *Project) renderRequest(t *template.Template, route string, admin map[string]any, inputs *renderInputs) ([]byte, error) {
 	title := "Home"
 	if route != "/" {
 		parts := strings.Split(strings.Trim(route, "/"), "/")
@@ -453,57 +407,27 @@ func (p *Project) renderRequest(t *template.Template, route string, admin map[st
 			title = strings.ToUpper(title[:1]) + title[1:]
 		}
 	}
-	snips := map[string]any{}
-	for k, v := range p.Snips {
-		snips[k] = v
+	values := map[string]any{}
+	for k, v := range p.Data {
+		values[k] = v
 	}
-	description := ""
+	settings := p.pageSettings[t.Name()]
+	if settings.Title != "" {
+		title = settings.Title
+	}
+	description := settings.Description
 	blog := p.blogData(route)
 	if current, ok := blog["post"].(map[string]any); ok {
 		title = current["title"].(string)
 		description = current["excerpt"].(string)
 	}
-	if page := p.Content.Pages[route]; page != nil {
-		if page.Title != "" {
-			title = page.Title
-		}
-		if page.Description != "" {
-			description = page.Description
-		}
-	}
 	app := make(map[string]any, len(p.App)+1)
 	for key, value := range p.App {
 		app[key] = value
 	}
-	app["current_admin"] = nil
-	if owner && admin != nil {
-		copy := map[string]any{}
-		for k, v := range admin {
-			copy[k] = v
-		}
-		if _, enabled := p.Apps["blog"]; enabled {
-			copy["blog_enabled"] = true
-		}
-		app["current_admin"] = copy
-	}
-	data := map[string]any{"app": app, "page": map[string]any{"title": title, "description": description, "path": route}, "snip": snips, "data": snips}
-	photos := map[string]any{}
-	for id, photo := range p.Content.Media {
-		photos[id] = map[string]any{"src": "/media/" + photo.File, "alt": photo.Alt, "width": photo.Width, "height": photo.Height, "name": photo.Name}
-	}
-	data["media"] = photos
+	data := map[string]any{"app": app, "page": map[string]any{"title": title, "description": description, "path": route}, "data": values}
 	data["blog"] = map[string]any{"data": blog}
-	videos := map[string]any{}
-	for id, v := range p.Content.Videos {
-		poster := ""
-		if photo, ok := p.Content.Media[v.Poster]; ok {
-			poster = "/media/" + photo.File
-		}
-		videos[id] = map[string]any{"src": "/media/" + v.File, "poster": poster, "width": v.Width, "height": v.Height, "name": v.Name}
-	}
-	data["videos"] = videos
 	data["admin"] = admin
-	data["__ownerPreview"] = owner
 	data["__request"] = inputs
 	if inputs != nil && inputs.appName != "" {
 		if _, exists := data[inputs.appName]; exists {

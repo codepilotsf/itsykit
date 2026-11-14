@@ -28,7 +28,7 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `internal/admin/`: privileged release activation, lock, recovery journal, and probes.
 - `internal/admin/sites.go`: read-only site inventory and unregister (retaining files).
 - `internal/setup/server.go`: SSH-only server-wide site listing and removal over an explicit target.
-- `internal/editor/`: inline editing, in-memory OTPs, persistent rolling sessions,
+- `internal/editor/`: Blog editing, in-memory OTPs, persistent rolling sessions,
   CSRF and external same-origin editor assets. Sign-in markup lives in templates/site/admin/.
 - `internal/editstore/`: conflict-checked content saves and validated snapshot publication.
 - `internal/mailer/`: provider-neutral Sender and Resend HTTP adapter; never expose provider errors or secrets.
@@ -39,9 +39,6 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `internal/cli/cli_test.go`: CLI tests and executable/server smoke test.
 - `internal/site/project.go`: loading, validation, routes, snapshots, and rendering.
 - `internal/site/routes.go` and `data.go`: shared route conversion and JSON-directory loading.
-- `internal/site/regions.go`: source-preserving region scanner and lexical references.
-- `internal/site/extraction.go`: dev-only `LoadEditing` and snip extraction orchestration.
-- `internal/site/snip_transaction.go`: content-first extraction journal and replay.
 - `internal/site/files.go`: pinned project reads and durable atomic writes, also used by icons.
 - `internal/admin/content.go`: remote content merge/staging; activation retains the deployment lock.
 - `internal/setup/ssh.go`: shared SSH/SCP connection policy and target formatting.
@@ -65,7 +62,7 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 
 Source CSS is loaded from the immutable release. `internal/site/managed.go`
 provides confined fixed-path file helpers. Theme editor/overlay/sync code has
-been removed; snip synchronization remains in setup/admin/syncstate.
+been removed; Blog synchronization remains in setup/admin/syncstate.
 
 ## Blog
 

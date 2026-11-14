@@ -1,13 +1,1 @@
-{
-  "pages": {
-    "/": {
-      "title": "Home",
-      "description": "Welcome to your new ItsyWeb site.",
-      "snips": {
-        "a7Km2pQ9xB": {"content": "Welcome to ItsyWeb."},
-        "b8Ln3rR0yC": {"content": "Your new site is ready. Make yourself at home."}
-      }
-    }
-  },
-  "shared": {"snips": {}}
-}
+{}
