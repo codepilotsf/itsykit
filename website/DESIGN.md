@@ -17,7 +17,7 @@ colors:
 typography:
   display:
     fontFamily: "Inter, system-ui, sans-serif"
-    fontSize: "clamp(2.25rem, 4.4vw, 3.75rem)"
+    fontSize: "clamp(2.25rem, 1.6rem + 3vw, 4.5rem)"
     fontWeight: 700
     lineHeight: 1.1
     letterSpacing: "-0.035em"
@@ -68,11 +68,11 @@ Ice identifies the primary action on dark surfaces and the active project view. 
 
 ## Typography
 
-Inter supplies both headings and reading text. Monospace belongs to source, filenames and terminal commands. The homepage display role above has separate phone rules in `homepage.css`; section headings use fluid sizes and tight line heights. Reading paragraphs use relaxed spacing and the existing text measure. Documentation keeps its established heading and article hierarchy.
+Inter supplies both headings and reading text. Monospace belongs to source, filenames and terminal commands. The homepage display role uses one fluid size across all viewport widths, without breakpoint overrides; section headings use fluid sizes and tight line heights. Reading paragraphs use relaxed spacing and the existing text measure. Documentation keeps its established heading and article hierarchy.
 
 ## Layout
 
-The shared header uses a 1200px container. The upper homepage and agent section use 1120px containers with fluid page gutters; the hero demonstration caps at 960px. The headline and description have narrower centered measures, a 32px gap, and 64px before the demonstration. Desktop hero padding is 80px above and below; phone spacing scales down to 40–48px. Source and result share two equal columns; at 520px they stack. The earlier five-step card row is removed: Develop links to installation, while Develop and Publish reveal the commands on demand. The HTML explanation precedes the coding-agent section. Lower sections retain their 1280px container.
+The shared header and hero use 1200px containers; the agent section uses 1120px, all with fluid page gutters. The hero demonstration caps at 1040px. The headline has an 880px centered measure; the description stays narrower, with a 32px gap on desktop and 24px on phones. The gap before the demonstration scales from 48px to 80px. Hero top padding scales from 48px to 112px and bottom padding from 56px to 112px. Source and result share two equal columns; at 520px they stack. The earlier five-step card row is removed: Develop links to installation, while Develop and Publish reveal the commands on demand. The HTML explanation precedes the coding-agent section. Lower sections retain their 1280px container.
 
 The agent demonstration puts the file tree beside the file content; at 520px it becomes horizontal file tabs above the content. At 800px the surrounding heading and explanation stack. Documentation retains its sidebar and reading column, with the native Guides disclosure below 640px. The shared header offers Docs and Get started; the homepage agent section and documentation retain access to the coding-agent guide.
 
@@ -84,13 +84,13 @@ The homepage uses tonal layering and thin borders rather than added shadows. Nav
 
 ## Shapes
 
-Actions use the default radius; hero tabs use a flat underline. Large demonstrations use the large radius, with gently curved inner panes and workflow steps. Preserve the supplied SVG brand assets and consistent library icons.
+Actions and hero view controls use the default radius. Large demonstrations use the large radius, with gently curved inner panes and workflow steps. Preserve the supplied SVG brand assets and consistent library icons.
 
 ## Components
 
 **Actions:** ice on navy; the shared header action reverses to navy on pale. Keep visible focus and a generous target. The hero has no action button; the shared header and closing section provide the tutorial action.
 
-**Project tabs:** semantic links work as section anchors without JavaScript. Enhancement supplies tab roles, selection, arrow/Home/End keys and focus management. Hero views use an ice underline and text; file tabs keep the pale blue selection. Inactive panels are hidden only after enhancement.
+**Project tabs:** semantic links work as section anchors without JavaScript. Enhancement supplies tab roles, selection, arrow/Home/End keys and focus management. Hero views use bordered, pane-colored controls with a filled ice selection, 48px targets and a “Choose a view to explore” prompt. The selected control has a dark inset focus outline. The prompt sits beside the controls when space allows and above them on phones; file tabs keep the pale blue selection. Inactive panels are hidden only after enhancement.
 
 **Code panes:** the hero demonstration uses a single outer frame with adjoining source and result panes, without nested card borders or decorative window dots. Source remains scrollable with a filename or terminal label. Syntax accents are restrained and line numbers are decorative. Copy controls use a 44px target and announce success through the shared copy script.
 

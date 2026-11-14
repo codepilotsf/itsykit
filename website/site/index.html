@@ -10,11 +10,14 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
     </div>
 
     <div class="project-demo tab-group" data-tabs>
-      <nav class="demo-tabs" aria-label="Example project views" data-tab-list>
-        <a id="view-html" class="project-tab" href="#example-html" data-tab>{icon code-xml}<span>HTML</span></a>
-        <a id="view-develop" class="project-tab" href="#example-develop" data-tab>{icon terminal}<span>Develop</span></a>
-        <a id="view-publish" class="project-tab" href="#example-publish" data-tab>{icon upload}<span>Publish</span></a>
-      </nav>
+      <div class="demo-toolbar">
+        <p class="demo-hint" id="demo-hint">Choose a view to explore.</p>
+        <nav class="demo-tabs" aria-label="Example project views" aria-describedby="demo-hint" data-tab-list>
+          <a id="view-html" class="project-tab" href="#example-html" data-tab>{icon code-xml}<span>HTML</span></a>
+          <a id="view-develop" class="project-tab" href="#example-develop" data-tab>{icon terminal}<span>Develop</span></a>
+          <a id="view-publish" class="project-tab" href="#example-publish" data-tab>{icon upload}<span>Publish</span></a>
+        </nav>
+      </div>
       <section class="demo-stage" id="example-html" aria-labelledby="view-html" data-tab-panel>
         <div class="demo-pane source-pane">
           <div class="pane-bar">{icon file}<span data-example-file>site/index.html</span></div>
