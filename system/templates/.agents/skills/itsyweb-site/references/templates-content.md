@@ -1,9 +1,10 @@
-# Templates and optional editable content
+# Templates and content
 
 Use the selected config and content directory described in [the skill](../SKILL.md).
-Read the installed README and feature guide for version-specific syntax.
+Read installed requirements for version-specific syntax. This reference describes
+its page-CMS removal contract, not a conversion workflow for older sites.
 
-## Pages, layouts and data
+## Pages, layouts and metadata
 
 `site/index.html` maps to `/`. Both `site/about.html` and
 `site/about/index.html` map to `/about`; providing both is a collision. Assets
@@ -11,19 +12,35 @@ retain their public paths. `.html` URLs and non-root trailing slashes return 404
 unless explicitly configured as redirects. Dot/underscore-prefixed files and
 layouts are private. `_404.html` uses the main layout; `_500.html` is standalone.
 
-`site/main.layout.html` optionally wraps pages with `{slot}`. A custom layout is
-selected by one leading settings block before markup:
+`site/main.layout.html` optionally wraps pages with `{slot}`. Ordinary page
+metadata and an optional custom layout use one leading settings comment:
 
 ```html
 <!-- itsy
+title: Visit the bookshop
+description: Find our opening hours and plan a visit.
 layout: /custom.layout.html
 -->
-<h1>Page content</h1>
+<h1>Visit us</h1>
 ```
 
-Legacy `<!-- flea` blocks still work. Paths are site-relative `*.layout.html`
-files. Only `layout` is supported; duplicate/unknown settings, nested layouts,
-settings in partials and unsafe/missing layout paths fail validation.
+Only `title`, `description` and `layout` are supported. Values are trimmed,
+single-line plain text, split at the first colon. Braces, quotes, HTML characters
+and later colons remain data, never template source; do not add YAML quoting.
+Unknown, malformed and duplicate settings fail, including duplicate empty values.
+The existing `<!-- flea` spelling remains supported; no new aliases are added.
+Layout paths must name existing site-root-relative private `*.layout.html` files;
+retain confinement and traversal checks. Layouts cannot select another layout;
+partials cannot select layouts. `_500.html` remains standalone.
+
+Layouts use `{page.title}`, `{page.description}` and `{page.path}` with contextual
+escaping. A missing/empty title uses `Home` at `/`, otherwise the final route
+component with hyphens replaced by spaces and its first letter capitalized.
+Missing/empty description is empty. Published Blog posts use their saved title
+and excerpt, overriding post-template comment metadata. There are no saved
+ordinary-page metadata overrides, extraction writes or metadata editor.
+
+## Partials, data and literal syntax
 
 Partials are underscore-prefixed HTML files anywhere in `site/`.
 `{render footer}` includes adjacent `_footer.html`;
@@ -34,62 +51,49 @@ missing/recursive includes fail even in unused partials. Preserve existing share
 markup; the starter keeps header/footer directly in its main layout.
 
 Public config globals use `{app.site_name}`. Developer-managed
-`itsy/data/home.json` uses `{data.home.title}`. Route metadata in
-`itsy/snips.json` supplies `{page.title}`, `{page.description}` and `{page.path}`.
-This metadata works without editable snips. Values are contextually escaped.
+`itsy/data/home.json` uses `{data.home.title}`. Values are contextually escaped.
 
 ```html
 {#if app.email}<a href="mailto:{app.email}">Email</a>
 {:else if app.phone}<p>{app.phone}</p>{:else}<p>Contact us soon.</p>{/if}
-{#unless app.current_admin}<a href="/admin">Admin</a>{/unless}
+<a href="/admin">Admin</a>
 {#each data.home.services as service}
   <h2>{service.name}</h2>
 {:else}<p>No services listed.</p>{/each}
 ```
 
-Conditions are paths, not comparisons or expressions. Empty/missing collections
-use the each fallback; other non-array values fail. Do not assume filters,
-functions, array indexes, raw HTML or Markdown rendering. Script/style elements
-and HTML comments stay inert except leading page settings. To display an exact
-command literally, encode braces: `&#123;app.site_name&#125;`. Ordinary balanced
-literal braces/JSON stay literal; content JSON is never compiled as templates.
-Legacy escaped named/structured snips under `itsy/snips/*.json` remain supported;
-do not rewrite them simply to modernize syntax.
+Conditions are dotted paths, not comparisons or expressions; `#unless` supplies
+negative conditions. Empty/missing collections use the each fallback; other
+non-array values fail. Do not assume filters, functions, array indexes, raw HTML
+or Markdown rendering. Only exact `{blog.data.post.body}` renders sanitized rich
+HTML in ordinary element content; aliases remain escaped.
 
-## Editing, media and collections
+Script/style elements and HTML comments stay inert except leading page settings.
+To show exact template syntax in public HTML examples, encode literal braces:
+`&#123;app.site_name&#125;`. Balanced ordinary literal braces/JSON stay literal;
+developer JSON, metadata and Blog bodies are never recursively compiled.
 
-Only for requested browser editing, mark text with a bare `snip` attribute and
-let `itsy dev` extract it into `itsy/snips.json`, leaving `{snip ID}`. Never
-invent IDs, quote generated IDs, nest regions or put directives inside a new
-region. Preserve existing IDs, stored content and labels. Removed IDs are archived;
-reintroducing them restores stored content. Status/deploy never extract; commit
-rewritten templates and seeds together. Rich HTML is sanitized, not unrestricted.
+## Static assets and retained Blog storage
 
-For requested media editing, `<img snip src="/images/person.jpg" alt="Person">`
-extracts typed src/alt bindings;
-`<video snip src="/videos/intro.mp4" controls></video>`
-extracts src/poster bindings. Keep classes, dimensions, links, loading and playback
-behavior developer-managed. No competing `picture`, `source` or `srcset`, and no
-media nested in text snips. Ordinary media tags remain noneditable.
+Write page copy directly in HTML; structured lists use `itsy/data/*.json` and
+`#each`. Images and videos are ordinary static files under `site/`, referenced
+by public URLs. Keep classes, dimensions, links and playback behavior in source.
+Styles, Prewind and theme tokens remain developer-managed and deploy with code.
+Public pages have no authenticated CMS state or global page-media namespace.
+Blog covers use `blog.data.post.cover` and the private admin photo list; see
+[apps](apps.md) for post/photo records, upload limits and administration.
 
-JPEG/PNG imports (up to 8 MiB/20 megapixels) are processed into immutable files
-under `itsy/media/`, served at `/media/`. Photos are resized to at most 2048px
-and metadata stripped; the library allows 100 records and 64 MiB of files.
-Commit processed photo seeds and JSON. MP4 videos
-must already be fast-start H.264 with optional AAC-LC, at most 25 MiB/file and
-64 MiB retained total; no transcoding. Video bytes are Git-ignored and transferred
-separately during deploy/pull/backup. Fresh clones need referenced videos restored
-before validation, using an authorized pull when appropriate. No automatic pruning.
+Keep the selected `itsy/snips.json` or supported legacy `flea/snips.json` for
+Blog storage. Its only optional top-level fields are `blog` and `media`; `{}` is
+valid empty storage. Do not cosmetically rename this file, `internal/snips` or
+synchronization `Snips` wire fields: these retain active Blog uses. Rejection
+guards and custom-app namespace restrictions also remain live behavior.
 
-For requested repeated editing, use a page-local group with one root and named
-fields, such as `<article multisnip="team"><h2 snip="name">Name</h2></article>`.
-Dev extracts `{#multisnip team}` with named `{snip.name}` fields. Named image
-fields work; video fields do not. No groups in layouts, partials, loops or other
-groups. Preserve stable item IDs and the existing field structure.
-
-Admins edit on-page, with explicit Save changes/Cancel for text, metadata, media
-and collection order. Media-dialog Done previews a draft; page Save publishes it.
-Cancel discards staged uploads. Retain dashed shadow-root overlays, keyboard focus
-and reduced motion without changing content layout. Do not add separate library
-buttons or a browser Theme editor. General field schemas, item/edit revision
-history and adaptive video streaming remain deferred.
+Page text/media snips, named/structured snips, multisnips/collections, extraction,
+page editing and browser theme controls are removed. Old page-CMS JSON fields,
+retired attributes/directives, named-content directories and pending extraction
+journals fail closed without conversion or rewriting. Preserve a backup and
+require explicitly scoped source conversion before using the incompatible runtime
+on an old site. Never delete content/media or journals merely to pass validation;
+no bulk migration, compatibility layer, automatic pruning or live cleanup is
+implied. Consult [operations](compatibility-operations.md) for version boundaries.
