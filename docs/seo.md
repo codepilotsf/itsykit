@@ -1,7 +1,7 @@
 # Search discovery and canonical URLs
 
 From 0.20.0, ItsyWeb can generate a sitemap, advertise it through robots.txt, add canonical URLs
-and exclude selected pages from search. Enable this in `.itsy.config.json`,
+and exclude selected pages from search. Enable this in `itsy.config.json`,
 preserving the other settings:
 
 ```json

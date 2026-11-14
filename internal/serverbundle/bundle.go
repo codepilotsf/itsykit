@@ -29,7 +29,7 @@ func extract(ctx context.Context, source fs.FS, arch, destination string) error 
 	if arch != "amd64" && arch != "arm64" {
 		return fmt.Errorf("Unsupported server architecture: %s", arch)
 	}
-	name := "assets/flea-server-linux-" + arch
+	name := "assets/itsy-server-linux-" + arch
 	sum, err := fs.ReadFile(source, name+".sha256")
 	if err != nil {
 		return fmt.Errorf("This ItsyWeb executable is missing its bundled server.\n\nRebuild from the ItsyWeb source with: bash scripts/build.sh\nOr install a complete ItsyWeb release.")

@@ -66,7 +66,7 @@ func run(server, root string) error {
 	for n := 0; n < 30; n++ {
 		dir := filepath.Join(base, fmt.Sprintf("site-%02d", n))
 		config := fmt.Sprintf(`{"app":{"site_name":"Capacity site %02d"}}`, n)
-		if err := write(filepath.Join(dir, ".itsy.config.json"), []byte(config)); err != nil {
+		if err := write(filepath.Join(dir, "itsy.config.json"), []byte(config)); err != nil {
 			return err
 		}
 		items := make([]map[string]string, 20)

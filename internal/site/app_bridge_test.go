@@ -19,7 +19,7 @@ import (
 // only its mount accepts POST, and the thank-you page is read-only.
 func TestContactRouteMethodPreserved(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.test"}}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.test"}}}}`)
 	put(t, root, "contact/index.html", `<form method="post" action="/contact">{csrf}</form>`)
 	put(t, root, "contact/thank-you.html", `<p>Thanks</p>`)
 	p := mustLoad(t, root)

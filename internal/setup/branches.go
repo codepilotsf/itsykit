@@ -23,7 +23,7 @@ type DeploymentConfig struct {
 
 func readDeploymentConfig(root string) (DeploymentConfig, error) {
 	c := DeploymentConfig{Branches: map[string]DeploySettings{}}
-	data, err := site.ReadManagedFile(root, ".itsy.config.json")
+	data, err := site.ReadManagedFile(root, "itsy.config.json")
 	if os.IsNotExist(err) {
 		return c, nil
 	}
@@ -35,7 +35,7 @@ func readDeploymentConfig(root string) (DeploymentConfig, error) {
 		return c, err
 	}
 	if shape == nil {
-		return c, fmt.Errorf(".itsy.config.json must be an object")
+		return c, fmt.Errorf("itsy.config.json must be an object")
 	}
 	data, exists := shape["deploy"]
 	if !exists {
@@ -45,7 +45,7 @@ func readDeploymentConfig(root string) (DeploymentConfig, error) {
 	dec.DisallowUnknownFields()
 	err = dec.Decode(&c)
 	if err != nil {
-		return c, fmt.Errorf(".itsy.config.json: %w", err)
+		return c, fmt.Errorf("itsy.config.json: %w", err)
 	}
 	if c.Branches == nil {
 		c.Branches = map[string]DeploySettings{}
@@ -54,13 +54,13 @@ func readDeploymentConfig(root string) (DeploymentConfig, error) {
 }
 
 func saveDeploymentConfig(root string, c DeploymentConfig) error {
-	data, err := site.ReadManagedFile(root, ".itsy.config.json")
+	data, err := site.ReadManagedFile(root, "itsy.config.json")
 	if err != nil {
 		return err
 	}
 	var fields map[string]json.RawMessage
 	if err = json.Unmarshal(data, &fields); err != nil || fields == nil {
-		return fmt.Errorf(".itsy.config.json must be a valid object")
+		return fmt.Errorf("itsy.config.json must be a valid object")
 	}
 	fields["deploy"], err = json.Marshal(c)
 	if err != nil {
@@ -70,7 +70,7 @@ func saveDeploymentConfig(root string, c DeploymentConfig) error {
 	if err != nil {
 		return err
 	}
-	return site.WriteManagedFile(root, ".itsy.config.json", append(data, '\n'))
+	return site.WriteManagedFile(root, "itsy.config.json", append(data, '\n'))
 }
 
 func (s DeploySettings) domains() []string {

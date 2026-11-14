@@ -48,7 +48,7 @@ func TestUpdateVerifiedReplacementAndFailures(t *testing.T) {
 			if scenario == "checksum mismatch" {
 				hash = strings.Repeat("0", 64)
 			}
-			name := "flea-" + runtime.GOOS + "-" + runtime.GOARCH
+			name := "itsy-" + runtime.GOOS + "-" + runtime.GOARCH
 			s := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/latest.txt":
@@ -266,7 +266,7 @@ func TestRenamedExecutableMigration(t *testing.T) {
 	if err := os.WriteFile(target, payload, 0755); err != nil {
 		t.Fatal(err)
 	}
-	name := "flea-" + runtime.GOOS + "-" + runtime.GOARCH
+	name := "itsy-" + runtime.GOOS + "-" + runtime.GOARCH
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/latest.txt":

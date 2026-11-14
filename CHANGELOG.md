@@ -6,7 +6,11 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
-- Create sites with `.itsy.config.json`, `itsy/` and `<!-- itsy` layout settings.
+## 0.21.0 - 2026-11-14
+
+- Publish canonical `itsy` downloads at itsyweb.dev while retaining legacy
+  artifact aliases for existing Flea updaters.
+- Create sites with `itsy.config.json`, `itsy/` and `<!-- itsy` layout settings.
   Retain the old JSON filename, data directory and layout comment automatically;
   writes stay in the selected layout. Protocol 29 blocks incompatible older
   servers before deployment; explicit server updates preserve old sites.
@@ -17,7 +21,7 @@ During 0.x development, interfaces may change without backward compatibility.
   display the rename notice and stop; `flea update` remains available to install
   `itsy` with a prominent explanation, including when already up to date.
 - Use the approved ItsyWeb logo and icons in new sites and development diagnostics.
-  Preserve existing site content, configuration paths, server services and protocols.
+  Preserve existing site content, configuration paths and server services. App wire protocol stays 2.
 
 ## 0.20.5 - 2026-11-09
 

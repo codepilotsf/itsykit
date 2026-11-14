@@ -20,7 +20,7 @@ trap 'rm -rf -- "$stage"' EXIT
 for arch in amd64 arm64; do
   GO_BINARY="$GO_BINARY" bash scripts/bundle-app.sh linux "$arch"
   echo "Building Linux server ($arch)..."
-  GOOS=linux GOARCH="$arch" "$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/flea-server-linux-$arch" ./cmd/itsy-server
+  GOOS=linux GOARCH="$arch" "$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/itsy-server-linux-$arch" ./cmd/itsy-server
 done
 bash scripts/bundle.sh "$stage"
 FLEA_REQUIRE_BUNDLE=1 "$GO_BINARY" test ./internal/serverbundle -count=1

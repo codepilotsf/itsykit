@@ -17,7 +17,7 @@ require a full-site design interview.
 Blog requires ItsyWeb 0.15.0 or newer and a matching server. Check `itsy version`;
 do not assume the public download channel includes Blog yet.
 
-Merge this fragment into `.itsy.config.json`, preserving all other fields:
+Merge this fragment into `itsy.config.json`, preserving all other fields:
 
 ```json
 {"apps":{"blog":{"mount":"/blog"}}}

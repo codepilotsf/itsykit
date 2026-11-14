@@ -61,7 +61,7 @@ func TestExtract(t *testing.T) {
 			if mode == "truncated" {
 				body = body[:len(body)-5]
 			}
-			name := "assets/flea-server-linux-" + arch
+			name := "assets/itsy-server-linux-" + arch
 			source := fstest.MapFS{name + ".gz": &fstest.MapFile{Data: body}, name + ".sha256": &fstest.MapFile{Data: []byte(sum)}}
 			if mode == "missing" {
 				delete(source, name+".gz")
@@ -111,7 +111,7 @@ func TestExtract(t *testing.T) {
 
 func TestEmbeddedServers(t *testing.T) {
 	// Source-only checkouts have a placeholder; packaged builds require both.
-	if _, err := fs.Stat(assets, "assets/flea-server-linux-amd64.gz"); err != nil {
+	if _, err := fs.Stat(assets, "assets/itsy-server-linux-amd64.gz"); err != nil {
 		if os.Getenv("FLEA_REQUIRE_BUNDLE") == "1" {
 			t.Fatal("missing bundled servers")
 		}

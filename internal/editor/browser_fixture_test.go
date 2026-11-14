@@ -70,7 +70,7 @@ func browserDecorate(w http.ResponseWriter, r *http.Request, decorate func([]byt
 			}
 			return markup
 		})
-		shell := template.Must(template.New("fixture").Parse(`<div id="flea-owner-root" data-revision="" data-email="{{.Email}}" data-csrf="{{.CSRF}}" data-shared="{{.Shared}}" data-page="{{.Page}}" data-photos="{{.Photos}}" data-media="{{.Media}}" data-photo-placeholder="{{.PhotoPlaceholder}}"><template shadowrootmode="open">{{.UI}}</template></div>`))
+		shell := template.Must(template.New("fixture").Parse(`<div id="itsy-owner-root" data-revision="" data-email="{{.Email}}" data-csrf="{{.CSRF}}" data-shared="{{.Shared}}" data-page="{{.Page}}" data-photos="{{.Photos}}" data-media="{{.Media}}" data-photo-placeholder="{{.PhotoPlaceholder}}"><template shadowrootmode="open">{{.UI}}</template></div>`))
 		_ = shell.Execute(&out, map[string]any{"Email": identity.Email, "CSRF": identity.CSRF, "Shared": string(sharedJSON), "Page": string(pageJSON), "Photos": string(photosJSON), "Media": string(mediaJSON), "PhotoPlaceholder": site.EmptyPhotoSource, "UI": template.HTML("<style>" + string(editorAssets["editor.css"]) + "</style>" + section + inlineUI + collectionIconTemplates())})
 		policy := w.Header().Get("Content-Security-Policy")
 		shellMarkup := bytes.Clone(out.Bytes())

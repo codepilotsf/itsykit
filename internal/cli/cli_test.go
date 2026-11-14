@@ -55,7 +55,7 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			for _, name := range []string{".itsy.config.json", "itsy/snips.json", "site/main.layout.html", "site/_404.html", "site/_500.html"} {
+			for _, name := range []string{"itsy.config.json", "itsy/snips.json", "site/main.layout.html", "site/_404.html", "site/_500.html"} {
 				if _, err := os.Stat(filepath.Join(root, name)); err != nil {
 					t.Fatal(err)
 				}
@@ -244,7 +244,7 @@ func TestExecutableWorkflow(t *testing.T) {
 		}
 		return response.StatusCode, string(b)
 	}
-	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/global.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/.itsy.config.json": 404, "/_header.html": 404, "/%2e%2e/.itsy.config.json": 404} {
+	for url, want := range map[string]int{"/": 200, "/about": 404, "/css/global.css": 200, "/images/mark.svg": 200, "/about/": 404, "/about.html": 404, "/itsy.config.json": 404, "/_header.html": 404, "/%2e%2e/itsy.config.json": 404} {
 		if code, _ := get(url); code != want {
 			t.Errorf("%s: %d", url, code)
 		}
@@ -303,7 +303,7 @@ func TestExecutableWorkflow(t *testing.T) {
 	}
 	edit("css/global.css", "/* updated asset */")
 	wait("/css/global.css", 200, "updated asset")
-	edit(".itsy.config.json", `{"app":{"site_name":"Changed config"}}`)
+	edit("itsy.config.json", `{"app":{"site_name":"Changed config"}}`)
 	wait("/", 200, "Changed config")
 	edit("index.html", `{render missing-secret-name}`)
 	wait("/", 500, "")

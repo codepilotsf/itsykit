@@ -14,7 +14,7 @@ import (
 
 func TestArchiveRoundTripAndScope(t *testing.T) {
 	root := t.TempDir()
-	for name, body := range map[string]string{"site/index.html": "hello", ".itsy.config.json": `{"app":{"site_name":"test"},"admin":{"emails":["owner@example.test"]},"redirects":{"/old.html":"/"},"deploy":{"branches":{"main":{"target":"private-target"}}}}`, "itsy/data/home.json": "{}", "itsy/runtime/sessions.json": "private-session", ".git/config": "secret", "README.md": "local", ".agents/skills/core/SKILL.md": "private agent instructions", ".agents/skills-source.md": "local source provenance"} {
+	for name, body := range map[string]string{"site/index.html": "hello", "itsy.config.json": `{"app":{"site_name":"test"},"admin":{"emails":["owner@example.test"]},"redirects":{"/old.html":"/"},"deploy":{"branches":{"main":{"target":"private-target"}}}}`, "itsy/data/home.json": "{}", "itsy/runtime/sessions.json": "private-session", ".git/config": "secret", "README.md": "local", ".agents/skills/core/SKILL.md": "private agent instructions", ".agents/skills-source.md": "local source provenance"} {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)
@@ -40,10 +40,10 @@ func TestArchiveRoundTripAndScope(t *testing.T) {
 	if data, err := os.ReadFile(filepath.Join(dest, "site", "index.html")); err != nil || string(data) != "hello" {
 		t.Fatal(string(data), err)
 	}
-	if _, err := os.Stat(filepath.Join(dest, ".itsy.config.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(dest, "itsy.config.json")); err != nil {
 		t.Fatal("configuration missing from release", err)
 	}
-	configBytes, err := os.ReadFile(filepath.Join(dest, ".itsy.config.json"))
+	configBytes, err := os.ReadFile(filepath.Join(dest, "itsy.config.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

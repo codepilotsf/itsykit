@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-const BaseURL = "https://fleacms.com/releases"
+const BaseURL = "https://itsyweb.dev/releases"
 const maxBinary = 128 << 20
 
 var stableVersion = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$`)
@@ -84,7 +84,7 @@ func newer(latest, current string) (bool, error) {
 	}
 	base := strings.SplitN(strings.SplitN(current, "+", 2)[0], "-", 2)[0]
 	if !stableVersion.MatchString(base) {
-		return false, fmt.Errorf("this build has an invalid version; reinstall from fleacms.com")
+		return false, fmt.Errorf("this build has an invalid version; reinstall from itsyweb.dev")
 	}
 	a, b := strings.Split(latest, "."), strings.Split(base, ".")
 	for i := range a {
@@ -189,7 +189,7 @@ func (u updater) run(ctx context.Context, current string, out io.Writer) error {
 		fmt.Fprintf(out, "ItsyWeb %s is already up to date.\nUse itsy for all commands from now on.\n", current)
 		return nil
 	}
-	name := "flea-" + u.system + "-" + u.arch
+	name := "itsy-" + u.system + "-" + u.arch
 	if err := u.download(ctx, version+"/SHA256SUMS", &manifest, 8192); err != nil {
 		return err
 	}

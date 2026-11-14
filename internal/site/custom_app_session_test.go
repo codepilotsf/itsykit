@@ -74,7 +74,7 @@ func TestCustomAppSessionLifecycle(t *testing.T) {
 	}
 	exe := buildSessionApp(t)
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"session":{"mount":"/session"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"session":{"mount":"/session"}}}`)
 	put(t, root, "itsy/apps/session/app.json", `{"name":"session","version":"0.1.0","protocol":2,"executable":{"`+runtime.GOOS+"-"+runtime.GOARCH+`":"session"}}`)
 	copyExecutable(t, exe, filepath.Join(root, "itsy", "apps", "session", "session"))
 	put(t, root, "session/index.html", `<p id="state">{session.data.authenticated}</p><p id="invalid">{session.invalid.action}</p><form method="post" action="/session">{csrf}<input name="action" value="login"></form>`)

@@ -17,7 +17,7 @@ import (
 
 func seoConfig(t *testing.T, root, settings string) {
 	t.Helper()
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"seo":`+settings+`}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"seo":`+settings+`}`)
 }
 
 func sitemapLocations(t *testing.T, body []byte) []string {
@@ -159,7 +159,7 @@ func TestSEOCustomDiscoveryAndOptIn(t *testing.T) {
 
 func TestSEOBlogSnapshotsAndAppBoundaries(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{},"seo":{"url":"https://example.test"},"apps":{"blog":{"mount":"/journal"},"contact":{"mount":"/contact","email":{"to":"admin@example.test"}},"demo":{"mount":"/demo"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{},"seo":{"url":"https://example.test"},"apps":{"blog":{"mount":"/journal"},"contact":{"mount":"/contact","email":{"to":"admin@example.test"}},"demo":{"mount":"/demo"}}}`)
 	put(t, root, "journal/_index.html", "Blog")
 	put(t, root, "journal/_post.html", "{blog.data.post.title}")
 	put(t, root, "contact/index.html", `<html><head><title>Contact</title></head><body><form>{csrf}</form></body></html>`)
@@ -211,7 +211,7 @@ func TestSEOBlogSnapshotsAndAppBoundaries(t *testing.T) {
 	}
 	// A source reload replaces both origin and documents without mutating the old
 	// snapshot or retaining an endpoint that is no longer configured.
-	put(t, root, ".itsy.config.json", `{"app":{}}`)
+	put(t, root, "itsy.config.json", `{"app":{}}`)
 	if err := s.Reload(root); err != nil {
 		t.Fatal(err)
 	}
@@ -263,7 +263,7 @@ func TestSEOCanonicalInsertionPreservesSource(t *testing.T) {
 func TestSEOGeneratedDocumentsNeverWriteSiteFiles(t *testing.T) {
 	root := fixture(t)
 	seoConfig(t, root, `{"url":"https://example.test"}`)
-	before, err := os.ReadFile(filepath.Join(root, ".itsy.config.json"))
+	before, err := os.ReadFile(filepath.Join(root, "itsy.config.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -273,7 +273,7 @@ func TestSEOGeneratedDocumentsNeverWriteSiteFiles(t *testing.T) {
 			t.Fatal("generation wrote into the project", name, err)
 		}
 	}
-	after, err := os.ReadFile(filepath.Join(root, ".itsy.config.json"))
+	after, err := os.ReadFile(filepath.Join(root, "itsy.config.json"))
 	if err != nil || !bytes.Equal(before, after) || !json.Valid(after) {
 		t.Fatal("generation rewrote configuration", err)
 	}
@@ -281,7 +281,7 @@ func TestSEOGeneratedDocumentsNeverWriteSiteFiles(t *testing.T) {
 
 func TestSEORedirectBoundaries(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{},"seo":{"url":"https://example.test"},"redirects":{"/old-about.html":"/about"}}`)
+	put(t, root, "itsy.config.json", `{"app":{},"seo":{"url":"https://example.test"},"redirects":{"/old-about.html":"/about"}}`)
 	s := NewProductionServer(mustLoad(t, root), nil)
 	w := request(s, "GET", "/old-about.html")
 	if w.Code != 301 || w.Header().Get("Location") != "/about" || w.Header().Get("Link") != "" || strings.Contains(w.Body.String(), `rel="canonical"`) {
@@ -292,7 +292,7 @@ func TestSEORedirectBoundaries(t *testing.T) {
 		t.Fatal("redirect source entered sitemap", locations)
 	}
 	for _, source := range []string{"/sitemap.xml", "/robots.txt"} {
-		put(t, root, ".itsy.config.json", `{"app":{},"seo":{"url":"https://example.test"},"redirects":{"`+source+`":"/about"}}`)
+		put(t, root, "itsy.config.json", `{"app":{},"seo":{"url":"https://example.test"},"redirects":{"`+source+`":"/about"}}`)
 		if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "automatic SEO endpoint") {
 			t.Fatal("redirect shadowed generated discovery", source, err)
 		}

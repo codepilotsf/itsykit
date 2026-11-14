@@ -1,6 +1,6 @@
 # ItsyWeb
 
-New sites use `.itsy.config.json`, `itsy/`, and `<!-- itsy` layout settings.
+New sites use `itsy.config.json`, `itsy/`, and `<!-- itsy` layout settings.
 Existing `.flea.config.json`, `flea/`, and `<!-- flea` projects remain supported
 without conversion. Keep using an existing site's selected files rather than
 creating a second layout. New-layout deployment requires server protocol 29;
@@ -60,7 +60,7 @@ itsy dev
 ```
 
 On the first run, enter your site name and an optional admin email. New sites
-enable `dev.email_preview` in `.itsy.config.json`: sign-in and contact emails
+enable `dev.email_preview` in `itsy.config.json`: sign-in and contact emails
 open in your browser without sending or needing Resend credentials. The preview
 looks like an opened email, with sender, recipient, subject and date/time.
 Use its sign-in code normally. Previews expire after 10 minutes and stay only in
@@ -129,7 +129,7 @@ No remote is configured automatically. There is no existing `origin` to rename.
 | `site/admin.layout.html` | Sign-in layout |
 | `site/css/` | Stylesheets and theme tokens |
 | `site/images/` | Developer-managed images and logo |
-| `.itsy.config.json` | Site settings and branch deployment destinations |
+| `itsy.config.json` | Site settings and branch deployment destinations |
 | `itsy/snips.json` | Editable content, page metadata, and media records |
 | `itsy/data/` | Optional developer-managed JSON data |
 | `itsy/media/` | Managed photos and videos |
@@ -155,7 +155,7 @@ unless listed as migration redirects.
 
 ### Migration redirects
 
-Add a top-level `redirects` object in `.itsy.config.json`, alongside `app`:
+Add a top-level `redirects` object in `itsy.config.json`, alongside `app`:
 
 ```json
 "redirects": {
@@ -211,7 +211,7 @@ Relative paths resolve from the calling template. Use `{render /shared/card}` fo
 
 ### Site settings
 
-Store public site-wide values in the `app` object in `.itsy.config.json`:
+Store public site-wide values in the `app` object in `itsy.config.json`:
 
 ```json
 {
@@ -228,7 +228,7 @@ name here; commit it before deploying.
 
 ### Search discovery and SEO
 
-Add a top-level `seo` object alongside `app` in `.itsy.config.json` when the
+Add a top-level `seo` object alongside `app` in `itsy.config.json` when the
 production address is known:
 
 ```json
@@ -439,7 +439,7 @@ automatic deletion. Video fields in multisnips are not supported.
 
 The starter includes `site/contact/index.html` and `site/contact/thank-you.html`.
 Merge `"apps": {"contact": {"mount": "/contact", "email": {"to": "owner@example.com"}}}`
-into `.itsy.config.json`, preserving other settings. Local preview mode needs no
+into `itsy.config.json`, preserving other settings. Local preview mode needs no
 provider credentials. For real delivery, configure email with `itsy email`.
 Restart dev after changing contact settings.
 
@@ -531,7 +531,7 @@ itsy deploy
 
 The first run asks for the branch's server, domain, WWW redirect, and HTTPS
 preferences, then saves the destination under `deploy.branches` in
-`.itsy.config.json`. It can run before your first commit and offers to commit
+`itsy.config.json`. It can run before your first commit and offers to commit
 reviewed changes before deploying.
 
 Deployment ships committed source; unresolved working-tree changes block it.

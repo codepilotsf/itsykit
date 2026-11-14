@@ -30,7 +30,7 @@ func TestManagedContact(t *testing.T) {
 		t.Skip("run scripts/build.sh for the managed-process integration test")
 	}
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/deep/contact","email":{"to":"owner@example.test","from":"support@example.test"}}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/deep/contact","email":{"to":"owner@example.test","from":"support@example.test"}}}}`)
 	put(t, root, "deep/contact/index.html", `<form method="post" action="/deep/contact">{csrf}<input name="name" value="{contact.data.name}"><input name="email" value="{contact.data.email}"><textarea name="message">{contact.data.message}</textarea><p>{contact.invalid.email}</p><p>{contact.error}</p></form>`)
 	put(t, root, "deep/contact/thank-you.html", `<h1>Thanks</h1><p>{contact.flash.notice}</p>`)
 	put(t, root, "mailers/main.layout.html", `<html>{slot}</html>`)
@@ -122,7 +122,7 @@ func TestManagedContact(t *testing.T) {
 		t.Fatal(w.Code, w.Body.String())
 	}
 	before := calls.Load()
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/deep/contact","email":{"to":"changed@example.test"}}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/deep/contact","email":{"to":"changed@example.test"}}}}`)
 	if err := s.Reload(root); err != nil {
 		t.Fatal(err)
 	}
@@ -141,7 +141,7 @@ func TestManagedContact(t *testing.T) {
 func managedContactRoot(t *testing.T) string {
 	t.Helper()
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/deep/contact","email":{"to":"owner@example.test","from":"support@example.test"}}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"contact":{"mount":"/deep/contact","email":{"to":"owner@example.test","from":"support@example.test"}}}}`)
 	put(t, root, "deep/contact/index.html", `<form method="post" action="/deep/contact">{csrf}<input name="name" value="{contact.data.name}"><input name="email" value="{contact.data.email}"><textarea name="message">{contact.data.message}</textarea><p>{contact.invalid.email}</p><p>{contact.error}</p></form>`)
 	put(t, root, "deep/contact/thank-you.html", `<h1>Thanks</h1><p>{contact.flash.notice}</p>`)
 	put(t, root, "mailers/main.layout.html", `<html>{slot}</html>`)

@@ -32,7 +32,7 @@ func TestNavigationStylesBrowser(t *testing.T) {
    try {
      const rules=[...document.querySelector('link[rel=stylesheet]').sheet.cssRules];
      if(!rules.some(rule=>rule.cssText.startsWith('@view-transition') && /navigation:\s*auto/.test(rule.cssText))) throw Error('native navigation rule missing');
-     if(getComputedStyle(document.querySelector('main')).viewTransitionName!=='flea-page') throw Error('main not isolated');
+     if(getComputedStyle(document.querySelector('main')).viewTransitionName!=='itsy-page') throw Error('main not isolated');
      result.textContent='PASS';
    }catch(error){result.textContent='FAIL: '+error.message;}
    document.body.append(result);

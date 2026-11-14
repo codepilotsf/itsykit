@@ -1,7 +1,7 @@
 /* Developer-designated media regions share the page's Save/Cancel transaction. */
 (() => {
   'use strict';
-  const host=document.getElementById('flea-owner-root');
+  const host=(document.getElementById('itsy-owner-root')||document.getElementById('flea-owner-root'));
   if(!host?.ownerEditing)return;
   const ui=host.shadowRoot,owner=host.ownerEditing;
   const entries=JSON.parse(host.dataset.media||'null')||{};

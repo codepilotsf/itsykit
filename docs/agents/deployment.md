@@ -111,7 +111,7 @@ verification and rollback boundaries. Never delete retained downloads to shrink 
 site archive, or include the store in site backups. The 256 MiB archive limit remains.
 
 Deploy/https select only the current Git branch's saved destination from
-.itsy.config.json's deploy.branches map. Use the actual branch name without a production
+itsy.config.json's deploy.branches map. Use the actual branch name without a production
 label or environment question. Generate the internal remote site name from the
 project folder and branch; do not ask the user to name it. First use prompts,
 suggests staging.<main domain> for staging, and saves server, domain, stable
@@ -154,7 +154,7 @@ Top-level site `redirects` is runtime config too: preserve it in the committed
 snapshot/archive and validate its destination routes on both sides. Protocol 28
 requires matching clients/servers because older servers silently ignore these
 rules. Keep server updates separate from site deployment.
-Deploy packages committed site/ pages/assets/partials, .itsy.config.json,
+Deploy packages committed site/ pages/assets/partials, itsy.config.json,
 mailers/, itsy/snips.json, itsy/media/, itsy/data/, legacy itsy/snips/, itsy/icons/,
 and each custom app's `itsy/apps/<name>/app.json` with exactly the executables it
 declares. Validate the actual packaged snapshot locally and the extracted release

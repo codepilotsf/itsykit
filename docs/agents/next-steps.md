@@ -9,7 +9,7 @@ for completed changes, and [README.md](../../README.md) for current usage.
 ## Pending ItsyWeb rename release
 
 The CLI uses `itsy`, with `flea update` as the only working old command. New sites
-use `.itsy.config.json` and `itsy/`; old names remain supported without conversion.
+use `itsy.config.json` and `itsy/`; old names remain supported without conversion.
 Before publication, assign the next minor version, sync the new installer to the
 website, and verify fresh installs and both updater steps on native Mac ARM64 and
 Linux AMD64. Verify protocol-28-to-29 server updates with existing site content,

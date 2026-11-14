@@ -134,13 +134,13 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 		return nil, err
 	}
 	// Validate the tree before reading configuration or any content.
-	if err = readJSON(boundary, ".itsy.config.json", &config); err != nil {
+	if err = readJSON(boundary, "itsy.config.json", &config); err != nil {
 		return nil, err
 	}
 	p.App = config.App
 	p.seo, err = decodeSEO(config.SEO)
 	if err != nil {
-		return nil, fmt.Errorf(".itsy.config.json: %w", err)
+		return nil, fmt.Errorf("itsy.config.json: %w", err)
 	}
 	p.Apps, err = decodeApps(config.Apps)
 	if err != nil {
@@ -158,12 +158,12 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 		return nil, fmt.Errorf("contact settings now belong in apps.contact; see the Contact app documentation")
 	}
 	if p.App == nil {
-		return nil, fmt.Errorf(".itsy.config.json: app must be a JSON object")
+		return nil, fmt.Errorf("itsy.config.json: app must be a JSON object")
 	}
 	if value, exists := p.App["site_name"]; exists {
 		name, ok := value.(string)
 		if !ok || strings.TrimSpace(name) == "" {
-			return nil, fmt.Errorf(".itsy.config.json: app.site_name must be a nonempty string")
+			return nil, fmt.Errorf("itsy.config.json: app.site_name must be a nonempty string")
 		}
 		p.SiteNameConfigured = true
 	} else {

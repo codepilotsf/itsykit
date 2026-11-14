@@ -64,7 +64,7 @@ func typedMediaArchive(t *testing.T, kind string) string {
 		markup = `<video src="{snip ` + typedMediaID + `.src}" poster="{snip ` + typedMediaID + `.poster}" controls></video>`
 	}
 	store.Page("/").Snips[typedMediaID] = entry
-	for name, body := range map[string][]byte{".itsy.config.json": []byte(`{"app":{"site_name":"Test"}}`), "site/index.html": []byte(markup), "itsy/media/" + filename: data} {
+	for name, body := range map[string][]byte{"itsy.config.json": []byte(`{"app":{"site_name":"Test"}}`), "site/index.html": []byte(markup), "itsy/media/" + filename: data} {
 		if e := os.WriteFile(filepath.Join(root, name), body, 0644); e != nil {
 			t.Fatal(e)
 		}

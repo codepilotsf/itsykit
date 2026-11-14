@@ -28,8 +28,14 @@ var preferenceScriptHash = func() string {
 	if !ok {
 		panic("unclosed preference initializer")
 	}
-	sum := sha256.Sum256([]byte(script))
-	return " 'sha256-" + base64.StdEncoding.EncodeToString(sum[:]) + "'"
+	// Both known, data-free initializers are supported so custom sites can
+	// retain their original declarative toolbar through the rename.
+	policy := ""
+	for _, initializer := range []string{script, strings.ReplaceAll(script, "itsy-", "flea-")} {
+		sum := sha256.Sum256([]byte(initializer))
+		policy += " 'sha256-" + base64.StdEncoding.EncodeToString(sum[:]) + "'"
+	}
+	return policy
 }()
 
 //go:embed inline/squire.js

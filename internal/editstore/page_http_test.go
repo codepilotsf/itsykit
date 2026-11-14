@@ -92,7 +92,7 @@ func TestAuthenticatedPagePublication(t *testing.T) {
 			}
 		}
 		for _, a := range n.Attr {
-			if a.Key == "id" && a.Val == "flea-owner-root" {
+			if a.Key == "id" && a.Val == "itsy-owner-root" {
 				for _, a := range n.Attr {
 					attrs[a.Key] = a.Val
 				}
@@ -133,7 +133,7 @@ func TestAuthenticatedPagePublication(t *testing.T) {
 		t.Fatal("missing canonical save receipt", err, w.Body.String())
 	}
 	w = request("GET", "/", nil, nil)
-	if !strings.Contains(w.Body.String(), "Saved heading") || !strings.Contains(w.Body.String(), edit.Title) || strings.Contains(w.Body.String(), "flea-owner-root") {
+	if !strings.Contains(w.Body.String(), "Saved heading") || !strings.Contains(w.Body.String(), edit.Title) || strings.Contains(w.Body.String(), "itsy-owner-root") {
 		t.Fatal("publication failed", w.Body.String())
 	}
 	w = request("POST", "/admin/page", values, session)

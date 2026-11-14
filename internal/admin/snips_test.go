@@ -31,7 +31,7 @@ func richArchive(t *testing.T, include bool, css ...string) string {
 	if err := os.WriteFile(filepath.Join(root, "itsy/snips.json"), data, 0644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"Test"}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "itsy.config.json"), []byte(`{"app":{"site_name":"Test"}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	page := `<p>No region</p>`

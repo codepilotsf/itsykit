@@ -60,7 +60,7 @@ func TestIndexingPersistsAcrossDeploySyncRollbackRestore(t *testing.T) {
 	if _, err = backup.Extract(bytes.NewReader(buf.Bytes()), dest); err != nil {
 		t.Fatal(err)
 	}
-	raw, err := os.ReadFile(filepath.Join(dest, ".itsy.config.json"))
+	raw, err := os.ReadFile(filepath.Join(dest, "itsy.config.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

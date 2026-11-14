@@ -19,7 +19,7 @@ func testConfig(t *testing.T, listen string) string {
 	t.Helper()
 	dir := t.TempDir()
 	root := filepath.Join(dir, "site")
-	for path, body := range map[string]string{".itsy.config.json": `{"app":{"site_name":"Host test"},"dev":{"email_preview":true}}`, "site/index.html": "<h1>{app.site_name}</h1>", "site/_404.html": "Custom missing"} {
+	for path, body := range map[string]string{"itsy.config.json": `{"app":{"site_name":"Host test"},"dev":{"email_preview":true}}`, "site/index.html": "<h1>{app.site_name}</h1>", "site/_404.html": "Custom missing"} {
 		file := filepath.Join(root, path)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)

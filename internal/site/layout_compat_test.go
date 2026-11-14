@@ -12,7 +12,7 @@ import (
 )
 
 func TestCurrentAndLegacySiteLayouts(t *testing.T) {
-	for _, config := range []string{".itsy.config.json", ".flea.config.json"} {
+	for _, config := range []string{"itsy.config.json", ".flea.config.json"} {
 		for _, data := range []string{"itsy", "flea"} {
 			t.Run(config+"/"+data, func(t *testing.T) {
 				root := fixture(t)
@@ -27,8 +27,8 @@ func TestCurrentAndLegacySiteLayouts(t *testing.T) {
 				if err := os.WriteFile(filepath.Join(root, "site", "images", "seed.png"), seed.Bytes(), 0644); err != nil {
 					t.Fatal(err)
 				}
-				if config != ".itsy.config.json" {
-					if err := os.Rename(filepath.Join(root, ".itsy.config.json"), filepath.Join(root, config)); err != nil {
+				if config != "itsy.config.json" {
+					if err := os.Rename(filepath.Join(root, "itsy.config.json"), filepath.Join(root, config)); err != nil {
 						t.Fatal(err)
 					}
 				}
@@ -86,7 +86,7 @@ func TestCurrentAndLegacySiteLayouts(t *testing.T) {
 					t.Fatal("private runtime not ignored", string(ignore), err)
 				}
 				if config == ".flea.config.json" {
-					if _, err := os.Stat(filepath.Join(root, ".itsy.config.json")); !os.IsNotExist(err) {
+					if _, err := os.Stat(filepath.Join(root, "itsy.config.json")); !os.IsNotExist(err) {
 						t.Fatal("created a second config")
 					}
 				}
@@ -112,7 +112,7 @@ func TestCurrentAndLegacyLayoutComments(t *testing.T) {
 func TestLegacyNamingAliasesRejectSymlinks(t *testing.T) {
 	for _, config := range []bool{true, false} {
 		root := fixture(t)
-		current, legacy := ".itsy.config.json", ".flea.config.json"
+		current, legacy := "itsy.config.json", ".flea.config.json"
 		if !config {
 			current, legacy = "itsy", "flea"
 		}

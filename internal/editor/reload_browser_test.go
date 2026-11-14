@@ -20,7 +20,7 @@ func TestOwnerReloadBrowser(t *testing.T) {
 		t.Skip("set FLEA_TEST_BROWSER")
 	}
 	checks := `setTimeout(async()=>{
- const host=document.getElementById('flea-owner-root'),ui=host.shadowRoot;
+ const host=document.getElementById('itsy-owner-root'),ui=host.shadowRoot;
  const wait=ms=>new Promise(r=>setTimeout(r,ms));
  const report=value=>fetchResult('/test-result?value='+encodeURIComponent(value));const fetchResult=window.fetch.bind(window);
  const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};

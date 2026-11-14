@@ -12,7 +12,7 @@ supported.
 
 ## Enable it
 
-Merge this into `.itsy.config.json`, preserving your other settings:
+Merge this into `itsy.config.json`, preserving your other settings:
 
 ```json
 {

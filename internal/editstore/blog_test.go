@@ -16,7 +16,7 @@ func TestBlogLifecycleLocalAndManagedContent(t *testing.T) {
 	for _, remote := range []bool{false, true} {
 		t.Run(map[bool]string{false: "local", true: "managed"}[remote], func(t *testing.T) {
 			s, public := fixture(t, remote)
-			config, err := os.ReadFile(filepath.Join(s.Root, ".itsy.config.json"))
+			config, err := os.ReadFile(filepath.Join(s.Root, "itsy.config.json"))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -24,7 +24,7 @@ func TestBlogLifecycleLocalAndManagedContent(t *testing.T) {
 			json.Unmarshal(config, &cfg)
 			cfg["apps"] = map[string]any{"blog": map[string]any{"mount": "/blog"}}
 			config, _ = json.Marshal(cfg)
-			os.WriteFile(filepath.Join(s.Root, ".itsy.config.json"), config, 0644)
+			os.WriteFile(filepath.Join(s.Root, "itsy.config.json"), config, 0644)
 			os.Mkdir(filepath.Join(s.Root, "site", "blog"), 0755)
 			os.WriteFile(filepath.Join(s.Root, "site", "blog", "_index.html"), []byte(`{#each blog.data.posts as post}{post.title}{/each}`), 0644)
 			os.WriteFile(filepath.Join(s.Root, "site", "blog", "_post.html"), []byte(`{blog.data.post.body}`), 0644)

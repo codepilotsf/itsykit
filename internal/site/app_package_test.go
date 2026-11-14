@@ -80,7 +80,7 @@ func TestCustomAppRegistration(t *testing.T) {
 	load := func(t *testing.T, settings, man string, executable bool, page bool) error {
 		t.Helper()
 		root := fixture(t)
-		put(t, root, ".itsy.config.json", settings)
+		put(t, root, "itsy.config.json", settings)
 		if man != "" {
 			put(t, root, "itsy/apps/demo/app.json", man)
 		}
@@ -128,7 +128,7 @@ func TestCustomAppRegistration(t *testing.T) {
 
 	// A non-executable file is not a runnable package.
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy.config.json", valid)
 	put(t, root, "itsy/apps/demo/app.json", validManifest)
 	put(t, root, "itsy/apps/demo/demo", "not executable")
 	put(t, root, "demo/index.html", "Form")
@@ -138,7 +138,7 @@ func TestCustomAppRegistration(t *testing.T) {
 
 	// A symlinked executable is refused.
 	root = fixture(t)
-	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy.config.json", valid)
 	put(t, root, "itsy/apps/demo/app.json", validManifest)
 	put(t, root, "demo/index.html", "Form")
 	target := filepath.Join(root, "_secret")
@@ -160,7 +160,7 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 	valid := `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`
 	load := func(t *testing.T) error {
 		root := fixture(t)
-		put(t, root, ".itsy.config.json", valid)
+		put(t, root, "itsy.config.json", valid)
 		put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 		put(t, root, "demo/index.html", "Form")
 		writeExecutable(t, root, "itsy/apps/demo/demo")
@@ -173,7 +173,7 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 
 	// app.json is reserved and is never a valid executable filename.
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy.config.json", valid)
 	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "app.json"))
 	put(t, root, "demo/index.html", "Form")
 	if _, err := Load(root); err == nil {
@@ -182,7 +182,7 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 
 	// A declaration whose bytes are not the platform's native format is refused.
 	root = fixture(t)
-	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy.config.json", valid)
 	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	put(t, root, "demo/index.html", "Form")
 	if err := os.WriteFile(filepath.Join(root, "itsy", "apps", "demo", "demo"), []byte("#!/bin/sh\nexit 0\n"), 0755); err != nil {
@@ -194,7 +194,7 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 
 	// A hardlink on a non-selected declared artifact is still refused.
 	root = fixture(t)
-	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy.config.json", valid)
 	put(t, root, "itsy/apps/demo/app.json", fmt.Sprintf(`{"name":"demo","version":"1.0.0","protocol":2,"executable":{%q:"demo",%q:"demo-plan9"}}`, testPlatform, "plan9-386"))
 	put(t, root, "demo/index.html", "Form")
 	writeExecutable(t, root, "itsy/apps/demo/demo")
@@ -210,7 +210,7 @@ func TestAppPackageRejectsUnsafeArtifacts(t *testing.T) {
 
 	// A hardlinked manifest is refused.
 	root = fixture(t)
-	put(t, root, ".itsy.config.json", valid)
+	put(t, root, "itsy.config.json", valid)
 	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	put(t, root, "demo/index.html", "Form")
 	writeExecutable(t, root, "itsy/apps/demo/demo")
@@ -229,7 +229,7 @@ func TestAppStorageIsStableRuntimeState(t *testing.T) {
 	releaseA := fixture(t)
 	releaseB := fixture(t)
 	for _, root := range []string{releaseA, releaseB} {
-		put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
+		put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
 		put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 		put(t, root, "demo/index.html", "Form")
 		writeExecutable(t, root, "itsy/apps/demo/demo")
@@ -265,7 +265,7 @@ func TestAppStorageIsStableRuntimeState(t *testing.T) {
 // process.
 func TestChangedPackageFailsClosed(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
 	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	put(t, root, "demo/index.html", "Form")
 	writeExecutable(t, root, "itsy/apps/demo/demo")
@@ -289,7 +289,7 @@ func TestChangedPackageFailsClosed(t *testing.T) {
 // swapped through its other name after validation, fails closed at load.
 func TestAppPackageHardlinkRejected(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
 	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	put(t, root, "demo/index.html", "Form")
 	writeExecutable(t, root, "itsy/apps/demo/demo")

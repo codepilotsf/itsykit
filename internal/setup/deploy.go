@@ -107,7 +107,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			return err
 		}
 		if !p.SiteNameConfigured {
-			return fmt.Errorf("Set app.site_name in .itsy.config.json, or run itsy dev to choose a site name, then commit it before deploying.")
+			return fmt.Errorf("Set app.site_name in itsy.config.json, or run itsy dev to choose a site name, then commit it before deploying.")
 		}
 		localProject = p
 		// Admin login, Contact forms and every session-owning custom app require

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const ConfigName = ".itsy.config.json"
+const ConfigName = "itsy.config.json"
 const DataDir = "itsy"
 const LegacyConfigName = ".flea.config.json"
 const LegacyDataDir = "flea"

@@ -1,7 +1,7 @@
 # Architecture and review guide
 
 `internal/selfupdate` updates only the local CLI, separate from SSH server updates.
-It trusts bounded HTTPS metadata from fleacms.com, checks checksum/platform/version,
+It trusts bounded HTTPS metadata from itsyweb.dev, checks checksum/platform/version,
 and replaces the executable under the shared installer lock. The canonical command
 is `itsy`; only `flea update` dispatches through the retired command entry point.
 When converting a regular `flea`, the updater exclusively links the verified
@@ -9,7 +9,8 @@ executable to `itsy`, then atomically replaces `flea` with a relative symlink.
 An unrelated existing `itsy` is never replaced during conversion. The installer
 installs `itsy` and the same retired-command link. New site paths use Itsy names,
 with legacy config/data aliases. Installed server paths, wire identifiers and
-release artifacts retain their spelling. Already released updaters have a
+released artifact aliases retain their spelling. Canonical downloads use itsy-*;
+legacy flea-* aliases contain identical verified bytes. Already released updaters have a
 narrow read-only version probe; see docs/installation.md. Checksums are not
 independent signatures. Public-host and clean-machine verification remain pending.
 
@@ -23,8 +24,8 @@ creation and preserves the Impeccable launcher executable bit on extraction.
 Runtime files are under `itsy/runtime/`, outside serving, watching and archives.
 Template names and public URLs stay relative to site/, not the project root.
 Extraction journals use physical site/ paths. All *.layout.html files are private.
-Root `.itsy.config.json` and its explicit legacy alias `.flea.config.json` are
-the only admitted config dotfiles. `sitefiles/layout.go` selects each config/data
+Root `itsy.config.json` and its explicit legacy alias `.flea.config.json` are
+the only admitted root configuration files. `sitefiles/layout.go` selects each config/data
 name once per operation, preferring Itsy names and falling back only on absence.
 The ordinary confined type, ownership and symlink checks still apply. Loader,
 editor, media, archives, pull and session paths use this shared resolution. Deployment destinations
@@ -340,7 +341,7 @@ sites before replacement; failed readiness restores the saved old executable.
 
 `sitefiles.Included` is a runtime inclusion policy, not a public-URL policy.
 Configuration and content belong in an archive but remain private over HTTP.
-Site configuration uses `.itsy.config.json` or its explicit legacy JSON alias.
+Site configuration uses `itsy.config.json` or its explicit legacy JSON alias.
 Protocol 29 rejects older servers before new-layout deployment; its loader also
 retains the existing inline-save/formatting contract.
 There is no extensionless-name fallback.

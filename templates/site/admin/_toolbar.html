@@ -1,4 +1,4 @@
-<div id="flea-owner-root"
+<div id="itsy-owner-root"
      data-email="{app.current_admin.email}"
      data-version="{app.current_admin.version}"
      data-revision="{app.current_admin.revision}">
@@ -21,5 +21,5 @@
     </section>
   </template>
 </div>
-<script>(()=>{const h=document.getElementById('flea-owner-root'),ui=h.shadowRoot;try{ui.querySelector('#edit').checked=sessionStorage.getItem('flea-editing:'+h.dataset.email)!=='off';}catch{}ui.querySelector('#details').disabled=!ui.querySelector('#edit').checked;})();</script>
+<script>(()=>{const h=document.getElementById('itsy-owner-root'),ui=h.shadowRoot;try{ui.querySelector('#edit').checked=sessionStorage.getItem('itsy-editing:'+h.dataset.email)!=='off';}catch{}ui.querySelector('#details').disabled=!ui.querySelector('#edit').checked;})();</script>
 <script src="/admin/assets/editor.js" defer></script>

@@ -34,7 +34,7 @@ func TestDevOnboardingFirstRun(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			before, _ := os.ReadFile(filepath.Join(root, ".itsy.config.json"))
+			before, _ := os.ReadFile(filepath.Join(root, "itsy.config.json"))
 			var out bytes.Buffer
 			changed, offered, err := prepareDevOwner(context.Background(), p, strings.NewReader(tc.input), &out, tc.interactive)
 			if (err != nil) != tc.wantErr || changed != tc.wantChanged || offered != tc.wantOff {
@@ -52,7 +52,7 @@ func TestDevOnboardingFirstRun(t *testing.T) {
 			if tc.wantErr {
 				return
 			}
-			after, _ := os.ReadFile(filepath.Join(root, ".itsy.config.json"))
+			after, _ := os.ReadFile(filepath.Join(root, "itsy.config.json"))
 			if !bytes.Equal(before, after) && !tc.wantChanged {
 				t.Fatal("unexpected config write")
 			}

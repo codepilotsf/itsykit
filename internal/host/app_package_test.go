@@ -62,7 +62,7 @@ func appRelease(t *testing.T, base, revision string, withApp bool) (string, stri
 		config = `{"app":{"site_name":"Example"},"apps":{"demo":{"mount":"/demo"}}}`
 	}
 	files := map[string]string{
-		".itsy.config.json":    config,
+		"itsy.config.json":     config,
 		"site/index.html":      "<h1>Home</h1>",
 		"site/demo/index.html": "<p>Demo</p>",
 	}
@@ -249,7 +249,7 @@ func sampleReleaseFiles(t *testing.T, base, revision, binary string, files map[s
 func sampleRelease(t *testing.T, base, revision, binary, page string) (string, string) {
 	t.Helper()
 	return sampleReleaseFiles(t, base, revision, binary, map[string]string{
-		".itsy.config.json":       `{"app":{"site_name":"Example"},"apps":{"session":{"mount":"/session"}}}`,
+		"itsy.config.json":        `{"app":{"site_name":"Example"},"apps":{"session":{"mount":"/session"}}}`,
 		"site/session/index.html": page,
 	})
 }
@@ -469,7 +469,7 @@ func TestBlogSaveKeepsCustomAppSessionAndManagedRuntime(t *testing.T) {
 		`<p id="state">{session.data.authenticated}</p>` +
 		`<form method="post" action="/session">{csrf}<input name="action" value="login"></form>`
 	root, content := sampleReleaseFiles(t, base, "first", binary, map[string]string{
-		".itsy.config.json":       `{"app":{"site_name":"Example"},"apps":{"blog":{"mount":"/blog"},"session":{"mount":"/session"}}}`,
+		"itsy.config.json":        `{"app":{"site_name":"Example"},"apps":{"blog":{"mount":"/blog"},"session":{"mount":"/session"}}}`,
 		"site/session/index.html": page,
 		"site/blog/_index.html":   `<main id="posts">{#each blog.data.posts as post}<a href="{post.url}">{post.title}</a>{/each}</main>`,
 		"site/blog/_post.html":    `<main id="post"><h1>{blog.data.post.title}</h1>{blog.data.post.body}</main>`,

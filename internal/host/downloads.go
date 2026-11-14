@@ -21,7 +21,7 @@ const maxDownloadVersions = 128
 const maxDownloadBytes int64 = 128 << 20
 
 var downloadVersion = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$`)
-var downloadName = regexp.MustCompile(`^flea-(darwin|linux)-(amd64|arm64)$`)
+var downloadName = regexp.MustCompile(`^(flea|itsy)-(darwin|linux)-(amd64|arm64)$`)
 var downloadHash = regexp.MustCompile(`^[0-9a-f]{64}$`)
 
 type downloadFile struct {

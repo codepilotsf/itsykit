@@ -212,7 +212,7 @@ content and runtime state have separate locations.
 
 ```text
 my-site/
-  .itsy.config.json
+  itsy.config.json
   flea/
     snips.json
     media/
@@ -257,7 +257,7 @@ my-site/
 | `**/_name.html` | Developer                              | No                             | Reusable partial templates, except reserved names |
 | `_404.html`    | Developer                               | Only as the 404 response       | Not-found document                                |
 | `_500.html`    | Developer                               | Only as the 500 response       | Server-error document                             |
-| `.itsy.config.json`  | Developer                               | No                             | Site configuration                                |
+| `itsy.config.json`  | Developer                               | No                             | Site configuration                                |
 | `itsy/snips.json` | Site admin or developer | No | Editable content and page metadata |
 | `itsy/media/` | Site admin | Catalogue URLs under `/media/` only | Managed photos and optimized videos |
 | `itsy/runtime/` | Server | No | Ignored sessions and recovery journals |
@@ -318,7 +318,7 @@ The layout explicitly gates admin/_toolbar.html with {#if app.current_admin} and
 supplies a csrf-token meta tag. This reserved request-only object is absent for
 visitors. External editor assets and a protected metadata endpoint keep source small.
 
-There is no `routes.json`. Top-level `.itsy.config.json` `redirects` maps exact old paths to existing local public URLs for 301 GET/HEAD responses. Sources may have legacy extensions or trailing slashes. No query-specific/wildcard/external rules, private paths, chains, loops or active route/app conflicts are accepted. Incoming queries survive unless the target supplies a query. Deployment protocol 28 requires matching clients and servers.
+There is no `routes.json`. Top-level `itsy.config.json` `redirects` maps exact old paths to existing local public URLs for 301 GET/HEAD responses. Sources may have legacy extensions or trailing slashes. No query-specific/wildcard/external rules, private paths, chains, loops or active route/app conflicts are accepted. Incoming queries survive unless the target supplies a query. Deployment protocol 28 requires matching clients and servers.
 
 ## Templates
 
@@ -549,7 +549,7 @@ ItsyWeb validates a snip before writing it. It writes content atomically: create
 
 ## Configuration
 
-`.itsy.config.json` contains JSON only. Comments and trailing commas are not supported. The site loader reads the `app` object. Local `.itsy.config.json` stores a `deploy.branches` map of confirmed deployment settings (target, domain, name, www_redirect, https, email, agree_tos, expected_ips). First deploy prompts and saves; later deploys select only the current branch. Changed settings require `-configure` confirmation. The `deploy` section contains no credentials and is excluded from uploads; runtime settings, including redirects, are retained. Use branch names directly without environment labels or questions. Generate the internal site name automatically; staging suggests a subdomain. Top-level `redirects` now supplies exact page migration mappings; WWW-to-primary redirects remain host-level 308 responses.
+`itsy.config.json` contains JSON only. Comments and trailing commas are not supported. The site loader reads the `app` object. Local `itsy.config.json` stores a `deploy.branches` map of confirmed deployment settings (target, domain, name, www_redirect, https, email, agree_tos, expected_ips). First deploy prompts and saves; later deploys select only the current branch. Changed settings require `-configure` confirmation. The `deploy` section contains no credentials and is excluded from uploads; runtime settings, including redirects, are retained. Use branch names directly without environment labels or questions. Generate the internal site name automatically; staging suggests a subdomain. Top-level `redirects` now supplies exact page migration mappings; WWW-to-primary redirects remain host-level 308 responses.
 
 Example:
 
@@ -757,7 +757,7 @@ itsy rollback
   or a failed commit preserves the created site with instructions to finish setup.
   Includes a starter .gitignore. No remote or hosted project is created; successful
   commit output explains how to add origin and push main.
-- Creates default `.itsy.config.json`, editable starter copy, a layout with inline
+- Creates default `itsy.config.json`, editable starter copy, a layout with inline
   header/footer, error pages, and a welcome page with its SVG mark. Navigation links
   Team and Contact; /test remains an unlinked example. Contact uses an introduction
   beside a three-field form, stacked on mobile. Home, Team, Contact, Thank You and
@@ -789,7 +789,7 @@ itsy rollback
 - Requires deployment protocol 27 before upload, offering first-time setup when absent. Validates the
   packaged site, uploads over SSH/SCP, stages, and atomically switches host config.
 - Restarts and verifies revision/hostname; restores the prior config on failure.
-- Uses native SSH and the saved current-branch mapping in .itsy.config.json. The first
+- Uses native SSH and the saved current-branch mapping in itsy.config.json. The first
   invocation confirms server/domain, WWW redirect, and
   HTTPS, then saves configuration for future deploys.
 - Ask for an SSH username, default root, when user@host is not supplied. Save it

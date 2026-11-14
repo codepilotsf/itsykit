@@ -1,7 +1,7 @@
 /* Authenticated inline editing. Server validation is the security boundary. */
 (() => {
   'use strict';
-  const host = document.getElementById('flea-owner-root');
+  const host = (document.getElementById('itsy-owner-root')||document.getElementById('flea-owner-root'));
   if (!host) return;
   const shared = new Set(JSON.parse(host.dataset.shared));
   const page = JSON.parse(host.dataset.page);
@@ -128,7 +128,7 @@
     $('#status').textContent=saveError || (dirty?'Unsaved changes':'');
     controls();
   }
-  const updateToolbarHeight=()=>{const rect=host.getBoundingClientRect(),height=rect.height;host.style.setProperty('--owner-height',rect.bottom+'px');document.documentElement.style.scrollPaddingTop=height+12+'px';document.documentElement.style.setProperty('--flea-toolbar-height',height+'px');};
+  const updateToolbarHeight=()=>{const rect=host.getBoundingClientRect(),height=rect.height;host.style.setProperty('--owner-height',rect.bottom+'px');document.documentElement.style.scrollPaddingTop=height+12+'px';document.documentElement.style.setProperty('--itsy-toolbar-height',height+'px');document.documentElement.style.setProperty('--flea-toolbar-height',height+'px');};
   updateToolbarHeight();new ResizeObserver(updateToolbarHeight).observe(host);
   window.addEventListener('scroll',updateToolbarHeight,{passive:true});
   function stop() {
@@ -144,9 +144,10 @@
     draft={title:page.title,description:page.description};active=null;editing=dirty=false;saveError='';
     $('#cancel').disabled=$('#save').disabled=true;$('#edit').checked=false;$('#status').textContent='';controls();
   }
-  const editPreference='flea-editing:'+host.dataset.email;
+  const editPreference='itsy-editing:'+host.dataset.email;
+  const legacyEditPreference='flea-editing:'+host.dataset.email;
   let preferredEditing=true;
-  try{preferredEditing=sessionStorage.getItem(editPreference)!=='off';}catch{}
+  try{preferredEditing=(sessionStorage.getItem(editPreference)??sessionStorage.getItem(legacyEditPreference))!=='off';}catch{}
   $('#edit').checked=preferredEditing;
   function start(){
     if(editing||saving||expired)return;
@@ -159,7 +160,7 @@
   $('#edit').onclick=()=>{
     if(saving||expired){$('#edit').checked=editing;return;}
     if(editing){if(dirty&&!confirm('Discard your unsaved changes and turn editing off?')){$('#edit').checked=true;return;}stop();}else start();
-    preferredEditing=editing;try{sessionStorage.setItem(editPreference,editing?'on':'off');}catch{}
+    preferredEditing=editing;try{sessionStorage.setItem(editPreference,editing?'on':'off');sessionStorage.setItem(legacyEditPreference,editing?'on':'off');}catch{}
   };
   function startRegion(r) {
       r.onInput=()=>changed(r);
@@ -338,7 +339,7 @@
   window.addEventListener('beforeunload',event=>{if(dirty){event.preventDefault();event.returnValue='';}});
   $('#logout').onclick=()=>{
     if(dirty && !confirm('Discard your unsaved changes and sign out?'))return;dirty=false;
-    try{sessionStorage.removeItem(editPreference);}catch{}
+    try{sessionStorage.removeItem(editPreference);sessionStorage.removeItem(legacyEditPreference);}catch{}
     const form=document.createElement('form');form.method='post';form.action='/admin/logout';const csrf=document.createElement('input');csrf.type='hidden';csrf.name='csrf';csrf.value=host.dataset.csrf;form.append(csrf);document.body.append(form);form.submit();
   };
   host.ownerEditing={isEditing:()=>editing,canEdit:()=>editing&&!saving&&!expired,changed,open,close,editableNodes:()=>regions.filter(r=>r.node.isConnected).map(r=>r.node)};

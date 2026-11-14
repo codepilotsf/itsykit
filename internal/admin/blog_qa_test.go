@@ -21,7 +21,7 @@ import (
 func blogArchive(t *testing.T, title string) string {
 	t.Helper()
 	root := t.TempDir()
-	for name, body := range map[string]string{".itsy.config.json": `{"app":{"site_name":"Blog"},"apps":{"blog":{"mount":"/blog"}}}`, "site/index.html": "Home", "site/blog/_index.html": `{#each blog.data.posts as post}{post.title}{/each}`, "site/blog/_post.html": `{blog.data.post.body}`} {
+	for name, body := range map[string]string{"itsy.config.json": `{"app":{"site_name":"Blog"},"apps":{"blog":{"mount":"/blog"}}}`, "site/index.html": "Home", "site/blog/_index.html": `{#each blog.data.posts as post}{post.title}{/each}`, "site/blog/_post.html": `{blog.data.post.body}`} {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
 			t.Fatal(err)

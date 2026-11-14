@@ -61,7 +61,7 @@ func TestDevAdminReloadsAccessAndMail(t *testing.T) {
 		t.Fatal(err)
 	}
 	get("Send sign-in code")
-	if err := os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"Test"},"admin":{"emails":[]}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "itsy.config.json"), []byte(`{"app":{"site_name":"Test"},"admin":{"emails":[]}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	if err := public.Reload(root); err != nil {

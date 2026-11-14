@@ -21,7 +21,7 @@ template values consistent with the actual app contracts. These additions do not
 require a full-site design consultation. Bundled import/redesign and site-building
 skills use two design directions and a sample-page review before a substantial full build, unless the user explicitly
 delegates those decisions. Keep generated README/AGENTS summaries aligned.
-`.itsy.config.json` at the project root stores public globals in the required `app` object.
+`itsy.config.json` at the project root stores public globals in the required `app` object.
 Branch destinations live under `deploy.branches` in that same file. Preserve other
 JSON fields when saving destinations and strip `deploy` from releases/backups.
 Templates use app.site_name and other app.* values; no site.* compatibility alias.
@@ -112,7 +112,7 @@ remain escaped. Snip JSON is limited to 5 MiB and each content value to 1 MiB.
 Use internal/sitefiles as the shared exclusion policy for loading, reloads,
 Git snapshots, and archives. Exclude dotpaths, node_modules, and project metadata
 (README.md, AGENTS.md, ARCHITECTURE.md, spec.md, next-steps.md, checklist.md, LICENSE, LICENSE.md, go.mod, go.sum).
-Include only site/, mailers/, .itsy.config.json (or its legacy alias) and approved
+Include only site/, mailers/, itsy.config.json (or its legacy alias) and approved
 itsy/ (or legacy flea/) content, data, media and icon files in release snapshots. The selected config is the sole dotfile exception.
 Private runtime and skills never enter archives. Keep the project-root read boundary
 separate from the site/ template boundary: logical template names remain site-relative,

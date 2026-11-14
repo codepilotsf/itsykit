@@ -128,7 +128,7 @@ func TestLANDevWorkflow(t *testing.T) {
 	}
 	w = req("GET", "/", nil, session)
 	csrfMatch := regexp.MustCompile(`name="csrf-token" content="([^"]+)"`).FindStringSubmatch(w.Body.String())
-	if len(csrfMatch) != 2 || !strings.Contains(w.Body.String(), "flea-owner-root") {
+	if len(csrfMatch) != 2 || !strings.Contains(w.Body.String(), "itsy-owner-root") {
 		t.Fatal("LAN owner shell missing", w.Code)
 	}
 	csrf := csrfMatch[1]
@@ -159,7 +159,7 @@ func TestLANDevWorkflow(t *testing.T) {
 	if w := req("POST", "/admin/page", values, session); w.Code != 409 {
 		t.Fatal("stale save accepted", w.Code)
 	}
-	if w := req("GET", "/", nil, nil); !strings.Contains(w.Body.String(), edit.Title) || strings.Contains(w.Body.String(), "flea-owner-root") {
+	if w := req("GET", "/", nil, nil); !strings.Contains(w.Body.String(), edit.Title) || strings.Contains(w.Body.String(), "itsy-owner-root") {
 		t.Fatal("anonymous publication failed")
 	}
 	// The same authenticated LAN endpoint must support bounded multipart media.
@@ -261,7 +261,7 @@ func TestLANDevWorkflow(t *testing.T) {
 	if w := req("POST", "/", nil, nil); w.Code != 405 || !strings.Contains(w.Body.String(), "Check the form") {
 		t.Fatal("LAN diagnostic unavailable", w.Code)
 	}
-	for _, path := range []string{"/.itsy.config.json", "/itsy/runtime/sessions.json", "/mailers/sign-in.email.html"} {
+	for _, path := range []string{"/itsy.config.json", "/itsy/runtime/sessions.json", "/mailers/sign-in.email.html"} {
 		if w := req("GET", path, nil, nil); w.Code != 404 {
 			t.Fatalf("private path %s: %d", path, w.Code)
 		}
@@ -269,7 +269,7 @@ func TestLANDevWorkflow(t *testing.T) {
 	if w := req("POST", "/admin/logout", url.Values{"csrf": {csrf}}, session); w.Code != 303 {
 		t.Fatal("logout", w.Code)
 	}
-	if w := req("GET", "/", nil, session); strings.Contains(w.Body.String(), "flea-owner-root") {
+	if w := req("GET", "/", nil, session); strings.Contains(w.Body.String(), "itsy-owner-root") {
 		t.Fatal("logged-out session still works")
 	}
 }

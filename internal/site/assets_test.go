@@ -123,7 +123,7 @@ func TestStreamedAssetDoesNotFollowReplacementSymlink(t *testing.T) {
 	if err := os.Remove(file); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Symlink(filepath.Join(root, ".itsy.config.json"), file); err != nil {
+	if err := os.Symlink(filepath.Join(root, "itsy.config.json"), file); err != nil {
 		t.Fatal(err)
 	}
 	if w := request(NewProductionServer(p, nil), "GET", "/large.bin"); w.Code != 200 || w.Body.String() != body {

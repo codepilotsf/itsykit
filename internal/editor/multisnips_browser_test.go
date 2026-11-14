@@ -53,7 +53,7 @@ func TestMultisnipsBrowser(t *testing.T) {
 	h, mail := fixture(t)
 	cookie := login(t, h, mail)
 	checks := `setTimeout(async()=>{const out=document.createElement('output');out.id='multi-result';const assert=(v,m)=>{if(!v)throw Error(m)};try{
- const host=document.getElementById('flea-owner-root'),ui=host.shadowRoot,$=s=>ui.querySelector(s),team=document.getElementById('team'),services=document.getElementById('services'),original=(assert($('#edit').checked,'editing defaults on'),$('#edit').click(),team.innerHTML),originalServices=services.innerHTML;
+ const host=document.getElementById('itsy-owner-root'),ui=host.shadowRoot,$=s=>ui.querySelector(s),team=document.getElementById('team'),services=document.getElementById('services'),original=(assert($('#edit').checked,'editing defaults on'),$('#edit').click(),team.innerHTML),originalServices=services.innerHTML;
  // Headless dump-dom does not reliably tick compositor frames under virtual time.
  // Drive layout/drag callbacks with virtual timers; reduced motion closes dialogs.
  window.requestAnimationFrame=fn=>setTimeout(()=>fn(performance.now()),16);window.cancelAnimationFrame=clearTimeout;

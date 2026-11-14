@@ -35,7 +35,7 @@ func resetSite(root string, in io.Reader, out io.Writer) error {
 	if info, err := os.Lstat(filepath.Join(root, "site")); err != nil || !info.IsDir() {
 		return fmt.Errorf("site must be a real directory, not a link")
 	}
-	for _, name := range []string{".itsy.config.json", "site/main.layout.html", "site/index.html"} {
+	for _, name := range []string{"itsy.config.json", "site/main.layout.html", "site/index.html"} {
 		info, err := os.Lstat(sitefiles.Path(root, name))
 		if err != nil || !info.Mode().IsRegular() {
 			return fmt.Errorf("run itsy reset from a site with config, layout and index files")

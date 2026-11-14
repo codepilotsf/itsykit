@@ -78,7 +78,7 @@ func TestLANBrowserEditing(t *testing.T) {
  const assert=(v,m)=>{if(!v)throw Error(m)};
  const wait=async fn=>{for(let n=0;n<200;n++){if(fn())return;await new Promise(r=>setTimeout(r,50));}throw Error('editor wait timed out')};
  try {
-  const doc=document,win=window,host=doc.getElementById('flea-owner-root'),ui=host.shadowRoot;
+  const doc=document,win=window,host=doc.getElementById('itsy-owner-root'),ui=host.shadowRoot;
   await wait(()=>ui.querySelector('#edit')?.disabled===false);
   await wait(()=>doc.querySelector('[contenteditable=true]'));
   const field=doc.querySelector('[contenteditable=true]');
@@ -119,7 +119,7 @@ func TestLANBrowserEditing(t *testing.T) {
 			recorder := httptest.NewRecorder()
 			admin.ServeHTTP(recorder, r)
 			body := recorder.Body.Bytes()
-			if strings.Contains(string(body), `id="flea-owner-root"`) {
+			if strings.Contains(string(body), `id="itsy-owner-root"`) {
 				digest := sha256.Sum256([]byte(checks))
 				recorder.Header().Set("Content-Security-Policy", recorder.Header().Get("Content-Security-Policy")+" 'sha256-"+base64.StdEncoding.EncodeToString(digest[:])+"'")
 				body = append(body, []byte("<script>"+checks+"</script>")...)

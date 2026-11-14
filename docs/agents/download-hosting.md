@@ -23,8 +23,9 @@ redirect, content, theme and session settings. Never put this field in site conf
 
 The root contains stable SemVer directories such as `0.7.0/`, each containing
 `SHA256SUMS` and only the binaries listed in that manifest. Allowed names are
-`flea-{darwin,linux}-{amd64,arm64}` to preserve historical downloads. New releases
-publish only native-verified `flea-darwin-arm64` and `flea-linux-amd64` CLIs;
+`{itsy,flea}-{darwin,linux}-{amd64,arm64}` to preserve historical downloads.
+New releases publish native-verified `itsy-darwin-arm64` and `itsy-linux-amd64`
+CLIs, with byte-identical `flea-*` aliases for released updaters;
 Linux ARM64 CLI downloads are discontinued from 0.18.0.
 The root is administrator-owned and read-only to the service. Use directories
 0755 and files 0644, no symlinks or hardlinked files. Group/world-writable

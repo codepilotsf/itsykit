@@ -1,7 +1,7 @@
 /* Arrange the real collection nodes; editor chrome never enters saved content. */
 (() => {
   'use strict';
-  const host=document.getElementById('flea-owner-root');
+  const host=(document.getElementById('itsy-owner-root')||document.getElementById('flea-owner-root'));
   if(!host?.ownerCollections)return;
   const ui=host.shadowRoot,$=s=>ui.querySelector(s),owner=host.ownerEditing;
   const {groups,photos,setPhoto,addItem,clearActive}=host.ownerCollections;

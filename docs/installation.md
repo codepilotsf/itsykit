@@ -1,6 +1,6 @@
 # Installation and updates
 
-## ItsyWeb rename (unreleased)
+## ItsyWeb 0.21.0 rename
 
 Flea is now ItsyWeb, and the command is `itsy`. In the renamed CLI,
 `flea update` is the only working old command: it displays a prominent notice,
@@ -13,7 +13,7 @@ The installer places `itsy` in `~/.local/bin` and retains `flea` as a relative
 symlink to it for the notice and update exception. The updater will not replace
 an unrelated existing `itsy` during conversion.
 
-New sites use `.itsy.config.json` and `itsy/`. Existing `.flea.config.json` and
+New sites use `itsy.config.json` and `itsy/`. Existing `.flea.config.json` and
 `flea/` remain supported automatically, including writes, sessions, media and
 pull. Itsy names take precedence when present. No migration is performed.
 `ITSY_INSTALL_DIR` selects a different installer directory; `FLEA_INSTALL_DIR`
@@ -23,14 +23,17 @@ The new layout requires deployment protocol 29. Before deploying a new site to
 an existing server, explicitly run `itsy update-server` from a site with a saved
 destination. The update validates and preserves existing Flea sites; it does not
 rename server accounts, service paths, credentials, cookies or live content.
-Wire identifiers, locks, release URLs and artifact names remain stable. Local CLI
-updates never change remote servers.
+Wire identifiers and locks remain stable. Canonical releases use
+`https://itsyweb.dev/releases/` and `itsy-*` artifact names. The previous
+fleacms.com URLs and `flea-*` aliases remain available to released updaters.
+Local CLI updates never change remote servers.
 
 Already released Flea binaries cannot display new notices themselves. Their first
 `flea update` installs the renamed binary under the old name, using the preserved
 private version probe. Run `flea update` once more to see the notice and install
 `itsy`, or use the new installer. Publishing the renamed CLI and installer is a
-separate release step; the public channel has not changed in this task.
+separate release step. Both native platform checks must pass before the public
+channel advances.
 
 Earlier release notes below retain their historical command names.
 

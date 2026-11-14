@@ -17,7 +17,7 @@ import (
 
 func enableTestContact(t *testing.T, root string) {
 	t.Helper()
-	file := filepath.Join(root, ".itsy.config.json")
+	file := filepath.Join(root, "itsy.config.json")
 	data, err := os.ReadFile(file)
 	if err != nil {
 		t.Fatal(err)

@@ -8,7 +8,7 @@ external service or frontend build is needed.
 
 Fresh sites include private example templates at `site/blog/_index.html` and
 `site/blog/_post.html`, plus `site/admin/blog.html` and `blog-edit.html`. Merge this
-into `.itsy.config.json`, preserving other apps and settings:
+into `itsy.config.json`, preserving other apps and settings:
 
 ```json
 {"apps":{"blog":{"mount":"/blog"}}}

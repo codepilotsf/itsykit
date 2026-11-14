@@ -4,16 +4,16 @@
 
 Flea is now ItsyWeb. Use `itsy` for all commands. Run `flea update` to
 install the new command; other `flea` commands show the rename notice and stop.
-New sites use `.itsy.config.json` and `itsy/`. Existing `.flea.config.json`
+New sites use `itsy.config.json` and `itsy/`. Existing `.flea.config.json`
 and `flea/` continue working, with no conversion. Installed server paths stay
 compatible. Deploying the new layout requires a protocol-29 server; explicitly
 run `itsy update-server` before deploying to an older server.
 
 ## Install
 
-ItsyWeb 0.20.5 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
+ItsyWeb 0.21.0 supports Apple Silicon macOS and x86-64 Linux CLIs. Local deployment,
 setup and installer packaging respect `TMPDIR`, with private scratch directories
-and actionable storage diagnostics. The public release uses protocol 28; this unreleased rename uses 29. CLI updates
+and actionable storage diagnostics. This version uses deployment protocol 29. CLI updates
 and server updates are separate operations. App wire protocol
 remains 2. The Mac binary is ad-hoc signed, not notarized; clean-Mac and real-email
 acceptance remain unverified. Both CLIs bundle x86-64 and cross-compiled ARM64
@@ -22,7 +22,7 @@ Linux servers; native ARM64 server testing is recorded separately.
 Install the public test release for Apple Silicon Mac or x86-64 Linux:
 
 ```sh
-curl -fsSL https://fleacms.com/install.sh | bash
+curl -fsSL https://itsyweb.dev/install.sh | bash
 ```
 
 Authorized source-checkout users can build with Go 1.26 or newer:
@@ -87,7 +87,7 @@ printed backup before trying again; some original files may still be in the site
 
 On first startup in a terminal, ItsyWeb asks for the site name and an optional admin
 email. Press Enter to skip the admin. New sites enable `dev.email_preview` in
-`.itsy.config.json`: sign-in and contact emails open in your browser instead of
+`itsy.config.json`: sign-in and contact emails open in your browser instead of
 being sent. No Resend setup is needed. The preview shows the sender, recipient,
 subject, date/time and actual message, including a usable sign-in code.
 Automated runs never prompt. Use `itsy admin` to add an admin later.
@@ -197,7 +197,7 @@ below. When you're ready to publish, see [deploy a site](#deploy-a-site) and
 
 ```text
 my-site/
-  .itsy.config.json       App, admin, apps and deploy.branches settings
+  itsy.config.json       App, admin, apps and deploy.branches settings
   itsy/
     snips.json           Rich content and page metadata
     media/               Managed photos and optimized videos
@@ -229,7 +229,7 @@ Start with `site/index.html` for your home page. Add `site/about.html` and it's
 available at `/about`. Put shared markup in `site/main.layout.html`, styles in
 `site/css/`, and developer-supplied images in `site/images/`.
 
-Every site needs `.itsy.config.json`; JSON snips are optional. The starter gives
+Every site needs `itsy.config.json`; JSON snips are optional. The starter gives
 you a welcome page, a layout with a header and footer, error pages, an SVG logo,
 and CSS you can make your own. It loads Google Fonts and Prewind from external
 services.
@@ -242,7 +242,7 @@ secrets in ignored `.env` files. Mailers are loaded privately, never served.
 Managed media is served by its catalogue under `/media/`, not `/itsy/media/`.
 `itsy/runtime/` and `itsy/skills/` are never served or deployed. Runtime is ignored
 by Git; skills remain committed. Deployment settings live under `deploy.branches`
-in `.itsy.config.json` and are stripped from release archives and backups.
+in `itsy.config.json` and are stripped from release archives and backups.
 
 This structure is required; there is no old-directory fallback or automatic
 migration. Existing projects need an explicit, collision-checked reorganization.
@@ -541,10 +541,10 @@ deployed with code, not treated as admin-editable rich content. Legacy
 
 ### Site settings
 
-Site settings must use root `.itsy.config.json`. Existing projects need the full
+Site settings must use root `itsy.config.json`. Existing projects need the full
 structure described above; no old filename or directory fallback is supported.
 
-`.itsy.config.json` stores public site-wide variables in `app`:
+`itsy.config.json` stores public site-wide variables in `app`:
 
 ```json
 {
@@ -613,7 +613,7 @@ From your site's folder, run `itsy admin` and enter an email, or provide it dire
 itsy admin admin@example.com
 ```
 
-This creates or appends to `admin.emails` in `.itsy.config.json`, preserves other
+This creates or appends to `admin.emails` in `itsy.config.json`, preserves other
 settings, and skips addresses already present (case-insensitive). It accepts up
 to 20 admins and does not send email, commit, or deploy. Missing or invalid local
 mail settings start the email wizard automatically only when preview mode is off.
@@ -636,7 +636,7 @@ There is no registration, password, or user-management screen. All listed addres
 have the same editing access. Up to 20 unique addresses are supported; matching is
 case-insensitive. Only the developer can change the list.
 
-To view or remove admins, edit `admin.emails` in `.itsy.config.json`. Dev reloads the
+To view or remove admins, edit `admin.emails` in `itsy.config.json`. Dev reloads the
 list automatically. Removed admins lose access; other admins stay signed in.
 Access or email-setting changes clear pending codes, not valid sessions.
 Commit and deploy for the live site.
@@ -814,7 +814,7 @@ values. There is no need to source the file. Parsing supports literal NAME=value
 lines, single/double quotes, and full-line comments, with no variable expansion
 or shell execution. Double-quoted escapes use JSON/Go string syntax. Only the
 mail settings are consumed; this does not export arbitrary variables to commands.
-Never place keys in `.itsy.config.json` or commit them. No restart is needed for
+Never place keys in `itsy.config.json` or commit them. No restart is needed for
 admin access or sign-in email changes. Contact forms still need a dev restart.
 Authentication still requires an emailed code.
 
@@ -847,7 +847,7 @@ HTML templates. See [Blog](docs/blog.md) for setup, JSON, tokens and synchroniza
 
 ## Contact app
 
-Enable Contact by merging this into `.itsy.config.json`:
+Enable Contact by merging this into `itsy.config.json`:
 
 ```json
 {
@@ -924,7 +924,7 @@ edit `templates/site/*.html` for markup, `templates/site/css/` for styles,
 `templates/README.md` is the generated site's readme. Rebuild ItsyWeb after
 editing these files. They are embedded in the executable, so `itsy new`
 works from any directory without access to this repository. The embedding
-includes private *.layout.html files, error pages, and root .itsy.config.json.
+includes private *.layout.html files, error pages, and root itsy.config.json.
 
 ## Lucide icons
 
@@ -1008,7 +1008,7 @@ from an old snapshot. The operating system manages file caching.
 ### Permanent redirects for site migrations
 
 From 0.20.0, map old paths to their replacements in the top-level `redirects` object in
-`.itsy.config.json`:
+`itsy.config.json`:
 
 ```json
 {
@@ -1061,7 +1061,7 @@ version, run `itsy update-server` from a site with that server saved as its curr
 branch's destination. Server updates briefly restart every site on that host;
 deploying website files alone does not update the server software.
 
-Add a top-level `seo` object to `.itsy.config.json`, alongside `app`:
+Add a top-level `seo` object to `itsy.config.json`, alongside `app`:
 
 ```json
 "seo": {
@@ -1230,7 +1230,7 @@ SSH connection is reused, including the same verified bundled-server extraction.
 Failed SSH authentication does not trigger setup,
 and an older or incomplete installation requires an update rather than reinstall.
 
-Selections are saved under `deploy.branches` in `.itsy.config.json` before
+Selections are saved under `deploy.branches` in `itsy.config.json` before
 attempting deployment, preserving app/admin/contact and other fields:
 
 ```json
@@ -1305,7 +1305,7 @@ that firewall ports are open. DNS names must point at the server for ACME.
 
 Deploy resolves referenced icons in a temporary snapshot, validates it, and
 uploads it over native SSH/SCP. Only files under `site/`, private `mailers/`,
-the runtime portion of `.itsy.config.json`, managed `itsy/media/`,
+the runtime portion of `itsy.config.json`, managed `itsy/media/`,
 `itsy/snips.json`, `itsy/data/`, legacy `itsy/snips/`, and
 `itsy/icons/` are included. Repository files and other private workspace files are
 excluded. Archives are limited to 256 MiB uncompressed and 10,000 entries;

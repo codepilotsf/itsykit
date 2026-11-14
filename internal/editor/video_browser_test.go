@@ -30,7 +30,7 @@ func TestVideosBrowser(t *testing.T) {
 		t.Fatal(e)
 	}
 	checks := `setTimeout(async()=>{const result=document.createElement('output');result.id='video-result';const assert=(v,m)=>{if(!v)throw Error(m)},wait=()=>new Promise(r=>setTimeout(r,350));try{
- const host=document.getElementById('flea-owner-root'),ui=host.shadowRoot,$=s=>ui.querySelector(s),movie=document.getElementById('movie');let sent,body;
+ const host=document.getElementById('itsy-owner-root'),ui=host.shadowRoot,$=s=>ui.querySelector(s),movie=document.getElementById('movie');let sent,body;
  window.fetch=async(url,options)=>{if(url!=='/admin/page')return {ok:true};body=options.body;sent=JSON.parse(body.get('edit'));assert(options.headers['X-CSRF-Token']===host.dataset.csrf,'CSRF header');return {ok:false,status:409};};window.confirm=()=>true;
  assert(!$('#videos')&&!$('#photos'),'library buttons remain');assert($('#edit').checked,'editing defaults on');movie.click();assert($('#media-dialog').open&&!$('#media-poster-field').hidden,'video editor missing');
  $('#media-name').value='New movie';$('#media-clear-poster').checked=true;const transfer=new DataTransfer(),raw=Uint8Array.from(atob('FIXTURE'),c=>c.charCodeAt(0));transfer.items.add(new File([raw],'movie.mp4',{type:'video/mp4'}));$('#media-file').files=transfer.files;$('#media-form').requestSubmit();await wait();assert(movie.getAttribute('src').startsWith('blob:')&&!movie.hasAttribute('poster'),'preview missing');assert(movie.hasAttribute('controls')&&movie.getAttribute('preload')==='metadata','developer playback attributes altered');

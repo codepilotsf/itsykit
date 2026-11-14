@@ -35,7 +35,7 @@ func TestOptionalEmailSkip(t *testing.T) {
 	t.Setenv("FLEA_EMAIL_FROM", "")
 	root := t.TempDir()
 	os.Mkdir(filepath.Join(root, "_"), 0755)
-	os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"Test"}}`), 0644)
+	os.WriteFile(filepath.Join(root, "itsy.config.json"), []byte(`{"app":{"site_name":"Test"}}`), 0644)
 	var out bytes.Buffer
 	err := configureEmailFlow(context.Background(), root, strings.NewReader("\n"), &out, func(mailer.Settings) mailer.Checker { t.Fatal("checked skipped key"); return nil }, true)
 	if err != nil || strings.Contains(out.String(), "Sender") || strings.Contains(out.String(), "updated") {

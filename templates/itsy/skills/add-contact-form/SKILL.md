@@ -14,7 +14,7 @@ authorize deployment or sending real test mail.
 ## Configure and connect
 
 Reuse an existing `apps.contact` entry. Otherwise merge this fragment into
-`.itsy.config.json`, preserving other fields:
+`itsy.config.json`, preserving other fields:
 
 ```json
 {"apps":{"contact":{"mount":"/contact","email":{"to":"owner@example.com"}}}}

@@ -15,7 +15,7 @@ import (
 
 func put(t *testing.T, root, name, body string) {
 	t.Helper()
-	if !strings.HasPrefix(name, "itsy/") && !strings.HasPrefix(name, "mailers/") && !strings.HasPrefix(name, "site/") && !strings.HasPrefix(name, ".") && name != "AGENTS.md" && name != "README.md" {
+	if !strings.HasPrefix(name, "itsy/") && !strings.HasPrefix(name, "mailers/") && !strings.HasPrefix(name, "site/") && !strings.HasPrefix(name, ".") && name != "itsy.config.json" && name != "AGENTS.md" && name != "README.md" {
 		name = "site/" + name
 	}
 	dest := filepath.Join(root, filepath.FromSlash(name))
@@ -29,7 +29,7 @@ func put(t *testing.T, root, name, body string) {
 func fixture(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test","url":"javascript:alert(1)","unsafe":"\"/><script>alert(1)</script>"}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test","url":"javascript:alert(1)","unsafe":"\"/><script>alert(1)</script>"}}`)
 	put(t, root, "itsy/snips/team.json", `{"text":"<b>{app.site_name}</b>","members":[{"name":"Ada","children":[{"name":"Bea"}]},{"name":"Cy","children":[]}],"empty":[],"false":false,"zero":0,"blank":""}`)
 	put(t, root, "index.html", "<h1>{app.site_name}</h1>")
 	put(t, root, "about/index.html", "About")
@@ -49,7 +49,7 @@ func mustLoad(t *testing.T, root string) *Project {
 
 func TestConfigurationRequiresJSONFilename(t *testing.T) {
 	root := fixture(t)
-	current := filepath.Join(root, ".itsy.config.json")
+	current := filepath.Join(root, "itsy.config.json")
 	old := filepath.Join(root, "itsy/flea.config")
 	if err := os.Rename(current, old); err != nil {
 		t.Fatal(err)
@@ -61,7 +61,7 @@ func TestConfigurationRequiresJSONFilename(t *testing.T) {
 		t.Fatal(err)
 	}
 	p := mustLoad(t, root)
-	for _, route := range []string{"/.itsy.config.json", "/flea/flea.config"} {
+	for _, route := range []string{"/itsy.config.json", "/flea/flea.config"} {
 		if got := request(NewProductionServer(p, nil), "GET", route).Code; got != 404 {
 			t.Fatalf("private configuration route %s returned %d", route, got)
 		}
@@ -86,7 +86,7 @@ func TestRoutingAndSecurity(t *testing.T) {
 			t.Errorf("%s: %d", url, w.Code)
 		}
 	}
-	for _, url := range []string{"/index.html", "/about.html", "/about/index.html", "/about/", "/missing", "/_secret.txt", "/.env", "/.hidden/file", "/_private/file", "/.itsy.config.json", "/../.itsy.config.json", "/%2e%2e/.itsy.config.json", "/%5fsecret.txt", "/%252e%252e/secret", "//about", "/css/../_secret.txt", "/css%5c..%5c_secret.txt", "/%00"} {
+	for _, url := range []string{"/index.html", "/about.html", "/about/index.html", "/about/", "/missing", "/_secret.txt", "/.env", "/.hidden/file", "/_private/file", "/itsy.config.json", "/../itsy.config.json", "/%2e%2e/itsy.config.json", "/%5fsecret.txt", "/%252e%252e/secret", "//about", "/css/../_secret.txt", "/css%5c..%5c_secret.txt", "/%00"} {
 		w := request(s, "GET", url)
 		if w.Code != 404 || strings.Contains(w.Body.String(), "SECRET") {
 			t.Errorf("unsafe route %s: %d %s", url, w.Code, w.Body.String())
@@ -121,7 +121,7 @@ func TestCollisionsAndSymlinks(t *testing.T) {
 			}
 		})
 	}
-	for _, name := range []string{"link.txt", "nested", "itsy/snips/link.json", ".itsy.config.json"} {
+	for _, name := range []string{"link.txt", "nested", "itsy/snips/link.json", "itsy.config.json"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
 			target := filepath.Join(t.TempDir(), "secret")
@@ -129,10 +129,10 @@ func TestCollisionsAndSymlinks(t *testing.T) {
 				t.Fatal(err)
 			}
 			dest := filepath.Join(root, "site", name)
-			if strings.HasPrefix(name, "itsy/") || name == ".itsy.config.json" {
+			if strings.HasPrefix(name, "itsy/") || name == "itsy.config.json" {
 				dest = filepath.Join(root, name)
 			}
-			if name == ".itsy.config.json" {
+			if name == "itsy.config.json" {
 				if err := os.Remove(dest); err != nil {
 					t.Fatal(err)
 				}
@@ -260,7 +260,7 @@ func TestInvalidTemplatesAndData(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
-	for _, name := range []string{".itsy.config.json", "itsy/snips/team.json"} {
+	for _, name := range []string{"itsy.config.json", "itsy/snips/team.json"} {
 		t.Run(name, func(t *testing.T) {
 			root := fixture(t)
 			put(t, root, name, "{bad}")
@@ -382,7 +382,7 @@ func TestWatchChangesAndRecovery(t *testing.T) {
 		t.Fatal("watch did not publish change")
 	}
 	for _, edit := range []struct{ name, body, url, want string }{
-		{".itsy.config.json", `{"app":{"site_name":"Renamed"}}`, "/", "Renamed"},
+		{"itsy.config.json", `{"app":{"site_name":"Renamed"}}`, "/", "Renamed"},
 		{"index.html", `{snip.team.text}`, "/", "&lt;b&gt;"},
 		{"itsy/snips/team.json", `{"text":"new content"}`, "/", "new content"},
 		{"css/main.css", "new css", "/css/main.css", "new css"},
@@ -427,7 +427,7 @@ func TestConfinedReads(t *testing.T) {
 	if _, err := readFile(boundary, "link/flea.config.json"); err == nil {
 		t.Fatal("followed a private directory symlink")
 	}
-	if err := os.Symlink(filepath.Join(root, ".itsy.config.json"), filepath.Join(root, "secret")); err != nil {
+	if err := os.Symlink(filepath.Join(root, "itsy.config.json"), filepath.Join(root, "secret")); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := readFile(boundary, "secret"); err == nil {

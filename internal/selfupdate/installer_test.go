@@ -19,13 +19,13 @@ func TestInstallerOffline(t *testing.T) {
 		name, system, machine, artifact string
 		bad, missing, unsupported       bool
 	}{
-		{"mac arm64", "Darwin", "arm64", "flea-darwin-arm64", false, false, false},
-		{"linux amd64", "Linux", "x86_64", "flea-linux-amd64", false, false, false},
-		{"linux arm64", "Linux", "aarch64", "flea-linux-arm64", false, false, true},
-		{"linux arm64 alias", "Linux", "arm64", "flea-linux-arm64", false, false, true},
-		{"wrong version", "Linux", "x86_64", "flea-linux-amd64", false, false, false},
-		{"bad checksum", "Linux", "x86_64", "flea-linux-amd64", true, false, false},
-		{"missing linux amd64", "Linux", "x86_64", "flea-linux-amd64", false, true, false},
+		{"mac arm64", "Darwin", "arm64", "itsy-darwin-arm64", false, false, false},
+		{"linux amd64", "Linux", "x86_64", "itsy-linux-amd64", false, false, false},
+		{"linux arm64", "Linux", "aarch64", "itsy-linux-arm64", false, false, true},
+		{"linux arm64 alias", "Linux", "arm64", "itsy-linux-arm64", false, false, true},
+		{"wrong version", "Linux", "x86_64", "itsy-linux-amd64", false, false, false},
+		{"bad checksum", "Linux", "x86_64", "itsy-linux-amd64", true, false, false},
+		{"missing linux amd64", "Linux", "x86_64", "itsy-linux-amd64", false, true, false},
 	} {
 		t.Run(scenario.name, func(t *testing.T) {
 			dir := t.TempDir()
@@ -48,7 +48,7 @@ func TestInstallerOffline(t *testing.T) {
 			}
 			manifest := hash + "  " + name + "\n"
 			if scenario.missing {
-				manifest = hash + "  flea-darwin-arm64\n"
+				manifest = hash + "  itsy-darwin-arm64\n"
 			}
 			uname := fmt.Sprintf("#!/bin/sh\ncase \"$1\" in -s) echo %s;; -m) echo %s;; *) exit 1;; esac\n", scenario.system, scenario.machine)
 			if err := os.WriteFile(filepath.Join(fake, "uname"), []byte(uname), 0755); err != nil {
@@ -66,7 +66,7 @@ for ((i=1;i<=$#;i++)); do
   if [[ "${!i}" == --output ]]; then j=$((i+1)); output=${!j}; fi
 done
 url=${!#}
-[[ "$url" == https://fleacms.com/releases/* ]] || exit 1
+[[ "$url" == https://itsyweb.dev/releases/* ]] || exit 1
 name=${url##*/}
 if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/$name"; fi
 `

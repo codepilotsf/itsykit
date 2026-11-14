@@ -302,7 +302,7 @@ func Pack(directory string, output io.Writer) error {
 			hdr.Mode = int64(sitefiles.ExecutableMode)
 		}
 		var config []byte
-		if sitefiles.CanonicalName(name) == ".itsy.config.json" && !info.IsDir() {
+		if sitefiles.CanonicalName(name) == "itsy.config.json" && !info.IsDir() {
 			if info.Size() > 1<<20 {
 				return fmt.Errorf("site config exceeds 1 MiB")
 			}

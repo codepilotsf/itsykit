@@ -47,7 +47,7 @@ func TestManagedSessionsSurviveReleaseChange(t *testing.T) {
 		if err := os.CopyFS(root, templates.Files); err != nil {
 			t.Fatal(err)
 		}
-		write(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"Example"},"admin":{"emails":["owner@example.test"],"session_idle_days":30}}`), 0644)
+		write(filepath.Join(root, "itsy.config.json"), []byte(`{"app":{"site_name":"Example"},"admin":{"emails":["owner@example.test"],"session_idle_days":30}}`), 0644)
 		content := filepath.Join(base, "content", revision+".json")
 		seed, err := os.ReadFile(filepath.Join(root, "itsy", "snips.json"))
 		if err != nil {
@@ -89,7 +89,7 @@ func TestManagedSessionsSurviveReleaseChange(t *testing.T) {
 		}
 	}
 	// Startup with all owners removed permanently prunes their sessions.
-	write(filepath.Join(config.Sites["example.test"], ".itsy.config.json"), []byte(`{"app":{"site_name":"Example"},"admin":{"emails":[]}}`), 0644)
+	write(filepath.Join(config.Sites["example.test"], "itsy.config.json"), []byte(`{"app":{"site_name":"Example"},"admin":{"emails":[]}}`), 0644)
 	if err := initializeSessions(config); err != nil {
 		t.Fatal(err)
 	}

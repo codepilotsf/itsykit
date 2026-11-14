@@ -9,7 +9,7 @@ import (
 
 func blogFixture(t *testing.T) string {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Blog"},"apps":{"blog":{"mount":"/journal"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Blog"},"apps":{"blog":{"mount":"/journal"}}}`)
 	put(t, root, "journal/_index.html", `{#each blog.data.posts as post}<a href="{post.url}">{post.title}</a>{/each}`)
 	put(t, root, "journal/_post.html", `<h1>{blog.data.post.title}</h1><p>{page.description}</p><p>{page.title}</p>{blog.data.post.body}`)
 	return root
@@ -56,7 +56,7 @@ func TestBlogRichBodyContextAndMountValidation(t *testing.T) {
 		}
 	}
 	root := blogFixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{},"apps":{"blog":{"mount":"/admin"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{},"apps":{"blog":{"mount":"/admin"}}}`)
 	if _, err := Load(root); err == nil {
 		t.Fatal("reserved mount")
 	}

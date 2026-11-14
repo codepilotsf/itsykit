@@ -37,7 +37,7 @@ func TestSEOSharedHostIndexingIsolation(t *testing.T) {
 	c.Sites["staging.test"] = root
 	c.Indexing = map[string]string{"staging.test": "noindex"}
 	for name, body := range map[string]string{
-		".itsy.config.json": `{"app":{},"seo":{"url":"https://example.test","exclude":["/receipt"]}}`,
+		"itsy.config.json":  `{"app":{},"seo":{"url":"https://example.test","exclude":["/receipt"]}}`,
 		"site/index.html":   `<html><head><title>Home</title></head><body>Home</body></html>`,
 		"site/receipt.html": "Receipt",
 	} {

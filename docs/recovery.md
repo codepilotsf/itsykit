@@ -4,13 +4,13 @@ Run these from a site's current Git branch. They use its saved SSH destination,
 not a production/staging alias. No HTTP administration endpoint is exposed.
 
 ```sh
-flea rollback --list
-flea rollback
-flea rollback <release-id>
-flea backup ../my-site.flea-backup
-flea restore ../my-site.flea-backup
-flea update-server
-flea update-server --recover
+itsy rollback --list
+itsy rollback
+itsy rollback <release-id>
+itsy backup ../my-site.flea-backup
+itsy restore ../my-site.flea-backup
+itsy update-server
+itsy update-server --recover
 ```
 
 Server-wide site administration needs no local site or saved deployment settings.
@@ -18,8 +18,8 @@ It accepts an explicit SSH target (otherwise it asks for the server login, for
 example `root@fleacms.com`):
 
 ```sh
-flea server list [ssh-target]
-flea server remove [ssh-target] [site-name]
+itsy server list [ssh-target]
+itsy server remove [ssh-target] [site-name]
 ```
 
 ## Rollback
@@ -78,7 +78,7 @@ Upgrade affects every site on the selected server and asks before restarting it.
 It validates all installed sites with a pinned copy of the new bundled executable,
 keeps the previous executable, journals the swap, restarts, and probes all sites.
 Failed verification restores the prior executable. Interrupted upgrades block
-further deployments and content saves until `flea update-server --recover` completes.
+further deployments and content saves until `itsy update-server --recover` completes.
 
 This updates the executable only. It does not reset sites, migrate data formats,
 change SSH permissions, or replace customized systemd units. Incompatible site
@@ -90,11 +90,11 @@ restore and power-loss behavior still need disposable-server verification.
 
 ## Removing a site
 
-`flea server list [ssh-target]` shows each site's name and branch, then its HTTPS
+`itsy server list [ssh-target]` shows each site's name and branch, then its HTTPS
 domains, then its HTTP-only domains, then redirects. It is read-only and does not
 take the deployment lock, so it also works while a recovery journal is pending.
 
-`flea server remove [ssh-target] [site-name]` unregisters one site's routing
+`itsy server remove [ssh-target] [site-name]` unregisters one site's routing
 after the server prints the exact affected domains and you type the exact site
 name. Omitting the site name lists the managed sites and asks for one by its
 exact name. It is unregister/offline only: it deletes no files. Site files stay

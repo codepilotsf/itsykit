@@ -20,7 +20,7 @@ contents; there is no old-path or built-in site-template fallback.
 
 ## Local delivery previews
 
-New sites include `"dev": {"email_preview": true}` in `.itsy.config.json`.
+New sites include `"dev": {"email_preview": true}` in `itsy.config.json`.
 While `flea dev` runs, sign-in and contact emails open as browser previews instead
 of being sent. First-run dev asks for the site name and optional admin email,
 never Resend credentials. Approved admins still use the normal code sign-in flow;

@@ -7,7 +7,7 @@ import "embed"
 // files and project-local agent skills, which Go's default directory embedding
 // would otherwise exclude. Agent skills remain outside runtime/deploy content.
 //
-//go:embed all:site all:mailers all:itsy all:.agents .itsy.config.json README.md AGENTS.md .gitignore
+//go:embed all:site all:mailers all:itsy all:.agents itsy.config.json README.md AGENTS.md .gitignore
 var Files embed.FS
 
 // MinimalFiles supplies the two content files used by the clean default.

@@ -14,7 +14,7 @@ import (
 // guards their coexistence after the custom-app reconciliation.
 func TestBlogCustomAppAndLiteralBracesCoexist(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"blog":{"mount":"/blog"},"demo":{"mount":"/demo"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"blog":{"mount":"/blog"},"demo":{"mount":"/demo"}}}`)
 	put(t, root, "site/blog/_index.html", `<main><h1>Blog</h1>{#each blog.data.posts as post}<a href="{post.path}">{post.title}</a>{/each}</main>`)
 	put(t, root, "site/blog/_post.html", `<main><h1>{blog.data.post.title}</h1>{blog.data.post.body}</main>`)
 	put(t, root, "site/demo/index.html", `<form method="post" action="/demo">{csrf}</form><p data-app='{"name":"demo","value":"{app.site_name}"}'></p>`)
@@ -58,7 +58,7 @@ func TestAppNamesReserveCurrentNamespaces(t *testing.T) {
 	}
 
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"media":{"mount":"/m"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"media":{"mount":"/m"}}}`)
 	put(t, root, "itsy/apps/media/app.json", manifest("media", "1.0.0", 2, "media"))
 	writeExecutable(t, root, "itsy/apps/media/media")
 	put(t, root, "site/m/index.html", "Form")
@@ -70,7 +70,7 @@ func TestAppNamesReserveCurrentNamespaces(t *testing.T) {
 // A custom app mount cannot overlap the built-in Blog subtree.
 func TestCustomAppMountCannotOverlapBlog(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"blog":{"mount":"/blog"},"demo":{"mount":"/blog/extra"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"blog":{"mount":"/blog"},"demo":{"mount":"/blog/extra"}}}`)
 	put(t, root, "site/blog/_index.html", `<main>Blog</main>`)
 	put(t, root, "site/blog/_post.html", `<main>{blog.data.post.title}</main>`)
 	put(t, root, "site/blog/extra/index.html", "Form")
@@ -85,7 +85,7 @@ func TestCustomAppMountCannotOverlapBlog(t *testing.T) {
 // storage stays under it, outside any release path.
 func TestCustomAppRuntimeRootDefaultsUnderSite(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
 	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	writeExecutable(t, root, "itsy/apps/demo/demo")
 	put(t, root, "site/demo/index.html", "Form")
@@ -104,7 +104,7 @@ func TestCustomAppRuntimeRootDefaultsUnderSite(t *testing.T) {
 // registered and stable, exercising the reload path touched by the port.
 func TestCustomAppRegistrationSurvivesReload(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
+	put(t, root, "itsy.config.json", `{"app":{"site_name":"Test"},"apps":{"demo":{"mount":"/demo"}}}`)
 	put(t, root, "itsy/apps/demo/app.json", manifest("demo", "1.0.0", 2, "demo"))
 	writeExecutable(t, root, "itsy/apps/demo/demo")
 	put(t, root, "site/demo/index.html", "Form")

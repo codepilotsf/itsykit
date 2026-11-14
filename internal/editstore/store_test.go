@@ -86,9 +86,9 @@ func fixture(t *testing.T, remote bool) (*Store, *site.Server) {
 	t.Helper()
 	root := t.TempDir()
 	files := map[string]string{
-		".itsy.config.json": `{"app":{"site_name":"Editor test"},"admin":{"emails":["owner@example.test"]}}`,
-		"site/index.html":   `<h1>{snip abcdefghij}</h1><p>{page.title}</p><p>{page.description}</p>`,
-		"itsy/snips.json":   `{"pages":{"/":{"snips":{"abcdefghij":{"label":"Heading","content":"Original"}}}},"shared":{"snips":{}}}`,
+		"itsy.config.json": `{"app":{"site_name":"Editor test"},"admin":{"emails":["owner@example.test"]}}`,
+		"site/index.html":  `<h1>{snip abcdefghij}</h1><p>{page.title}</p><p>{page.description}</p>`,
+		"itsy/snips.json":  `{"pages":{"/":{"snips":{"abcdefghij":{"label":"Heading","content":"Original"}}}},"shared":{"snips":{}}}`,
 	}
 	layout, err := templates.Files.ReadFile("site/admin.layout.html")
 	if err != nil {
@@ -236,7 +236,7 @@ func TestRejectUnknownTargetsAndChangedAccess(t *testing.T) {
 			t.Fatal("invalid edit accepted", u)
 		}
 	}
-	if err := os.WriteFile(filepath.Join(s.Root, ".itsy.config.json"), []byte(`{"app":{"site_name":"Changed"},"admin":{"emails":[]}}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(s.Root, "itsy.config.json"), []byte(`{"app":{"site_name":"Changed"},"admin":{"emails":[]}}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := s.Read(); err == nil {

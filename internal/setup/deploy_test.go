@@ -19,7 +19,7 @@ func TestDeploySSHWorkflow(t *testing.T) {
 	os.Mkdir(filepath.Join(root, "."), 0755)
 	os.Mkdir(filepath.Join(root, "site"), 0755)
 	os.WriteFile(filepath.Join(root, "site", "index.html"), []byte("Hello"), 0644)
-	os.WriteFile(filepath.Join(root, ".itsy.config.json"), []byte(`{"app":{"site_name":"test"}}`), 0644)
+	os.WriteFile(filepath.Join(root, "itsy.config.json"), []byte(`{"app":{"site_name":"test"}}`), 0644)
 	initRepo(t, root)
 	for _, fail := range []string{"", "connect", "dns", "upload", "activate", "cancel-upload"} {
 		t.Run(fail, func(t *testing.T) {

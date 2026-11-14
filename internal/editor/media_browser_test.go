@@ -23,7 +23,7 @@ func TestPhotosBrowser(t *testing.T) {
 	h, mail := fixture(t)
 	cookie := login(t, h, mail)
 	checks := `setTimeout(async()=>{const result=document.createElement('output');result.id='photo-result';const assert=(v,m)=>{if(!v)throw Error(m)},wait=()=>new Promise(r=>setTimeout(r,350));try{
- const host=document.getElementById('flea-owner-root'),ui=host.shadowRoot,$=s=>ui.querySelector(s),image=document.getElementById('portrait');let sent,body;
+ const host=document.getElementById('itsy-owner-root'),ui=host.shadowRoot,$=s=>ui.querySelector(s),image=document.getElementById('portrait');let sent,body;
  window.fetch=async(url,options)=>{if(url!=='/admin/page')return {ok:true};body=options.body;sent=JSON.parse(body.get('edit'));assert(options.headers['X-CSRF-Token']===host.dataset.csrf,'missing CSRF header');return {ok:false,status:409};};window.confirm=()=>true;
  assert(!$('#photos')&&!$('#videos'),'library buttons remain');
  assert($('#edit').checked,'editing defaults on');assert($('#save').disabled,'dirty on open');document.getElementById('ordinary').click();assert(!$('#media-dialog').open,'undesignated image editable');image.click();assert($('#media-dialog').open,'image click did not open editor');

@@ -45,7 +45,7 @@ func TestNewInitializesGitWithCommit(t *testing.T) {
 		t.Fatal("new site should be clean", string(status), err)
 	}
 	files, err := exec.Command("git", "-C", "demo", "ls-tree", "-r", "--name-only", "HEAD").Output()
-	for _, file := range []string{".gitignore", ".itsy.config.json", "site/index.html", "itsy/icons/.keep", "itsy/skills/"} {
+	for _, file := range []string{".gitignore", "itsy.config.json", "site/index.html", "itsy/icons/.keep", "itsy/skills/"} {
 		if err != nil || !strings.Contains(string(files), file) {
 			t.Fatal("initial commit missing", file, err)
 		}

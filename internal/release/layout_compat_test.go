@@ -40,7 +40,7 @@ func TestArchivePreservesLegacyLayoutAndExcludesPrivateState(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(dest, "flea", "snips.json")); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{".itsy.config.json", "itsy", "flea/runtime", "flea/skills"} {
+	for _, name := range []string{"itsy.config.json", "itsy", "flea/runtime", "flea/skills"} {
 		if _, err := os.Stat(filepath.Join(dest, name)); !os.IsNotExist(err) {
 			t.Fatal("unexpected archive entry", name, err)
 		}

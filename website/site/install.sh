@@ -5,7 +5,7 @@ itsy_install() (
   set -euo pipefail
   umask 077
   local system arch file version expected actual destination stage='' locked=false
-  local base='https://fleacms.com/releases'
+  local base='https://itsyweb.dev/releases'
   fail() { printf 'ItsyWeb: %s\n' "$1" >&2; exit 1; }
   command -v curl >/dev/null || fail 'Install curl, then run this command again.'
   case "$(uname -s)" in Darwin) system=darwin ;; Linux) system=linux ;; *) fail 'This installer supports macOS and Linux.' ;; esac
@@ -15,7 +15,7 @@ itsy_install() (
     linux-arm64) fail 'Linux ARM64 CLI downloads are no longer supported. Use Apple Silicon macOS or x86-64 Linux.' ;;
     *) fail 'CLI downloads support Apple Silicon macOS and x86-64 Linux.' ;;
   esac
-  file="flea-$system-$arch"
+  file="itsy-$system-$arch"
   # The published checksum list decides which platforms have been verified.
   fetch() { curl --fail --silent --show-error --location --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 15 --max-time 180 "$@"; }
   hash() {
@@ -50,7 +50,7 @@ itsy_install() (
   fetch --max-filesize 8192 --output "$stage/SHA256SUMS" "$base/$version/SHA256SUMS" || fail 'Could not retrieve release checksums.'
   [[ $(wc -c < "$stage/SHA256SUMS") -le 8192 ]] || fail 'Release checksum list is too large.'
   expected=$(awk -v name="$file" '$2 == name && NF == 2 {print $1}' "$stage/SHA256SUMS")
-  [[ "$expected" =~ ^[0-9a-f]{64}$ ]] || fail "ItsyWeb $version has no verified download for $system/$arch. See https://fleacms.com/docs for available platforms."
+  [[ "$expected" =~ ^[0-9a-f]{64}$ ]] || fail "ItsyWeb $version has no verified download for $system/$arch. See https://itsyweb.dev/docs for available platforms."
   printf 'Downloading ItsyWeb %s…\n' "$version"
   fetch --max-filesize 134217728 --output "$stage/itsy" "$base/$version/$file" || fail 'Download failed. Your existing CLI was not changed.'
   [[ $(wc -c < "$stage/itsy") -le 134217728 ]] || fail 'Download is too large.'

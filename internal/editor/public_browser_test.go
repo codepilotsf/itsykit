@@ -27,7 +27,7 @@ func TestPublicPreviewBrowser(t *testing.T) {
  const result = document.createElement('output'); result.id = 'browser-result';
  const assert = (ok, message) => { if (!ok) throw new Error(message); };
  try {
-  const root=document.getElementById('flea-owner-root'), ui=root.shadowRoot;
+  const root=document.getElementById('itsy-owner-root'), ui=root.shadowRoot;
   const article=document.querySelector('article'), leaf=document.querySelector('h2');
   const originalMatchMedia=window.matchMedia;window.matchMedia=query=>query==='(prefers-reduced-motion: reduce)'?{matches:false}:originalMatchMedia(query);
   assert(ui.querySelector('#edit').checked,'default editing mode');ui.querySelector('#edit').click();

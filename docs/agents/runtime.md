@@ -11,7 +11,7 @@ even when already current. A private `.flea-update-* version` probe retains the
 exact old version response required by released updaters; it performs no writes.
 See [installation](../installation.md) for the two-step path from old binaries.
 
-New sites use `.itsy.config.json` and `itsy/`. Existing `.flea.config.json`
+New sites use `itsy.config.json` and `itsy/`. Existing `.flea.config.json`
 and `flea/` remain supported, with the current name preferred when present.
 Writes preserve the selected spelling; no migration or prompt is needed.
 Protocol 29 keeps older servers from accepting a new layout they cannot load.

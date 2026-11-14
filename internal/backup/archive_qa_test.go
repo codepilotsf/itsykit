@@ -17,7 +17,7 @@ func TestQABackupRejectsMaliciousTarHeaders(t *testing.T) {
 	for _, header := range []*tar.Header{
 		{Name: "../escape", Typeflag: tar.TypeReg, Mode: 0644},
 		{Name: "index.html", Typeflag: tar.TypeSymlink, Linkname: "/etc/passwd"},
-		{Name: "index.html", Typeflag: tar.TypeLink, Linkname: ".itsy.config.json"},
+		{Name: "index.html", Typeflag: tar.TypeLink, Linkname: "itsy.config.json"},
 		{Name: "index.html", Typeflag: tar.TypeFifo, Mode: 0644},
 	} {
 		t.Run(header.Name+string(header.Typeflag), func(t *testing.T) {
@@ -50,7 +50,7 @@ func TestQABackupRejectsMaliciousTarHeaders(t *testing.T) {
 
 func TestQABackupBoundsIntegrityAndPrivateExclusions(t *testing.T) {
 	root := t.TempDir()
-	for name, value := range map[string]string{"site/index.html": "<p>public</p>", ".env": "secret", "itsy/runtime/sessions.json": "session", ".itsy.config.json": `{"app":{"site_name":"Example"},"deploy":{"branches":{}}}`} {
+	for name, value := range map[string]string{"site/index.html": "<p>public</p>", ".env": "secret", "itsy/runtime/sessions.json": "session", "itsy.config.json": `{"app":{"site_name":"Example"},"deploy":{"branches":{}}}`} {
 		p := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(p), 0755); err != nil {
 			t.Fatal(err)

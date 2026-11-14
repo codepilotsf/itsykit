@@ -21,7 +21,7 @@ func TestConfigurationFilename(t *testing.T) {
 			t.Fatalf("mailer excluded: %s", name)
 		}
 	}
-	if !Included(".itsy.config.json") {
+	if !Included("itsy.config.json") {
 		t.Fatal("site configuration excluded")
 	}
 	if Included("itsy/flea.config") {

@@ -41,9 +41,9 @@ func TestPublicReleaseStaging(t *testing.T) {
 			if err := os.Mkdir(filepath.Join(root, "dist"), 0755); err != nil {
 				t.Fatal(err)
 			}
-			files := []string{"flea-darwin-arm64", "flea-linux-amd64"}
+			files := []string{"itsy-darwin-arm64", "itsy-linux-amd64"}
 			for _, name := range files {
-				if missing && name == "flea-linux-amd64" {
+				if missing && name == "itsy-linux-amd64" {
 					continue
 				}
 				if err := os.WriteFile(filepath.Join(root, "dist", name), []byte(name), 0755); err != nil {
@@ -62,7 +62,7 @@ func TestPublicReleaseStaging(t *testing.T) {
 			}
 			out, err := run()
 			if missing {
-				if err == nil || !strings.Contains(string(out), "Missing native-verified artifact: flea-linux-amd64") {
+				if err == nil || !strings.Contains(string(out), "Missing native-verified artifact: itsy-linux-amd64") {
 					t.Fatal(err, string(out))
 				}
 				if _, err := os.Stat(filepath.Join(root, "dist/public")); !os.IsNotExist(err) {
@@ -81,13 +81,22 @@ func TestPublicReleaseStaging(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(strings.Fields(string(manifest))) != 2*len(files) {
+			if len(strings.Fields(string(manifest))) != 4*len(files) {
 				t.Fatal("unexpected checksum entries", string(manifest))
 			}
 			for _, name := range files {
 				body, err := os.ReadFile(filepath.Join(release, name))
 				if err != nil || string(body) != name {
 					t.Fatal("staged artifact differs", name, err)
+				}
+				legacy := strings.Replace(name, "itsy-", "flea-", 1)
+				alias, err := os.ReadFile(filepath.Join(release, legacy))
+				if err != nil || string(alias) != string(body) {
+					t.Fatal("legacy artifact alias differs", legacy, err)
+				}
+				legacySum := fmt.Sprintf("%x  %s\n", sha256.Sum256(alias), legacy)
+				if !strings.Contains(string(manifest), legacySum) {
+					t.Fatal("missing legacy checksum", legacy)
 				}
 				want := fmt.Sprintf("%x  %s", sha256.Sum256(body), name)
 				if !strings.Contains(string(manifest), want+"\n") {

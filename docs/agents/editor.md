@@ -109,7 +109,7 @@ credentials or sender details during dev startup. New sites enable
 dev.email_preview; the CLI-only preview sender handles both auth and contact
 mail without provider credentials. Read docs/email-templates.md for its boundaries.
 Confirm the site name with "Config file updated." and an added admin with
-"Added <email> to .itsy.config.json." Noninteractive stdin never prompts. Only
+"Added <email> to itsy.config.json." Noninteractive stdin never prompts. Only
 the explicit email wizard checks Resend. Reload after adding an owner, before
 initializing sessions and serving. Keep secrets in ignored .env,
 never site config. Malformed settings or wizard failures stop with an error.
@@ -149,7 +149,7 @@ claim that the connection check verifies the sender domain or email delivery.
 Local /admin must show actionable environment setup instructions when email is
 unconfigured; production keeps an owner-facing message without local shell steps.
 
-`admin.emails` in .itsy.config.json is a developer-owned list (max 20), empty by
+`admin.emails` in itsy.config.json is a developer-owned list (max 20), empty by
 default. /admin supports email OTP; the public-page editor supports title/description
 rich content, designated images/videos, collections.
 Templates, schemas, archived entries and developer configuration remain private.

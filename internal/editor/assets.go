@@ -53,12 +53,12 @@ var editorAssets = func() map[string][]byte {
 	js = append(js, inlineSquire...)
 	js = append(js, []byte(`
 ;(async()=>{
- const host=document.getElementById('flea-owner-root'); if(!host)return;
+ const host=(document.getElementById('itsy-owner-root')||document.getElementById('flea-owner-root')); if(!host)return;
  const csrf=document.querySelector('meta[name="csrf-token"]')?.content;
  if(!csrf)throw Error('Missing csrf-token meta tag in the layout.');
  if(!host.shadowRoot)throw Error('Update site/admin/_toolbar.html to include the declarative toolbar shell.');
  const edit=host.shadowRoot.querySelector('#edit');
- try{edit.checked=sessionStorage.getItem('flea-editing:'+host.dataset.email)!=='off';}catch{}
+ try{edit.checked=(sessionStorage.getItem('itsy-editing:'+host.dataset.email)??sessionStorage.getItem('flea-editing:'+host.dataset.email))!=='off';}catch{}
  const [response,markup]=await Promise.all([
    fetch('/admin/editor-context?route='+encodeURIComponent(location.pathname),{cache:'no-store',headers:{'X-CSRF-Token':csrf},signal:AbortSignal.timeout(15000)}),
    fetch('/admin/assets/toolbar.html',{signal:AbortSignal.timeout(15000)})
@@ -75,7 +75,7 @@ var editorAssets = func() map[string][]byte {
 		js = append(js, script...)
 	}
 	js = append(js, []byte(`
-})().catch(error=>{const host=document.getElementById('flea-owner-root');if(host){const status=host.shadowRoot?.querySelector('#status')||host;status.textContent=error.message;status.setAttribute('role','alert');}console.error(error);});`)...)
+})().catch(error=>{const host=(document.getElementById('itsy-owner-root')||document.getElementById('flea-owner-root'));if(host){const status=host.shadowRoot?.querySelector('#status')||host;status.textContent=error.message;status.setAttribute('role','alert');}console.error(error);});`)...)
 	blog := append([]byte(nil), inlinePurify...)
 	blog = append(blog, '\n', ';', '\n')
 	blog = append(blog, inlineSquire...)

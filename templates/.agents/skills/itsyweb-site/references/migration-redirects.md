@@ -2,7 +2,7 @@
 
 Use this for requests such as "index the old site and add migration redirects"
 or "find which URLs need 301s". Read the destination's local requirements and
-inspect `.itsy.config.json`, public routes, existing redirects and installed ItsyWeb
+inspect `itsy.config.json`, public routes, existing redirects and installed ItsyWeb
 version. Confirm the source website and destination project if context does not
 identify them. A crawl is read-only; it does not authorize publishing a site.
 

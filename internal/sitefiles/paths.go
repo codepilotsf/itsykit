@@ -15,7 +15,7 @@ func Included(name string) bool {
 	if name == "." {
 		return true
 	}
-	if name == ".itsy.config.json" {
+	if name == "itsy.config.json" {
 		return true
 	}
 	for _, part := range strings.Split(name, "/") {

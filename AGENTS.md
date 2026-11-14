@@ -69,7 +69,7 @@ dependencies, trust boundaries, loading, transactions or publication.
 Use `itsy` for all commands. The retired `flea` command prints the rename notice
 and exits without dispatch, except `flea update`, which installs `itsy`. Preserve
 the narrow read-only version probe required by already released Flea updaters.
-New sites use `.itsy.config.json`, `itsy/`, and `<!-- itsy` page settings. Existing
+New sites use `itsy.config.json`, `itsy/`, and `<!-- itsy` page settings. Existing
 `.flea.config.json`, `flea/`, and `<!-- flea` remain explicitly supported; prefer
 Itsy names when present and otherwise use the legacy name. Writes stay in the
 selected files; never silently rename or migrate a site. These naming aliases
@@ -83,7 +83,7 @@ Protocol 29 is required before deploying the new site layout; an explicit
 
 Generated sites use `site/` for public templates/assets, `mailers/` for private
 email templates, `itsy/` for content/data/media/icons/skills, and
-`.itsy.config.json` for configuration. Runtime state is private in
+`itsy.config.json` for configuration. Runtime state is private in
 `itsy/runtime/`. Globals use `app.*`; there is no `site.*` alias.
 Bundled Contact uses the Flea App Protocol and explicit `{csrf}` visitor forms.
 Optional Blog uses the built-in content/editor snapshot; read [Blog](docs/blog.md)

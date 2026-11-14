@@ -34,6 +34,33 @@ func downloadFixture(t *testing.T) string {
 	return root
 }
 
+func TestCanonicalAndLegacyDownloadNamesShareVerifiedBytes(t *testing.T) {
+	root := downloadFixture(t)
+	version := filepath.Join(root, "0.7.0")
+	body, err := os.ReadFile(filepath.Join(version, "flea-linux-amd64"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(version, "itsy-linux-amd64"), body, 0644); err != nil {
+		t.Fatal(err)
+	}
+	manifest := fmt.Sprintf("%x  flea-linux-amd64\n%x  itsy-linux-amd64\n", sha256.Sum256(body), sha256.Sum256(body))
+	if err := os.WriteFile(filepath.Join(version, "SHA256SUMS"), []byte(manifest), 0644); err != nil {
+		t.Fatal(err)
+	}
+	d, err := loadDownloads(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"itsy-linux-amd64", "flea-linux-amd64"} {
+		w := httptest.NewRecorder()
+		d.ServeHTTP(w, httptest.NewRequest("GET", "http://example.test/releases/0.7.0/"+name, nil))
+		if w.Code != 200 || w.Body.String() != string(body) {
+			t.Fatal(name, w.Code)
+		}
+	}
+}
+
 func TestDownloadsRangeAndConfinement(t *testing.T) {
 	d, err := loadDownloads(downloadFixture(t))
 	if err != nil {

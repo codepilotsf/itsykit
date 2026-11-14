@@ -49,9 +49,9 @@ addEventListener('pagereveal',async event=>{
  try {
   if(!event.viewTransition)throw Error('No native navigation transition');
   await event.viewTransition.ready;
-  if(getComputedStyle(document.querySelector('main')).viewTransitionName!=='flea-page')throw Error('Missing page transition name');
-  if(getComputedStyle(document.documentElement,'::view-transition-new(flea-page)').animationName!=='flea-page-in')throw Error('Missing content animation');
+  if(getComputedStyle(document.documentElement,'::view-transition-new(itsy-page)').animationName!=='itsy-page-in')throw Error('Missing content animation');
   await event.viewTransition.finished;
+  if(getComputedStyle(document.querySelector('main')).viewTransitionName!=='itsy-page')throw Error('Missing page transition name');
  }catch(error){result='FAIL '+error.message;}
  fetch('/test-result?value='+encodeURIComponent(result));
 });

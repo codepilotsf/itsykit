@@ -10,7 +10,7 @@ import (
 
 func TestConfiguredRedirects(t *testing.T) {
 	root := fixture(t)
-	put(t, root, ".itsy.config.json", `{"app":{},"redirects":{
+	put(t, root, "itsy.config.json", `{"app":{},"redirects":{
 		"/old.html":"/about", "/old/":"/about#team",
 		"/old%20name.php":"/about?source=migration#team", "/style.css":"/css/main.css",
 		"/clear":"/about?", "/encoded":"/caf%C3%A9"
@@ -71,7 +71,7 @@ func TestRedirectValidation(t *testing.T) {
 	} {
 		t.Run(raw, func(t *testing.T) {
 			root := fixture(t)
-			put(t, root, ".itsy.config.json", `{"app":{},"redirects":`+raw+`}`)
+			put(t, root, "itsy.config.json", `{"app":{},"redirects":`+raw+`}`)
 			if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "redirect") {
 				t.Fatalf("expected redirect validation error, got %v", err)
 			}
@@ -84,26 +84,26 @@ func TestRedirectAppBoundariesAndReload(t *testing.T) {
 	put(t, root, "contact/index.html", "Contact")
 	put(t, root, "contact/thank-you.html", "Thanks")
 	config := `{"app":{},"apps":{"contact":{"mount":"/contact","email":{"to":"admin@example.test"}}},"redirects":`
-	put(t, root, ".itsy.config.json", config+`{"/old-contact.html":"/contact"}}`)
+	put(t, root, "itsy.config.json", config+`{"/old-contact.html":"/contact"}}`)
 	s := NewServer(mustLoad(t, root))
 	if w := request(s, "GET", "/old-contact.html"); w.Code != 301 || w.Header().Get("Location") != "/contact" {
 		t.Fatal("could not redirect to a Contact page", w)
 	}
-	put(t, root, ".itsy.config.json", config+`{"/contact/old.html":"/about"}}`)
+	put(t, root, "itsy.config.json", config+`{"/contact/old.html":"/about"}}`)
 	if err := s.Reload(root); err == nil {
 		t.Fatal("allowed redirect inside an app's subtree")
 	}
 	if w := request(s, "GET", "/old-contact.html"); w.Code == 301 {
 		t.Fatal("served a stale redirect after failed reload")
 	}
-	put(t, root, ".itsy.config.json", config+`{"/old-contact.html":"/about"}}`)
+	put(t, root, "itsy.config.json", config+`{"/old-contact.html":"/about"}}`)
 	if err := s.Reload(root); err != nil {
 		t.Fatal(err)
 	}
 	if got := request(s, "GET", "/old-contact.html").Header().Get("Location"); got != "/about" {
 		t.Fatalf("reload kept the old redirect: %q", got)
 	}
-	put(t, root, ".itsy.config.json", `{"app":{},"redirects":{}}`)
+	put(t, root, "itsy.config.json", `{"app":{},"redirects":{}}`)
 	if err := s.Reload(root); err != nil {
 		t.Fatal(err)
 	}
@@ -124,7 +124,7 @@ func TestRedirectFormerBlogSlug(t *testing.T) {
 		t.Fatal(err)
 	}
 	put(t, root, "itsy/snips.json", string(body))
-	put(t, root, ".itsy.config.json", `{"app":{},"apps":{"blog":{"mount":"/journal"}},"redirects":{"/journal/old":"/journal/new"}}`)
+	put(t, root, "itsy.config.json", `{"app":{},"apps":{"blog":{"mount":"/journal"}},"redirects":{"/journal/old":"/journal/new"}}`)
 	s := NewProductionServer(mustLoad(t, root), nil)
 	if w := request(s, "GET", "/journal/old"); w.Code != 301 || w.Header().Get("Location") != "/journal/new" {
 		t.Fatal("former slug did not redirect", w)
@@ -132,7 +132,7 @@ func TestRedirectFormerBlogSlug(t *testing.T) {
 	if w := request(s, "GET", "/journal/new"); w.Code != 200 || !strings.Contains(w.Body.String(), "Moved post") {
 		t.Fatal("published destination failed", w)
 	}
-	put(t, root, ".itsy.config.json", `{"app":{},"apps":{"blog":{"mount":"/journal"}},"redirects":{"/journal/old":"/journal/draft"}}`)
+	put(t, root, "itsy.config.json", `{"app":{},"apps":{"blog":{"mount":"/journal"}},"redirects":{"/journal/old":"/journal/draft"}}`)
 	if _, err := Load(root); err == nil {
 		t.Fatal("accepted an unpublished redirect destination")
 	}

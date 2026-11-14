@@ -1,19 +1,27 @@
 # Publishing ItsyWeb
 
-## Pending ItsyWeb rename
+## ItsyWeb 0.21.0 rollout
 
-Development builds now produce `bin/itsy` and a retired `bin/flea` link. Stage
-the renamed installer with the first renamed release. Keep public artifact names
-`flea-darwin-arm64` and `flea-linux-amd64`: released updaters and the host download
-catalogue require those names. Invoke downloaded artifacts through an `itsy`
-name for CLI smoke checks; old `.flea-update-* version` verification is retained
-only for the transition. From a pre-rename CLI, the first `flea update` installs
-the transition binary; a second `flea update` installs the canonical `itsy` name.
-Verify both steps and the strong notice on native supported platforms before
-publication. New sites use `.itsy.config.json` and `itsy/`, with explicit legacy
-aliases; protocol 29 is required. Verify a protocol-28 server update against old
-site files, sessions and custom-app storage before publishing. No release,
-website installer sync or server rollout is performed by this local rename task. Existing release receipts below retain historical names.
+Development builds produce `bin/itsy` and a retired `bin/flea` link. Canonical
+public artifacts are `itsy-darwin-arm64` and `itsy-linux-amd64`, hosted at
+`https://itsyweb.dev/releases/`. Stage byte-identical `flea-*` aliases alongside
+them so released Flea updaters can still upgrade from fleacms.com. The host
+catalogue accepts both names; retained versions and bytes stay immutable.
+
+Invoke downloaded artifacts through an `itsy` name for CLI smoke checks. The
+private old `.flea-update-* version` probe remains solely for released updaters.
+From a pre-rename CLI, the first `flea update` installs the transition binary;
+a second `flea update` installs `itsy`. Verify both steps, installer aliases,
+and the strong notice on both native supported platforms before publication.
+
+New sites use `itsy.config.json` and `itsy/`, with explicit legacy aliases;
+protocol 29 is required. Validate the protocol-28 server upgrade against old
+site files, sessions, custom-app storage and both toolbar initializers. Upgrade
+the server before deploying renamed sites or enabling canonical downloads.
+Publish verified artifacts before advancing either website's latest.txt or
+installer. Native Mac checks remain required even when the Linux server and
+local site conversions are ready. Existing release receipts below retain
+historical names; record actual rollout evidence separately.
 
 For the manual public release workflow, SemVer rules, low-memory host safeguards
 and recovery steps, follow the [deployment runbook](deployment-runbook.md).
@@ -175,8 +183,9 @@ GitLab package API: https://docs.gitlab.com/user/packages/generic_packages/
    machine for x86-64 before announcing the release or updating a tap. Record
    ARM64 server native acceptance separately when hardware is available.
 
-Public CLI artifacts are flea-linux-amd64 and flea-darwin-arm64. Build artifacts
-also include flea-server-linux-amd64 and flea-server-linux-arm64 for embedding.
+Public CLI artifacts are itsy-linux-amd64 and itsy-darwin-arm64, with matching
+flea-* aliases for released updaters. Build artifacts also include
+itsy-server-linux-amd64 and itsy-server-linux-arm64 for embedding.
 Linux ARM64 CLI artifacts are no longer built, staged or published.
 A Homebrew formula can install the appropriate Mac binary directly, with its release SHA-256 and
 no Go dependency. Creating/publishing that tap remains a separate step.

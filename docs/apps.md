@@ -91,7 +91,7 @@ packages are private and are not a public SDK.
 Contact sends a visitor's message to one email address. It has no database,
 inbox, uploads, automatic replies or delivery queue.
 
-Merge this into `.itsy.config.json`, preserving your other settings:
+Merge this into `itsy.config.json`, preserving your other settings:
 
 ```json
 {
