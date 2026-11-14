@@ -12,7 +12,7 @@
 
 <section id="templates">
   <h2>Pages and URLs</h2>
-<p>Put public pages and assets in <code>site/</code>. Page URLs leave off the file extension:</p>
+<p>ItsyWeb turns the HTML files in <code>site/</code> into pages. The file's location determines its URL, so there are no routes to register. The homepage uses <code>index.html</code>, and other page URLs leave off the file extension:</p>
 <div class="directory-tree" aria-label="Site files and their public URLs">
   <div class="directory-tree-heading"><span>Project files</span><span>Public URL</span></div>
   <ul>
@@ -30,28 +30,34 @@
     </li>
   </ul>
 </div>
-<p>Link to <code>/visit</code>, without <code>.html</code> or a trailing slash. Files beginning with an underscore are private templates.</p>
+<p>Assets keep their file extensions. An image at <code>site/images/shop.jpg</code> is available at <code>/images/shop.jpg</code>. Files beginning with an underscore are private templates, such as the partials described below.</p>
+<p>Link to <code>/visit</code>, without <code>.html</code> or a trailing slash. For a page with related files, you can use a folder: <code>site/books/index.html</code> becomes <code>/books</code>. Choose either <code>books.html</code> or <code>books/index.html</code> for that URL; do not create both.</p>
 </section>
 
 <section id="layouts">
   <h2>Layouts</h2>
-<p><code>site/main.layout.html</code> supplies the document around each page. The page appears at <code>&#123;slot&#125;</code>:</p><pre tabindex="0" aria-label="The layout slot"><code class="language-markup">&lt;header&gt;Little Bookshop&lt;/header&gt;
+<p><code>site/main.layout.html</code> supplies the document around each page. Put the shared header, navigation, and footer here so you can update them in one place. ItsyWeb inserts the requested page at <code>&#123;slot&#125;</code>:</p><pre tabindex="0" aria-label="The layout slot"><code class="language-markup">&lt;header&gt;Little Bookshop&lt;/header&gt;
 &lt;main&gt;&#123;slot&#125;&lt;/main&gt;
 &lt;footer&gt;Independent books. Curious readers.&lt;/footer&gt;</code></pre><p>This illustrates the shared pieces. When editing the generated layout, keep its HTML document, admin conditionals, CSRF meta tag, and toolbar include.</p>
-<p>Create <code>site/shop.layout.html</code> with its own <code>&#123;slot&#125;</code>, then select it at the start of a page:</p><pre tabindex="0" aria-label="Select a custom layout"><code class="language-markup">&lt;!-- itsy
+<p>A page uses <code>main.layout.html</code> automatically. If part of your site needs a different wrapper, create <code>site/shop.layout.html</code> with its own <code>&#123;slot&#125;</code>. Select it with a page settings comment before any markup:</p><pre tabindex="0" aria-label="Select a custom layout"><code class="language-markup">&lt;!-- itsy
 layout: /shop.layout.html
 --&gt;</code></pre>
 </section>
 
 <section id="partials">
   <h2>Partials</h2>
-<p>Save reusable markup in an underscore-prefixed file, such as <code>site/_hours.html</code>. Include it with:</p><pre tabindex="0" aria-label="Render a partial"><code class="language-markup">&#123;render hours&#125;</code></pre><p>Names resolve beside the calling template. Use <code>&#123;render /shared/hours&#125;</code> for <code>site/shared/_hours.html</code>.</p>
+<p>Use a partial for a piece of HTML that appears in more than one place, such as opening hours or a newsletter sign-up link. Save it in an underscore-prefixed file, such as <code>site/_hours.html</code>. Include it in a page or layout with:</p><pre tabindex="0" aria-label="Render a partial"><code class="language-markup">&#123;render hours&#125;</code></pre><p>The render name leaves off the underscore and <code>.html</code>. ItsyWeb looks beside the template containing the instruction, so <code>&#123;render hours&#125;</code> in a root-level page includes <code>site/_hours.html</code>. For a partial in another folder, use a path from the site root: <code>&#123;render /shared/hours&#125;</code> includes <code>site/shared/_hours.html</code>.</p>
 </section>
 
 <section id="data">
   <h2>Settings and JSON data</h2>
-<p>Public settings live under <code>app</code> in <code>itsy.config.json</code>. For example, <code>&#123;app.site_name&#125;</code> displays the site name.</p>
-<p>Save lists and other structured data in <code>itsy/data/</code>. Create <code>itsy/data/books.json</code>:</p><pre tabindex="0" aria-label="itsy/data/books.json"><code class="language-json">&#123;"items": [&#123;"title": "A Field Guide to Birds"&#125;, &#123;"title": "The Quiet Garden"&#125;]&#125;</code></pre><p>Loop over it in a page or partial:</p><pre tabindex="0" aria-label="Display a list"><code class="language-markup">&#123;#each data.books.items as book&#125;
+<p>Settings used across the site live under <code>app</code> in <code>itsy.config.json</code>. For example, <code>&#123;app.site_name&#125;</code> displays the site name in a page, layout, or partial. Keep these settings for public information such as your business name or phone number; credentials belong outside this file.</p>
+<p>When several items share the same structure, a JSON file lets you manage their content together. Save it in <code>itsy/data/</code>; the filename becomes the name you use in a template. For example, create <code>itsy/data/books.json</code>:</p><pre tabindex="0" aria-label="itsy/data/books.json"><code class="language-json">&#123;
+  "items": [
+    &#123;"title": "A Field Guide to Birds"&#125;,
+    &#123;"title": "The Quiet Garden"&#125;
+  ]
+&#125;</code></pre><p>The file is available as <code>data.books</code>. Loop over its <code>items</code> in a page or partial; each item is called <code>book</code> inside the loop:</p><pre tabindex="0" aria-label="Display a list"><code class="language-markup">&#123;#each data.books.items as book&#125;
   &lt;p&gt;&#123;book.title&#125;&lt;/p&gt;
 &#123;:else&#125;
   &lt;p&gt;New books are on their way.&lt;/p&gt;
@@ -62,7 +68,20 @@ layout: /shop.layout.html
 
 <section id="page-details">
   <h2>Page titles and descriptions</h2>
-<p>Each route has a record under <code>pages</code> in <code>itsy/snips.json</code>. Set its <code>title</code> and <code>description</code>. Layouts read them with <code>&#123;page.title&#125;</code> and <code>&#123;page.description&#125;</code>.</p>
+<p>The page title is used in the browser tab, while the description gives search engines a summary of the page. Each page can have its own values, separate from its visible heading and body text.</p>
+<p>Currently, these values live under <code>pages</code> in <code>itsy/snips.json</code>, keyed by the page's public URL. For the bookshop's Visit page, add or update this entry while keeping the file's other pages and content:</p>
+<pre tabindex="0" aria-label="Visit page metadata in itsy/snips.json"><code class="language-json">&#123;
+  "pages": &#123;
+    "/visit": &#123;
+      "title": "Visit the bookshop",
+      "description": "Find our opening hours and plan a visit to Little Bookshop."
+    &#125;
+  &#125;
+&#125;</code></pre>
+<p>The layout reads these values with <code>&#123;page.title&#125;</code> and <code>&#123;page.description&#125;</code>. For example, inside the layout's <code>&lt;head&gt;</code>:</p>
+<pre tabindex="0" aria-label="Page metadata in a layout"><code class="language-markup">&lt;title&gt;&#123;page.title&#125; | &#123;app.site_name&#125;&lt;/title&gt;
+&lt;meta name="description" content="&#123;page.description&#125;"&gt;</code></pre>
+<p>You can also change these values in <strong>Page details</strong> when signed in as an admin. Without a saved title, ItsyWeb uses <strong>Home</strong> for the homepage or derives a title from the last part of the URL. An unset description is empty.</p>
 <p>Ordinary page text can stay in HTML. Use <a href="/docs/editing">on-page editing</a> for content an admin should change.</p>
 </section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/styling">Continue to CSS and icons</a></nav>

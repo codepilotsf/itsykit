@@ -17,10 +17,10 @@ Install the public test release for Apple Silicon macOS or x86-64 Linux:
 
 ```sh
 curl -fsSL https://itsyweb.dev/install.sh | bash
-export PATH="$HOME/.local/bin:$PATH"
 ```
 
-From this repository's `website/` directory:
+If your terminal cannot find `itsy`, follow the PATH instructions printed by
+the installer. From this repository's `website/` directory:
 
 ```sh
 itsy dev
@@ -82,7 +82,9 @@ the last returns to Getting Started. Keep those links and chapter IDs aligned.
 `site/js/guides.js` opens the current guide and marks the current chapter.
 
 Keep Getting Started a small, working tutorial. Introduce each concept once,
-show the action and its result, and favor the normal path. Put optional features
+show the action and its result, and favor the normal path. Give each new concept
+enough explanation for a reader to understand why they are using it; avoid
+reducing the guide to commands and clipped instructions. Put optional features
 in their own guides and leave uncommon command options to CLI help. Keep the
 advanced app contract precise without repeating it in beginner guides.
 
