@@ -7,7 +7,7 @@
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>CSS and icons</h1>
-      <p>Style your site with CSS and the included Prewind utilities. No build command needed.</p>
+      <p>Start with Prewind or use your own CSS. Add built-in Lucide icons directly in your HTML.</p>
     </header>
 
 <section id="styling">
@@ -23,16 +23,53 @@ h1 &#123;
 
 <section id="utilities">
   <h2>Prewind utilities</h2>
-<p>The generated site includes Prewind 1.3.1. Start with global styles, then use utilities for individual layout and spacing adjustments:</p><pre tabindex="0" aria-label="Use Prewind utilities"><code class="language-markup">&lt;section class="container py-xl"&gt;
+<p>The generated site includes Prewind 1.3.1, a CSS library with a reset and utility classes for layout, spacing, and color. We recommend it because it fits ItsyWeb's no-build approach: load a stylesheet and start writing HTML. Shared styles handle the defaults, so you only need utility classes for individual adjustments.</p>
+<p>Prewind's fluid spacing and type scales adapt to the screen width. Theme tokens keep those sizes and your colors consistent across the site, and you can change them in <code>site/css/theme.css</code>.</p>
+<pre tabindex="0" aria-label="Use Prewind utilities"><code class="language-markup">&lt;section class="container py-xl"&gt;
   &lt;h1&gt;Visit the bookshop&lt;/h1&gt;
   &lt;p class="text-lg"&gt;Find your next read.&lt;/p&gt;
 &lt;/section&gt;</code></pre><p><code>container</code> provides the page width and padding. Sizes such as <code>sm</code>, <code>md</code>, and <code>lg</code> follow the theme's fluid scale.</p>
+<h3>Use your own styling</h3>
+<p>Prewind is optional. To use plain CSS or another styling library, replace the stylesheet link in <code>site/main.layout.html</code> with your own:</p>
+<pre tabindex="0" aria-label="Load your own stylesheet"><code class="language-markup">&lt;link rel="stylesheet" href="/css/my-styles.css" /&gt;</code></pre>
+<p>If you want to keep the starter's other styles, leave the layout link in place and remove just this import from <code>site/css/global.css</code>:</p>
+<pre tabindex="0" aria-label="Prewind import to remove"><code class="language-css">@import url("https://unpkg.com/prewindcss@1.3.1");</code></pre>
+<p>Update the starter's utility classes and any CSS that depends on Prewind's tokens or reset to suit your replacement. Check other layouts, including <code>site/admin.layout.html</code>, if you want them to use it too. ItsyWeb works with whichever styling approach you choose.</p>
 </section>
 
 <section id="icons">
-  <h2>Icons</h2>
+  <h2>Lucide icons</h2>
+<p>Lucide icon support is built in. <a href="https://lucide.dev/icons/">Browse and search the Lucide icon picker</a>, choose an icon, then use its lowercase, hyphenated name in a page, layout, or partial:</p>
 <pre tabindex="0" aria-label="Icon directives"><code class="language-markup">&#123;icon arrow-right&#125;
-&#123;icon search size="20" aria-label="Search"&#125;</code></pre><p>Dev downloads the Lucide icons you reference into <code>itsy/icons/</code>. Commit that cache so the site can use them offline.</p>
+&#123;icon search size="20" aria-label="Search"&#125;</code></pre>
+<p>ItsyWeb renders each icon as inline SVG. You don't need an icon script or package installation. Icons default to 24 × 24, with no fill and a 2px stroke that inherits the surrounding text color.</p>
+<h3>Supported options</h3>
+<p>Use quoted attributes, with either single or double quotes:</p>
+<table>
+  <caption>Options for the <code>&#123;icon&#125;</code> directive</caption>
+  <thead><tr><th scope="col">Option</th><th scope="col">What it does</th></tr></thead>
+  <tbody>
+    <tr><th scope="row"><code>size</code></th><td>Sets both dimensions, such as <code>size="20"</code> or <code>size="1em"</code>.</td></tr>
+    <tr><th scope="row"><code>width</code>, <code>height</code></th><td>Set dimensions separately. Explicit values take precedence over <code>size</code>.</td></tr>
+    <tr><th scope="row"><code>class</code>, <code>id</code></th><td>Apply your CSS. Every icon also gets <code>lucide</code> and <code>lucide-&lt;name&gt;</code> classes.</td></tr>
+    <tr><th scope="row"><code>color</code>, <code>stroke</code>, <code>fill</code></th><td>Set the color, outline, or fill. <code>stroke="currentColor"</code> follows the text color.</td></tr>
+    <tr><th scope="row"><code>stroke-width</code>, <code>stroke-linecap</code>, <code>stroke-linejoin</code></th><td>Adjust the outline thickness and the shape of its ends and joins.</td></tr>
+    <tr><th scope="row"><code>aria-*</code>, <code>role</code>, <code>tabindex</code></th><td>Set accessibility attributes. A label gives the icon a default <code>role="img"</code>.</td></tr>
+    <tr><th scope="row"><code>data-*</code></th><td>Add data attributes for your own scripts.</td></tr>
+  </tbody>
+</table>
+<pre tabindex="0" aria-label="Customize a Lucide icon"><code class="language-markup">&#123;icon check size="20" stroke-width="3" class="text-brand-1"&#125;
+&#123;icon info aria-label="About &#123;page.title&#125;"&#125;</code></pre>
+<p>Attribute values can include dotted-path data, as in <code>aria-label="About &#123;page.title&#125;"</code>, including aliases inside loops. The icon name itself must be literal. Dynamic names, custom icon sources, inline <code>style</code>, event handlers, and <code>href</code> are unsupported. Use a CSS class to style an icon and wrap it in an ordinary link or button when needed.</p>
+<h3>Accessible icons</h3>
+<p>Icons are decorative by default and hidden from screen readers with <code>aria-hidden="true"</code>. Keep that default beside visible text. For an icon that conveys meaning on its own, add <code>aria-label</code> or <code>aria-labelledby</code>. For an icon-only button, label the button itself:</p>
+<pre tabindex="0" aria-label="Label an icon-only button"><code class="language-markup">&lt;button type="button" aria-label="Search"&gt;
+  &#123;icon search size="20"&#125;
+&lt;/button&gt;</code></pre>
+<h3>Downloads and offline use</h3>
+<p><code>itsy dev</code> downloads only the icons you reference into <code>itsy/icons/</code>, including new references when you save. Commit that cache so the site can use them offline. The browser uses the rendered SVG without making icon downloads.</p>
+<p>ItsyWeb currently uses Lucide 1.47.0, so icons added to the picker in newer releases may be unavailable. A missing icon is omitted and dev prints a warning. Check the name or connection, then save the template again to retry. <code>itsy status</code> reports missing icons but does not download them.</p>
+<p>The <code>&#123;icon&#125;</code> directive supports Lucide. You can use other icon sets through your own HTML or SVG.</p>
 </section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/development">Continue to Local development</a></nav>
   </article>
