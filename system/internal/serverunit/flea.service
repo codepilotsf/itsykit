@@ -1,0 +1,26 @@
+[Unit]
+Description=ItsyWeb server
+Requires=flea.socket
+After=network.target flea.socket
+
+[Service]
+Type=exec
+User=flea
+Group=flea
+ExecStart=/usr/local/bin/flea-server -config /etc/flea/server.json -socket-activation
+EnvironmentFile=-/etc/flea/mail.env
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=10
+WorkingDirectory=/var/lib/flea
+NoNewPrivileges=true
+CapabilityBoundingSet=
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/flea/certs /var/lib/flea/sites /etc/flea/deploy.lock
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

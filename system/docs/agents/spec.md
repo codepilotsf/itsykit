@@ -104,3 +104,12 @@ See templates.md, runtime.md, editor.md, deployment.md and ../blog.md for detail
 Setup/deploy/pull/backup/recovery preserve exact destination/branch/commit checks,
 locks, expected versions, ownership, permissions, journals and publication order.
 No production/release action follows from development authorization.
+
+Managed Ubuntu installations use systemd socket activation to retain TCP 80/443
+through service restarts. New connections queue until the single server process
+is ready; in-flight requests retain the five-second graceful shutdown window.
+There is no guarantee against queue exhaustion, client timeouts or failed startup.
+Setup installs the canonical service/socket units. The first explicit server update
+converts only the exact original service without overrides, with executable and
+unit recovery in one journal; customized installations require manual review.
+This change does not alter the site/archive protocol or introduce a proxy.

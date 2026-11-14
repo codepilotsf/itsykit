@@ -10,15 +10,27 @@ case "$VERSION_ID" in 22.04|24.04|26.04) ;; *) echo "Unsupported Ubuntu release.
 test -d /run/systemd/system
 command -v ss >/dev/null || { echo "The ss command (iproute2) is required for the port check." >&2; exit 1; }
 # Check every IPv4/IPv6 TCP and UDP listener, including HTTPS/QUIC. Only the
-# systemd main process with the installed ItsyWeb executable may be exempted.
+# verified ItsyWeb main process and canonical systemd socket may be exempted.
 check_web_ports() {
   allowed_pid=0
+  allowed_systemd=0
   if test "${1:-}" = --reinstall; then
     allowed_pid=$(systemctl show flea.service --property=MainPID --value) || return 1
     case "$allowed_pid" in ''|*[!0-9]*) allowed_pid=0;; esac
     if test "$allowed_pid" != 0; then
       executable=$(readlink "/proc/$allowed_pid/exe") || return 1
       if test "$executable" != /usr/local/bin/flea-server; then allowed_pid=0; fi
+    fi
+    # PID 1 may retain ItsyWeb's listening descriptors. Exempt it only for the
+    # exact active socket unit, loaded without overrides or pending changes.
+    if cmp -s "$stage/flea.socket" /etc/systemd/system/flea.socket &&
+       socket_fragment=$(systemctl show flea.socket --property=FragmentPath --value) &&
+       socket_dropins=$(systemctl show flea.socket --property=DropInPaths --value) &&
+       socket_reload=$(systemctl show flea.socket --property=NeedDaemonReload --value) &&
+       test "$socket_fragment" = /etc/systemd/system/flea.socket &&
+       test -z "$socket_dropins" && test "$socket_reload" = no &&
+       systemctl is-active --quiet flea.socket; then
+      allowed_systemd=1
     fi
   fi
   for protocol in t u; do
@@ -34,6 +46,7 @@ check_web_ports() {
         exit 1
       fi
       for pid in $pids; do
+        if test "$pid" = 1 && test "$allowed_systemd" = 1 && test "$protocol" = t; then continue; fi
         if test "$allowed_pid" = 0 || test "$pid" != "$allowed_pid"; then
           echo "Another service is using port 80 or 443. Stop it before running ItsyWeb setup." >&2
           exit 1
@@ -49,13 +62,13 @@ check_web_ports "${2:-}"
 # Preserve the old files rather than recursively deleting site data.
 reuse_account=0
 if test "${2:-}" = --reinstall; then
-  for path in /usr/local/bin/flea-server /etc/flea /etc/systemd/system/flea.service /var/lib/flea; do
+  for path in /usr/local/bin/flea-server /etc/flea /etc/systemd/system/flea.service /etc/systemd/system/flea.socket /var/lib/flea; do
     test ! -L "$path" || { echo "Refusing to replace a symlink: $path" >&2; exit 1; }
   done
   test -f /usr/local/bin/flea-server
   test -f /etc/flea/server.json
   test -f /etc/systemd/system/flea.service
-  for file in flea-server server.json flea.service; do
+  for file in flea-server server.json flea.service flea.socket; do
     test -f "$stage/$file" && test ! -L "$stage/$file"
   done
   getent passwd flea >/dev/null
@@ -64,6 +77,10 @@ if test "${2:-}" = --reinstall; then
   chmod 0700 "$backup"
   echo "Previous installation backup: $backup"
   systemctl disable --now flea.service
+  if test -f /etc/systemd/system/flea.socket; then
+    systemctl disable --now flea.socket
+    mv /etc/systemd/system/flea.socket "$backup/flea.socket"
+  fi
   mv /usr/local/bin/flea-server "$backup/flea-server"
   mv /etc/flea "$backup/config"
   mv /etc/systemd/system/flea.service "$backup/flea.service"
@@ -76,7 +93,7 @@ check_web_ports
 
 # Setup is deliberately a first-install operation. Never replace existing data,
 # binaries, configuration, accounts, or administrator-managed service units.
-for path in /usr/local/bin/flea-server /etc/flea /etc/systemd/system/flea.service /var/lib/flea; do
+for path in /usr/local/bin/flea-server /etc/flea /etc/systemd/system/flea.service /etc/systemd/system/flea.socket /var/lib/flea; do
   if test -e "$path" || test -L "$path"; then
     echo "Refusing to replace existing $path. Setup is for a fresh installation." >&2
     exit 1
@@ -86,20 +103,25 @@ if test "$reuse_account" = 0 && { getent passwd flea >/dev/null || getent group 
   echo "The flea account or group already exists; refusing to repurpose it." >&2
   exit 1
 fi
-if systemctl cat flea.service >/dev/null 2>&1; then
-  echo "A flea.service unit already exists." >&2
+if systemctl cat flea.service >/dev/null 2>&1 || systemctl cat flea.socket >/dev/null 2>&1; then
+  echo "A flea.service or flea.socket unit already exists." >&2
   exit 1
 fi
-for file in flea-server server.json flea.service; do
+for file in flea-server server.json flea.service flea.socket; do
   test -f "$stage/$file" && test ! -L "$stage/$file"
 done
 
 installed_binary=0
 installed_config=0
 installed_unit=0
+installed_socket=0
 success=0
 cleanup() {
   if test "$success" = 0; then
+    if test "$installed_socket" = 1; then
+      systemctl disable --now flea.socket >/dev/null 2>&1 || true
+      rm -f /etc/systemd/system/flea.socket
+    fi
     if test "$installed_unit" = 1; then
       systemctl disable --now flea.service >/dev/null 2>&1 || true
       rm -f /etc/systemd/system/flea.service
@@ -127,8 +149,10 @@ installed_binary=1
 install -m 0755 "$stage/flea-server" /usr/local/bin/flea-server
 installed_unit=1
 install -m 0644 "$stage/flea.service" /etc/systemd/system/flea.service
+installed_socket=1
+install -m 0644 "$stage/flea.socket" /etc/systemd/system/flea.socket
 systemctl daemon-reload
-systemctl enable --now flea.service
+systemctl enable --now flea.socket flea.service
 
 attempt=0
 until /usr/local/bin/flea-server -config /etc/flea/server.json -check >/dev/null 2>&1; do
@@ -139,6 +163,6 @@ until /usr/local/bin/flea-server -config /etc/flea/server.json -check >/dev/null
   fi
   sleep 1
 done
-systemctl is-active --quiet flea.service
+systemctl is-active --quiet flea.service flea.socket
 success=1
 echo "ItsyWeb service installed and ready."

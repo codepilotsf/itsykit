@@ -287,6 +287,10 @@ func Run(ctx context.Context, configPath string, logger *log.Logger) error {
 
 // A supplied TLS configuration is used only by integration tests with a local CA.
 func serve(ctx context.Context, config Config, handler http.Handler, logger *log.Logger, testTLS *tls.Config) error {
+	return serveWithListeners(ctx, config, handler, logger, testTLS, nil)
+}
+
+func serveWithListeners(ctx context.Context, config Config, handler http.Handler, logger *log.Logger, testTLS *tls.Config, bound *listeners) error {
 	if err := initializeSessions(config); err != nil {
 		return err
 	}
@@ -297,11 +301,21 @@ func serve(ctx context.Context, config Config, handler http.Handler, logger *log
 	if testTLS != nil {
 		tlsConfig = testTLS
 	}
-	listener, err := net.Listen("tcp", config.Listen)
-	if err != nil {
-		return err
+	if bound == nil {
+		bound = &listeners{}
+		bound.http, err = net.Listen("tcp", config.Listen)
+		if err != nil {
+			return err
+		}
+		if tlsConfig != nil {
+			bound.https, err = net.Listen("tcp", config.TLS.Listen)
+			if err != nil {
+				bound.close()
+				return fmt.Errorf("HTTPS listen: %w", err)
+			}
+		}
 	}
-	defer listener.Close()
+	defer bound.close()
 	if runtime, ok := handler.(*runtimeHandler); ok {
 		stop := runtime.start(ctx)
 		defer stop()
@@ -312,20 +326,22 @@ func serve(ctx context.Context, config Config, handler http.Handler, logger *log
 	server := newServer(httpHandler)
 	servers := []*http.Server{server}
 	done := make(chan error, 2)
-	if tlsConfig != nil {
-		secure, err := net.Listen("tcp", config.TLS.Listen)
-		if err != nil {
-			return fmt.Errorf("HTTPS listen: %w", err)
+	if bound.https != nil {
+		if tlsConfig == nil {
+			// Systemd retains :443 even with no HTTPS domains. Reject handshakes
+			// promptly instead of leaving clients queued or serving plain HTTP.
+			tlsConfig = &tls.Config{MinVersion: tls.VersionTLS12, GetCertificate: func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+				return nil, fmt.Errorf("HTTPS is not configured")
+			}}
 		}
-		defer secure.Close()
 		s := newServer(tlsHandler(config, handler))
 		s.TLSConfig = tlsConfig
 		servers = append(servers, s)
-		go func() { done <- s.ServeTLS(secure, "", "") }()
+		go func() { done <- s.ServeTLS(bound.https, "", "") }()
 	}
-	go func() { done <- server.Serve(listener) }()
+	go func() { done <- server.Serve(bound.http) }()
 	if logger != nil {
-		logger.Printf("ItsyWeb server listening on %s", listener.Addr())
+		logger.Printf("ItsyWeb server listening on %s", bound.http.Addr())
 	}
 	var result error
 	remaining := len(servers)

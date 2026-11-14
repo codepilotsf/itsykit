@@ -449,6 +449,14 @@ Do not claim optional platforms work solely because they cross-compile.
 
 ### 3. Verify the real server workflow
 
+- [ ] Verify socket activation on a disposable Ubuntu server: fresh setup,
+  one-time standard-unit conversion, HTTP/HTTPS requests during deploy/update,
+  failed/interrupted conversion recovery and confirmed reinstall port ownership.
+  Review the shared host's existing GOMEMLIMIT drop-in before conversion; preserve
+  its resource policy. Native user-systemd smoke passed on November 14: HTTP and
+  verified HTTPS returned 200 after queuing through a 600 ms startup delay;
+  temporary units were removed. This does not establish production-unit acceptance.
+
 - [x] Obtain the disposable target, SSH identity, test domain/DNS and mail setup
   when needed. Keep credentials outside repository documents.
 - [ ] Start with a fresh generated site and install on a clean supported Ubuntu host.
@@ -477,9 +485,9 @@ Do not claim optional platforms work solely because they cross-compile.
 - [ ] Exercise `flea server list` and `flea server remove` on the disposable host:
   multi-site/aliases, exact-name cancellation, stale-review rejection including
   a commit-only change, restart/probe failure rollback and interrupted recovery
-  with `flea-server -recover`. Confirm the shared-service restart briefly affects
-  other sites, that removing the last HTTPS hostname disables automatic HTTPS
-  with cached certificates retained, and that redeploying the same name does not
+  with `flea-server -recover`. Confirm new connections queue through service
+  restarts on socket-activated installations, that removing the last HTTPS hostname
+  disables automatic HTTPS with cached certificates retained, and that redeploying the same name does not
   silently restore retained content. The shared host was upgraded to protocol 23
   on October 5; live inventory passed. Bookworm removal used a separately
   approved one-time protocol-22 maintenance script, not the new removal command,

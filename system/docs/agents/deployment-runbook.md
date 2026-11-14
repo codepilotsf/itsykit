@@ -40,6 +40,16 @@ The 0.20.2 rollout is recorded in [verification](release-0202-verification.md).
 The shared server and normal Kirin/Mac CLIs are 0.20.2 / protocol 28. The current
 inventory has 18 sites and 24 HTTPS names; CodePilot staging and Dropr preview
 have native noindex policy. Preserve all host policies through future releases.
+
+The unreleased socket activation change is not installed by these historical
+rollouts. A standard original unit can be converted by the next server update,
+with journaled recovery and a brief interruption on that first conversion.
+The shared host has a GOMEMLIMIT service drop-in (below), so automatic conversion
+will refuse it. Review the new service/socket units, preserve that limit and all
+other intentional policy, and obtain separate authorization for the host change.
+After conversion, restart only flea.service during updates; flea.socket keeps
+80/443 open. Test root-unit installation and recovery on a disposable host first.
+
 Asahi was decommissioned. It is excluded from the active inventory and future
 rollouts; older release receipts mention it only as historical test evidence.
 
