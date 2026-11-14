@@ -20,19 +20,27 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
       </div>
       <section class="demo-stage" id="example-html" aria-labelledby="view-html" data-tab-panel>
         <div class="demo-pane source-pane">
-          <div class="pane-bar">{icon file}<span data-example-file>site/index.html</span></div>
-          <pre class="source-code" tabindex="0" aria-label="Example page HTML"><code><span class="source-line"><span class="syntax-tag">&lt;h1&gt;</span><span data-example-source>Hello, web.</span><span class="syntax-tag">&lt;/h1&gt;</span></span>
-<span class="source-line">&#123;render /navigation&#125;</span></code></pre>
+          <div class="pane-bar example-source-bar">{icon file}<span data-example-file>site/index.html</span><button class="demo-replay" type="button" hidden data-demo-replay>Replay</button></div>
+          <pre class="source-code" tabindex="0" aria-label="Example page HTML"><code data-demo-source><span class="syntax-tag">&lt;main&gt;</span>
+  <span class="syntax-tag">&lt;h1&gt;</span><span data-example-source>Hello, web.</span><span class="syntax-tag">&lt;/h1&gt;</span>
+  <span class="syntax-tag">&lt;p&gt;</span><span data-example-source-description>A small site, simply made.</span><span class="syntax-tag">&lt;/p&gt;</span>
+  &#123;render /navigation&#125;
+  <span class="syntax-tag">&lt;footer&gt;</span>
+    <span class="syntax-tag">&lt;small&gt;</span>Made with ItsyWeb.<span class="syntax-tag">&lt;/small&gt;</span>
+  <span class="syntax-tag">&lt;/footer&gt;</span>
+<span class="syntax-tag">&lt;/main&gt;</span></code></pre>
         </div>
         <div class="demo-pane preview-pane" aria-label="Example rendered website">
           <div class="pane-bar preview-bar"><span class="preview-address" data-example-address>http://localhost:3000</span></div>
           <div class="example-page">
             <p class="example-title" data-example-title>Hello, web.</p>
+            <p class="example-description" data-example-description>A small site, simply made.</p>
             <nav class="example-links" aria-label="Example website pages">
               <button type="button" disabled data-example-page="home" aria-current="page">Home</button>
               <button type="button" disabled data-example-page="about">About</button>
               <button type="button" disabled data-example-page="contact">Contact</button>
             </nav>
+            <footer class="example-footer"><small>Made with ItsyWeb.</small></footer>
           </div>
         </div>
       </section>

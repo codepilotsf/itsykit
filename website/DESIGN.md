@@ -94,13 +94,13 @@ Actions and hero view controls use the default radius. Large demonstrations use 
 
 **Code panes:** the hero demonstration uses a single outer frame with adjoining source and result panes, without nested card borders or decorative window dots. Source remains scrollable with a filename or terminal label. Syntax accents are restrained and line numbers are decorative. Copy controls use a 44px target and announce success through the shared copy script.
 
-**Example preview:** native HTML, clearly labeled as an example. Its local buttons change authored example content without navigating the visitor away. The displayed port follows ItsyWeb's actual default.
+**Example preview:** native HTML, clearly labeled as an example. The eight-line source shows a heading, description, shared navigation and footer, matching the rendered example. Its local buttons change both the source and the preview without navigating the visitor away. The displayed port follows ItsyWeb's actual default. A 44px Replay control in the filename bar becomes Skip typing during playback.
 
 **File tabs:** selected filenames use pale blue. Desktop arrow navigation is vertical, matching the file tree; phone navigation is horizontal, matching its reflow.
 
 **Guide navigation:** the current guide uses ice and navy, matching the homepage view tabs. The current chapter uses pale blue. Code panes have 12px corners and pane-colored copy controls; next-guide links use a pale, bordered panel with a pale blue hover state.
 
-**Motion:** a single 200ms preview refresh with exponential easing. Tab color changes take 160ms. Both are limited to visitors who have not requested reduced motion.
+**Motion:** the HTML example types once over 2600ms when at least a quarter of its panel enters view, followed by a 200ms preview refresh with exponential easing. The source retains its full layout and accessible text beneath an aria-hidden typing copy; a steady cursor marks the insertion point. Replay repeats the sequence, while Skip typing or keyboard focus in the example reveals the completed result immediately. Switching views, leaving the viewport or hiding the browser tab ends playback. Reduced motion shows the finished example immediately and omits Replay. Local page changes use the same 200ms preview refresh. Tab color changes take 160ms. All animation respects reduced motion; nothing loops automatically.
 
 ## Do's and Don'ts
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-14T23:09:41.027477+00:00",
+  "generatedAt": "2026-11-14T23:22:06.619178+00:00",
   "title": "Design system: ItsyWeb",
   "extensions": {
     "sourceFiles": [
@@ -12,9 +12,14 @@
     ],
     "motion": [
       {
+        "name": "source-typing",
+        "value": "2600ms linear",
+        "purpose": "One eight-line HTML typing sequence on first visibility or Replay; no autoplay loop. Skip, focus, leaving the view and reduced motion reveal the completed example."
+      },
+      {
         "name": "preview-refresh",
         "value": "200ms cubic-bezier(.16,1,.3,1)",
-        "purpose": "One source/result preview refresh, disabled for reduced motion."
+        "purpose": "Reveal the rendered example after typing completes, or refresh it after an example-page click. Disabled for reduced motion."
       },
       {
         "name": "tab-state",
@@ -61,9 +66,9 @@
     {
       "name": "Code pane",
       "kind": "custom",
-      "description": "Framed hero source example with a pane-colored filename bar and scrollable code.",
-      "html": "<div class=\"ds-code\"><div class=\"ds-code-label\">site/index.html</div><pre tabindex=\"0\"><code>&lt;h1&gt;Hello, web.&lt;/h1&gt;</code></pre></div>",
-      "css": ".ds-code{overflow:hidden;border:1px solid var(--hero-border,#536e85);border-radius:var(--rounded-lg,1rem);background:var(--hero-terminal,#091b2e);color:var(--hero-ink,#f5f9ff)}.ds-code-label{padding:10px 18px;min-height:44px;box-sizing:border-box;background:var(--hero-pane,#17374f);font:600 .85rem/1.5 Inter,system-ui,sans-serif}.ds-code pre{overflow:auto;margin:0;padding:24px;font:.875rem/1.75 ui-monospace,monospace;scrollbar-color:var(--hero-comment,#a3b9d0) var(--hero-terminal,#091b2e)}.ds-code pre:focus-visible{outline:2px solid var(--accent,#a4dbff);outline-offset:-3px}.ds-code ::selection{background:var(--accent,#a4dbff);color:var(--hero-terminal,#091b2e)}"
+      "description": "Eight-line hero source example. Replay types the source, then refreshes the preview; playback can be skipped and is omitted for reduced motion.",
+      "html": "<div class=\"ds-code\"><div class=\"ds-code-label\">site/index.html<button class=\"ds-replay\" type=\"button\">Replay</button></div><pre tabindex=\"0\"><code>&lt;main&gt;\n  &lt;h1&gt;Hello, web.&lt;/h1&gt;\n  &lt;p&gt;A small site, simply made.&lt;/p&gt;\n  {render /navigation}\n  &lt;footer&gt;\n    &lt;small&gt;Made with ItsyWeb.&lt;/small&gt;\n  &lt;/footer&gt;\n&lt;/main&gt;</code></pre></div>",
+      "css": ".ds-code{overflow:hidden;border:1px solid var(--hero-border,#536e85);border-radius:var(--rounded-lg,1rem);background:var(--hero-terminal,#091b2e);color:var(--hero-ink,#f5f9ff)}.ds-code-label{display:flex;align-items:center;padding:0 18px;min-height:44px;box-sizing:border-box;background:var(--hero-pane,#17374f);font:600 .85rem/1.5 Inter,system-ui,sans-serif}.ds-code pre{overflow:auto;margin:0;padding:24px;font:.875rem/1.75 ui-monospace,monospace;scrollbar-color:var(--hero-comment,#a3b9d0) var(--hero-terminal,#091b2e)}.ds-code pre:focus-visible{outline:2px solid var(--accent,#a4dbff);outline-offset:-3px}.ds-code ::selection{background:var(--accent,#a4dbff);color:var(--hero-terminal,#091b2e)}.ds-replay{margin-left:auto;min-height:44px;padding:0 8px;border:0;border-radius:4px;background:transparent;color:var(--accent,#a4dbff);font:600 .76rem Inter,system-ui,sans-serif;cursor:pointer}.ds-replay:hover{background:var(--hero-bg,#0b2842)}.ds-replay:focus-visible{outline:2px solid var(--accent,#a4dbff);outline-offset:-3px}"
     },
     {
       "name": "Project file tab",
