@@ -91,7 +91,9 @@ This approach draws on SvelteKit's
 [continuous tutorial](https://guides.rubyonrails.org/getting_started.html), and
 Stripe's [task-focused quickstart](https://docs.stripe.com/checkout/quickstart).
 
-Page titles and descriptions live in `itsy/snips.json`. Encode literal template
+Page titles and descriptions can be set as defaults in a leading `<!-- itsy`
+page settings comment; nonempty route metadata in `itsy/snips.json` overrides
+them. Encode literal template
 braces in HTML code examples so they display instead of executing. Label fenced
 examples with the matching Prism language. The local Prism 1.30.0 bundles and
 MIT license live in `site/js/`; code colors live in `site/css/docs-code.css`.

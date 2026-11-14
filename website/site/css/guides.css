@@ -2,13 +2,14 @@
   .docs-sidebar { scrollbar-color:var(--light) transparent; scrollbar-width:thin; padding-right:var(--space-xs); }
   .guides-nav { font-size:.87rem; }
   .guide-section { margin:0; border-bottom:1px solid var(--light); }
-  .guide-section > summary { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; padding:13px 10px; border-radius:6px; list-style:none; font-weight:500; line-height:1.5; color:var(--darker); }
+  .guide-section > summary { list-style:none; }
+  .guide-section > summary > a { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; padding:13px 10px; border-radius:6px; text-decoration:none; font-weight:500; line-height:1.5; color:var(--darker); }
   .guide-section > summary::-webkit-details-marker { display:none; }
-  .guide-section > summary > svg { flex-shrink:0; color:var(--dark); }
-  .guide-section > summary:hover { background:var(--lighter); color:var(--black); }
-  .guide-section[open] > summary { font-weight:600; color:var(--black); }
-  .guide-section[open] > summary > svg { transform:rotate(180deg); }
-  .guide-section[data-current] > summary { color:var(--brand-1); background:var(--brand-1-light); }
+  .guide-section > summary > a > svg { flex-shrink:0; color:var(--dark); }
+  .guide-section > summary > a:hover { background:var(--lighter); color:var(--black); }
+  .guide-section[open] > summary > a { font-weight:600; color:var(--black); }
+  .guide-section[open] > summary > a > svg { transform:rotate(180deg); }
+  .guide-section[data-current] > summary > a { color:var(--brand-1); background:var(--brand-1-light); }
   .guide-chapters { display:flex; flex-direction:column; gap:2px; padding:8px 10px 16px 22px; }
   .guide-chapters a { display:block; padding:6px 8px; border-radius:4px; color:var(--dark); text-decoration:none; line-height:1.5; }
   .guide-chapters a:hover { color:var(--brand-1); background:var(--lighter); }
@@ -17,6 +18,19 @@
   .guide-next a { display:inline-flex; align-items:center; min-height:44px; font-weight:600; }
   .guide-next { border-top:1px solid var(--light); margin-top:var(--space-xl); padding-top:var(--space-lg); }
   .docs-content .file-list dt { overflow-wrap:anywhere; }
+  .directory-tree { margin-block:24px; padding:18px 22px; border:1px solid var(--light); border-radius:6px; background:var(--lighter); font-size:.9rem; }
+  .directory-tree-heading,.directory-tree li > div { display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
+  .directory-tree-heading { padding-bottom:12px; margin-bottom:12px; border-bottom:1px solid var(--light); color:var(--dark); font-size:.8rem; }
+  .directory-tree ul { max-width:none; margin:0; padding:0; list-style:none; }
+  .directory-tree ul ul { margin-left:6px; padding-left:18px; border-left:1px solid var(--light); }
+  .directory-tree li { max-width:none; margin:0; padding-block:4px; }
+  .directory-tree code { background:transparent; padding:0; font-size:inherit; overflow-wrap:anywhere; }
+  .directory-tree li > div > code + code { color:var(--dark); text-align:right; }
+  @media (max-width:640px) {
+    .directory-tree { padding:14px; font-size:.78rem; }
+    .directory-tree ul ul { padding-left:12px; }
+    .directory-tree li > div { gap:8px; }
+  }
   .docs-content h3[id] { scroll-margin-top:1rem; }
   .docs-content a:focus-visible,.docs-sidebar a:focus-visible,.guides-nav summary:focus-visible,.docs-mobile > summary:focus-visible { outline:2px solid var(--brand-1); outline-offset:3px; border-radius:2px; }
   @media (max-width:640px) {
@@ -24,8 +38,8 @@
     .guide-chapters a { display:flex; align-items:center; min-height:44px; }
   }
   @media (prefers-reduced-motion:no-preference) {
-    .guides-nav[data-ready] .guide-section > summary { transition:background-color 160ms ease,color 160ms ease; }
-    .guides-nav[data-ready] .guide-section > summary > svg { transition:transform 220ms cubic-bezier(.2,.7,.3,1); }
+    .guides-nav[data-ready] .guide-section > summary > a { transition:background-color 160ms ease,color 160ms ease; }
+    .guides-nav[data-ready] .guide-section > summary > a > svg { transition:transform 220ms cubic-bezier(.2,.7,.3,1); }
     @supports (interpolate-size:allow-keywords) {
       .guide-section::details-content { interpolate-size:allow-keywords; block-size:0; overflow:clip; opacity:0; }
       .guides-nav[data-ready] .guide-section::details-content { transition:block-size 240ms cubic-bezier(.2,.7,.3,1),opacity 180ms ease,content-visibility 240ms allow-discrete; }

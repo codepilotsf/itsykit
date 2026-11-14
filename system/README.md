@@ -297,8 +297,20 @@ layout: /admin.layout.html
 Paths are relative to `site/` and must name a `*.layout.html` file. All layout
 files are private, even when no page selects them.
 The layout uses `{slot}` for the page and can include relative partials. Without
-the comment, `main.layout.html` remains the default. One block is allowed; `layout`
-is currently the only setting. Unknown/duplicate settings, missing layouts,
+the comment, `main.layout.html` remains the default. One block is allowed. It
+supports `layout`, `title` and `description` as
+single-line plain text values without quotation marks. Titles and descriptions
+belong in page files, not layouts or partials. For example:
+
+```html
+<!-- itsy
+title: Visit the bookshop
+description: Opening hours and directions to Little Bookshop.
+-->
+<h1>Visit the bookshop</h1>
+```
+
+Unknown/duplicate settings, missing layouts,
 traversal paths, settings in partials, and nested layouts are validation errors.
 Selected layouts cannot also be included as partials. Ordinary comments stay inert.
 
@@ -323,7 +335,10 @@ This affects link navigation, not the automatic dev refresh after saving a file.
 
 Partials are underscore-prefixed HTML files anywhere under site/. `{render footer}` includes `_footer.html` beside the calling template. `{render /foo/bar/footer}` includes `foo/bar/_footer.html`. Relative directory paths, including `./` and `../`, resolve from the calling template; nested renders resolve from the partial containing them. Paths are unquoted and omit the filename's underscore and `.html`. Paths escaping site/ are rejected. The root `main.layout.html`, `_404.html`, and `_500.html` are reserved, not partials. This replaces the former `{partial "name"}` syntax and `_partials/` convention.
 
-Missing and recursive includes fail validation, even in unused partials. Includes inherit the surrounding loop aliases. `page.path` is the canonical route. `page.title` and `page.description` come from that route's metadata in `itsy/snips.json`. Without a title, the default is `Home` at `/`, otherwise the final route component with hyphens replaced by spaces and its first letter capitalized. Description defaults to empty. Metadata is contextually escaped.
+Missing and recursive includes fail validation, even in unused partials. Includes inherit the surrounding loop aliases. `page.path` is the canonical route. `page.title` and `page.description` use the leading page settings comment as
+defaults. Nonempty values in that route's metadata in `itsy/snips.json` override
+the defaults, preserving on-page editing. Blog posts use their own title and
+excerpt ahead of template defaults. Without a title, the default is `Home` at `/`, otherwise the final route component with hyphens replaced by spaces and its first letter capitalized. Description defaults to empty. Metadata is contextually escaped.
 
 ```html
 <h1>{snip.home.title}</h1>

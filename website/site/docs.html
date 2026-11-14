@@ -6,20 +6,21 @@
     <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <h1>Getting Started</h1>
-      <p>Build a small bookshop website with two pages, shared templates, and your own CSS.</p>
+      <p>You can have your first ItsyWeb site running in just a few minutes. Install the command, create a project, and start writing HTML.</p>
     </header>
-<p>You need basic HTML and CSS, a text editor, and a terminal. Everything in this tutorial runs on your computer.</p>
+<p>This guide walks you through a small bookshop website, from your first page to a shared layout and a few personal touches. As you save changes, ItsyWeb reloads the browser so you can see your site take shape. A little HTML and CSS is all you need to follow along.</p>
 <section id="installation">
   <h2>1. Install ItsyWeb</h2>
-<p>On an Apple Silicon Mac or x86-64 Linux computer, open a terminal and run:</p><div class="copy-code"><pre tabindex="0" aria-label="Install ItsyWeb"><code class="language-bash">curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div><p>Add the installed command to this terminal's PATH:</p><pre tabindex="0" aria-label="Check the installed CLI"><code class="language-bash">export PATH="$HOME/.local/bin:$PATH"
-itsy version</code></pre><p>The installer also explains how to make that PATH setting permanent.</p>
+<p>On an Apple Silicon Mac or x86-64 Linux computer, open a terminal and run:</p><div class="copy-code"><pre tabindex="0" aria-label="Install ItsyWeb"><code class="language-bash">curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div><p>The installer downloads and checks the command for your computer. There is no Go, Node, or database to set up.</p>
 </section>
 
 <section id="create-a-site">
   <h2>2. Create a site</h2>
+<p>Choose a folder name for your project, then start the local development server:</p>
 <pre tabindex="0" aria-label="Create the bookshop site"><code class="language-bash">itsy new little-bookshop
 cd little-bookshop
 itsy dev</code></pre><p>Enter <strong>Little Bookshop</strong> as the site name and skip the optional admin email. Open the Website URL printed in the terminal. Leave dev running while you work.</p>
+<p>If your terminal says <code>itsy</code> is not found, follow the PATH instructions printed by the installer, then try again.</p>
 </section>
 
 <section id="homepage">

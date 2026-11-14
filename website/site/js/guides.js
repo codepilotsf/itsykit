@@ -5,9 +5,15 @@ document.querySelectorAll('[data-guide-navigation]').forEach((navigation, index)
     guide.name = `docs-guides-${index}`;
     const current = guide.dataset.guidePath === currentPath;
     guide.open = current;
+    // Following a guide title opens its page; the current title can still fold it.
+    guide.querySelector('summary a').addEventListener('click', (event) => {
+      if (!current || location.hash || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      guide.open = !guide.open;
+    });
     if (current) {
       guide.dataset.current = '';
-      guide.querySelector('.guide-overview').setAttribute('aria-current', 'page');
+      guide.querySelector('summary a').setAttribute('aria-current', 'page');
     }
   });
 
@@ -32,7 +38,7 @@ document.querySelectorAll('[data-guide-navigation]').forEach((navigation, index)
   }
 
   const markChapter = () => {
-    navigation.querySelectorAll('.guide-chapters a:not(.guide-overview)').forEach((link) => {
+    navigation.querySelectorAll('.guide-chapters a').forEach((link) => {
       const target = new URL(link.href);
       if (target.pathname === currentPath && target.hash === location.hash && location.hash) {
         link.setAttribute('aria-current', 'location');

@@ -24,6 +24,7 @@ type Project struct {
 	MediaRoot      string
 	emails         map[string]emailTemplates
 	layouts        map[string]bool
+	pageOptions    map[string]pageOptions
 	adminTemplates map[string]*template.Template
 	Admin          AdminAccess
 	Dev            DevSettings
@@ -389,10 +390,11 @@ func loadProject(root string, content *snips.Store, mediaRoot, runtimeRoot strin
 }
 
 func (p *Project) buildTemplate(file string, layout bool) (*template.Template, error) {
-	text, selected, err := pageSettings(file, p.files[file])
+	text, options, err := pageSettings(file, p.files[file])
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", file, err)
 	}
+	selected := options.Layout
 	if selected == "" {
 		selected = "main.layout.html"
 	}
@@ -458,6 +460,12 @@ func (p *Project) renderRequest(t *template.Template, route string, admin map[st
 		snips[k] = v
 	}
 	description := ""
+	if options := p.pageOptions[t.Name()]; options != (pageOptions{}) {
+		if options.Title != "" {
+			title = options.Title
+		}
+		description = options.Description
+	}
 	blog := p.blogData(route)
 	if current, ok := blog["post"].(map[string]any); ok {
 		title = current["title"].(string)

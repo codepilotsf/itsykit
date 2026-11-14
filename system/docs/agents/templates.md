@@ -143,7 +143,13 @@ settings and icon caches in version control by default.
 
 - `main.layout.html` is the optional global wrapper; `{slot}` inserts the page.
 - A leading `<!-- itsy` (or legacy `<!-- flea`) comment with `layout: /admin.layout.html` on its own
-  line and a closing `-->` selects a custom layout. Use one block before markup,
+  line and a closing `-->` selects a custom layout. The same block supports
+  single-line plain text `title` and `description` defaults, without quotes.
+  Nonempty route metadata in `itsy/snips.json` takes precedence; blog posts use
+  their title/excerpt ahead of template defaults. Metadata stays escaped data,
+  never template source, and loading/extraction does not copy defaults into JSON.
+  Titles/descriptions belong in pages, not layouts or partials.
+  Use one block before markup,
   site-relative *.layout.html paths, and only supported key:value settings.
   Reject unknown/duplicate keys, missing/unsafe layouts, nested layouts and settings
   in partials. Layouts support {slot} and relative partials, cannot be included as
