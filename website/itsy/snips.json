@@ -34,7 +34,7 @@
     },
     "/docs/styling": {
       "title": "CSS and icons",
-      "description": "Style your site with CSS and the included Prewind utilities. No build command needed.",
+      "description": "Start with Prewind or use your own CSS. Add built-in Lucide icons directly in your HTML.",
       "snips": {}
     },
     "/docs/deployment": {

@@ -37,10 +37,26 @@ document.querySelectorAll('[data-guide-navigation]').forEach((navigation, index)
     });
   }
 
+  const chapters = [...navigation.querySelectorAll('[data-current] .guide-chapters a')]
+    .map((link) => ({ link, target: document.getElementById(new URL(link.href).hash.slice(1)) }))
+    .filter(({ target }) => target);
+
   const markChapter = () => {
-    navigation.querySelectorAll('.guide-chapters a').forEach((link) => {
-      const target = new URL(link.href);
-      if (target.pathname === currentPath && target.hash === location.hash && location.hash) {
+    // Match native anchor positioning, including the sticky header's scroll padding.
+    const padding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    let active;
+    chapters.forEach((chapter) => {
+      const margin = parseFloat(getComputedStyle(chapter.target).scrollMarginTop) || 0;
+      if (chapter.target.getBoundingClientRect().top <= padding + margin + 1) active = chapter;
+    });
+    // The final chapter may be too short to reach the reading line.
+    if (window.scrollY > 0 && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1) {
+      active = chapters[chapters.length - 1];
+    }
+
+    chapters.forEach((chapter) => {
+      const { link } = chapter;
+      if (chapter === active) {
         link.setAttribute('aria-current', 'location');
       } else {
         link.removeAttribute('aria-current');
@@ -48,6 +64,20 @@ document.querySelectorAll('[data-guide-navigation]').forEach((navigation, index)
     });
   };
 
+  let scheduled = false;
+  const scheduleChapter = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      markChapter();
+    });
+  };
+
   markChapter();
-  window.addEventListener('hashchange', markChapter);
+  window.addEventListener('scroll', scheduleChapter, { passive: true });
+  window.addEventListener('resize', scheduleChapter);
+  window.addEventListener('hashchange', scheduleChapter);
+  window.addEventListener('pageshow', scheduleChapter);
+  window.addEventListener('load', scheduleChapter);
 });
