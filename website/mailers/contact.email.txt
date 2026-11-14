@@ -1,6 +1,0 @@
-New contact message for {app.site_name}
-
-Name: {email.name}
-Email: {email.address}
-
-{email.message}

@@ -1,6 +1,0 @@
-{app.site_name}
-
-Your sign-in code is {email.code}.
-
-It expires in 10 minutes and can only be used once.
-If you didn't request this code, ignore this email.
