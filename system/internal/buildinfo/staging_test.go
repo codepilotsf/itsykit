@@ -21,8 +21,8 @@ func TestPublicReleaseStaging(t *testing.T) {
 	}
 	for _, missing := range []bool{false, true} {
 		t.Run(fmt.Sprintf("missing-amd64=%t", missing), func(t *testing.T) {
-			root := t.TempDir()
-			for _, name := range []string{"scripts/stage-release.sh", "scripts/version.sh", "internal/buildinfo/version.go", "website/site/install.sh"} {
+			root := filepath.Join(t.TempDir(), "system")
+			for _, name := range []string{"scripts/stage-release.sh", "scripts/version.sh", "internal/buildinfo/version.go", "../website/site/install.sh"} {
 				body, err := os.ReadFile(filepath.Join("../..", name))
 				if err != nil {
 					t.Fatal(err)
@@ -108,7 +108,7 @@ func TestPublicReleaseStaging(t *testing.T) {
 				t.Fatal("wrong update channel", err, string(latest))
 			}
 			installer, err := os.ReadFile(filepath.Join(root, "dist/public/install.sh"))
-			original, readErr := os.ReadFile("../../website/site/install.sh")
+			original, readErr := os.ReadFile("../../../website/site/install.sh")
 			if err != nil || readErr != nil || string(installer) != string(original) {
 				t.Fatal("installer differs", err, readErr)
 			}

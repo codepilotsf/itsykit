@@ -1,5 +1,15 @@
 # Architecture and review guide
 
+The combined repository contains `system/` (this Go module) and sibling
+`website/` (the actual public site and docs). Paths below are framework-relative.
+Framework build outputs remain under `system/bin/` and `system/dist/`.
+Release staging reads the canonical installer from `../website/site/install.sh`.
+The website has its own site configuration and custom layout; it is not embedded
+in the CLI. Only `templates/` is the canonical generated-site starter.
+Both source histories and immutable release tags retain their original commits.
+Website Git snapshots are scoped to the `website/` subtree by the existing
+subdirectory-aware deployment flow; commit repository changes explicitly first.
+
 `internal/selfupdate` updates only the local CLI, separate from SSH server updates.
 It trusts bounded HTTPS metadata from itsyweb.dev, checks checksum/platform/version,
 and replaces the executable under the shared installer lock. The canonical command

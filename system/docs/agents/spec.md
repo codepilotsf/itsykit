@@ -2,6 +2,11 @@
 
 ## Product and build specification
 
+Source is maintained in one CP Git repository named `itsyweb`, with sibling
+`system/` (Go module, CLI/server, starter and framework docs) and `website/`
+(current public site and docs). Framework commands run from `system/`; website
+commands run from `website/`. Existing release tags retain their historical layouts.
+
 Local deployment packaging and server setup follow Go's standard temporary
 directory selection, including `TMPDIR` on Linux/macOS. Each invocation owns a
 private, unique scratch directory and removes it after completion, ordinary

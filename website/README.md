@@ -15,7 +15,9 @@ There is no frontend build step or language runtime to install.
 
 Use `itsy` for commands, `itsy.config.json` for site settings, and `itsy/` for
 content and runtime files. Downloads are served from `itsyweb.dev`. This
-repository contains the website and documentation, not the CLI source.
+`website/` directory contains the public website and documentation. The CLI and
+server source live beside it in [../system/](../system/README.md), in the
+same ItsyWeb repository. Run the site commands below from `website/`.
 
 ## Getting started
 
@@ -37,8 +39,8 @@ cd my-site
 itsy dev
 ```
 
-This repository already is a site, so start with `itsy dev`. Enter a site name
-if prompted; the admin email is optional. Open the Website URL printed by dev.
+This `website/` directory already is a site, so start with `itsy dev`. Enter a
+site name if prompted; the admin email is optional. Open the Website URL printed by dev.
 Skip admin setup to start with HTML pages.
 
 ### Edit the HTML

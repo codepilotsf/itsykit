@@ -1,5 +1,13 @@
 # Publishing ItsyWeb
 
+Run framework commands in this guide from `system/` in the combined
+`itsyweb` repository. Build outputs are `system/bin/` and `system/dist/`
+from the repository root; the public site is the sibling `website/`. The root
+GitLab CI configuration changes into `system/` and collects its artifacts.
+CP Git hosts source and has no automatic release pipeline; native release checks
+and explicit publication remain required. Historical release tags retain their
+original layouts and must not be moved or recreated.
+
 ## ItsyWeb 0.21.0 rollout
 
 Public 0.21.0, both native CLIs and the shared server are updated. All native
@@ -73,11 +81,11 @@ silently ignore them. Publication and server rollout remain separate operations.
 
 The agreed plan is in [next-steps.md](next-steps.md). Source remains private;
 public binaries will be free to use without an account or license key. The
-primary path is the implemented `website/site/install.sh`, intended for
+primary path is the implemented `../website/site/install.sh`, intended for
 https://itsyweb.dev/install.sh, followed by `itsy update` for local CLI updates.
 Remote updates use `itsy update-server` (including `--recover`), without an alias.
-The public test release is hosted by the separate website repository at
-`/Users/sean/Projects/flea-website`. Its `RELEASES.md` records build provenance and
+The public website source is the sibling `../website/`. Its
+[RELEASES.md](../../../website/RELEASES.md) records build provenance and
 actual public installer/update checks. Versioned binaries, SHA256SUMS,
 latest.txt and install.sh are live on fleacms.com. Public installation, reinstall,
 update and already-current checks pass on both currently supported platforms. The
@@ -130,8 +138,8 @@ Local verification built both Mac architectures, generated the formula using a
 non-publishing placeholder URL, and passed Ruby syntax validation. A real tap
 installation and downloaded-artifact verification remain pending.
 
-The website/ directory is unpublished local website source. Confirm downloads,
-installation instructions and live deployment before publishing it.
+The sibling `../website/` is the published website source. Repository moves do
+not redeploy it; preserve its design, deployment mappings and live content.
 
 End users install only ItsyWeb. Setup uses native SSH/SCP and extracts the
 matching bundled static Linux server; neither machine needs Go or source code.
@@ -198,7 +206,7 @@ no Go dependency. Creating/publishing that tap remains a separate step.
 Run from anywhere on this Mac:
 
 ```sh
-bash /Users/sean/Projects/flea/scripts/build.sh
+bash /Users/sean/Projects/itsyweb/system/scripts/build.sh
 ```
 
 Use the normal Go cache and, when temporary storage is constrained, the private

@@ -304,7 +304,7 @@ preserved. No source merge into main is implied by the release branch/tag.
   Linux full-suite/build verification, clean-machine Mac acceptance and
   notarization remain open; this is still a test release.
 - The older sprint notes below predate the published website and 0.5.0 downloads.
-  Use the separate website's RELEASES.md for recorded publication evidence;
+  Use `website/RELEASES.md` at the repository root for recorded publication evidence;
   do not treat the earlier "hosting pending" notes as current release status.
 
 ## Agreed scope
@@ -508,10 +508,10 @@ Agreed structure: exactly two public content pages, homepage and `/docs`, using
 zjax.dev's concise example-led structure with a fresh, bright visual style.
 Documentation, owner guidance, limitations, release notes and support are anchored
 sections of `/docs`, not separate pages. Authentication/error templates remain.
-Build this as a separate Flea site/repository at `/Users/sean/Projects/fleacms.com`,
-not inside the framework. It has not been created yet; see `handoff.md` for setup,
-references and the homepage-review checkpoint. Preserve the existing scaffold
-until useful content has been ported and verified.
+The website is published and its source is now `website/` beside `system/`
+in the combined ItsyWeb repository. The old scaffold has been replaced with the
+current site, preserving its design and history. The older checklist below records
+the original design brief; it does not authorize redesign or redeployment.
 
 - [x] Inspect the existing `website/` scaffold and preserve useful content.
 - [ ] Locate/enable and read the requested design skill before design work.

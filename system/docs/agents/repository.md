@@ -2,7 +2,9 @@
 
 Implementation requirements linked from [AGENTS.md](../../AGENTS.md).
 Read this when the task touches this subsystem. Paths in prose and code are
-relative to the repository root unless stated otherwise.
+relative to `system/` unless stated otherwise. The repository root contains
+this framework and the sibling `website/`, which is the current public site and
+documentation, not a starter scaffold. See [website guidance](../../../website/AGENTS.md).
 
 New sites include a short AGENTS.md, shared/authoring skills in .agents/skills/,
 version-specific .agents/site-requirements.md, and focused Blog/Contact/import

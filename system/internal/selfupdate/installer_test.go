@@ -11,7 +11,7 @@ import (
 )
 
 func TestInstallerOffline(t *testing.T) {
-	installer, err := filepath.Abs("../../website/site/install.sh")
+	installer, err := filepath.Abs("../../../website/site/install.sh")
 	if err != nil {
 		t.Fatal(err)
 	}

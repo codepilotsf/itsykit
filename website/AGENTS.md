@@ -1,5 +1,13 @@
 # Working on this ItsyWeb site
 
+This is `website/` in the combined ItsyWeb CP Git repository. The CLI/server
+source and generated starter live in sibling `../system/`. Paths in this
+guide are relative to `website/`; run `itsy` site commands here. Commit changes
+explicitly before deployment because the site is inside a larger repository.
+Preserve both saved branch deployment mappings in `itsy.config.json`; `main`
+targets fleacms.com and `t3/reframe-flea-html-focus` targets itsyweb.dev. This
+repository move does not authorize deploying or changing those mappings.
+
 Read README.md before changing templates. Preserve existing custom layouts,
 content and assets. There is no frontend build step or Node requirement.
 `itsy new` is minimal; `--starter`/`-s` adds example pages. The shared navigation

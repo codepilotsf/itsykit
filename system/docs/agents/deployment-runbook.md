@@ -8,9 +8,12 @@ and [recovery guide](../recovery.md) first.
 
 ## Repositories and destinations
 
-- Framework: `/Users/sean/Projects/flea`, branch `main`.
-- Public website: `/Users/sean/Projects/flea-website`, branch `main`. This is separate
-  from the framework's `website/` source directory. Preserve its custom layout.
+- Canonical repository: `git@git.codepilot.com:itsyweb.git` (CP Git).
+- Kirin framework: `/home/sean/Projects/itsyweb/framework`, branch `main`.
+- Kirin public website: `/home/sean/Projects/itsyweb/website`, in the same repository.
+  Preserve its custom layout and both saved branch mappings. Run framework
+  scripts in `system/` and site commands in `website/`. The older paths and
+  versions below are historical operator notes; recheck live state before use.
 - Production SSH: `root@fleacms.com`. The shared `flea.service` serves 24
   configured hostnames; an executable upgrade restarts all hosted sites.
 - Website deployment uses the current branch's saved `.flea.config.json` mapping.

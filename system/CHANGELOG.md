@@ -6,6 +6,10 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Consolidate framework and current public website history into the CP Git
+  `itsyweb` repository, with sibling `system/` and `website/` directories.
+  Run framework build scripts and Go checks from `system/`.
+
 ## 0.21.0 - 2026-11-14
 
 - Publish canonical `itsy` downloads at itsyweb.dev while retaining legacy
