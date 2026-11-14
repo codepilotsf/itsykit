@@ -1,6 +1,5 @@
 @layer styles {
   .docs-sidebar { scrollbar-color:var(--light) transparent; scrollbar-width:thin; padding-right:var(--space-xs); }
-  .docs-nav-heading { font-size:1rem; margin:0 0 var(--space-md); }
   .guides-nav { font-size:.87rem; }
   .guide-section { margin:0; border-bottom:1px solid var(--light); }
   .guide-section > summary { display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; padding:13px 10px; border-radius:6px; list-style:none; font-weight:500; line-height:1.5; color:var(--darker); }
@@ -15,9 +14,8 @@
   .guide-chapters a:hover { color:var(--brand-1); background:var(--lighter); }
   .guide-chapters a[aria-current="location"] { color:var(--brand-1); background:var(--brand-1-light); font-weight:600; }
   .guide-breadcrumb { display:inline-block; font-size:.9rem; margin-bottom:var(--space-md); }
+  .guide-next a { display:inline-flex; align-items:center; min-height:44px; font-weight:600; }
   .guide-next { border-top:1px solid var(--light); margin-top:var(--space-xl); padding-top:var(--space-lg); }
-  .guide-next h2 { font-size:1.2rem; }
-  .guide-next li + li { margin-top:var(--space-xs); }
   .docs-content .file-list dt { overflow-wrap:anywhere; }
   .docs-content h3[id] { scroll-margin-top:1rem; }
   .docs-content a:focus-visible,.docs-sidebar a:focus-visible,.guides-nav summary:focus-visible,.docs-mobile > summary:focus-visible { outline:2px solid var(--brand-1); outline-offset:3px; border-radius:2px; }

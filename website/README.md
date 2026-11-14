@@ -24,7 +24,10 @@ same ItsyWeb repository. Run the site commands below from `website/`.
 `site/docs.html` is Getting Started, the documentation landing page at `/docs`.
 The remaining guides live in `site/docs/`. All guides share the accordion
 navigation in `site/_guides-nav.html`, driven by `itsy/data/guides.json`.
-Keep guide URLs and chapter IDs in that data file aligned with the pages.
+The array order is the reading sequence, starting with Getting Started, templates,
+and styling. Each page ends with one continuation link to the next guide; the
+last returns to Getting Started. Keep those links, guide URLs, and chapter IDs
+aligned with the data file.
 The current guide opens in the sidebar; phones show the same navigation inside
 Guides. `site/js/guides.js` selects the current guide and chapter.
 Getting Started builds one small site from installation through local validation;

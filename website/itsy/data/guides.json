@@ -48,52 +48,6 @@
       ]
     },
     {
-      "url": "/docs/installation",
-      "title": "Installation and updates",
-      "first": false,
-      "chapters": [
-        {
-          "id": "installation",
-          "title": "Install ItsyWeb"
-        },
-        {
-          "id": "updates",
-          "title": "Keep ItsyWeb up to date"
-        }
-      ]
-    },
-    {
-      "url": "/docs/development",
-      "title": "Local development",
-      "first": false,
-      "chapters": [
-        {
-          "id": "quickstart",
-          "title": "Your first HTML site"
-        },
-        {
-          "id": "quickstart-chapter-1",
-          "title": "Edit a page"
-        },
-        {
-          "id": "quickstart-chapter-2",
-          "title": "Check and save"
-        },
-        {
-          "id": "quickstart-chapter-3",
-          "title": "Other ways to start"
-        },
-        {
-          "id": "lan-testing",
-          "title": "Test on another device"
-        },
-        {
-          "id": "lan-testing-chapter-1",
-          "title": "Sign-in codes and email previews"
-        }
-      ]
-    },
-    {
       "url": "/docs/templates",
       "title": "Pages, layouts and data",
       "first": false,
@@ -144,17 +98,33 @@
       ]
     },
     {
-      "url": "/docs/agents",
-      "title": "Working with coding agents",
+      "url": "/docs/development",
+      "title": "Local development",
       "first": false,
       "chapters": [
         {
-          "id": "agents",
-          "title": "AI-assisted development"
+          "id": "quickstart",
+          "title": "Your first HTML site"
         },
         {
-          "id": "agents-chapter-1",
-          "title": "Use the skills in an existing project"
+          "id": "quickstart-chapter-1",
+          "title": "Edit a page"
+        },
+        {
+          "id": "quickstart-chapter-2",
+          "title": "Check and save"
+        },
+        {
+          "id": "quickstart-chapter-3",
+          "title": "Other ways to start"
+        },
+        {
+          "id": "lan-testing",
+          "title": "Test on another device"
+        },
+        {
+          "id": "lan-testing-chapter-1",
+          "title": "Sign-in codes and email previews"
         }
       ]
     },
@@ -263,6 +233,83 @@
       ]
     },
     {
+      "url": "/docs/deployment",
+      "title": "Server setup and deployment",
+      "first": false,
+      "chapters": [
+        {
+          "id": "deployment",
+          "title": "Put your site online"
+        },
+        {
+          "id": "server",
+          "title": "Set up the server"
+        },
+        {
+          "id": "deployment-chapter-2",
+          "title": "Deploy a branch"
+        },
+        {
+          "id": "deployment-chapter-3",
+          "title": "Temporary packaging storage"
+        }
+      ]
+    },
+    {
+      "url": "/docs/seo",
+      "title": "Search engines and SEO",
+      "first": false,
+      "chapters": [
+        {
+          "id": "seo-discovery",
+          "title": "Sitemaps, canonical URLs and page exclusions"
+        },
+        {
+          "id": "seo-update",
+          "title": "1. Check your CLI and server"
+        },
+        {
+          "id": "seo-configure",
+          "title": "2. Set the production address"
+        },
+        {
+          "id": "seo-check",
+          "title": "3. Check locally, then deploy"
+        },
+        {
+          "id": "seo-discovery-chapter-4",
+          "title": "What ItsyWeb includes and preserves"
+        },
+        {
+          "id": "seo-search-console",
+          "title": "Optional: tell Google where the sitemap is"
+        },
+        {
+          "id": "indexing",
+          "title": "Keep staging out of search"
+        }
+      ]
+    },
+    {
+      "url": "/docs/redirects",
+      "title": "Migration redirects",
+      "first": false,
+      "chapters": [
+        {
+          "id": "redirects",
+          "title": "Preserve old links with 301 redirects"
+        },
+        {
+          "id": "redirects-chapter-1",
+          "title": "Inventory the original website with an agent"
+        },
+        {
+          "id": "redirects-chapter-2",
+          "title": "Validate before deploying"
+        }
+      ]
+    },
+    {
       "url": "/docs/apps",
       "title": "Managed apps",
       "first": false,
@@ -334,79 +381,32 @@
       ]
     },
     {
-      "url": "/docs/deployment",
-      "title": "Server setup and deployment",
+      "url": "/docs/agents",
+      "title": "Working with coding agents",
       "first": false,
       "chapters": [
         {
-          "id": "deployment",
-          "title": "Put your site online"
+          "id": "agents",
+          "title": "AI-assisted development"
         },
         {
-          "id": "server",
-          "title": "Set up the server"
-        },
-        {
-          "id": "deployment-chapter-2",
-          "title": "Deploy a branch"
-        },
-        {
-          "id": "deployment-chapter-3",
-          "title": "Temporary packaging storage"
+          "id": "agents-chapter-1",
+          "title": "Use the skills in an existing project"
         }
       ]
     },
     {
-      "url": "/docs/redirects",
-      "title": "Migration redirects",
+      "url": "/docs/installation",
+      "title": "Installation and updates",
       "first": false,
       "chapters": [
         {
-          "id": "redirects",
-          "title": "Preserve old links with 301 redirects"
+          "id": "installation",
+          "title": "Install ItsyWeb"
         },
         {
-          "id": "redirects-chapter-1",
-          "title": "Inventory the original website with an agent"
-        },
-        {
-          "id": "redirects-chapter-2",
-          "title": "Validate before deploying"
-        }
-      ]
-    },
-    {
-      "url": "/docs/seo",
-      "title": "Search engines and SEO",
-      "first": false,
-      "chapters": [
-        {
-          "id": "seo-discovery",
-          "title": "Sitemaps, canonical URLs and page exclusions"
-        },
-        {
-          "id": "seo-update",
-          "title": "1. Check your CLI and server"
-        },
-        {
-          "id": "seo-configure",
-          "title": "2. Set the production address"
-        },
-        {
-          "id": "seo-check",
-          "title": "3. Check locally, then deploy"
-        },
-        {
-          "id": "seo-discovery-chapter-4",
-          "title": "What ItsyWeb includes and preserves"
-        },
-        {
-          "id": "seo-search-console",
-          "title": "Optional: tell Google where the sitemap is"
-        },
-        {
-          "id": "indexing",
-          "title": "Keep staging out of search"
+          "id": "updates",
+          "title": "Keep ItsyWeb up to date"
         }
       ]
     },

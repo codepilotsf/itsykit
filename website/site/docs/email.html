@@ -1,6 +1,5 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <h2 class="docs-nav-heading">Guides</h2>
     {render /guides-nav}
   </aside>
   <article class="docs-content">
@@ -18,7 +17,7 @@
   &lt;div hidden&gt;&lt;label&gt;Leave empty &lt;input name="website" tabindex="-1" autocomplete="off" /&gt;&lt;/label&gt;&lt;/div&gt;
   &lt;button type="submit"&gt;Send message&lt;/button&gt;
 &lt;/form&gt;</code></pre><p>Success redirects to the mount's <code>thank-you</code> page with a visitor-bound notice. Messages are emailed, not stored, and validation re-renders the form with safe values on error. There is no general-purpose form backend.</p><h3 id="email-chapter-2">Email templates</h3><p>Customize <code>mailers/*.email.html</code> and <code>*.email.txt</code>. HTML emails share <code>mailers/main.layout.html</code>. Keep its slot and use escaped <code>app.*</code> and <code>email.*</code> values.</p><pre tabindex="0" aria-label="Code example"><code class="language-bash">itsy email preview sign-in</code></pre><p>This renders a sample without sending an email.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/editing">On-page editing</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Next guide"><a href="/docs/blog">Continue to Blog</a></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>

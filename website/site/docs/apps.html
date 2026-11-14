@@ -1,6 +1,5 @@
 <div class="docs-shell container">
   <aside class="docs-sidebar">
-    <h2 class="docs-nav-heading">Guides</h2>
     {render /guides-nav}
   </aside>
   <article class="docs-content">
@@ -322,7 +321,7 @@ func writeJSON(w http.ResponseWriter, status int, body any) &#123;
   -H "Authorization: Bearer $APP_TOKEN" \
   -H "Content-Type: application/json" \
   -d '&#123;"name":"Alex"&#125;'</code></pre><p>This proves the wire contract, authentication and statuses. It does not mount the service in a site.</p><h3 id="custom-apps-chapter-11">What remains planned</h3><p>Remote (non-local) services, public read-only routes declared in configuration, databases, storage helpers and file uploads remain planned. ItsyWeb supervises only a confined local executable; it does not download packages or run arbitrary commands.</p></section>
-    <nav class="guide-next" aria-label="Continue reading"><h2>Keep going</h2><ul><li><a href="/docs/email">Email and contact forms</a></li></ul></nav>
+    <nav class="guide-next" aria-label="Next guide"><a href="/docs/agents">Continue to Working with coding agents</a></nav>
   </article>
 </div>
 <script src="/js/prism.js" defer></script>
