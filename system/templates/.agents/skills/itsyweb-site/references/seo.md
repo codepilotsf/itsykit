@@ -36,8 +36,9 @@ hostname after confirmation and restarts the shared service. `allow` removes onl
 that imposed restriction. Policy survives deploy, sync, rollback and restore;
 site backups exclude it. `itsy server list` and status report effective policy.
 A production SEO origin does not automatically protect staging. Both systems
-require a supporting server; new-layout deployment requires protocol 30 and an
-explicit authorized server upgrade, not merely changed site config.
+require a supporting server. Naming support began at protocol 29; the page-CMS
+removal contract requires protocol 30. Check [operations](compatibility-operations.md)
+for the source/release boundary; site config alone does not upgrade a server.
 
 Verify locally: sitemap absolute production URLs, robots discovery, public
 canonical tags/Link headers, excluded page accessibility/noindex, custom-file

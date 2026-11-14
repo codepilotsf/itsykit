@@ -35,11 +35,14 @@ locks, `flea-sync` baselines and recovery names; do not rename private state.
 Canonical release URLs use `https://itsyweb.dev/releases/` and `itsy-*` artifacts;
 legacy fleacms.com URLs and `flea-*` artifact aliases remain for released updaters.
 
-This website requires ItsyWeb 0.22.0 or newer and protocol 30
-(`FLEA_DEPLOY=30` on the wire). App protocol remains 2. Existing page-CMS sites
-need an explicitly approved conversion with verified backups before a shared
-server upgrade; the upgrade validates installed sites and does not convert them.
-`itsy update` updates only
+The page-CMS removal contract requires ItsyWeb 0.22.0 or newer and protocol 30
+(`FLEA_DEPLOY=30`). Public 0.21.0 uses protocol 29 and does not contain this
+contract. Earlier feature minimums (host indexing 27, SEO/redirects 28, naming
+29) do not relax this requirement. App protocol remains 2. Existing page-CMS
+sites need an explicitly approved conversion with verified backups before a
+shared-server upgrade; the upgrade validates installed sites and does not convert
+them. A local commit/build authorizes no release, deployment or shared-server
+upgrade. `itsy update` updates only
 the local CLI/bundled servers; `itsy update-server` explicitly upgrades the saved
 branch's server executable after confirmation, briefly affecting every hosted
 site. It preserves compatible sites and does not migrate systemd policy/configuration.
@@ -69,19 +72,23 @@ public DNS, inbound TCP 80/443, a contact email and explicit Let's Encrypt terms
 acceptance. Use `itsy https` for an already deployed site; preserve other hosts.
 
 Normal `itsy deploy` publishes committed templates, config, assets and CSS,
-seeds new Blog post IDs, and preserves live posts and cover photos. Page
-metadata and developer CSS travel with code. Preserve `deploy.branches` mappings;
-only the current branch is selected,
-with no main fallback. Deployment needs committed clean source. In a larger Git
-repository commit manually; the CLI will not offer its automatic commit there.
+seeds local-only IDs, and preserves existing live Blog posts and cover photos.
+Missing source IDs never delete live records. Preserve `deploy.branches` mappings;
+only the current branch is selected, with no main fallback. Deployment needs
+committed clean source. In a larger Git repository commit manually; the CLI will
+not offer its automatic commit there.
 
-Stop dev before authorized `itsy pull`. It retrieves content and referenced
-media, never CSS, templates, config, secrets or sessions, and never commits.
+Stop dev before authorized `itsy pull`; selected local files must be committed.
+It retrieves Blog posts and referenced cover photos, never CSS, templates, config,
+secrets or sessions, and never commits.
 Preserve local-only IDs and review/commit results. `itsy deploy --with-content`
 explicitly publishes reviewed local content; existing destinations need an exact
-pull baseline first. Conflicts require choices and unattended conflicts stop.
-Blog posts compare as whole records. Removed page-content and theme flags have
-no aliases; CSS travels with code.
+destination-scoped pull baseline first. Posts and photos compare as whole records.
+Conflicts require explicit choices and unattended conflicts stop. Keep baselines
+in private Git metadata, scoped to exact destination/project. Check expected remote
+state under the deployment lock; preserve local project locks and recovery guards.
+`--with-snips` is removed without an alias. Removed theme flags `--with-theme`,
+`--theme-only`, `--snips-only` also have no aliases; CSS travels with code.
 
 `itsy status` validates locally, then automatically checks the current branch's
 saved remote without changing baselines. Without that mapping it finishes locally.
@@ -95,11 +102,22 @@ content and selects the earlier code/CSS. `itsy backup ../site.flea-backup`
 writes a new private archive outside the site; the suffix is not a rename mandate.
 Backups include code/config/live content/media, excluding deploy settings,
 credentials, certificates, sessions, host indexing and custom-app storage.
-`itsy restore` replaces live code/content after explicit confirmation. Interrupted
-server upgrades use `itsy update-server --recover`. Read recovery docs before use.
+`itsy restore` replaces live code/content after an expected-snapshot check and
+explicit confirmation. Preserve backup identity/digest checks, locking and
+rollback/recovery safeguards; retained files are never automatically pruned.
+Interrupted server upgrades use `itsy update-server --recover`. Read recovery docs
+before use.
 
 `itsy reset` replaces all local files/settings except `.git` after confirmation,
 keeping a private sibling recovery copy; it never deploys. Do not use it for
 cleanup. Server removal unregisters routing and restarts the shared service but
 retains files; redeploying the same name does not recover retained live content.
 Release pruning, remote logs commands and automatic retention remain deferred.
+
+Before using this incompatible runtime on an old site, preserve a backup and
+require an explicitly scoped source conversion. Old page-CMS fields, named-content
+directories and pending extraction journals fail closed without rewriting. Do not
+discard content/media to pass validation or perform automatic migration, pruning
+or live cleanup. Naming compatibility does not make old page-CMS content compatible.
+Keep historical release receipts; rollback retains current Blog content rather
+than converting it for an older runtime, so check code/content compatibility.

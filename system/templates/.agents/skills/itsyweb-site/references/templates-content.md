@@ -1,20 +1,19 @@
 # Templates and content
 
-Implementation requirements linked from the installed site AGENTS.md.
+Use the selected config and content directory described in [the skill](../SKILL.md).
+Read installed requirements for version-specific syntax. This reference describes
+its page-CMS removal contract, not a conversion workflow for older sites.
 
-`site/` owns public HTML and assets; root `mailers/` owns private email templates.
-Config is `itsy.config.json`. `itsy/data/*.json` contains developer-authored objects.
-`itsy/snips.json` retains only Blog posts and cover metadata. `itsy/media/` holds
-immutable library photos; `itsy/runtime/` holds private sessions. Never serve or
-archive runtime state, secrets or agent guidance. Keep `.agents/` and installed
-skills in Git. Impeccable stays globally installed, never copied into a site.
+## Pages, layouts and metadata
 
-Existing `.flea.config.json`, `flea/` and `<!-- flea` spellings remain supported;
-prefer Itsy names when present and write only the selected paths. No new alias or
-migration is authorized. Protocol 30 requires a matching server. Old page-CMS
-JSON/markup/named content and pending extraction journals fail closed.
+`site/index.html` maps to `/`. Both `site/about.html` and
+`site/about/index.html` map to `/about`; providing both is a collision. Assets
+retain their public paths. `.html` URLs and non-root trailing slashes return 404
+unless explicitly configured as redirects. Dot/underscore-prefixed files and
+layouts are private. `_404.html` uses the main layout; `_500.html` is standalone.
 
-Ordinary page metadata belongs in one leading HTML settings comment, before markup:
+`site/main.layout.html` optionally wraps pages with `{slot}`. Ordinary page
+metadata and an optional custom layout use one leading settings comment:
 
 ```html
 <!-- itsy
@@ -22,62 +21,79 @@ title: Visit the bookshop
 description: Find our opening hours and plan a visit.
 layout: /custom.layout.html
 -->
-<h1>Visit the bookshop</h1>
+<h1>Visit us</h1>
 ```
 
-Each value is single-line plain text, without surrounding quotation marks. Split
-at the first colon; later colons and braces stay literal. `layout` is optional and
-must name an existing site-relative private `*.layout.html` file. The existing
-`<!-- flea` spelling is also supported. Unknown and duplicate settings fail
-validation, including duplicate empty values. This is not YAML.
+Only `title`, `description` and `layout` are supported. Values are trimmed,
+single-line plain text, split at the first colon. Braces, quotes, HTML characters
+and later colons remain data, never template source; do not add YAML quoting.
+Unknown, malformed and duplicate settings fail, including duplicate empty values.
+The existing `<!-- flea` spelling remains supported; no new aliases are added.
+Layout paths must name existing site-root-relative private `*.layout.html` files;
+retain confinement and traversal checks. Layouts cannot select another layout;
+partials cannot select layouts. `_500.html` remains standalone.
 
-`{page.title}` and `{page.description}` render with contextual escaping, for
-example `<title>{page.title}</title>` and
-`<meta name="description" content="{page.description}">`. Missing or empty title
-uses `Home` at `/`, otherwise the final URL component with hyphens replaced by
-spaces and its first letter capitalized. Missing or empty description is empty.
-Comment values are never compiled as template source or copied into JSON.
-Blog posts use their saved title and excerpt instead of template comment metadata.
-There are no saved ordinary-page metadata overrides or page metadata editor.
+Layouts use `{page.title}`, `{page.description}` and `{page.path}` with contextual
+escaping. A missing/empty title uses `Home` at `/`, otherwise the final route
+component with hyphens replaced by spaces and its first letter capitalized.
+Missing/empty description is empty. Published Blog posts use their saved title
+and excerpt, overriding post-template comment metadata. There are no saved
+ordinary-page metadata overrides, extraction writes or metadata editor.
 
-`index.html` maps to `/`; `about.html` and `about/index.html` both map to
-`/about`, and cannot coexist. `.html` URLs and non-root trailing slashes are 404
-unless explicitly configured as redirects. Underscore/dot paths and all
-`*.layout.html` files are private. `admin/` is reserved for authenticated templates.
+## Partials, data and literal syntax
 
-`main.layout.html` optionally wraps pages using `{slot}`. Layouts may render
-partials but cannot select another layout or be included as partials. `_404.html`
-uses the main layout; `_500.html` stays standalone. Preserve custom site layouts.
-`{render footer}` includes adjacent `_footer.html`; `{render /foo/bar/footer}`
-includes `site/foo/bar/_footer.html`. Paths are unquoted, omit underscore/extension
-and resolve relative to the calling template. Reject traversal, missing and
-recursive includes, including unused partials.
+Partials are underscore-prefixed HTML files anywhere in `site/`.
+`{render footer}` includes adjacent `_footer.html`;
+`{render /shared/footer}` includes `site/shared/_footer.html`. Paths are unquoted,
+omit the underscore/extension, and resolve relative to the calling template,
+including inside partials. Never escape `site/`. Includes inherit loop aliases;
+missing/recursive includes fail even in unused partials. Preserve existing shared
+markup; the starter keeps header/footer directly in its main layout.
 
-Values use `{app.site_name}`, `{data.home.title}` or loop aliases. No `site.*`
-alias. Dotted-path-only conditions use `{#if app.email}...{:else}...{/if}` or
-`#unless`; `:else if` is supported. Loops use
-`{#each data.home.items as item}{item.name}{:else}Empty{/each}`. Missing arrays
-use the fallback; non-arrays fail. Nested loops restore shadowed outer aliases.
-No functions, filters, comparisons or arbitrary expressions. All ordinary values
-retain Go contextual escaping. Only the exact Blog body directive renders
-sanitized rich HTML, and only in ordinary element content.
+Public config globals use `{app.site_name}`. Developer-managed
+`itsy/data/home.json` uses `{data.home.title}`. Values are contextually escaped.
 
-Comments and complete script/style elements stay inert except the leading settings
-block. Balanced ordinary literal brace groups and JSON stay literal. Recognized
-commands/dotted paths retain malformed-syntax diagnostics. Encode braces as
-`&#123;` and `&#125;` when showing exact syntax. JSON and Blog bodies are never
-recursively compiled. Retired page directives are recognized only to reject them.
+```html
+{#if app.email}<a href="mailto:{app.email}">Email</a>
+{:else if app.phone}<p>{app.phone}</p>{:else}<p>Contact us soon.</p>{/if}
+<a href="/admin">Admin</a>
+{#each data.home.services as service}
+  <h2>{service.name}</h2>
+{:else}<p>No services listed.</p>{/each}
+```
 
-Public forms keep `{csrf}` as a whole hidden input in ordinary element content.
-Contact uses `apps.contact`, a mount-relative thank-you route and its existing
-email/form contract. Admin forms separately use `{admin.csrf}` and exact Origin.
-Public layouts have ordinary `/admin` links and no authenticated page state or
-editor mount. Blog uses private admin templates and `/admin/blog`; see the installed Blog guide.
+Conditions are dotted paths, not comparisons or expressions; `#unless` supplies
+negative conditions. Empty/missing collections use the each fallback; other
+non-array values fail. Do not assume filters, functions, array indexes, raw HTML
+or Markdown rendering. Only exact `{blog.data.post.body}` renders sanitized rich
+HTML in ordinary element content; aliases remain escaped.
 
-`itsy new` defaults to minimal ordinary HTML with Home comment metadata and `{}`
-Blog storage. `--starter` adds static demo pages and six fictional team members.
-Both include admin/Blog/mail templates and authored guidance. Refuse nonempty
-creation targets, hidden entries and symlinks. Git initialization, initial commit,
-`--skip-git` and explicit reset/recovery safeguards remain unchanged. Dev loads and
-watches templates read-only apart from explicit icon caching, site-name/admin setup
-and session storage. There is no extraction or content reindexing transaction.
+Script/style elements and HTML comments stay inert except leading page settings.
+To show exact template syntax in public HTML examples, encode literal braces:
+`&#123;app.site_name&#125;`. Balanced ordinary literal braces/JSON stay literal;
+developer JSON, metadata and Blog bodies are never recursively compiled.
+
+## Static assets and retained Blog storage
+
+Write page copy directly in HTML; structured lists use `itsy/data/*.json` and
+`#each`. Images and videos are ordinary static files under `site/`, referenced
+by public URLs. Keep classes, dimensions, links and playback behavior in source.
+Styles, Prewind and theme tokens remain developer-managed and deploy with code.
+Public pages have no authenticated CMS state or global page-media namespace.
+Blog covers use `blog.data.post.cover` and the private admin photo list; see
+[apps](apps.md) for post/photo records, upload limits and administration.
+
+Keep the selected `itsy/snips.json` or supported legacy `flea/snips.json` for
+Blog storage. Its only optional top-level fields are `blog` and `media`; `{}` is
+valid empty storage. Do not cosmetically rename this file, `internal/snips` or
+synchronization `Snips` wire fields: these retain active Blog uses. Rejection
+guards and custom-app namespace restrictions also remain live behavior.
+
+Page text/media snips, named/structured snips, multisnips/collections, extraction,
+page editing and browser theme controls are removed. Old page-CMS JSON fields,
+retired attributes/directives, named-content directories and pending extraction
+journals fail closed without conversion or rewriting. Preserve a backup and
+require explicitly scoped source conversion before using the incompatible runtime
+on an old site. Never delete content/media or journals merely to pass validation;
+no bulk migration, compatibility layer, automatic pruning or live cleanup is
+implied. Consult [operations](compatibility-operations.md) for version boundaries.
