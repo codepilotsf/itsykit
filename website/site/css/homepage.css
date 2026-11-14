@@ -46,17 +46,32 @@
   .example-description { margin:0 0 20px; font-size:1rem; line-height:1.6; color:var(--darker); }
   .example-footer { margin-top:28px; color:var(--dark); font-size:.85rem; }
   .example-links { display:flex; flex-wrap:wrap; gap:22px; }
-  .example-links button { display:inline; min-height:28px; margin:0; padding:0; border:0; border-radius:0; background:none; color:#174fc7; font:inherit; font-size:1rem; font-weight:400; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+  .example-links button,.example-links > span { display:inline; min-height:28px; margin:0; padding:0; border:0; border-radius:0; background:none; color:#174fc7; font:inherit; font-size:1rem; font-weight:400; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+  .example-links > span { cursor:default; }
   .example-links button:hover:not(:disabled) { color:var(--black); filter:none; }
   .example-links button:focus-visible { outline-color:var(--brand-1); }
-  .demo-explanation { padding:24px 28px; background:var(--hero-pane); color:var(--hero-ink); font-size:.92rem; line-height:1.5; }
-  .demo-explanation .demo-view-title { margin:0 0 8px; color:var(--hero-ink); font-size:1.12rem; font-weight:700; }
-  .demo-explanation p { margin:0 0 16px; color:var(--hero-muted); }
-  .demo-explanation a { display:inline-flex; align-items:center; gap:8px; color:var(--accent); font-weight:600; }
-  .demo-explanation a svg { width:16px; height:16px; }
-  .demo-explanation .demo-install { margin-bottom:0; font-size:.82rem; }
-  .demo-install a { display:inline; }
-  .demo-install svg { display:inline; vertical-align:middle; }
+  .demo-command { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; padding:12px 24px 0; color:var(--hero-ink); font-size:.8rem; }
+  .demo-command code { background:none; padding:0; color:inherit; }
+  .demo-command > span { color:var(--hero-muted); font-size:.75rem; }
+  #example-develop .source-code { padding-block:16px 12px; }
+  #example-publish .source-code { padding-bottom:12px; }
+  .demo-status { margin:0; padding:0 24px 20px; color:var(--accent); font-size:.76rem; line-height:1.6; }
+  .demo-caption { grid-column:1/-1; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:18px 24px; background:var(--hero-pane); font-size:.82rem; line-height:1.6; }
+  .demo-caption p { margin:0; max-width:75ch; color:var(--hero-muted); }
+  .demo-caption strong { color:var(--hero-ink); font-weight:600; }
+  .demo-caption a { color:var(--accent); }
+  .demo-caption > a { display:inline-flex; align-items:center; gap:8px; flex-shrink:0; min-height:44px; font-weight:600; }
+  .demo-caption a svg { width:16px; height:16px; }
+  .demo-caption code { background:none; padding:0; color:var(--hero-ink); font-size:inherit; }
+  .publish-lock { display:flex; align-items:center; color:var(--accent); }
+  .publish-lock + .preview-address { padding-left:0; }
+  .demo-playing [data-publish-step] { opacity:.32; }
+  .demo-playing [data-publish-step].is-current { opacity:1; }
+  .demo-playing [data-publish-preview] { opacity:.45; }
+  .demo-playing [data-publish-lock] { visibility:hidden; }
+  .edit-original { color:transparent; }
+  [data-edit-title] { position:relative; }
+  .edit-copy { position:absolute; top:0; left:0; color:var(--hero-ink); border-right:2px solid var(--accent); }
   .agent-section { background:var(--hero-ink); padding:var(--space-xl) 0; }
   .agent-grid { --container-max:1120px; --container-padding:0 var(--page-gutter); display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.75fr); align-items:start; gap:32px; }
   .agent-grid > h2 { margin:28px 0 0; font-size:clamp(2rem,2.9vw,2.75rem); line-height:1.12; letter-spacing:-.035em; }
@@ -152,8 +167,11 @@
     .preview-bar { gap:10px; }
     .example-page { padding:24px 20px; }
     .example-title { font-size:1.85rem; }
-    .example-links button { font-size:.95rem; }
-    .demo-explanation { padding:24px 20px; }
+    .example-links button,.example-links > span { font-size:.95rem; }
+    .demo-command { padding-inline:16px; }
+    .demo-status { padding-inline:16px; }
+    .demo-caption { align-items:flex-start; flex-direction:column; gap:6px; padding:16px; }
+    .demo-caption > a { flex-shrink:1; }
     .agent-section { padding-top:28px; }
     .agent-grid > h2 { margin:0; font-size:2rem; }
     .agent-project { grid-template-columns:1fr; }

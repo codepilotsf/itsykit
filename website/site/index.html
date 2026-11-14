@@ -11,7 +11,7 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
 
     <div class="project-demo tab-group" data-tabs>
       <div class="demo-toolbar">
-        <p class="demo-hint" id="demo-hint">Choose a view to explore.</p>
+        <p class="demo-hint" id="demo-hint">One site. From HTML to HTTPS.</p>
         <nav class="demo-tabs" aria-label="Example project views" aria-describedby="demo-hint" data-tab-list>
           <a id="view-html" class="project-tab" href="#example-html" data-tab>{icon code-xml}<span>HTML</span></a>
           <a id="view-develop" class="project-tab" href="#example-develop" data-tab>{icon terminal}<span>Develop</span></a>
@@ -43,33 +43,54 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
             <footer class="example-footer"><small>Made with ItsyWeb.</small></footer>
           </div>
         </div>
+        <div class="demo-caption"><p><strong>Write the page.</strong> Ordinary HTML, with shared pieces where you need them.</p><a href="#example-develop" data-demo-next>See it reload {icon arrow-right}</a></div>
       </section>
       <section class="demo-stage" id="example-develop" aria-labelledby="view-develop" data-tab-panel>
         <div class="demo-pane source-pane">
-          <div class="pane-bar">{icon terminal}<span>Your terminal</span></div>
-          <pre class="source-code" tabindex="0" aria-label="Create and preview a site"><code><span class="syntax-comment"># create a site, then start the dev server</span>
-<span class="syntax-tag">$</span> itsy new my-site &amp;&amp; cd my-site
-<span class="syntax-tag">$</span> itsy dev</code></pre>
+          <div class="pane-bar example-source-bar">{icon file}<span>site/index.html</span><button class="demo-replay" type="button" hidden data-demo-replay>Replay</button></div>
+          <div class="demo-command"><code><span class="syntax-tag">$</span> itsy dev</code><span>localhost:3000</span></div>
+          <pre class="source-code" tabindex="0" aria-label="Save an HTML edit to reload the local preview"><code><span class="syntax-tag">&lt;main&gt;</span>
+  <span class="syntax-tag">&lt;h1&gt;</span><span data-edit-title>Hello, again.</span><span class="syntax-tag">&lt;/h1&gt;</span>
+  <span class="syntax-tag">&lt;p&gt;</span>A small site, simply made.<span class="syntax-tag">&lt;/p&gt;</span>
+  &#123;render /navigation&#125;
+  <span class="syntax-tag">&lt;footer&gt;</span>
+    <span class="syntax-tag">&lt;small&gt;</span>Made with ItsyWeb.<span class="syntax-tag">&lt;/small&gt;</span>
+  <span class="syntax-tag">&lt;/footer&gt;</span>
+<span class="syntax-tag">&lt;/main&gt;</span></code></pre>
+          <p class="demo-status" data-develop-status>Saved · browser reloaded</p>
         </div>
-        <div class="demo-pane demo-explanation">
-          <p class="demo-view-title">Save a file. See the change.</p>
-          <p>The local server reloads your browser when you save. Edit the HTML and CSS directly, or let your coding agent work in the same files.</p>
-          <p class="demo-install"><a href="/docs/installation">Install ItsyWeb {icon arrow-up-right}</a> for Apple Silicon Mac or x86-64 Linux, then create your site.</p>
+        <div class="demo-pane preview-pane" aria-label="Example live-reloading website">
+          <div class="pane-bar preview-bar"><span class="preview-address">http://localhost:3000</span></div>
+          <div class="example-page" data-develop-preview>
+            <p class="example-title" data-develop-title>Hello, again.</p>
+            <p class="example-description">A small site, simply made.</p>
+            <nav class="example-links" aria-label="Local example website pages"><span>Home</span><span>About</span><span>Contact</span></nav>
+            <footer class="example-footer"><small>Made with ItsyWeb.</small></footer>
+          </div>
         </div>
+        <div class="demo-caption"><p><strong>Save a file. See the change.</strong> <a href="/docs/installation">Install ItsyWeb</a> for Apple Silicon Mac or x86-64 Linux, then <code>itsy new my-site</code>.</p><a href="#example-publish" data-demo-next>Take it live {icon arrow-right}</a></div>
       </section>
       <section class="demo-stage" id="example-publish" aria-labelledby="view-publish" data-tab-panel>
         <div class="demo-pane source-pane">
-          <div class="pane-bar">{icon upload}<span>From your computer to your server</span></div>
-          <pre class="source-code" tabindex="0" aria-label="Set up a server and deploy"><code><span class="syntax-comment"># prepare your Ubuntu host over SSH</span>
-<span class="syntax-tag">$</span> itsy setup
-<span class="syntax-comment"># commit your changes, then publish</span>
-<span class="syntax-tag">$</span> itsy deploy</code></pre>
+          <div class="pane-bar example-source-bar">{icon terminal}<span>Your terminal</span><button class="demo-replay" type="button" hidden data-demo-replay>Replay</button></div>
+          <pre class="source-code" tabindex="0" aria-label="Example workflow: set up an Ubuntu server, commit and deploy"><code><span data-publish-step="setup"><span class="syntax-comment"># prepare your Ubuntu host over SSH</span>
+<span class="syntax-tag">$</span> itsy setup</span>
+<span data-publish-step="commit"><span class="syntax-comment"># commit the page you just edited</span>
+<span class="syntax-tag">$</span> git add site/index.html
+<span class="syntax-tag">$</span> git commit -m "Update greeting"</span>
+<span data-publish-step="deploy"><span class="syntax-tag">$</span> itsy deploy</span></code></pre>
+          <p class="demo-status" data-publish-status>Published · automatic HTTPS</p>
         </div>
-        <div class="demo-pane demo-explanation">
-          <p class="demo-view-title">Your site. Your server. HTTPS included.</p>
-          <p>Bring an Ubuntu server, SSH access and a domain. ItsyWeb installs its web server and deploys committed files, with automatic certificates and renewal.</p>
-          <a href="/docs/deployment">Server setup and deployment {icon arrow-up-right}</a>
+        <div class="demo-pane preview-pane" aria-label="Example published website">
+          <div class="pane-bar preview-bar"><span class="publish-lock" data-publish-lock>{icon lock-keyhole}</span><span class="preview-address" data-publish-address>https://example.com</span></div>
+          <div class="example-page" data-publish-preview>
+            <p class="example-title">Hello, again.</p>
+            <p class="example-description">A small site, simply made.</p>
+            <nav class="example-links" aria-label="Published example website pages"><span>Home</span><span>About</span><span>Contact</span></nav>
+            <footer class="example-footer"><small>Made with ItsyWeb.</small></footer>
+          </div>
         </div>
+        <div class="demo-caption"><p><strong>Your site. Your server. HTTPS included.</strong> Bring an Ubuntu server, SSH access and a domain. Point DNS to your server and open ports 80 and 443 for automatic certificates and renewal.</p><a href="/docs/deployment">Setup and deployment {icon arrow-up-right}</a></div>
       </section>
     </div>
   </div>
