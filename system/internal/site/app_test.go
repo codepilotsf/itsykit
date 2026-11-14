@@ -15,7 +15,7 @@ func TestAppSettings(t *testing.T) {
 	}
 	root := fixture(t)
 	put(t, root, "itsy.config.json", `{"app":{"phone":"<123>","number":9007199254740993},"admin":{"emails":[]},"custom":{"keep":true}}`)
-	put(t, root, "index.html", `{app.site_name} {app.phone} {site.name} {#each snip.team.members as member}{app.phone}{/each}`)
+	put(t, root, "index.html", `{app.site_name} {app.phone} {site.name} {#each data.team.members as member}{app.phone}{/each}`)
 	before, _ := os.ReadFile(filepath.Join(root, "itsy.config.json"))
 	p, err := Load(root)
 	if err != nil {

@@ -11,7 +11,6 @@ import (
 
 	"itsy/internal/media"
 	"itsy/internal/snips"
-	"itsy/internal/video"
 )
 
 type Snapshot struct {
@@ -60,11 +59,11 @@ func choose(key, base, local, remote string, resolve Resolve) (string, error) {
 	return remote, nil
 }
 
-// MergeSnips compares individual content and metadata values. Labels and region
-// ownership belong to templates. Missing local IDs are not deletion requests.
-func MergeSnips(base, local, remote *snips.Store, resolve Resolve) (*snips.Store, error) {
+// MergeContent compares Blog posts and cover photos as whole records.
+// Missing local IDs are not deletion requests.
+func MergeContent(base, local, remote *snips.Store, resolve Resolve) (*snips.Store, error) {
 	if base == nil || local == nil || remote == nil {
-		return nil, fmt.Errorf("run itsy pull before publishing existing snips")
+		return nil, fmt.Errorf("run itsy pull before publishing existing Blog content")
 	}
 	bytes, err := remote.Bytes()
 	if err != nil {
@@ -76,35 +75,6 @@ func MergeSnips(base, local, remote *snips.Store, resolve Resolve) (*snips.Store
 	}
 	if out.Media == nil {
 		out.Media = map[string]media.Photo{}
-	}
-	if out.Videos == nil {
-		out.Videos = map[string]video.Video{}
-	}
-	videoIDs := make([]string, 0, len(local.Videos))
-	for id := range local.Videos {
-		videoIDs = append(videoIDs, id)
-	}
-	sort.Strings(videoIDs)
-	for _, id := range videoIDs {
-		encode := func(s *snips.Store) string {
-			v, ok := s.Videos[id]
-			if !ok {
-				return "null"
-			}
-			b, _ := json.Marshal(v)
-			return string(b)
-		}
-		value, e := choose("video "+id, encode(base), encode(local), encode(remote), resolve)
-		if e != nil {
-			return nil, e
-		}
-		if value != "null" {
-			var v video.Video
-			if e = json.Unmarshal([]byte(value), &v); e != nil {
-				return nil, e
-			}
-			out.Videos[id] = v
-		}
 	}
 	photoIDs := make([]string, 0, len(local.Media))
 	for id := range local.Media {
@@ -176,127 +146,6 @@ func MergeSnips(base, local, remote *snips.Store, resolve Resolve) (*snips.Store
 		if p, ok := rp[id]; ok {
 			out.Blog = append(out.Blog, p)
 			delete(rp, id)
-		}
-	}
-	index := func(s *snips.Store) (map[string]snips.Entry, error) {
-		m, e := s.Index()
-		if e != nil {
-			return nil, e
-		}
-		for id, entry := range s.Archive {
-			if _, ok := m[id]; !ok {
-				m[id] = entry
-			}
-		}
-		return m, nil
-	}
-	b, err := index(base)
-	if err != nil {
-		return nil, err
-	}
-	l, err := index(local)
-	if err != nil {
-		return nil, err
-	}
-	r, err := index(remote)
-	if err != nil {
-		return nil, err
-	}
-	keys := make([]string, 0, len(l))
-	for id := range l {
-		keys = append(keys, id)
-	}
-	sort.Strings(keys)
-	for _, id := range keys {
-		entry := l[id]
-		label := entry.Label
-		encode := func(value snips.Entry) string {
-			value.Label = ""
-			data, _ := json.Marshal(value)
-			return string(data)
-		}
-		re, exists := r[id]
-		if exists {
-			// Distinguish a new ID collision from an empty baseline value.
-			be, known := b[id]
-			localValue, remoteValue := encode(entry), encode(re)
-			if !known && localValue != remoteValue {
-				if resolve == nil {
-					return nil, fmt.Errorf("new snip ID collision: %s", id)
-				}
-				useLocal, e := resolve(Conflict{"snip " + id, localValue, remoteValue})
-				if e != nil {
-					return nil, e
-				}
-				if !useLocal {
-					entry = re
-				}
-			} else {
-				var selected string
-				selected, err = choose("snip "+id, encode(be), localValue, remoteValue, resolve)
-				if err != nil {
-					return nil, err
-				}
-				entry = snips.Entry{}
-				if err = json.Unmarshal([]byte(selected), &entry); err != nil {
-					return nil, err
-				}
-			}
-		}
-		entry.Label = label
-		delete(out.Archive, id)
-		delete(out.Shared.Snips, id)
-		for _, page := range out.Pages {
-			delete(page.Snips, id)
-		}
-		out.Archive[id] = entry
-	}
-	routes := make([]string, 0, len(local.Pages))
-	for route := range local.Pages {
-		routes = append(routes, route)
-	}
-	sort.Strings(routes)
-	for _, route := range routes {
-		lp := local.Pages[route]
-		bp, rp := base.Pages[route], remote.Pages[route]
-		if bp == nil {
-			bp = &snips.Page{}
-		}
-		if rp == nil {
-			rp = &snips.Page{}
-		}
-		op := out.Page(route)
-		if op.Multisnips == nil {
-			op.Multisnips = map[string][]snips.MultiItem{}
-		}
-		groupNames := make([]string, 0, len(lp.Multisnips))
-		for name := range lp.Multisnips {
-			groupNames = append(groupNames, name)
-		}
-		sort.Strings(groupNames)
-		for _, name := range groupNames {
-			encode := func(items []snips.MultiItem) string { b, _ := json.Marshal(items); return string(b) }
-			value, e := choose(route+" multisnip "+name, encode(bp.Multisnips[name]), encode(lp.Multisnips[name]), encode(rp.Multisnips[name]), resolve)
-			if e != nil {
-				return nil, e
-			}
-			var items []snips.MultiItem
-			if e = json.Unmarshal([]byte(value), &items); e != nil {
-				return nil, e
-			}
-			if items == nil {
-				delete(op.Multisnips, name)
-			} else {
-				op.Multisnips[name] = items
-			}
-		}
-		op.Title, err = choose(route+" title", bp.Title, lp.Title, rp.Title, resolve)
-		if err != nil {
-			return nil, err
-		}
-		op.Description, err = choose(route+" description", bp.Description, lp.Description, rp.Description, resolve)
-		if err != nil {
-			return nil, err
 		}
 	}
 	if err := out.ValidateBlog(); err != nil {

@@ -136,48 +136,6 @@
       ]
     },
     {
-      "url": "/docs/editing",
-      "title": "On-page editing",
-      "first": false,
-      "chapters": [
-        {
-          "id": "editable-content",
-          "title": "Make text editable"
-        },
-        {
-          "id": "admin-editing",
-          "title": "Add an admin"
-        },
-        {
-          "id": "save-and-cancel",
-          "title": "Edit and save"
-        },
-        {
-          "id": "content-sync",
-          "title": "Bring live edits into your project"
-        }
-      ]
-    },
-    {
-      "url": "/docs/media",
-      "title": "Photos, videos and collections",
-      "first": false,
-      "chapters": [
-        {
-          "id": "media",
-          "title": "Photos"
-        },
-        {
-          "id": "videos",
-          "title": "Videos"
-        },
-        {
-          "id": "collections",
-          "title": "Collections"
-        }
-      ]
-    },
-    {
       "url": "/docs/email",
       "title": "Email and contact forms",
       "first": false,

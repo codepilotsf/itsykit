@@ -68,7 +68,7 @@ func TestConfinedWritesAndReads(t *testing.T) {
 }
 
 func TestDataDirectoriesShareValidation(t *testing.T) {
-	for _, directory := range []string{"itsy/snips", "itsy/data"} {
+	for _, directory := range []string{"itsy/data"} {
 		t.Run(directory, func(t *testing.T) {
 			root := fixture(t)
 			put(t, root, directory+"/extra.json", `{"title":"Hello"}`)
@@ -81,26 +81,5 @@ func TestDataDirectoriesShareValidation(t *testing.T) {
 			}
 		})
 	}
-	root := fixture(t)
-	put(t, root, "itsy/snips/duplicate.json", `{}`)
-	put(t, root, "itsy/data/duplicate.json", `{}`)
-	if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "duplicate legacy snip/data") {
-		t.Fatal(err)
-	}
-}
 
-func TestPageRoutesMatchSnipScopes(t *testing.T) {
-	for file, want := range map[string]string{"index.html": "/", "about.html": "/about", "about/index.html": "/about", "about/history.html": "/about/history"} {
-		if got := pageRoute(file); got != want {
-			t.Errorf("%s: %s", file, got)
-		}
-		if got := snipScope(file); got != want {
-			t.Errorf("scope %s: %s", file, got)
-		}
-	}
-	for _, file := range []string{"main.layout.html", "about/_card.html", "_shared/card.html"} {
-		if got := snipScope(file); got != "" {
-			t.Errorf("shared scope %s: %s", file, got)
-		}
-	}
 }

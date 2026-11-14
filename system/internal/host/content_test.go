@@ -17,7 +17,7 @@ func TestAliasesRequireOneContentSnapshot(t *testing.T) {
 	}
 	config.Sites["www.example.test"] = config.Sites["example.test"]
 	content := filepath.Join(filepath.Dir(file), "content.json")
-	if err := os.WriteFile(content, []byte(`{"pages":{},"shared":{"snips":{}}}`), 0644); err != nil {
+	if err := os.WriteFile(content, []byte(`{}`), 0644); err != nil {
 		t.Fatal(err)
 	}
 	for _, consistent := range []bool{false, true} {

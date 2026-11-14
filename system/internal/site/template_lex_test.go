@@ -116,34 +116,22 @@ func TestRecognizableMalformedBraces(t *testing.T) {
 
 func TestEntitySyntaxAndContentAreNotCompiled(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "index.html", `<p>&#123;app.site_name&#125; &#123;snip a7Km2pQ9xB&#125;</p><div data-media="&#123;snip a7Km2pQ9xB.src&#125;"></div><p>{snip team}</p>`)
+	put(t, root, "index.html", `<p>&#123;app.site_name&#125; &#123;snip a7Km2pQ9xB&#125;</p><div data-media="&#123;snip a7Km2pQ9xB.src&#125;"></div><p>{data.team.text}</p>`)
 	w := request(NewServer(mustLoad(t, root)), "GET", "/")
 	if w.Code != 200 || strings.Contains(w.Body.String(), "Test") || !strings.Contains(w.Body.String(), "{app.site_name}") {
 		t.Fatal(w.Code, w.Body.String())
 	}
 }
 
-func TestMultisnipLiteralBraces(t *testing.T) {
-	body := `<article data-json='{"path":"{snip.name}","rich":"{snip a7Km2pQ9xB}"}'><h2>{snip.name}</h2><p>{not Flea}</p><p>&#123;snip.literal&#125;</p></article>`
-	def, err := definition(body)
-	if err != nil || len(def.Fields) != 1 {
-		t.Fatal(def, err)
-	}
-	blocks, err := multisnipBlocks("index.html", `<p>{"example":"{#multisnip team}{/multisnip}"}</p>`)
-	if err != nil || len(blocks) != 0 {
-		t.Fatal(blocks, err)
-	}
-}
-
 func TestBareAliasBraceRecognition(t *testing.T) {
 	root := fixture(t)
-	put(t, root, "index.html", `{#each snip.team.members as member}<p>{ member }</p>{/each}<p>Use { and } to group items.</p>`)
+	put(t, root, "index.html", `{#each data.team.members as member}<p>{ member }</p>{/each}<p>Use { and } to group items.</p>`)
 	p := mustLoad(t, root)
-	compiled, err := p.compile(`{#each snip.team.members as member}{ member }{/each}`, "index.html", nil, map[string]string{})
+	compiled, err := p.compile(`{#each data.team.members as member}{ member }{/each}`, "index.html", nil, map[string]string{})
 	if err != nil || strings.Contains(compiled, "{ member }") {
 		t.Fatal(compiled, err)
 	}
-	put(t, root, "index.html", `{#each snip.team.members as member}{ member`)
+	put(t, root, "index.html", `{#each data.team.members as member}{ member`)
 	if _, err := Load(root); err == nil || !strings.Contains(err.Error(), "unclosed template directive") {
 		t.Fatal(err)
 	}

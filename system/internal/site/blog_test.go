@@ -11,13 +11,16 @@ func blogFixture(t *testing.T) string {
 	root := fixture(t)
 	put(t, root, "itsy.config.json", `{"app":{"site_name":"Blog"},"apps":{"blog":{"mount":"/journal"}}}`)
 	put(t, root, "journal/_index.html", `{#each blog.data.posts as post}<a href="{post.url}">{post.title}</a>{/each}`)
-	put(t, root, "journal/_post.html", `<h1>{blog.data.post.title}</h1><p>{page.description}</p><p>{page.title}</p>{blog.data.post.body}`)
+	put(t, root, "journal/_post.html", `<!-- itsy
+title: Template title
+description: Template description
+-->
+<h1>{blog.data.post.title}</h1><p>{page.description}</p><p>{page.title}</p>{blog.data.post.body}`)
 	return root
 }
 func TestBlogPublishedViewsAndDraftPrivacy(t *testing.T) {
 	root := blogFixture(t)
 	s := snips.NewStore()
-	s.Page("/journal/older").Title = "Custom SEO"
 	s.Blog = []snips.BlogPost{
 		{ID: "Abcdef1234", Title: "Older", Slug: "older", Status: "published", PublishedAt: "2026-10-12T10:00:00Z", Body: `<p>Hello {app.site_name}</p><script>bad()</script><img src=x onerror=bad()>`, Excerpt: "An excerpt"},
 		{ID: "Bbcdef1234", Title: "Newer <b>", Slug: "newer", Status: "published", PublishedAt: "2026-10-13T10:00:00Z"},
@@ -31,7 +34,7 @@ func TestBlogPublishedViewsAndDraftPrivacy(t *testing.T) {
 		t.Fatal(list.Code, list.Body.String())
 	}
 	page := request(server, "GET", "/journal/older")
-	if page.Code != 200 || !strings.Contains(page.Body.String(), "<p>Hello {app.site_name}</p>") || strings.Contains(page.Body.String(), "bad()") || strings.Contains(page.Body.String(), "<img") || !strings.Contains(page.Body.String(), "An excerpt") || !strings.Contains(page.Body.String(), "Custom SEO") {
+	if page.Code != 200 || !strings.Contains(page.Body.String(), "<p>Hello {app.site_name}</p>") || strings.Contains(page.Body.String(), "bad()") || strings.Contains(page.Body.String(), "<img") || !strings.Contains(page.Body.String(), "An excerpt") || !strings.Contains(page.Body.String(), "Older") || strings.Contains(page.Body.String(), "Template title") || strings.Contains(page.Body.String(), "Template description") {
 		t.Fatal(page.Code, page.Body.String())
 	}
 	for _, path := range []string{"/journal/secret", "/journal/_post.html", "/flea/snips.json", "/journal/no-post", "/journal/secret.html"} {

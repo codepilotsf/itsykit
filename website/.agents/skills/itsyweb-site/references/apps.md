@@ -20,7 +20,7 @@ Use a native URL-encoded POST to that mount with required `name`, `email`,
 `message`, optional hidden empty spam trap `website`, and explicit `{csrf}` inside
 the form. `{csrf}` emits the entire hidden `_csrf` control, not a token value.
 Unknown/repeated fields, arbitrary forms, multipart uploads, recipient controls
-and visitor-selected success URLs are unsupported. Form controls stay outside snips.
+and visitor-selected success URLs are unsupported. Keep form controls in ordinary HTML.
 
 Render safe returned values through `contact.data.name/email/message`, field
 feedback through `contact.invalid.name/email/message`, operational failure through
@@ -40,20 +40,24 @@ prove inbox delivery. Never add an alternate mail API as incidental setup.
 
 Admin access uses `itsy admin [email]` and `admin.emails`; an empty list disables
 live sign-in. Live access changes require an authorized commit/deploy. Preserve
-`{admin.csrf}`, form names/actions, code autofill, sessions and conditional toolbar
-contracts. Never put `app.current_admin` in config or copy private runtime sessions.
+`{admin.csrf}`, form names/actions, code autofill, sessions and Blog admin
+contracts. Public layouts need no page toolbar or admin CSRF meta. Never put
+`app.current_admin` in config or copy private runtime sessions.
 
 ## Blog
 
 Blog is an optional built-in content app, not a child executable. Merge
 `{"apps":{"blog":{"mount":"/blog"}}}` and use private
 `site/blog/_index.html` and `_post.html`; no ordinary route/assets may occupy its
-subtree. Admin templates use `/admin/blog` and `/admin/blog-edit`. Older sites may
-need missing templates/CSS from a disposable matching-version site; preserve the
+subtree. Admin handlers use `/admin/blog` and `/admin/blog/edit`, rendering
+`site/admin/blog.html` and `site/admin/blog-edit.html`. After sign-in, `/admin`
+opens Blog management when enabled. Older sites may need missing templates/CSS
+from a disposable matching-version site; preserve the
 custom layout instead of resetting it.
 
-Posts live in the top-level `blog` array in `itsy/snips.json` alongside other
-content. Preserve stable ten-character alphanumeric IDs. Records use `title`,
+Posts live in the top-level `blog` array in `itsy/snips.json`; the only other
+supported top-level field is the cover-photo `media` map. Preserve stable
+ten-character alphanumeric IDs. Records use `title`,
 `slug`, `excerpt`, sanitized rich `body`, `status` (`draft`/`published`), an RFC3339
 `published_at` for published posts, and optional library-photo ID `cover`.
 Use the installed guide for limits and JSON examples; do not invent a schema.
@@ -67,7 +71,7 @@ even for signed-in admins. Cover files remain public, including draft covers.
 New posts save as drafts. Publish/Unpublish is explicit; saving a published post
 changes it immediately. A future date does not schedule publication. Slug changes
 create no redirect; omitting an ID does not delete live content. Normal deploy
-preserves live posts; explicit snip synchronization compares each post as a whole.
+preserves live posts; explicit content synchronization compares each post as a whole.
 Comments, taxonomy, search, scheduling, revisions and inline body images remain
 planned. Authoring instructions do not authorize live publication.
 

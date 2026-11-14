@@ -24,11 +24,7 @@ func Status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.W
 }
 
 func status(ctx context.Context, p *site.Project, in io.Reader, out, errOut io.Writer, terminal bool, run runner, check func(context.Context, string) error) error {
-	index, err := p.Content.Index()
-	if err != nil {
-		return err
-	}
-	fmt.Fprintf(out, "%s\n%s\n\nLocal\n  Files        Valid configuration, templates and content\n  Site         %s, %s, %s\n", display(fmt.Sprint(p.App["site_name"])), display(p.Root), quantity(len(p.Pages), "page"), quantity(len(p.Assets), "asset"), quantity(len(index), "editable area"))
+	fmt.Fprintf(out, "%s\n%s\n\nLocal\n  Files        Valid configuration, templates and content\n  Site         %s, %s, %s\n", display(fmt.Sprint(p.App["site_name"])), display(p.Root), quantity(len(p.Pages), "page"), quantity(len(p.Assets), "asset"), quantity(len(p.Content.Blog), "blog post"))
 	for _, warning := range p.Warnings {
 		fmt.Fprintf(errOut, "Warning: %s\n", warning)
 	}

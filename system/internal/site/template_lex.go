@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"html"
 	"strings"
-
-	xhtml "golang.org/x/net/html"
 )
 
 // braceLexer pairs literal groups once, without parsing JSON or decoding source.
@@ -135,44 +133,4 @@ func (l braceLexer) group(start int) (int, bool, error) {
 		return end, false, nil
 	}
 	return start + 1, false, nil
-}
-
-// directiveView keeps byte offsets and HTML structure while hiding literal
-// braces from reference/field scanners. Entities are never executable syntax.
-// This view is for validation only, never rendering or extraction writes.
-func directiveView(source string) string {
-	l := newBraceLexer(source)
-	out := []byte(source)
-	for i := 0; i < len(source); {
-		if source[i] == '{' {
-			end, syntax, _ := l.group(i)
-			if !syntax {
-				for j := i; j < end; {
-					c, n := lexicalChar(source, j)
-					if c == '{' || c == '}' {
-						out[j] = ' '
-					}
-					j += n
-				}
-			}
-			i = end
-			continue
-		}
-		c, n := lexicalChar(source, i)
-		if n > 1 && (c == '{' || c == '}') {
-			out[i] = ' '
-		}
-		i += n
-	}
-	return string(out)
-}
-
-func directiveAttributes(raw string) map[string]string {
-	z := xhtml.NewTokenizer(strings.NewReader(directiveView(raw)))
-	z.Next()
-	attrs := map[string]string{}
-	for _, a := range z.Token().Attr {
-		attrs[a.Key] = a.Val
-	}
-	return attrs
 }

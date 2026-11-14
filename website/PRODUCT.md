@@ -24,7 +24,9 @@ Generated projects include AGENTS.md and portable Markdown skills for site autho
 
 ## Capabilities and Constraints
 
-No frontend build step or Node runtime is required. The public test binaries support Apple Silicon macOS and x86-64 Linux. Optional on-page editing, media, Contact, Blog and managed apps have their own documentation. The public website is an existing ItsyWeb site with plain HTML, CSS, JSON content and Prewind utilities. Preserve its editable bindings, admin integration, URLs and saved deployment mappings. No deployment or release is authorized by this design task.
+No frontend build step or Node runtime is required. The public test binaries support Apple Silicon macOS and x86-64 Linux. Contact, Blog and managed apps have their own documentation. The public website is an existing ItsyWeb site with plain HTML, CSS, JSON content and Prewind utilities. Ordinary page copy and metadata live in HTML; Blog retains its own admin editor, storage and cover uploads. Preserve URLs, Contact CSRF and saved deployment mappings. No deployment or release is authorized by this design task.
+
+The integrated source targets the page-editing-removal candidate and protocol 30. The public 0.21.0 installer uses protocol 29 and does not supply this contract. A matching release, current native acceptance and explicit server-upgrade authorization remain prerequisites to rollout.
 
 ## Brand Commitments
 

@@ -17,7 +17,6 @@ import (
 
 	"itsy/internal/formguard"
 	"itsy/internal/sitefiles"
-	"itsy/internal/viewer"
 )
 
 // Server publishes complete validated snapshots. Failed edits produce a 500
@@ -74,7 +73,7 @@ func (s *Server) reload(ctx context.Context, root string, resolveIcons bool) err
 	var p *Project
 	var err error
 	if resolveIcons {
-		p, err = loadEditing(ctx, root)
+		p, err = LoadDev(ctx, root)
 	} else {
 		p, err = Load(root)
 	}
@@ -194,10 +193,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.mu.RLock()
 	p, loadErr, revision := s.project, s.err, s.revision
 	s.mu.RUnlock()
-	if p != nil && p.syncOnly {
-		http.Error(w, "Site synchronization is incomplete.", http.StatusServiceUnavailable)
-		return
-	}
 	if p != nil && loadErr == nil && safeURL(r.URL.Path) {
 		if mount, _, ok := s.appFor(p, r.URL.Path); ok {
 			s.serveInstalledApp(w, r, mount)
@@ -234,34 +229,17 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if p.seoExcluded[r.URL.Path] {
 			w.Header().Add("X-Robots-Tag", "noindex")
 		}
-		decorate, owner := r.Context().Value(ownerRenderKey{}).(ownerTransform)
-		var admin map[string]any
-		if identity, authenticated := viewer.From(r.Context()); owner && authenticated {
-			admin = map[string]any{"email": identity.Email, "csrf_token": identity.CSRF, "version": p.EditingVersion(), "revision": ""}
-			if !s.production {
-				admin["revision"] = fmt.Sprint(revision)
-			}
-		}
 		var inputs *renderInputs
 		var commitForm func(http.ResponseWriter)
 		if p.csrfTemplates[t] {
 			inputs, commitForm = s.formRender(r)
 		}
-		body, err := p.renderRequest(t, r.URL.Path, admin, owner, inputs)
+		body, err := p.renderRequest(t, r.URL.Path, nil, inputs)
 		if err != nil {
 			s.serveError(w, r, p, 500, revision, err)
 			return
 		}
-		if owner {
-			if !s.production {
-				w.Header().Set("X-Flea-Dev-Revision", fmt.Sprint(revision))
-			}
-			var ok bool
-			body, ok = decorate(body, p.Content, p.EditingVersion())
-			if !ok {
-				return
-			}
-		} else if !s.production {
+		if !s.production {
 			body = withReload(body, revision)
 		}
 		if commitForm != nil {
@@ -269,9 +247,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		body = p.canonicalResponse(w, r.URL.Path, body)
 		writeHTML(w, r, 200, body)
-		return
-	}
-	if p.serveVideo(w, r) {
 		return
 	}
 	if data, ok := p.AssetData[r.URL.Path]; ok {

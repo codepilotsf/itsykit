@@ -229,7 +229,7 @@ func TestStatusDifferencesWithAndWithoutBaseline(t *testing.T) {
 		t.Run(fmt.Sprint(known), func(t *testing.T) {
 			p, s := statusFixture(t, true)
 			remote := snips.NewStore()
-			remote.Page("/").Title = "Live title"
+			remote.Blog = []snips.BlogPost{{ID: "Abcdef1234", Title: "Live title", Slug: "post", Status: "draft"}}
 			if known {
 				if err := saveBaseline(context.Background(), p.Root, s, syncstate.Baseline{Snips: p.Content}); err != nil {
 					t.Fatal(err)

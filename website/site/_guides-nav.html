@@ -1,9 +1,8 @@
 <nav class="guides-nav" aria-label="Guides" data-guide-navigation data-current-guide="{page.path}">
   {#each data.guides.items as guide}
   <details class="guide-section" data-guide-path="{guide.url}" {#if guide.first}open{/if}>
-    <summary><span>{guide.title}</span>{icon chevron-down size="16"}</summary>
+    <summary><a href="{guide.url}"><span>{guide.title}</span>{icon chevron-down size="16"}</a></summary>
     <div class="guide-chapters">
-      <a class="guide-overview" href="{guide.url}">Overview</a>
       {#each guide.chapters as chapter}
       <a href="{guide.url}#{chapter.id}">{chapter.title}</a>
       {/each}

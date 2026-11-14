@@ -169,14 +169,14 @@ func streamAdmin(ctx context.Context, command string, ssh func(context.Context, 
 	return nil
 }
 
-func makePlan(base syncstate.Baseline, local *site.Project, remote syncstate.Snapshot, withSnips bool, resolve syncstate.Resolve) (*syncstate.Plan, error) {
+func makePlan(base syncstate.Baseline, local *site.Project, remote syncstate.Snapshot, withContent bool, resolve syncstate.Resolve) (*syncstate.Plan, error) {
 	plan := &syncstate.Plan{Expected: remote.Version()}
 	var e error
-	if withSnips {
+	if withContent {
 		if !remote.Exists {
 			plan.Snips = local.Content
 		} else {
-			plan.Snips, e = syncstate.MergeSnips(base.Snips, local.Content, remote.Snips, resolve)
+			plan.Snips, e = syncstate.MergeContent(base.Snips, local.Content, remote.Snips, resolve)
 			if e != nil {
 				return nil, e
 			}
@@ -222,13 +222,10 @@ func pull(ctx context.Context, root string, in io.Reader, out, errOut io.Writer,
 		return e
 	}
 	if status != "" {
-		return fmt.Errorf("commit your local snip changes before pulling")
+		return fmt.Errorf("commit your local Blog changes before pulling")
 	}
-	p, e := site.LoadSyncSource(root)
+	p, e := site.Load(root)
 	if e != nil {
-		return e
-	}
-	if e = p.CheckExtractedSnips(); e != nil {
 		return e
 	}
 	base, e := readBaseline(ctx, root, s)
@@ -285,15 +282,11 @@ func pull(ctx context.Context, root string, in io.Reader, out, errOut io.Writer,
 	if comparison == nil {
 		comparison = snips.NewStore()
 	}
-	merged, e := syncstate.MergeSnips(comparison, p.Content, remote.Snips, resolveSync(ctx, in, out))
+	merged, e := syncstate.MergeContent(comparison, p.Content, remote.Snips, resolveSync(ctx, in, out))
 	if e != nil {
 		return e
 	}
-	refs, e := p.SnipReferences()
-	if e != nil {
-		return e
-	}
-	nextContent, e = snips.Merge(p.Content, merged, refs)
+	nextContent, e = snips.Merge(p.Content, merged)
 	if e != nil {
 		return e
 	}
@@ -313,7 +306,7 @@ func pull(ctx context.Context, root string, in io.Reader, out, errOut io.Writer,
 	if e = installPhotos(root, photoSource, nextContent); e != nil {
 		return e
 	}
-	if _, e = site.LoadWithSnips(root, nextContent); e != nil {
+	if _, e = site.LoadWithContent(root, nextContent); e != nil {
 		return e
 	}
 	if e = site.SaveContent(root, nextContent); e != nil {
@@ -322,6 +315,6 @@ func pull(ctx context.Context, root string, in io.Reader, out, errOut io.Writer,
 	if e = saveBaseline(ctx, root, s, base); e != nil {
 		return fmt.Errorf("files pulled, but baseline could not be saved: %w", e)
 	}
-	fmt.Fprintln(out, "Pulled live snips and media. Review and commit the local changes.")
+	fmt.Fprintln(out, "Pulled live Blog content and media. Review and commit the local changes.")
 	return nil
 }

@@ -1,3 +1,7 @@
+<!-- itsy
+title: Blog
+description: Add a blog with drafts, cover photos, and an admin editor.
+-->
 <div class="docs-shell container">
   <aside class="docs-sidebar">
     {render /guides-nav}
@@ -7,7 +11,7 @@
     <header>
       <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
       <h1>Blog</h1>
-      <p>Add a blog with drafts, cover photos, and on-page publishing.</p>
+      <p>Add a blog with drafts, cover photos, and an admin editor.</p>
     </header>
 
 <section id="blog">
@@ -19,9 +23,11 @@
 
 <section id="publishing">
   <h2>Write and publish</h2>
-<p>Sign in at <code>/admin</code> and open <code>/admin/blog</code>. Choose <strong>New post</strong>, add a title, slug, excerpt, and body, then save the draft. You can also choose a cover photo.</p>
+<p>Run <code>itsy admin admin@example.com</code> to add an admin. Sign in at <code>/admin</code> with the emailed code; enabled Blog sites open <code>/admin/blog</code>. Local dev previews the email; live sign-in needs HTTPS and <a href="/docs/email#delivery">email delivery</a>. Commit and deploy admin-list changes before sharing live access.</p>
+<p>In the Blog admin, choose <strong>New post</strong>, add a title, slug, excerpt, and body, then save the draft. You can also choose a cover photo.</p>
 <p><strong>Publish</strong> makes the post public; <strong>Unpublish</strong> makes it a draft again. Saving a published post updates it immediately. Publication dates control ordering, not scheduled publishing.</p>
-<p>Draft text stays private. Uploaded photos remain public assets, including draft covers.</p>
+<p>Draft text stays private. Uploaded JPEG or PNG cover photos remain public assets, including draft covers. Choose an existing photo or upload one in the post editor; saving the post stores its selected cover. Keep the admin forms, session handling, and CSRF controls intact.</p>
+<p>Cover uploads accept JPEG or PNG up to 8 MiB and 20 megapixels. Photos are resized to at most 2048 pixels and embedded metadata is stripped. The library supports up to 100 photos and 64 MiB of files. Ordinary page images and videos stay in <code>site/</code> as static assets.</p>
 </section>
 
 <section id="blog-templates">
@@ -37,7 +43,8 @@
 
 <section id="blog-data">
   <h2>Posts in JSON</h2>
-<p>Posts live in the <code>blog</code> array in <code>itsy/snips.json</code>. An agent can add a draft like this while preserving the file's other records:</p><pre tabindex="0" aria-label="A draft post record"><code class="language-json">&#123;
+<p>Blog storage remains in <code>itsy/snips.json</code>, with top-level <code>blog</code> and <code>media</code> records. Cover files live in <code>itsy/media/</code>. Ordinary pages and their metadata stay in HTML.</p>
+<p>Posts live in the <code>blog</code> array. An agent can add a draft like this while preserving the file's other records:</p><pre tabindex="0" aria-label="A draft post record"><code class="language-json">&#123;
   "id": "a7Km2pQ9xB",
   "title": "Notes from the bookshop",
   "slug": "notes-from-the-bookshop",
@@ -49,7 +56,8 @@
 
 <section id="blog-deployment">
   <h2>Deploy and sync</h2>
-<p>Normal deployment preserves live posts. Pull before editing them in source, then publish reviewed changes with <code>itsy deploy --with-snips</code>.</p>
+<p>The content command below targets the upcoming framework release and matching server protocol 30. It is not available in the published 0.21.0 installer.</p>
+<p>Normal deployment preserves existing live posts and cover photos, and seeds new post IDs. To change an existing live post in source, stop dev and download the destination’s content first:</p><pre tabindex="0" aria-label="Download Blog content"><code class="language-bash">itsy pull</code></pre><p>Review and commit the result. After editing and reviewing local posts, publish the content changes with:</p><pre tabindex="0" aria-label="Publish reviewed Blog content"><code class="language-bash">itsy deploy --with-content</code></pre><p>The explicit content sync requires a matching pull baseline for an existing destination. Conflicting post changes are compared as whole records and need a choice. Omitting a post from source does not delete it from the live site.</p>
 <p>Changing a slug changes its URL. Add a <a href="/docs/redirects">redirect</a> when an old address should keep working.</p>
 </section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/seo">Continue to Search engines and SEO</a></nav>

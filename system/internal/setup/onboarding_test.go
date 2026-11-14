@@ -70,7 +70,7 @@ func TestDeployOffersSetupOnlyForMissingServer(t *testing.T) {
 					}
 					fmt.Fprintln(c.out, "FLEA_SYSTEM=ubuntu:24.04:x86_64:0")
 					if installed {
-						fmt.Fprintln(c.out, "FLEA_DEPLOY=29")
+						fmt.Fprintln(c.out, "FLEA_DEPLOY=30")
 					} else if mode == "outdated" {
 						fmt.Fprintln(c.out, "FLEA_DEPLOY=1")
 					} else {

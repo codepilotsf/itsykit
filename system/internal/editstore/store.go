@@ -1,5 +1,5 @@
 // Package editstore validates and publishes owner edits under the same lock as
-// deployment (or local extraction). The HTTP editor never chooses file paths.
+// deployment (or local dev reload). The HTTP editor never chooses file paths.
 package editstore
 
 import (
@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
-	"unicode/utf8"
 
 	"itsy/internal/editor"
 	"itsy/internal/site"
@@ -94,7 +93,7 @@ func (s *Store) Read() (editor.Document, error) {
 	if err != nil {
 		return editor.Document{}, err
 	}
-	return editor.Document{BlogMount: p.Apps["blog"].Mount, Store: p.Content, Routes: p.Routes(), Version: p.EditingVersion()}, nil
+	return editor.Document{BlogMount: p.Apps["blog"].Mount, Store: p.Content, Version: p.EditingVersion()}, nil
 }
 func (s *Store) Save(u editor.Update) error {
 	unlock, err := s.lock()
@@ -106,9 +105,6 @@ func (s *Store) Save(u editor.Update) error {
 	if err != nil {
 		return err
 	}
-	if u.Page != nil {
-		u.Version = u.Page.Version
-	}
 	if u.Version == "" || u.Version != p.EditingVersion() {
 		return fmt.Errorf("content changed since opening this form")
 	}
@@ -116,52 +112,8 @@ func (s *Store) Save(u editor.Update) error {
 		if err := s.applyBlog(p, *u.Blog); err != nil {
 			return err
 		}
-	} else if u.Page != nil {
-		if err := s.applyMedia(p, *u.Page); err != nil {
-			return err
-		}
-		if err := applyPage(p, *u.Page); err != nil {
-			return err
-		}
-	} else if u.ID != "" {
-		refs, err := p.SnipReferences()
-		if err != nil {
-			return err
-		}
-		if _, ok := refs[u.ID]; !ok {
-			return fmt.Errorf("snip is not referenced by this site")
-		}
-		index, err := p.Content.Index()
-		if err != nil {
-			return err
-		}
-		entry, ok := index[u.ID]
-		if !ok {
-			return fmt.Errorf("unknown snip")
-		}
-		entry.Content, err = snips.Sanitize(u.Content)
-		if err != nil {
-			return err
-		}
-		if _, ok := p.Content.Shared.Snips[u.ID]; ok {
-			p.Content.Shared.Snips[u.ID] = entry
-		} else {
-			for _, page := range p.Content.Pages {
-				if _, ok := page.Snips[u.ID]; ok {
-					page.Snips[u.ID] = entry
-				}
-			}
-		}
 	} else {
-		if _, ok := p.Pages[u.Route]; !ok {
-			return fmt.Errorf("unknown page")
-		}
-		if utf8.RuneCountInString(u.Title) > 200 || utf8.RuneCountInString(u.Description) > 500 {
-			return fmt.Errorf("page details exceed the length limit")
-		}
-		page := p.Content.Page(u.Route)
-		page.Title = u.Title
-		page.Description = u.Description
+		return fmt.Errorf("only Blog edits are supported")
 	}
 	// Validate the full candidate before making it durable or visible to readers.
 	next, err := site.LoadWithMedia(s.Root, p.Content, s.mediaRoot(), s.runtimeRoot())
@@ -187,24 +139,6 @@ func (s *Store) Save(u editor.Update) error {
 				break
 			}
 		}
-	}
-	if u.Page != nil && u.Result != nil {
-		page := next.Content.Page(u.Page.Route)
-		result := editor.PageResult{Page: editor.PageEdit{Version: next.EditingVersion(), Route: u.Page.Route, Title: page.Title, Description: page.Description, Changes: []editor.ContentEdit{}, Multisnips: map[string][]snips.MultiItem{}}, Media: map[string]snips.Entry{}}
-		index, _ := next.Content.Index() // The candidate has already been validated.
-		result.Photos = next.Content.Media
-		for _, change := range u.Page.Changes {
-			result.Page.Changes = append(result.Page.Changes, editor.ContentEdit{ID: change.ID, Content: index[change.ID].Content})
-		}
-		for name := range u.Page.Multisnips {
-			result.Page.Multisnips[name] = page.Multisnips[name]
-		}
-		for _, change := range u.Page.Media {
-			if !change.Library {
-				result.Media[change.ID] = index[change.ID]
-			}
-		}
-		*u.Result = result
 	}
 	return nil
 }

@@ -123,7 +123,7 @@ func rollback(ctx context.Context, root, target string, list bool, in io.Reader,
 		if !found {
 			return fmt.Errorf("choose a release from itsy rollback --list")
 		}
-		fmt.Fprintf(out, "Rollback %s to %s. Live snips will be kept. Styles come from the selected release.\n", r.settings.Domain, target)
+		fmt.Fprintf(out, "Rollback %s to %s. Live Blog content will be kept. Styles come from the selected release.\n", r.settings.Domain, target)
 		answer, err := ask(ctx, in, out, "Continue? (y/N)", "n")
 		if err != nil {
 			return err

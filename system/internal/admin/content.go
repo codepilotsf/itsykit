@@ -14,17 +14,10 @@ import (
 	"itsy/internal/syncstate"
 )
 
-// prepareContent stages a new snapshot without modifying the active one. The
-// returned store is the post-readiness version: removed IDs are archived only
-// after activation succeeds. The caller holds the deployment lock throughout.
-func (m Manager) prepareContent(c host.Config, name, id, dest string, project *site.Project) (string, *snips.Store, error) {
-	return m.prepareContentPlan(c, name, id, dest, project, nil)
-}
+// prepareContentPlan stages a complete Blog snapshot without modifying the active one.
+// The caller holds the deployment lock through candidate validation and activation.
 func (m Manager) prepareContentPlan(c host.Config, name, id, dest string, project *site.Project, plan *syncstate.Plan) (string, *snips.Store, error) {
-	refs, e := project.SnipReferences()
-	if e != nil {
-		return "", nil, e
-	}
+	var e error
 	remote := snips.NewStore()
 	parent := filepath.Dir(dest)
 	for domain, previous := range c.Sites {
@@ -48,7 +41,7 @@ func (m Manager) prepareContentPlan(c host.Config, name, id, dest string, projec
 	if plan != nil && plan.Snips != nil {
 		selected = plan.Snips
 	}
-	activeContent, err := snips.Merge(project.Content, selected, refs)
+	activeContent, err := snips.Merge(project.Content, selected)
 	if err != nil {
 		return "", nil, err
 	}
@@ -92,26 +85,8 @@ func (m Manager) prepareContentPlan(c host.Config, name, id, dest string, projec
 	if err = m.prepareMedia(dest, contentPath, activeContent); err != nil {
 		return "", nil, err
 	}
-	// Candidate is private until config activation. Keep orphans active until
-	// readiness succeeds, then Apply writes the pruned store after verification.
+	// The complete candidate remains private until config activation.
 	candidateBytes, e := activeContent.Bytes()
-	if e != nil {
-		return "", nil, e
-	}
-	candidateStore, e := snips.Decode(candidateBytes)
-	if e != nil {
-		return "", nil, e
-	}
-	oldIndex, e := remote.Index()
-	if e != nil {
-		return "", nil, e
-	}
-	for key, entry := range oldIndex {
-		if _, ok := refs[key]; !ok {
-			candidateStore.Shared.Snips[key] = entry
-		}
-	}
-	candidateBytes, e = candidateStore.Bytes()
 	if e != nil {
 		return "", nil, e
 	}

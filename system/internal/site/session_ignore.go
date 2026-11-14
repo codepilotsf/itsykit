@@ -8,7 +8,7 @@ import (
 
 // sessionIgnoreRules are the lines IgnoreSessionFiles ensures are present in the
 // project's .gitignore.
-var sessionIgnoreRules = []string{"/itsy/runtime/", "/itsy/media/*.mp4"}
+var sessionIgnoreRules = []string{"/itsy/runtime/"}
 
 // IgnoreSessionFiles preserves developer rules and keeps private runtime state
 // out of ordinary Git adds. The CLI first checks for already tracked files.

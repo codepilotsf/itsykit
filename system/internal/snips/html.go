@@ -18,7 +18,7 @@ var alignment = regexp.MustCompile(`(?i)^\s*text-align\s*:\s*(left|center|right)
 // attribute is trusted, and content is never reparsed as ItsyWeb template code.
 func Sanitize(source string) (string, error) {
 	if len(source) > 1<<20 {
-		return "", fmt.Errorf("snip content exceeds 1 MiB")
+		return "", fmt.Errorf("Blog body exceeds 1 MiB")
 	}
 	nodes, err := xhtml.ParseFragment(strings.NewReader(source), &xhtml.Node{Type: xhtml.ElementNode, Data: "div", DataAtom: atom.Div})
 	if err != nil {

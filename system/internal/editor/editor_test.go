@@ -110,7 +110,7 @@ type memoryStore struct {
 }
 
 func (s *memoryStore) Read() (Document, error) {
-	return Document{Store: snips.NewStore(), Routes: []string{"/", "/about"}, Version: "revision"}, nil
+	return Document{Store: snips.NewStore(), Version: "revision"}, nil
 }
 func (s *memoryStore) Save(Update) error { s.mu.Lock(); defer s.mu.Unlock(); s.saves++; return nil }
 func fixture(t *testing.T) (*Handler, inbox) {
@@ -174,8 +174,8 @@ func login(t *testing.T, h *Handler, mail inbox) *http.Cookie {
 	if w.Code != 303 {
 		t.Fatal(w.Code, w.Body.String())
 	}
-	if w.Header().Get("Location") != "/" {
-		t.Fatal("login must return to homepage", w.Header())
+	if w.Header().Get("Location") != "/admin" {
+		t.Fatal("login must return to admin", w.Header())
 	}
 	return cookie(t, w, h.cookieName("session"))
 }
@@ -186,8 +186,8 @@ func TestLoginEditingLogoutAndCookieIsolation(t *testing.T) {
 		t.Fatal(c)
 	}
 	w := request(h, "GET", "/admin", "example.test", nil, c)
-	if w.Code != 303 || w.Header().Get("Location") != "/" {
-		t.Fatal("signed-in owner should return to site", w.Code)
+	if w.Code != 200 || !strings.Contains(w.Body.String(), "Blog is not enabled") {
+		t.Fatal("signed-in admin without Blog should see status", w.Code)
 	}
 	s := h.sessions[key(c.Value)]
 	oldSave := request(h, "POST", "/admin/save", "example.test", url.Values{"csrf": {s.csrf}}, c)
@@ -196,7 +196,7 @@ func TestLoginEditingLogoutAndCookieIsolation(t *testing.T) {
 	}
 
 	w = request(h, "GET", "/admin", "other.test", nil, c)
-	if w.Code == 303 {
+	if strings.Contains(w.Body.String(), "Blog is not enabled") {
 		t.Fatal("session crossed hosts")
 	}
 	w = request(h, "POST", "/admin/logout", "example.test", url.Values{"csrf": {s.csrf}}, c)
@@ -204,7 +204,7 @@ func TestLoginEditingLogoutAndCookieIsolation(t *testing.T) {
 		t.Fatal(w.Code)
 	}
 	w = request(h, "GET", "/admin", "example.test", nil, c)
-	if w.Code == 303 {
+	if strings.Contains(w.Body.String(), "Blog is not enabled") {
 		t.Fatal("logged-out session accepted")
 	}
 }
@@ -255,7 +255,7 @@ func TestSessionExpiry(t *testing.T) {
 	future := time.Now().Add(h.sessionDuration() + time.Second)
 	h.now = func() time.Time { return future }
 	w := request(h, "GET", "/admin", "example.test", nil, c)
-	if w.Code == 303 {
+	if strings.Contains(w.Body.String(), "Blog is not enabled") {
 		t.Fatal("expired session accepted")
 	}
 }

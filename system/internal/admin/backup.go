@@ -87,9 +87,6 @@ func (m Manager) Backup(name, branch string, out io.Writer) error {
 			}
 		}
 	}
-	if err = site.InstallVideos(filepath.Join(m.DataDir, "sites", name, "content", "media"), sitefiles.Path(stage, filepath.Join("itsy", "media")), live.Snips); err != nil {
-		return err
-	}
 	if _, err = site.Load(stage); err != nil {
 		return err
 	}
@@ -143,9 +140,6 @@ func (m Manager) Restore(ctx context.Context, name, branch, file, expected strin
 	}
 	p, err := site.Load(stage)
 	if err != nil {
-		return "", err
-	}
-	if err = p.CheckExtractedSnips(); err != nil {
 		return "", err
 	}
 	archive, err := os.CreateTemp("", "flea-restore-release-*")

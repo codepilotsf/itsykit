@@ -15,12 +15,12 @@ func TestQAPhotoSyncConflictsAreExplicit(t *testing.T) {
 		return s
 	}
 	base, local, remote := makeStore("Original"), makeStore("Local"), makeStore("Owner")
-	if _, e := MergeSnips(base, local, remote, nil); e == nil {
+	if _, e := MergeContent(base, local, remote, nil); e == nil {
 		t.Fatal("silently resolved photo metadata conflict")
 	}
 	for _, takeLocal := range []bool{false, true} {
 		called := false
-		out, e := MergeSnips(base, local, remote, func(c Conflict) (bool, error) {
+		out, e := MergeContent(base, local, remote, func(c Conflict) (bool, error) {
 			called = true
 			if c.Key != "photo Abcdefghij" {
 				t.Fatal(c.Key)
@@ -38,7 +38,7 @@ func TestQAPhotoSyncConflictsAreExplicit(t *testing.T) {
 			t.Fatal("wrong conflict selection")
 		}
 	}
-	out, e := MergeSnips(base, base, remote, nil)
+	out, e := MergeContent(base, base, remote, nil)
 	if e != nil || out.Media["Abcdefghij"].Name != "Owner" {
 		t.Fatal("unchanged local photo overwrote owner edit", e)
 	}

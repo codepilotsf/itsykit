@@ -1,3 +1,7 @@
+<!-- itsy
+title: Getting Started
+description: Build a small bookshop website with two pages, shared templates, and your own CSS.
+-->
 <div class="docs-shell container">
   <aside class="docs-sidebar">
     {render /guides-nav}
@@ -6,34 +10,35 @@
     <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
       <h1>Getting Started</h1>
-      <p>Build a small bookshop website with two pages, shared templates, and your own CSS.</p>
+      <p>You can have your first ItsyWeb site running in just a few minutes. Install the command, create a project, and start writing HTML.</p>
     </header>
-<p>You need basic HTML and CSS, a text editor, and a terminal. Everything in this tutorial runs on your computer.</p>
+<p>This guide walks you through a small bookshop website, from your first page to a shared layout and a few personal touches. As you save changes, ItsyWeb reloads the browser so you can see your site take shape. A little HTML and CSS is all you need to follow along.</p>
 <section id="installation">
   <h2>1. Install ItsyWeb</h2>
-<p>On an Apple Silicon Mac or x86-64 Linux computer, open a terminal and run:</p><div class="copy-code"><pre tabindex="0" aria-label="Install ItsyWeb"><code class="language-bash">curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div><p>Add the installed command to this terminal's PATH:</p><pre tabindex="0" aria-label="Check the installed CLI"><code class="language-bash">export PATH="$HOME/.local/bin:$PATH"
-itsy version</code></pre><p>The installer also explains how to make that PATH setting permanent.</p>
+<p>On an Apple Silicon Mac or x86-64 Linux computer, open a terminal and run:</p><div class="copy-code"><pre tabindex="0" aria-label="Install ItsyWeb"><code class="language-bash">curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div><p>The installer downloads and checks the command for your computer. There is no Go, Node, or database to set up.</p>
 </section>
 
 <section id="create-a-site">
   <h2>2. Create a site</h2>
+<p>ItsyWeb creates a project folder with a homepage, a shared layout, and the styles you need to get started. Run these commands to create the bookshop project, move into its folder, and start the local development server:</p>
 <pre tabindex="0" aria-label="Create the bookshop site"><code class="language-bash">itsy new little-bookshop
 cd little-bookshop
-itsy dev</code></pre><p>Enter <strong>Little Bookshop</strong> as the site name and skip the optional admin email. Open the Website URL printed in the terminal. Leave dev running while you work.</p>
+itsy dev</code></pre><p>When prompted, enter <strong>Little Bookshop</strong> as the site name and skip the optional admin email. Open the Website URL printed in the terminal to see your new site. Leave this terminal running while you work; it serves the pages and watches for changes.</p>
+<p>If your terminal says <code>itsy</code> is not found, follow the PATH instructions printed by the installer, then try again.</p>
 </section>
 
 <section id="homepage">
   <h2>3. Write the homepage</h2>
-<p>Open the project in your editor. Replace <code>site/index.html</code> with:</p><pre tabindex="0" aria-label="site/index.html"><code class="language-markup">&lt;section class="container py-xl"&gt;
+<p>Open the project folder in your text editor. The <code>site/</code> folder holds the public pages and assets, and <code>index.html</code> is your homepage. Replace its contents with:</p><pre tabindex="0" aria-label="site/index.html"><code class="language-markup">&lt;section class="container py-xl"&gt;
   &lt;h1&gt;Little Bookshop&lt;/h1&gt;
   &lt;p&gt;Good books, a quiet corner, and time to browse.&lt;/p&gt;
   &lt;a href="/visit"&gt;Plan your visit&lt;/a&gt;
-&lt;/section&gt;</code></pre><p>Save. The browser reloads with your new content inside the site's header and footer.</p>
+&lt;/section&gt;</code></pre><p>Save the file and look at your browser. ItsyWeb reloads the page with your new content inside the site's header and footer. Those shared pieces come from the layout, so your page only needs the HTML for its own content.</p>
 </section>
 
 <section id="add-a-page">
   <h2>4. Add a second page</h2>
-<p>Create <code>site/visit.html</code>:</p><pre tabindex="0" aria-label="site/visit.html"><code class="language-markup">&lt;section class="container py-xl"&gt;
+<p>Adding a page is as simple as adding another HTML file. Create <code>site/visit.html</code> alongside your homepage:</p><pre tabindex="0" aria-label="site/visit.html"><code class="language-markup">&lt;section class="container py-xl"&gt;
   &lt;h1&gt;Visit the bookshop&lt;/h1&gt;
   &lt;p&gt;Find your next read at our little shop.&lt;/p&gt;
   &lt;a href="/"&gt;Back to the homepage&lt;/a&gt;
@@ -44,12 +49,13 @@ itsy dev</code></pre><p>Enter <strong>Little Bookshop</strong> as the site name 
 
 <section id="shared-layout">
   <h2>5. Change the shared layout</h2>
-<p><code>site/main.layout.html</code> wraps every page. Its <code>&#123;slot&#125;</code> marks where the page content goes.</p>
+<p><code>site/main.layout.html</code> supplies the shared HTML document, including the header and footer. Its <code>&#123;slot&#125;</code> marks where each page's content goes. A change to the layout appears on every page that uses it.</p>
 <p>In that file, add this line just before <code>&lt;/header&gt;</code>:</p><pre tabindex="0" aria-label="Add a shared header line"><code class="language-markup">&lt;p class="container py-xs"&gt;Independent books. Curious readers.&lt;/p&gt;</code></pre><p>Save and check Home and Visit. Both now show the same line above their content.</p>
 </section>
 
 <section id="partials">
   <h2>6. Reuse a partial</h2>
+<p>A partial is a small piece of HTML you can include wherever you need it. Opening hours are a useful example: they belong on both pages, but you should only have to update them once.</p>
 <p>Create <code>site/_hours.html</code>:</p><pre tabindex="0" aria-label="site/_hours.html"><code class="language-markup">&lt;p&gt;Open Tuesday to Saturday, 10am to 6pm.&lt;/p&gt;</code></pre><p>Add this inside the section on both pages:</p><pre tabindex="0" aria-label="Include the opening hours"><code class="language-markup">&#123;render hours&#125;</code></pre><p>The hours now appear in both places. Edit the partial to change them together. Its underscore keeps it private; the render instruction leaves off the underscore and extension.</p>
 </section>
 
@@ -57,7 +63,7 @@ itsy dev</code></pre><p>Enter <strong>Little Bookshop</strong> as the site name 
   <h2>7. Make it yours</h2>
 <p>Inside the existing <code>@layer styles</code> block in <code>site/css/global.css</code>, add:</p><pre tabindex="0" aria-label="Add a shared heading style"><code class="language-css">h1 &#123;
   color: var(--brand-1);
-&#125;</code></pre><p>Both headings now use the theme's primary color. Change colors and fonts in <code>site/css/theme.css</code> as you develop the design.</p>
+&#125;</code></pre><p>Both headings now use the theme's primary color. Change colors and fonts in <code>site/css/theme.css</code> as you develop the design. Your pages share these styles, so you can give the whole site a new feel without editing each page. The <a href="/docs/styling">CSS and icons guide</a> explains the included styles and utility classes.</p>
 </section>
 
 <section id="check-and-save">

@@ -37,7 +37,7 @@ func TestPersistentRollingSessions(t *testing.T) {
 	restarted.now = func() time.Time { return now }
 	now = now.Add(36 * time.Hour)
 	w := request(restarted, "GET", "/admin", "example.test", nil, c)
-	if w.Code != 303 || w.Header().Get("Location") != "/" {
+	if w.Code != 200 || !strings.Contains(w.Body.String(), "Blog is not enabled") {
 		t.Fatal(w.Code, w.Body.String())
 	}
 	renewed := cookie(t, w, h.cookieName("session"))
@@ -49,11 +49,11 @@ func TestPersistentRollingSessions(t *testing.T) {
 	restarted = New(h.options)
 	restarted.now = func() time.Time { return now }
 	w = request(restarted, "GET", "/admin", "example.test", nil, c)
-	if w.Code != 303 {
+	if w.Code != 200 || !strings.Contains(w.Body.String(), "Blog is not enabled") {
 		t.Fatal("rolling session expired early")
 	}
 	w = request(restarted, "GET", "/admin", "example.test", nil, otherDevice)
-	if w.Code == 303 {
+	if strings.Contains(w.Body.String(), "Blog is not enabled") {
 		t.Fatal("idle device was renewed by another device")
 	}
 	csrf := restarted.sessions[key(c.Value)].csrf
@@ -63,7 +63,7 @@ func TestPersistentRollingSessions(t *testing.T) {
 	}
 	// Even the original handler must read revocation from disk.
 	w = request(h, "GET", "/admin", "example.test", nil, c)
-	if w.Code == 303 {
+	if strings.Contains(w.Body.String(), "Blog is not enabled") {
 		t.Fatal("stale handler resurrected logout")
 	}
 }
@@ -87,7 +87,7 @@ func TestSessionOwnerRemovalAndShorterIdleWindow(t *testing.T) {
 			future := time.Now().Add(25 * time.Hour)
 			next.now = func() time.Time { return future }
 			w := request(next, "GET", "/admin", "example.test", nil, c)
-			if w.Code == 303 {
+			if strings.Contains(w.Body.String(), "Blog is not enabled") {
 				t.Fatal("revoked/expired session survived")
 			}
 		})
@@ -167,22 +167,6 @@ func TestActivityRequiresSessionOriginAndCSRF(t *testing.T) {
 	}
 }
 
-func TestActivityScriptIsPinnedAndHasNoIdleTimer(t *testing.T) {
-	// Exact inline script hashes are checked in TestAuthenticatedPublicPreview.
-	_, activity, _ := strings.Cut(string(inlineOwner), "let last=Date.now(),pending=false;")
-	if activity == "" {
-		t.Fatal("missing activity handler")
-	}
-	for _, forbidden := range []string{"setInterval", "setTimeout"} {
-		if strings.Contains(activity, forbidden) {
-			t.Fatal("idle timer present")
-		}
-	}
-	if !strings.Contains(string(inlineOwner), "event.isTrusted") {
-		t.Fatal("untrusted events renew session")
-	}
-}
-
 func TestSessionCapacityAndExpiredPruning(t *testing.T) {
 	h, _ := fixture(t)
 	now := time.Now()
@@ -216,7 +200,7 @@ func TestConcurrentSessionRenewalAndLogout(t *testing.T) {
 	group.Wait()
 	next := New(h.options)
 	w := request(next, "GET", "/admin", "example.test", nil, c)
-	if w.Code == 303 {
+	if strings.Contains(w.Body.String(), "Blog is not enabled") {
 		t.Fatal("concurrent renewal restored logged-out session")
 	}
 }

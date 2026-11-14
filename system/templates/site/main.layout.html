@@ -8,40 +8,34 @@
     <link rel="stylesheet" href="/css/navigation.css" />
     <style>@view-transition { navigation: auto; } @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }</style>
     <link rel="stylesheet" href="/css/global.css" />
-    {#if app.current_admin}
-    <meta name="csrf-token" content="{app.current_admin.csrf_token}" />
-    {/if}
     <link rel="icon" href="/images/favicon-32.png?v=itsyweb-20261114" type="image/png" sizes="32x32" />
     <link rel="icon" href="/images/favicon.svg?v=itsyweb-20261114" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/images/apple-touch-icon.png?v=itsyweb-20261114" sizes="180x180" />
   </head>
   <body class="flex flex-col min-h-screen m-0 p-0">
-    {#if app.current_admin}
-    {render /admin/toolbar}
-    {/if}
     <header class="sticky top-0 bg-lighter bg-opacity-80 backdrop-blur-sm">
       <nav class="container flex flex-wrap items-center gap-md py-xs">
         <a class="inline-flex items-center text-black no-underline" href="/">
           <img class="itsy-logo" src="/images/logo.svg?v=itsyweb-20261114" width="166" height="36" alt="ItsyWeb" />
         </a>
         <div class="desktop-navigation">{render /navigation}</div>
-        {#unless app.current_admin}
+
         <a
           href="/admin"
           class="ml-auto text-sm border border-light py-xs px-sm rounded-full hover:bg-white"
           >Admin</a
         >
-        {/unless}
+
         <button class="mobile-menu-toggle" popovertarget="mobile-navigation" aria-label="Open navigation"><span aria-hidden="true"></span></button>
         <div id="mobile-navigation" popover>
           <div class="flex items-center justify-between gap-md mb-md"><strong>Navigation</strong><button popovertarget="mobile-navigation" popovertargetaction="hide" aria-label="Close navigation">×</button></div>
-          <nav aria-label="Mobile navigation">{render /navigation}{#unless app.current_admin}<a href="/admin">Admin</a>{/unless}</nav>
+          <nav aria-label="Mobile navigation">{render /navigation}<a href="/admin">Admin</a></nav>
         </div>
       </nav>
     </header>
     <main class="flex-1 flex flex-col">{slot}</main>
     <footer class="container py-sm border-t border-light text-dark text-sm">
-      <span snip>&copy; 2026 Your business</span>
+      <span>&copy; 2026 Your business</span>
     </footer>
   </body>
 </html>

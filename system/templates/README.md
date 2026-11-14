@@ -1,18 +1,18 @@
 # ItsyWeb
 
-New sites use `itsy.config.json`, `itsy/`, and `<!-- itsy` layout settings.
+New sites use `itsy.config.json`, `itsy/`, and `<!-- itsy` page settings.
 Existing `.flea.config.json`, `flea/`, and `<!-- flea` projects remain supported
 without conversion. Keep using an existing site's selected files rather than
-creating a second layout. New-layout deployment requires server protocol 29;
+creating a second layout. This runtime requires server protocol 30;
 run `itsy update-server` explicitly before deploying to an older server.
 
-Build pages with HTML, style them with CSS, and let site admins edit their own content. ItsyWeb builds the server, and serves multiple sites with HTTPS directly.
+Build pages with HTML, style them with CSS, and optionally manage Blog posts in the admin editor. ItsyWeb builds the server, and serves multiple sites with HTTPS directly.
 
 ## Getting started
 
 The included Contact mini app uses a normal HTML form and `{csrf}`. Enable it
 only on sites that need it, as described below. Blog is an optional built-in content application, described below. Custom
-service apps remain planned.
+managed apps use validated local executable packages.
 
 For a new project, install ItsyWeb first, then run:
 
@@ -33,7 +33,7 @@ Use `itsy new .` to create a site in the current empty directory. Named paths
 also accept existing empty directories. Hidden files and `.git` count as content;
 ItsyWeb refuses nonempty directories.
 
-`itsy new` creates a clean layout and editable homepage. Use `itsy new --starter
+`itsy new` creates a clean layout and ordinary HTML homepage. Use `itsy new --starter
 foobar` (or `-s`) for example pages, a six-person fictional team and a contact form.
 Navigation uses a native HTML popover on mobile, with no menu JavaScript.
 The clean site has Home navigation; the starter has Team and Contact.
@@ -89,15 +89,8 @@ after changing networks. Without the flag, access stays on this computer.
 
 ### 2. Make your first change
 
-Open `site/index.html` to change the homepage structure. Edit `itsy/snips.json`
-for existing welcome text and page metadata, or add a new editable heading:
-
-```html
-<h1 snip>Welcome to our site</h1>
-```
-
-Dev moves the text into `itsy/snips.json` and replaces it with a generated snip
-directive. See [editable content](#editable-content) for details.
+Edit ordinary HTML in `site/index.html` and its leading title/description settings
+comment. Edit `itsy/data/*.json` for developer-managed lists. No extraction occurs.
 
 ### 3. Check and save your work
 
@@ -106,7 +99,7 @@ itsy status
 ```
 
 This validates the site without rewriting files. Review your changes, then commit
-the templates and extracted content together.
+the changed HTML, data and assets together.
 
 New sites have an `Initial site` commit on `main`, unless created with
 `--skip-git`, without Git installed, or with a Git error reported during creation.
@@ -130,7 +123,7 @@ No remote is configured automatically. There is no existing `origin` to rename.
 | `site/css/` | Stylesheets and theme tokens |
 | `site/images/` | Developer-managed images and logo |
 | `itsy.config.json` | Site settings and branch deployment destinations |
-| `itsy/snips.json` | Editable content, page metadata, and media records |
+| `itsy/snips.json` | Blog posts and cover-photo library |
 | `itsy/data/` | Optional developer-managed JSON data |
 | `itsy/media/` | Managed photos and videos |
 | `itsy/icons/` | Downloaded icon cache |
@@ -262,51 +255,46 @@ not register hosts, configure TLS or protect staging: keep the separate server
 indexing policy described above. A supporting ItsyWeb server executable is required;
 deploying this site's configuration alone does not upgrade it.
 
-### Editable content
+### Page content and metadata
 
-Add a bare `snip` attribute to an element whose content admins should edit:
+Pages are ordinary developer-authored HTML. Structured lists and objects live
+in `itsy/data/*.json`, accessed through `data.*`; use `#each` for repeated content.
+Images and videos are ordinary static files under `site/`, referenced by their
+public URLs. CSS, Prewind and theme tokens remain developer-managed and deploy
+with code. No page toolbar, page text/media editor, collection editor, extraction,
+legacy named snips or user-editable theme exists.
 
-```html
-<section snip>
-  <h2>About us</h2>
-  <p>We build things that last.</p>
-</section>
-```
+Optional Blog keeps its rich post editor and cover-photo library. Its existing
+private file is `itsy/snips.json`, now containing only optional `blog` and `media`
+fields. An empty site uses `{}`. Old page-CMS fields and pending extraction state
+are rejected without rewriting them. Back up and explicitly convert old sites
+before using this incompatible runtime; no migration or deletion is automatic.
 
-While dev is running, ItsyWeb extracts the inner HTML into `itsy/snips.json`, removes
-the attribute, and leaves a generated directive:
-
-```html
-<section>{snip a7Km2pQ9xB}</section>
-```
-
-Keep generated IDs unchanged and unquoted. Existing stored content is preserved.
-Removed snips are archived; restoring their IDs restores their content.
-
-Do not nest snip regions or put template directives inside new regions. Rich text
-is sanitized; use the photo and video features for media. Commit the rewritten
-templates and content together before deployment.
-
-### Repeated content with multisnips
-
-Use a multisnip for admin-managed lists such as team members:
+Ordinary page metadata belongs in one leading HTML settings comment, before markup:
 
 ```html
-<article multisnip="team">
-  <h2 snip="name">Joe Appleseed</h2>
-  <p snip="title">Founder</p>
-</article>
+<!-- itsy
+title: Visit the bookshop
+description: Find our opening hours and plan a visit.
+layout: /custom.layout.html
+-->
+<h1>Visit the bookshop</h1>
 ```
 
-Dev extracts seeds and creates a loop. Editing starts on after login and remembers
-your choice across pages in the same tab. Dashed outlines identify editable content.
-Collection cards have inset drag handles, remove X icons and an Add tile. Use mouse/touch dragging
-or arrow keys on a handle. Text and photo selection stay on-page; Save changes
-publishes everything and Cancel restores it. Both keep Editing on.
+Each value is single-line plain text, without surrounding quotation marks. Split
+at the first colon; later colons and braces stay literal. `layout` is optional and
+must name an existing site-relative private `*.layout.html` file. The existing
+`<!-- flea` spelling is also supported. Unknown and duplicate settings fail
+validation, including duplicate empty values. This is not YAML.
 
-Keep groups on individual pages, with one root element and named inner fields.
-Do not nest groups or place them in layouts, partials, or other loops.
-`site/team.html` includes a working example with a photo field.
+`{page.title}` and `{page.description}` render with contextual escaping, for
+example `<title>{page.title}</title>` and
+`<meta name="description" content="{page.description}">`. Missing or empty title
+uses `Home` at `/`, otherwise the final URL component with hyphens replaced by
+spaces and its first letter capitalized. Missing or empty description is empty.
+Comment values are never compiled as template source or copied into JSON.
+Blog posts use their saved title and excerpt instead of template comment metadata.
+There are no saved ordinary-page metadata overrides or page metadata editor.
 
 ### Structured data and conditions
 
@@ -326,7 +314,7 @@ containing a `members` array is available as `data.team.members`:
 ```
 
 Values are escaped. Conditions use dotted paths and also support `{:else}` and
-`{:else if app.email}`. Use multisnips when admins need to manage the list.
+`{:else if app.email}`. Use ordinary JSON data for developer-managed lists.
 
 For negative conditions, use `{#unless app.email}...{/unless}`. It uses the
 inverse of if truthiness and supports `{:else}` and `{:else if dotted.path}`.
@@ -365,31 +353,30 @@ Quote attribute values. Classes, dimensions, stroke attributes, and `aria-` and
 Unavailable icons are omitted with terminal warnings. Invalid syntax or unsafe
 SVGs fail validation.
 
-### Admin sign-in and editing
+### Blog administration
 
-Add an approved admin from your site folder:
+`/admin` is the email-code sign-in entry point. After verification it returns to
+`/admin`; authenticated admins go to `/admin/blog` when Blog is enabled. Without
+Blog they see a status page with Sign out, not an editor for website pages.
+`/admin/blog/edit` creates or edits a post, and `/admin/blog/save` saves, publishes
+or unpublishes it. New posts save as drafts. Only published posts enter public
+routes. Save on a published post updates it immediately; Unpublish returns it
+to a private draft. See the Optional Blog section below.
 
-```sh
-itsy admin admin@example.com
-```
+Keep `site/admin.layout.html` and the private sign-in/Blog templates. Admin forms
+use their own hidden `csrf` field from `{admin.csrf}`. Blog multipart saves also
+send `X-CSRF-Token`. Exact Origin, host-bound HttpOnly/SameSite sessions, production
+HTTPS, upload bounds and snapshot versions remain required. Public layouts need
+only an ordinary `/admin` link. They have no toolbar mount, `app.current_admin`
+state or admin CSRF meta. Public Contact forms retain the separate `{csrf}` input.
+The removed `/admin/page`, `/admin/editor-context`, `/admin/theme`, `editor.js`,
+`editor.css` and `toolbar.html` endpoints return 404. Only Blog's `blog.js` asset
+includes the pinned Squire and DOMPurify libraries.
 
-The command adds the address to `admin.emails`. It starts local email setup only
-when preview mode is off and delivery is unconfigured. Run `itsy email`
-separately to configure Resend for real delivery. Local secrets
-go in a private, Git-ignored `.env` file.
+#### Developer-managed styling
 
-Admins visit `/admin`, receive an emailed code, and return to the site to edit.
-**Edit** enables text editing and Page details; **Save changes** publishes the
-draft, and **Cancel** discards it.
-
-Live sign-in requires HTTPS and email delivery. Commit and deploy access changes
-before sharing the live `/admin` link. An empty admin list disables live sign-in;
-local dev shows setup guidance.
-
-Sessions survive browser closure, server restarts, and deployments. The default
-idle window is 30 days; set `admin.session_idle_days` to 1–365 to change it.
-Sign out revokes the current browser session. Remove an address from `admin.emails`
-to revoke that admin's access. Do not edit or copy runtime session files.
+Edit `site/css/theme.css` and ordinary stylesheets. Prewind/tokens, static assets
+and committed CSS deployment remain supported. There is no theme editor or overlay.
 
 ### Styling
 
@@ -397,43 +384,9 @@ Edit `site/css/theme.css` for colors, fonts and fluid sizing. Prewind and theme
 tokens remain available. Styles are developer-managed files: ordinary deployment
 publishes committed CSS, and rollback restores the selected release's CSS.
 
-### Photos
+### Static images and videos
 
-Designate an editable image with `<img snip src="/images/team.jpg" alt="Our team">`.
-Dev imports the local JPEG/PNG and generates `src="{snip ID.src}"` and
-`alt="{snip ID.alt}"`. The typed entry in `itsy/snips.json` owns those values;
-classes, layout and links stay in the template. Admins click the image in Edit
-mode, then use the page Save/Cancel. Files live in `itsy/media/`; commit processed
-photos and JSON as seeds. Images cannot be nested inside text snips.
-
-To add an admin-selectable photo to a multisnip, use a named image field:
-
-```html
-<img snip="photo" src="/images/person.jpg" alt="Person">
-```
-
-Admins click the item's photo to choose a library image or upload a JPEG/PNG.
-Done previews the choice; Save changes publishes new uploads to the library.
-Cancel discards the draft without uploading. Empty photos show a
-neutral portrait and an Add photo control during Edit. Normal deployment retains
-live photos; `itsy pull` retrieves their metadata and files together.
-
-### Videos
-
-`<video snip src="/videos/intro.mp4" controls></video>` imports a local seed.
-Videos require optimized MP4 files with H.264 video, optional AAC-LC audio,
-and fast-start metadata. Files may be up to 25 MiB; ItsyWeb does not convert them.
-
-Dev generates src/poster snip bindings. Admins click the video in Edit mode to
-replace it or its poster, then Save changes or Cancel with the page. No separate
-Photos/Videos buttons. Metadata lives in `itsy/snips.json`; MP4 files in
-`itsy/media/` are Git-ignored.
-Deployment stages referenced local files and preserves live replacements.
-
-Pulls and backups include video files. On a fresh clone, restore missing video
-files before validation, using `itsy pull` when a live destination is
-configured. Storage is limited to 64 MiB including retained replacements, with no
-automatic deletion. Video fields in multisnips are not supported.
+Store ordinary assets under `site/` and reference their public URLs. Blog covers use its private media library.
 
 ### Contact forms
 
@@ -483,10 +436,8 @@ Edit `site/admin/index.html`, `site/admin/code.html`, `site/admin/setup.html`, a
 comments select `site/admin.layout.html`. Keep form actions, field names, and
 hidden `{admin.csrf}` fields intact.
 
-In the public layout, preserve the `app.current_admin` conditional blocks, the
-CSRF meta tag, and the `{render /admin/toolbar}` include with the toolbar's
-version/revision fields. These connect your layout to the editor. The server
-supplies the signed-in identity; never configure `app.current_admin` yourself.
+Public layouts use ordinary `/admin` links. Admin and Contact forms retain their
+separate CSRF contracts; there is no page toolbar or public admin CSRF meta.
 
 ### Agent-assisted work
 
@@ -538,26 +489,30 @@ Deployment ships committed source; unresolved working-tree changes block it.
 Each branch has its own destination. Use `itsy deploy -configure` to change one.
 Email-enabled sites prompt for server-side Resend settings when needed.
 
-### Sync admin changes
+### Sync Blog changes
 
-Normal deployment preserves live editable content, seeding new IDs from your
-local site. It publishes committed CSS, including `site/css/theme.css`.
-To bring live snip/metadata and media edits back, stop dev and run:
+Commit `itsy/snips.json` when seeding Blog posts or cover metadata. Normal
+`itsy deploy` preserves live posts and photos by stable ID and adds source-only
+IDs. Omitting an ID never deletes a live post or photo. Publish code/CSS normally.
 
 ```sh
 itsy pull
+# Review and commit local Blog content and photos.
+itsy deploy --with-content
 ```
 
-Review and commit the result. Pull never retrieves styles, source templates,
-configuration, secrets or sessions. To intentionally publish local snip edits:
+`pull` retrieves Blog posts and cover photos from this branch's saved destination,
+keeps local-only IDs and never pulls CSS, templates, configuration or sessions.
+Stop dev first; selected local files must be committed. Explicit publication
+requires a destination-scoped pull baseline for existing sites. Posts and photos
+compare as whole records; conflicting edits require an explicit choice and stop
+noninteractively. The expected remote digest is checked under the deployment lock.
+`itsy status` reports content differences read-only. `--with-content` is removed
+without an alias. This contract requires deployment protocol 30.
 
-```sh
-itsy deploy --with-snips
-```
-
-Existing live sites require a pull baseline first. Conflicts require an explicit
-choice between live and local changes; unattended conflicts stop. There are no
-Theme controls or theme synchronization flags.
+Backups include Blog content and library photos. Rollback preserves current
+content while selecting earlier code/CSS. Restore requires an expected snapshot
+and explicit confirmation. Retained files are never pruned automatically.
 
 ## Backups and recovery
 
@@ -576,7 +531,7 @@ sessions.
 
 - **The site fails validation:** run `itsy status` and fix the reported file.
 - **A page returns 404:** check the filename and use its extensionless URL.
-- **New snips block deployment:** run dev to extract them, then commit the results.
+- **Old page-CMS markup/content blocks validation:** back up and explicitly convert it to HTML/JSON; no automatic migration occurs.
 - **Local sign-in needs email setup:** run `itsy email`, then return to `/admin`.
 - **Pull cannot acquire the project lock:** stop the site's dev process first.
 
@@ -598,6 +553,6 @@ The private `site/blog/_index.html` and `_post.html` templates supply the listin
 and posts. Sign in, then open `/admin/blog` for drafts, rich text, cover selection
 and explicit Publish/Unpublish. Posts use the top-level `blog` array in
 `itsy/snips.json`. Normal deploy preserves live posts; pull before publishing
-source edits with `--with-snips`. Draft text is private; uploaded photos are public.
+source edits with `--with-content`. Draft text is private; uploaded photos are public.
 See https://gitlab.codepilot.com/sean-schertell/flea/-/blob/main/docs/blog.md for
 the JSON/token contract.

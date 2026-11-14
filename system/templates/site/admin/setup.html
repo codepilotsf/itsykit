@@ -3,7 +3,7 @@ layout: /admin.layout.html
 -->
 <div class="container py-xl">
  <section class="admin-access">
-  <h1 class="text-xl mt-0">Sign-in needs setting up</h1>
+  <h1 class="text-xl mt-0">{#if admin.message}{admin.message}{:else}Sign-in needs setting up{/if}</h1>
   <pre class="whitespace-pre-wrap break-words">{admin.instructions}</pre>
   <p><a href="/admin">Check again</a> · <a href="/">Back to website</a></p>
  </section>

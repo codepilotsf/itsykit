@@ -1,14 +1,12 @@
 package site
 
 import (
-	"fmt"
 	"net"
 	"net/http"
 
 	contactapp "itsy/apps/contact"
 	"itsy/internal/appapi"
 	"itsy/internal/contact"
-	"itsy/internal/viewer"
 )
 
 func (s *Server) serveInstalledApp(w http.ResponseWriter, r *http.Request, mount appapi.Mount) {
@@ -38,7 +36,7 @@ func (s *Server) serveApp(w http.ResponseWriter, r *http.Request, mount appapi.M
 	s.mu.RLock()
 	p, loadErr, revision := s.project, s.err, s.revision
 	s.mu.RUnlock()
-	if loadErr != nil || p == nil || p.syncOnly {
+	if loadErr != nil || p == nil {
 		http.Error(w, "This page is unavailable.", 503)
 		return
 	}
@@ -155,29 +153,12 @@ func (s *Server) serveApp(w http.ResponseWriter, r *http.Request, mount appapi.M
 	}
 	inputs, commit := s.formRender(r)
 	inputs.appName, inputs.appData = mount.Name, envelope.Values()
-	decorate, owner := r.Context().Value(ownerRenderKey{}).(ownerTransform)
-	var admin map[string]any
-	if identity, authenticated := viewer.From(r.Context()); owner && authenticated {
-		admin = map[string]any{"email": identity.Email, "csrf_token": identity.CSRF, "version": p.EditingVersion(), "revision": ""}
-		if !s.production {
-			admin["revision"] = fmt.Sprint(revision)
-		}
-	}
-	body, err := p.renderRequest(t, r.URL.Path, admin, owner, inputs)
+	body, err := p.renderRequest(t, r.URL.Path, nil, inputs)
 	if err != nil {
 		http.Error(w, "This page could not be rendered.", 500)
 		return
 	}
-	if owner {
-		if !s.production {
-			w.Header().Set("X-Flea-Dev-Revision", fmt.Sprint(revision))
-		}
-		var ok bool
-		body, ok = decorate(body, p.Content, p.EditingVersion())
-		if !ok {
-			return
-		}
-	} else if !s.production {
+	if !s.production {
 		body = withReload(body, revision)
 	}
 	s.applySession(w, mount.Name, directive)

@@ -13,7 +13,7 @@ import (
 )
 
 func (m Manager) prepareMedia(source, content string, store *snips.Store) error {
-	if len(store.ImageAssets()) == 0 && len(store.VideoAssets()) == 0 {
+	if len(store.ImageAssets()) == 0 {
 		return nil
 	}
 	root := site.ManagedMediaRoot(content)
@@ -69,9 +69,6 @@ func (m Manager) prepareMedia(source, content string, store *snips.Store) error 
 		if total > media.MaxTotal {
 			return fmt.Errorf("photo library exceeds 64 MiB")
 		}
-	}
-	if err := site.InstallVideos(sitefiles.Path(source, filepath.Join("itsy", "media")), root, store); err != nil {
-		return err
 	}
 	return nil
 }

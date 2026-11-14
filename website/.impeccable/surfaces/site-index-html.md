@@ -25,7 +25,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 ## Scope and content
 
-Keep existing links, substantive operational information, editable snippet bindings and conditional admin integration. Preserve server/SSH/domain and DNS/network qualifications. Do not imply cloud-VM provisioning or an embedded coding agent. Retain optional editing, Contact, Blog, media and managed-app guides as supporting links. Match the docs' typography, header and code styles without changing their reading layout or tutorial sequence. No deployment is authorized.
+Keep current links and substantive operational information. Ordinary page copy and metadata are owned by HTML; public layouts have no page-editor integration. Preserve server/SSH/domain and DNS/network qualifications. Do not imply cloud-VM provisioning or an embedded coding agent. Retain Contact, Blog and managed-app guides as supporting links. Retired editing/media guides stay removed. Match the docs' typography, header and code styles without changing their reading layout or tutorial sequence. No deployment is authorized.
 
 ## Implementation and review
 
@@ -34,3 +34,7 @@ Implemented the selected second-round option 1. The owner then directed continua
 The comp's illustrative localhost:8000 became the actual default localhost:3000. The supplied Ubuntu/SSH/domain requirement and committed-files deployment are visible in the workflow and Publish view. The owner’s later request to keep the build-pipeline and server messages is reflected in dedicated sections below the agent example.
 
 Final source validation, actual desktop/mobile rendering, native interactions, link checks and the detector passed. The review was performed in-thread under the owner's one-agent rule. No raster asset is shipped in the website; generated concept images and prompt provenance remain design evidence only.
+
+## Candidate integration
+
+Integrated the owner-supplied page-editing-removal handoff at 9d85679. The approved hero copy now lives directly in HTML with a leading metadata settings comment. The visual direction is unchanged. Removed feature links follow the approved removal; the remaining three optional features share one row. Documentation keeps the new link-based guide titles and scroll-based chapter selection alongside the approved colors and panels. This source requires the unreleased protocol-30 candidate; it is not a public-release or deployment receipt.

@@ -1,6 +1,6 @@
 ---
 name: itsyweb-site
-description: Build or maintain ItsyWeb websites with the itsy CLI, plain HTML/JSON, optional editable snips and media, Contact, Blog, managed apps, migration redirects, SEO and content synchronization. Includes existing Flea sites; excludes CLI/server framework development.
+description: Build or maintain ItsyWeb websites with the itsy CLI, plain HTML/JSON, optional Blog posts and cover photos, Contact, Blog, managed apps, migration redirects, SEO and content synchronization. Includes existing Flea sites; excludes CLI/server framework development.
 ---
 
 # Build an ItsyWeb website
@@ -22,7 +22,7 @@ new names; adapt paths to the selected existing layout.
 
 For installation, transition, deployment, pull or recovery, read
 [compatibility and operations](references/compatibility-operations.md).
-Deployment of the new layout requires protocol 29; server upgrades are explicit.
+Deployment of the new layout requires protocol 30; server upgrades are explicit.
 
 ## Load only relevant guidance
 
@@ -31,7 +31,7 @@ Deployment of the new layout requires protocol 29; server upgrades are explicit.
 - Visual direction, UX, redesign or polish: also read [design](../design/SKILL.md).
   Use only runtime-discovered global Impeccable; never install, vendor, copy or
   link it into a site or starter. Keep design context and artifacts in the site.
-- Template syntax, layouts, editable content or media: read
+- Template syntax, layouts, Blog content or static media: read
   [templates and content](references/templates-content.md).
 - Contact, Blog or custom managed apps: read [apps](references/apps.md) and the
   relevant installed guide in `itsy/skills/` (or the selected `flea/skills/`).
@@ -68,23 +68,25 @@ maintenance and focused app additions do not restart a full-site consultation.
 
 ## Site authoring defaults
 
-Build agent-managed sites without editable snips by default. Write copy directly
-in HTML and use `itsy/data/*.json` for structured lists when useful. Do not add
-`snip` attributes, generated bindings or multisnips unless browser editing is
-explicitly requested. Preserve an existing client's editing workflow unless its
-conversion is requested. New CLI scaffolds include editable seeds: when creating
-an agent-managed site without requested editing, deliberately convert those seeds
-to ordinary HTML while retaining any route title/description metadata needed in
-`itsy/snips.json`.
+Pages are ordinary developer-authored HTML. Structured lists and objects live
+in `itsy/data/*.json`, accessed through `data.*`; use `#each` for repeated content.
+Images and videos are ordinary static files under `site/`, referenced by their
+public URLs. CSS, Prewind and theme tokens remain developer-managed and deploy
+with code. No page toolbar, page text/media editor, collection editor, extraction,
+legacy named snips or user-editable theme exists.
+
+Optional Blog keeps its rich post editor and cover-photo library. Its existing
+private file is `itsy/snips.json`, now containing only optional `blog` and `media`
+fields. An empty site uses `{}`. Old page-CMS fields and pending extraction state
+are rejected without rewriting them. Back up and explicitly convert old sites
+before using this incompatible runtime; no migration or deletion is automatic.
 
 - Public pages/assets belong in `site/`; mail templates in private `mailers/`.
   Config globals use `app.*`, not `site.*`. Keep secrets out of config and Git.
 - Preserve custom layouts, partials, navigation and native mobile behavior.
   `main.layout.html` uses `{slot}`; custom layouts use leading page settings.
-- Preserve conditional admin CSRF meta in `<head>` and conditional
-  `{render /admin/toolbar}` directly inside `<body>`. Keep version/revision
-  attributes, declarative shadow-root shell and external script.
-  `app.current_admin` is supplied per request, never configured in JSON.
+- Public layouts need only an ordinary `/admin` link. Keep private Blog admin
+  form CSRF and login templates; public Contact uses `{csrf}`.
 - Keep theme decisions in `site/css/theme.css`, shared rules in
   `site/css/global.css` under `@layer styles`, and vendored assets unchanged.
   Use installed Prewind utilities and tokens; do not invent Tailwind classes,
@@ -96,9 +98,8 @@ to ordinary HTML while retaining any route title/description metadata needed in
 
 ## Edit and verify
 
-Dev can rewrite templates for extraction. Stop a task-owned watcher before bulk
-rewrites; coordinate with an existing process owner before replacing their dev
-server. Restart for rendering, icon resolution or requested snip extraction.
+Dev validates source and reloads it without extraction. Coordinate with an
+existing process owner before replacing their server.
 `itsy status` validates without extracting or downloading icons. It also contacts
 the current branch's saved remote automatically, if configured; it is not a
 local-only or offline check in that case.
@@ -110,8 +111,7 @@ unintended overrides. Use local email preview for sign-in/Contact checks when
 enabled; keep messages, codes and capability links out of site files.
 
 Finish with `itsy status` and review templates with changed config, metadata and
-content. For new sites without requested editing, verify there are no authoring
-snip attributes, generated bindings, multisnips or editable entries; metadata may
-remain. Stop task-owned servers unless asked to keep them. Report actual checks
+content. Verify ordinary pages use HTML/JSON and comment metadata. Exercise Blog
+Save/Cancel and publication only in disposable fixtures or with explicit authority. Stop task-owned servers unless asked to keep them. Report actual checks
 and unverified boundaries. Do not run reset, pull, restore, publish posts, deploy
 or upgrade a server as incidental cleanup.
