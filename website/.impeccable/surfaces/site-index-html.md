@@ -42,3 +42,5 @@ Integrated the owner-supplied page-editing-removal handoff at 9d85679. The appro
 ## Owner refinement: quieter opening
 
 The owner requested removal of Coding agents from the navbar and found the upper homepage busy and too wide. This refinement supersedes the original comp’s first-viewport density: use a 960px demonstration, a narrow two-line headline, one description and action, restrained underlined tabs and adjoining panes. Remove the five workflow cards and redundant bold audience line. Installation remains linked in Develop; setup/deployment and their prerequisites remain in Publish and the hosting section. Put the HTML explanation before the coding-agent section and cap both at 1120px. Keep the approved palette, logo, factual claims and accessible demonstrations.
+
+The owner approved the quieter opening, then requested removal of the hero build button and more space around its elements, with no further review. The shared header and closing tutorial actions remain. This follow-up is authorized for merge and deployment to both existing website destinations.

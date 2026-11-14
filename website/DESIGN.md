@@ -72,7 +72,7 @@ Inter supplies both headings and reading text. Monospace belongs to source, file
 
 ## Layout
 
-The shared header uses a 1200px container. The upper homepage and agent section use 1120px containers with fluid page gutters; the hero demonstration caps at 960px. The headline and description have narrower centered measures and generous separation. Source and result share two equal columns; at 520px they stack. The earlier five-step card row is removed: Develop links to installation, while Develop and Publish reveal the commands on demand. The HTML explanation precedes the coding-agent section. Lower sections retain their 1280px container.
+The shared header uses a 1200px container. The upper homepage and agent section use 1120px containers with fluid page gutters; the hero demonstration caps at 960px. The headline and description have narrower centered measures, a 32px gap, and 64px before the demonstration. Desktop hero padding is 80px above and below; phone spacing scales down to 40–48px. Source and result share two equal columns; at 520px they stack. The earlier five-step card row is removed: Develop links to installation, while Develop and Publish reveal the commands on demand. The HTML explanation precedes the coding-agent section. Lower sections retain their 1280px container.
 
 The agent demonstration puts the file tree beside the file content; at 520px it becomes horizontal file tabs above the content. At 800px the surrounding heading and explanation stack. Documentation retains its sidebar and reading column, with the native Guides disclosure below 640px. The shared header offers Docs and Get started; the homepage agent section and documentation retain access to the coding-agent guide.
 
@@ -84,11 +84,11 @@ The homepage uses tonal layering and thin borders rather than added shadows. Nav
 
 ## Shapes
 
-Actions and tabs use the default radius. Large demonstrations use the large radius, with gently curved inner panes and workflow steps. Preserve the supplied SVG brand assets and consistent library icons.
+Actions use the default radius; hero tabs use a flat underline. Large demonstrations use the large radius, with gently curved inner panes and workflow steps. Preserve the supplied SVG brand assets and consistent library icons.
 
 ## Components
 
-**Actions:** ice on navy; the shared header action reverses to navy on pale. Keep visible focus and a generous target. The homepage hero action has a minimum 50px height.
+**Actions:** ice on navy; the shared header action reverses to navy on pale. Keep visible focus and a generous target. The hero has no action button; the shared header and closing section provide the tutorial action.
 
 **Project tabs:** semantic links work as section anchors without JavaScript. Enhancement supplies tab roles, selection, arrow/Home/End keys and focus management. Hero views use an ice underline and text; file tabs keep the pale blue selection. Inactive panels are hidden only after enhancement.
 

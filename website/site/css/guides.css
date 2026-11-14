@@ -19,6 +19,9 @@
   .guide-next a { display:flex; align-items:center; min-height:44px; padding:16px 22px; border:1px solid var(--light); border-radius:12px; background:var(--hero-ink); color:var(--black); font-weight:600; text-decoration:none; }
   .guide-next a:hover { background:var(--brand-2-light); text-decoration:underline; }
   .guide-next { margin-top:var(--space-xl); }
+  .docs-content .styling-choice { margin:32px 0; padding:clamp(24px,4vw,36px); border:0; border-radius:12px; background:var(--hero-bg); }
+  .docs-content .styling-choice p { margin:0; color:var(--hero-ink); font-size:clamp(1.15rem,2.2vw,1.45rem); line-height:1.55; }
+  .styling-choice strong { color:var(--accent); }
   .docs-content .file-list dt { overflow-wrap:anywhere; }
   .directory-tree { margin-block:24px; padding:18px 22px; border:1px solid var(--light); border-radius:12px; background:var(--hero-ink); font-size:.9rem; }
   .directory-tree-heading,.directory-tree li > div { display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
