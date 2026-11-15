@@ -127,39 +127,50 @@ site archive, or include the store in site backups. The 256 MiB archive limit re
 
 ### Domain redirects
 
-The unreleased host layer accepts administrator-owned `redirects` in
-`/etc/flea/server.json`, distinct from site-config path redirects. Both ends must
-be registered domain names in `sites`; they may belong to different managed
-sites. For a domain migration, merge rules such as:
+The unreleased CLI and server read domain redirect policy from the site's
+`itsy.config.json`, under `deploy.branches.<branch>.domain_redirects`. Merge the
+following fields into an existing branch entry, retaining its target, name,
+HTTPS, email and terms settings:
 
 ```json
 {
-  "redirects": {
-    "fleacms.com": "itsykit.dev",
-    "www.fleacms.com": "itsykit.dev",
-    "itsyweb.dev": "itsykit.dev"
+  "domain": "old.example",
+  "www_redirect": true,
+  "domain_redirects": {
+    "old.example": "new.example",
+    "www.old.example": "new.example"
   }
 }
 ```
 
-Rules return HTTP 308, preserve the escaped path and query, and use the
-destination's configured HTTP/HTTPS policy. The HTTP listener also goes directly
-to the final domain for HTTPS-enabled sources. Keep HTTPS enabled for retired
-domains so existing HTTPS links still have valid certificates. Health probes
-remain local to the requested host. Unknown sources/destinations, self-redirects,
-and chains/cycles are rejected; point every source directly at its final domain.
-Download URLs and ordinary pages follow the same redirect before serving content.
+This is deployment configuration, not the top-level path `redirects` map. A
+source must be in that branch's domain list, including a WWW alias enabled by
+`www_redirect`. The destination must be a final, registered domain on the same
+server; it may belong to another site. CLI mapping validation and privileged
+server ownership checks both apply. A branch cannot claim another branch's
+source domain or replace another site's routing.
 
-General host redirects survive ordinary deployment, HTTPS changes and code
-rollback. The deploy WWW preference only enables/disables its conventional
-`www.example.com -> example.com` pair; it does not clear custom domain policy.
-When a primary hostname already redirects elsewhere, a newly enabled default WWW
-redirect points directly at the final destination. Site removal still clears
-redirects touching the removed hosts. Change host policy only with explicit
-authorization, a private config backup, the deployment lock, candidate validation,
-restart/readiness checks and rollback on failure. Public 0.22.0 and older server
-binaries accept only the conventional WWW pair; install a supporting server
-before adding general rules. This is not a new CLI redirect-management command.
+Ordinary deploy and `itsy https` reconcile the selected site's redirect rules
+from this configuration. Removing a rule removes its deployed redirect;
+unrelated sites' rules survive. A default WWW redirect goes directly to the
+primary domain's configured final destination, while an explicit rule wins over
+the WWW preference. Code rollback and content restore retain the current routing
+policy. Site removal clears rules touching the removed hosts. The server's
+`redirects` map is generated routing state, not the place to author site policy.
+
+Rules return HTTP 308, preserve escaped paths and queries, and follow the
+final destination's configured HTTP/HTTPS policy. Keep certificates enabled for
+retired domains. Health probes bypass public redirection. Unknown domains,
+self-redirects and chains/cycles are rejected; every source points directly at
+its final domain. Download URLs follow the same redirect as ordinary pages.
+
+Both an updated CLI and supporting Itsy Server are required. Public 0.22.0 CLI
+rejects the new deployment-config field; an older server rejects the optional
+`-domain-redirects` activation argument before mutation. Protocol 30 remains
+unchanged because the existing command contract is retained and unsupported
+new rules fail closed. No private domain names are embedded in the routing
+implementation. Use the normal reviewed deployment transaction, preserving
+configuration backups, locking, validation, readiness and rollback safeguards.
 
 Deploy/https select only the current Git branch's saved destination from
 itsy.config.json's deploy.branches map. Use the actual branch name without a production

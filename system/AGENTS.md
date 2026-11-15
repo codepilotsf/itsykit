@@ -154,6 +154,9 @@ See [host indexing](docs/host-indexing.md) and the deployment guide. Host indexi
 was introduced in protocol 27; keep release rollout separate from site deploy.
 Site migration redirects use top-level config `redirects` and 301 GET/HEAD;
 protocol 28 prevents older servers from ignoring them. See the runtime guide.
+Domain redirects belong in site config at `deploy.branches.<branch>.domain_redirects`.
+Keep server behavior generic; never add bespoke domain names or site-specific
+routing rules to server code. See the deployment guide for ownership and reconciliation.
 
 Optional `seo.url` supplies the production HTTPS origin for snapshot-generated
 sitemaps, robots discovery and missing canonical tags; exact `seo.exclude` paths

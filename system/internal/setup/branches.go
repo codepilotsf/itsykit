@@ -85,7 +85,10 @@ func validateMapping(branch string, s DeploySettings, c DeploymentConfig) error 
 	if _, err := targetName(s.Target); err != nil {
 		return err
 	}
-	o := admin.Options{Archive: "snapshot", Name: s.Name, Domains: s.domains(), HTTPS: s.HTTPS, Email: s.Email, AgreeTOS: s.AgreeTOS}
+	o := admin.Options{Archive: "snapshot", Name: s.Name, Domains: s.domains(), HTTPS: s.HTTPS, Email: s.Email, AgreeTOS: s.AgreeTOS, DomainRedirects: s.DomainRedirects}
+	if s.WWWRedirect {
+		o.Canonical = s.Domain
+	}
 	if err := o.Validate(); err != nil {
 		return err
 	}

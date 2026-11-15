@@ -27,24 +27,25 @@ import (
 )
 
 type Options struct {
-	keepRouting bool // Recovery actions retain current host/TLS policy.
-	Sync        *syncstate.Plan
-	Archive     string
-	Name        string
-	Domains     []string
-	HTTPS       bool
-	Email       string
-	AgreeTOS    bool
-	Canonical   string
-	Branch      string
-	Commit      string
+	keepRouting     bool // Recovery actions retain current host/TLS policy.
+	Sync            *syncstate.Plan
+	Archive         string
+	Name            string
+	Domains         []string
+	HTTPS           bool
+	Email           string
+	AgreeTOS        bool
+	Canonical       string
+	DomainRedirects map[string]string
+	Branch          string
+	Commit          string
 }
 
 func (o Options) Validate() error {
 	if o.Branch != "" && !regexp.MustCompile(`^[0-9a-f]{40}([0-9a-f]{24})?$`).MatchString(o.Commit) {
 		return fmt.Errorf("deployment requires a full Git commit ID")
 	}
-	if o.Archive != "" && !regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$`).MatchString(o.Name) {
+	if (o.Archive != "" || o.Name != "" || len(o.DomainRedirects) > 0) && !regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$`).MatchString(o.Name) {
 		return fmt.Errorf("site name must be 1-64 letters, digits, hyphens or underscores")
 	}
 	if len(o.Domains) == 0 {
@@ -75,6 +76,14 @@ func (o Options) Validate() error {
 	if o.Canonical != "" {
 		if len(o.Domains) != 2 || o.Domains[0] != o.Canonical || o.Domains[1] != "www."+o.Canonical {
 			return fmt.Errorf("canonical redirect must pair the primary domain with its www alias")
+		}
+	}
+	for from, to := range o.DomainRedirects {
+		if !seen[from] || !host.ValidDomain(from) || !host.ValidDomain(to) || from == to || o.DomainRedirects[to] != "" {
+			return fmt.Errorf("invalid domain_redirects rule %s to %s: sources must belong to this deployment and targets must be final domain names", from, to)
+		}
+		if o.Canonical != "" && to == "www."+o.Canonical && o.DomainRedirects[to] == "" {
+			return fmt.Errorf("domain_redirects cannot target the default WWW redirect")
 		}
 	}
 	return nil
@@ -218,6 +227,9 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 	// Also enforce branch ownership for HTTPS-only changes, which carry no archive.
 	for _, domain := range o.Domains {
 		if root := c.Sites[domain]; root != "" {
+			if o.Name != "" && filepath.Dir(root) != filepath.Join(m.DataDir, "sites", o.Name, "releases") {
+				return "", fmt.Errorf("hostname %s belongs to a different site; refusing to replace it", domain)
+			}
 			name := filepath.Base(filepath.Dir(filepath.Dir(root)))
 			if owner := c.SiteBranches[name]; owner != "" && owner != o.Branch {
 				return "", fmt.Errorf("hostname %s belongs to branch %s", domain, owner)
@@ -240,11 +252,6 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 	var activeContent *snips.Store
 	if o.Archive != "" {
 		parent := filepath.Join(m.DataDir, "sites", o.Name, "releases")
-		for _, domain := range o.Domains {
-			if existing := c.Sites[domain]; existing != "" && filepath.Dir(existing) != parent {
-				return "", fmt.Errorf("hostname %s belongs to a different site; refusing to replace it", domain)
-			}
-		}
 		// The data tree is administrator-owned. Never follow a preexisting symlink
 		// while creating a release, even if an old installation had writable data.
 		if err = realDirs(m.DataDir, []string{"sites", o.Name, "releases"}); err != nil {
@@ -304,9 +311,23 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 		}
 	}
 	if !o.keepRouting {
+		// The branch's site config is authoritative for its own hostnames.
+		// Never clear incoming redirects owned by another managed site.
+		parent := filepath.Join(m.DataDir, "sites", o.Name, "releases")
+		for from, root := range c.Sites {
+			if o.Name != "" && filepath.Dir(root) == parent {
+				delete(c.Redirects, from)
+			}
+		}
+		for _, from := range o.Domains {
+			delete(c.Redirects, from)
+		}
+		for from, to := range o.DomainRedirects {
+			c.Redirects[from] = to
+		}
 		if o.Canonical != "" {
 			// A retired primary hostname can itself redirect to a new domain.
-			// Point its default WWW alias directly at that final destination.
+			// Point its default WWW alias directly at the configured final destination.
 			www := "www." + o.Canonical
 			if existing := c.Redirects[www]; existing == "" || existing == o.Canonical {
 				target := o.Canonical
@@ -314,17 +335,6 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 					target = next
 				}
 				c.Redirects[www] = target
-			}
-		} else {
-			for _, domain := range o.Domains {
-				// The deploy preference controls only the conventional WWW pair.
-				// Other domain redirects are administrator-owned host policy.
-				if strings.HasPrefix(domain, "www.") && c.Redirects[domain] == strings.TrimPrefix(domain, "www.") {
-					delete(c.Redirects, domain)
-				}
-				if c.Redirects["www."+domain] == domain {
-					delete(c.Redirects, "www."+domain)
-				}
 			}
 		}
 		if o.HTTPS {

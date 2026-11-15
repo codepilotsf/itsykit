@@ -56,6 +56,7 @@ func main() {
 	branch := flag.String("branch", "", "source Git branch")
 	commit := flag.String("commit", "", "source Git commit")
 	canonical := flag.String("canonical", "", "primary domain for WWW redirect")
+	domainRedirects := flag.String("domain-redirects", "", "deployment domain redirects as a JSON object")
 	flag.Parse()
 	if *version {
 		fmt.Println("ItsyWeb " + buildinfo.Version)
@@ -183,7 +184,14 @@ func main() {
 					os.Exit(1)
 				}
 			}
-			revision, err = m.Apply(ctx, admin.Options{Sync: plan, Archive: *archive, Name: *name, Domains: admin.Domains(*domain), HTTPS: *https, Email: *email, AgreeTOS: *agree, Canonical: *canonical, Branch: *branch, Commit: *commit})
+			var redirects map[string]string
+			if *domainRedirects != "" {
+				if err := json.Unmarshal([]byte(*domainRedirects), &redirects); err != nil {
+					logger.Print("Invalid domain redirects: ", err)
+					os.Exit(1)
+				}
+			}
+			revision, err = m.Apply(ctx, admin.Options{Sync: plan, Archive: *archive, Name: *name, Domains: admin.Domains(*domain), HTTPS: *https, Email: *email, AgreeTOS: *agree, Canonical: *canonical, Branch: *branch, Commit: *commit, DomainRedirects: redirects})
 			if err == nil {
 				fmt.Printf("Activated release %s\n", revision)
 			}

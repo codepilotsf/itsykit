@@ -145,6 +145,13 @@ production origins from requests, overwrite custom discovery/canonicals, discard
 host policy on deploy/recovery, or weaken Host/TLS readiness. Native fsnotify watches
 included directories with debounce and overflow recovery, never idle polling.
 
+Domain redirect declarations belong to the selected site's branch deployment
+config. Setup transmits them to the privileged deployment transaction, which
+validates source ownership and final registered targets and reconciles only the
+selected site's rules. Host routing interprets the resulting validated map
+generically; no site-specific domain policy belongs in server code. Recovery
+retains current routing. See [deployment](deployment.md#domain-redirects).
+
 Build with scripts/build.sh, serially refreshing Contact and both embedded Linux
 servers before the CLI. Self-update verifies bounded platform/checksum downloads
 under the installer lock. Release/production actions require separate authority.

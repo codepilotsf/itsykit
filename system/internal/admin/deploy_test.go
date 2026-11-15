@@ -138,7 +138,7 @@ func TestSavedHTTPSPreferenceKeepsOtherSites(t *testing.T) {
 	}
 }
 
-func TestDeploymentPreservesDomainRedirects(t *testing.T) {
+func TestDeploymentReconcilesDomainRedirects(t *testing.T) {
 	m, old := fixture(t)
 	old.Domains = []string{"old.test", "www.old.test"}
 	old.Canonical = "old.test"
@@ -152,55 +152,105 @@ func TestDeploymentPreservesDomainRedirects(t *testing.T) {
 	if _, err := m.Apply(context.Background(), current); err != nil {
 		t.Fatal(err)
 	}
+	old.DomainRedirects = map[string]string{"old.test": "current.test", "www.old.test": "current.test"}
+	current.DomainRedirects = map[string]string{"alias.test": "current.test"}
+	for _, o := range []Options{current, old, current, old} {
+		if _, err := m.Apply(context.Background(), o); err != nil {
+			t.Fatal(err)
+		}
+	}
 	c, _, err := host.Load(m.ConfigPath, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.Redirects = map[string]string{"old.test": "current.test", "www.old.test": "current.test", "alias.test": "current.test"}
-	data, _ := json.Marshal(c)
-	if err := os.WriteFile(m.ConfigPath, data, 0644); err != nil {
+	for _, from := range []string{"old.test", "www.old.test", "alias.test"} {
+		if c.Redirects[from] != "current.test" {
+			t.Fatalf("lost configured redirect for %s: %+v", from, c.Redirects)
+		}
+	}
+	if c.Sites["old.test"] == c.Sites["current.test"] {
+		t.Fatal("redirect changed site ownership")
+	}
+	// With no explicit WWW rule, the preference goes directly to the final target.
+	delete(old.DomainRedirects, "www.old.test")
+	if _, err := m.Apply(context.Background(), old); err != nil {
 		t.Fatal(err)
 	}
-	for _, o := range []Options{current, old} {
-		if _, err := m.Apply(context.Background(), o); err != nil {
-			t.Fatal(err)
-		}
-		c, _, err = host.Load(m.ConfigPath, nil)
+	c, _, err = host.Load(m.ConfigPath, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Redirects["www.old.test"] != "current.test" {
+		t.Fatal("default WWW rule introduced a chain")
+	}
+	// Removing declarations removes only this site's redirects, including aliases.
+	old.DomainRedirects = nil
+	if _, err := m.Apply(context.Background(), old); err != nil {
+		t.Fatal(err)
+	}
+	c, _, err = host.Load(m.ConfigPath, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Redirects["old.test"] != "" || c.Redirects["www.old.test"] != "old.test" || c.Redirects["alias.test"] != "current.test" {
+		t.Fatal("configuration removal did not reconcile only the owning site", c.Redirects)
+	}
+	// A rule for an alias omitted from the domain list is removed as well.
+	current.DomainRedirects = nil
+	current.Domains = []string{"current.test"}
+	if _, err := m.Apply(context.Background(), current); err != nil {
+		t.Fatal(err)
+	}
+	c, _, err = host.Load(m.ConfigPath, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Redirects["alias.test"] != "" || c.Redirects["www.old.test"] != "old.test" {
+		t.Fatal(c.Redirects)
+	}
+}
+
+func TestDomainRedirectCannotControlAnotherSite(t *testing.T) {
+	for _, rules := range []map[string]string{
+		{"foreign.test": "example.test"},
+		{"example.test": "example.test"},
+		{"example.test": "https://other.test/path"},
+		{"example.test": "other.test", "other.test": "last.test"},
+	} {
+		m, o := fixture(t)
+		before, err := os.ReadFile(m.ConfigPath)
 		if err != nil {
 			t.Fatal(err)
 		}
-		for _, from := range []string{"old.test", "www.old.test", "alias.test"} {
-			if c.Redirects[from] != "current.test" {
-				t.Fatalf("redeploy of %s lost redirect for %s: %+v", o.Name, from, c.Redirects)
-			}
+		o.DomainRedirects = rules
+		m.Restart = func(context.Context) error { t.Fatal("invalid rules reached activation"); return nil }
+		if _, err := m.Apply(context.Background(), o); err == nil {
+			t.Fatal("accepted invalid or foreign redirect", rules)
+		}
+		after, err := os.ReadFile(m.ConfigPath)
+		if err != nil || string(before) != string(after) {
+			t.Fatal("invalid rules changed host config", err)
 		}
 	}
-	old.Canonical = ""
-	if _, err := m.Apply(context.Background(), old); err != nil {
+}
+
+func TestDomainRedirectHTTPSCannotClaimAnotherSite(t *testing.T) {
+	m, owner := fixture(t)
+	if _, err := m.Apply(context.Background(), owner); err != nil {
 		t.Fatal(err)
 	}
-	c, _, err = host.Load(m.ConfigPath, nil)
+	before, err := os.ReadFile(m.ConfigPath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if c.Redirects["www.old.test"] != "current.test" {
-		t.Fatal("WWW preference removed an administrator-owned domain redirect")
+	claim := Options{Name: "other", Domains: owner.Domains, HTTPS: true, Email: "dev@example.test", AgreeTOS: true, DomainRedirects: map[string]string{"example.test": "current.test"}}
+	m.Restart = func(context.Context) error { t.Fatal("foreign source reached activation"); return nil }
+	if _, err := m.Apply(context.Background(), claim); err == nil || !strings.Contains(err.Error(), "different site") {
+		t.Fatal("HTTPS redirect claimed another site's source", err)
 	}
-	delete(c.Redirects, "www.old.test")
-	data, _ = json.Marshal(c)
-	if err := os.WriteFile(m.ConfigPath, data, 0644); err != nil {
-		t.Fatal(err)
-	}
-	old.Canonical = "old.test"
-	if _, err := m.Apply(context.Background(), old); err != nil {
-		t.Fatal(err)
-	}
-	c, _, err = host.Load(m.ConfigPath, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if c.Redirects["www.old.test"] != "current.test" {
-		t.Fatal("default WWW redirect introduced a redirect chain")
+	after, err := os.ReadFile(m.ConfigPath)
+	if err != nil || string(before) != string(after) {
+		t.Fatal("foreign redirect changed host config", err)
 	}
 }
 

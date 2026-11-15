@@ -6,10 +6,10 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
-- Allow permanent redirects between registered hostnames, including separate
-  sites, while preserving escaped paths and query strings. Reject unknown hosts,
-  self-redirects and chains. Keep administrator-owned domain redirects across
-  deployments; the WWW preference still controls the conventional WWW pair.
+- Declare domain redirects in `itsy.config.json` under each deployment branch's
+  `domain_redirects` setting. Validate source ownership, reconcile additions and
+  removals on deployment, and preserve other sites' routing. HTTP 308 retains
+  escaped paths and queries; unknown hosts, self-redirects and chains are rejected.
 
 - Keep HTTP and HTTPS listening ports open across server restarts with systemd
   socket activation. New connections queue during site deployments and executable
