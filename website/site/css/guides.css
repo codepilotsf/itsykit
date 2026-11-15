@@ -15,7 +15,6 @@
   .guide-chapters a { display:block; padding:6px 8px; border-radius:6px; color:var(--dark); text-decoration:none; line-height:1.5; }
   .guide-chapters a:hover { color:var(--brand-1); background:var(--lighter); }
   .guide-chapters a[aria-current="location"] { color:var(--black); background:var(--brand-2-light); font-weight:600; }
-  .guide-breadcrumb { display:inline-block; font-size:.9rem; margin-bottom:var(--space-md); }
   .guide-next a { display:flex; align-items:center; min-height:44px; padding:16px 22px; border:1px solid var(--light); border-radius:12px; background:var(--hero-ink); color:var(--black); font-weight:600; text-decoration:none; }
   .guide-next a:hover { background:var(--brand-2-light); text-decoration:underline; }
   .guide-next { margin-top:var(--space-xl); }
