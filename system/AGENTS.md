@@ -44,6 +44,9 @@ AGENTS.md. Paths and Go commands in this guide are relative to `system/`.
   public URL privacy is a separate boundary.
 - Do not deploy, push tags or publish artifacts unless requested. Passing local
   tests does not establish real email, Ubuntu/systemd, ACME or release acceptance.
+- Managed serving requires systemd's retained HTTP/HTTPS sockets; never silently
+  bind after an invalid handoff. Keep the approved one-time standard-unit conversion
+  under executable-upgrade recovery; see the deployment guide for its exact scope.
 
 ## Read the requirements for your task
 

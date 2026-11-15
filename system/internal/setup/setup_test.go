@@ -286,7 +286,7 @@ func TestInstallerSyntaxAndService(t *testing.T) {
 	if output, err := cmd.CombinedOutput(); err != nil {
 		t.Fatal(err, string(output))
 	}
-	for _, setting := range []string{"User=flea", "NoNewPrivileges=true", "AmbientCapabilities=CAP_NET_BIND_SERVICE", "CapabilityBoundingSet=CAP_NET_BIND_SERVICE", "ProtectSystem=strict", "ExecStart=/usr/local/bin/flea-server"} {
+	for _, setting := range []string{"User=flea", "NoNewPrivileges=true", "CapabilityBoundingSet=\n", "ProtectSystem=strict", "ExecStart=/usr/local/bin/flea-server", "-socket-activation", "Requires=flea.socket"} {
 		if !strings.Contains(service, setting) {
 			t.Fatal(setting)
 		}

@@ -40,6 +40,7 @@ func main() {
 	version := flag.Bool("version", false, "print ItsyWeb release version")
 	config := flag.String("config", "/etc/flea/server.json", "server JSON configuration")
 	check := flag.Bool("check", false, "check configuration and running server readiness")
+	socketActivation := flag.Bool("socket-activation", false, "require HTTP and HTTPS listening sockets from systemd")
 	protocol := flag.Bool("protocol", false, "print deployment protocol version")
 	mailStatus := flag.Bool("mail-status", false, "check server email configuration (root only)")
 	configureMail := flag.Bool("configure-mail", false, "save email settings from stdin (root only)")
@@ -225,6 +226,8 @@ func main() {
 		}
 	} else if *check {
 		err = host.Check(ctx, *config)
+	} else if *socketActivation {
+		err = host.RunSocketActivated(ctx, *config, logger)
 	} else {
 		err = host.Run(ctx, *config, logger)
 	}
