@@ -103,7 +103,7 @@ description: Build simple websites in familiar HTML and CSS. Itsy covers local d
 <section class="html-section container" id="templates" aria-labelledby="html-title">
   <div class="section-heading"><h2 id="html-title">Skip the build pipeline.<br />Keep the HTML.</h2><p>You wanted to make a website, not maintain a toolchain. Write ordinary HTML and CSS, then add the shared pieces a small site needs.</p></div>
   <div class="template-example">
-    <div class="template-source"><div class="pane-bar">{icon file}<span>site/main.layout.html</span></div><pre tabindex="0" aria-label="Shared layout example"><code>&lt;header&gt;<span class="syntax-tag">&#123;render /navigation&#125;</span>&lt;/header&gt;
+    <div class="template-source"><div class="pane-bar">{icon file}<span>site/main.layout.html</span></div><pre tabindex="0" aria-label="Shared layout example"><code>&lt;header&gt;<span class="syntax-tag">&#123;render navigation&#125;</span>&lt;/header&gt;
 &lt;main&gt;<span class="syntax-tag">&#123;slot&#125;</span>&lt;/main&gt;
 &lt;footer&gt;Made by our studio.&lt;/footer&gt;</code></pre></div>
     <div class="template-description"><h3>A shared header shouldn’t require a framework.</h3><p>Put shared markup in a layout or partial and change it once. Each page fills the layout’s <code>&#123;slot&#125;</code>. The server puts it together when someone visits; there is no static site to generate first.</p><a class="quiet-link" href="/docs/templates">Pages, layouts and data {icon arrow-up-right}</a></div>
@@ -134,7 +134,7 @@ Edit the HTML and CSS in `site/`.</code></pre>
       </div>
       <div class="agent-file" id="index-file" aria-labelledby="file-index" data-tab-panel>
         <div class="pane-bar">{icon file}<span>site/index.html</span></div>
-        <pre tabindex="0" aria-label="Example index page"><code>&#123;render /navigation&#125;
+        <pre tabindex="0" aria-label="Example index page"><code>&#123;render navigation&#125;
 &lt;h1&gt;Hello, web.&lt;/h1&gt;
 &lt;p&gt;A small website, in plain HTML.&lt;/p&gt;</code></pre>
       </div>
