@@ -77,20 +77,15 @@
   function sequence(id, duration, scene) {
     var panel = document.getElementById(id);
     if (!panel) return;
-    var replay = panel.querySelector('[data-demo-replay]');
     var frameId;
     var running = false;
     var played = false;
-    var label = panel.getAttribute('aria-labelledby');
-    var name = document.getElementById(label).textContent.trim();
     function finish(animate) {
       if (!running) return;
       cancelAnimationFrame(frameId);
       running = false;
       panel.classList.remove('demo-playing');
       scene.finish(animate);
-      replay.textContent = 'Replay';
-      replay.setAttribute('aria-label', 'Replay the ' + name + ' demo');
     }
     function play() {
       if (motion.matches || panel.hidden || document.hidden) return;
@@ -100,8 +95,6 @@
       running = true;
       panel.classList.add('demo-playing');
       scene.start();
-      replay.textContent = id === 'example-html' ? 'Skip typing' : 'Skip demo';
-      replay.setAttribute('aria-label', 'Skip to the finished ' + name + ' example');
       var started;
       function frame(now) {
         if (panel.hidden || document.hidden) return finish(false);
@@ -118,16 +111,10 @@
       var visible = Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0);
       if (!played && !panel.hidden && visible >= Math.min(rect.height, innerHeight) * 0.25) play();
     }
-    replay.hidden = motion.matches;
-    replay.setAttribute('aria-label', 'Replay the ' + name + ' demo');
-    replay.addEventListener('click', function () {
-      if (running) finish(true);
-      else play();
-    });
     panel.querySelectorAll('pre,.example-page').forEach(function (element) {
       element.addEventListener('focusin', function () { finish(false); });
     });
-    var controller = { panel: panel, finish: finish, play: play, replay: replay };
+    var controller = { panel: panel, finish: finish, play: play };
     sequences.push(controller);
     if ('IntersectionObserver' in window) {
       var observer = new IntersectionObserver(function (entries) {
@@ -293,7 +280,6 @@
   });
   motion.addEventListener('change', function () {
     sequences.forEach(function (controller) {
-      controller.replay.hidden = motion.matches;
       if (motion.matches) {
         controller.finish(false);
         controller.panel.getAnimations({ subtree: true }).forEach(function (animation) { animation.cancel(); });

@@ -29,10 +29,6 @@
   .source-code { position:relative; background:transparent; margin:0; padding:24px; font-size:.875rem; line-height:1.75; white-space:pre; border-radius:0; }
   .source-code code { font-size:inherit; color:inherit; }
   .example-source-bar { padding-block:0; }
-  .demo-replay { margin-left:auto; min-height:44px; padding:0 8px; border:0; border-radius:4px; background:transparent; color:var(--accent); font-size:.76rem; font-weight:600; white-space:nowrap; }
-  .demo-replay:hover:not(:disabled) { background:var(--hero-bg); filter:none; }
-  .demo-replay:focus-visible { outline-offset:-3px; }
-  .demo-replay[hidden] { display:none; }
   .typing-copy { position:absolute; top:24px; left:24px; pointer-events:none; }
   .typing-caret { display:inline-block; width:2px; height:1.1em; margin-left:2px; vertical-align:-.15em; background:var(--accent); }
   .demo-typing [data-demo-source],.demo-typing .example-page { opacity:0; }
