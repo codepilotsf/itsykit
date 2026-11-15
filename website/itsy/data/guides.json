@@ -324,6 +324,41 @@
       ]
     },
     {
+      "url": "/docs/cli",
+      "title": "CLI reference",
+      "first": false,
+      "chapters": [
+        {
+          "id": "help",
+          "title": "Command help"
+        },
+        {
+          "id": "local-development",
+          "title": "Create and develop"
+        },
+        {
+          "id": "admin-and-email",
+          "title": "Admin and email"
+        },
+        {
+          "id": "deployment",
+          "title": "Set up and publish"
+        },
+        {
+          "id": "server-management",
+          "title": "Manage deployed sites"
+        },
+        {
+          "id": "backups-and-recovery",
+          "title": "Backups and recovery"
+        },
+        {
+          "id": "updates",
+          "title": "Versions and updates"
+        }
+      ]
+    },
+    {
       "url": "/docs/release-notes",
       "title": "Release notes",
       "first": false,

@@ -58,7 +58,9 @@ The remaining guides cover [SEO](https://itsykit.dev/docs/seo),
 [redirects](https://itsykit.dev/docs/redirects),
 [managed apps](https://itsykit.dev/docs/apps),
 [coding agents](https://itsykit.dev/docs/agents), and
-[recovery](https://itsykit.dev/docs/recovery).
+[recovery](https://itsykit.dev/docs/recovery). The
+[CLI reference](https://itsykit.dev/docs/cli) lists commands and options, including
+server inventory and site removal.
 Use `itsy --help` or a command's `--help` for options.
 
 ## Project files

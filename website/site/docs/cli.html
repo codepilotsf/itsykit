@@ -1,0 +1,166 @@
+<!-- itsy
+title: CLI reference
+description: Commands and options for creating, developing, deploying, and managing Itsy sites.
+-->
+<div class="docs-shell container">
+  <aside class="docs-sidebar">
+    {render /guides-nav}
+  </aside>
+  <article class="docs-content">
+    <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
+    <header>
+      <h1>CLI reference</h1>
+      <p>Commands and options for creating, developing, deploying, and managing Itsy sites.</p>
+    </header>
+
+    <section id="help">
+      <h2>Command help</h2>
+      <pre tabindex="0" aria-label="Show CLI help"><code class="language-bash">itsy help
+itsy deploy --help
+itsy server --help</code></pre>
+      <p>Run <code>itsy</code> or <code>itsy help</code> for the command list. Add <code>--help</code> to a command for its syntax and options. Angle brackets mark required arguments and square brackets mark optional ones; omit the brackets when typing a command. A vertical bar separates alternatives: choose one.</p>
+      <p>Run site commands from the folder containing <code>itsy.config.json</code>. The <code>new</code>, <code>setup</code>, <code>server</code>, <code>update</code>, <code>version</code>, and help commands also work without a local site. Remote site commands use the current Git branch's saved deployment destination.</p>
+    </section>
+
+    <section id="local-development">
+      <h2>Create and develop</h2>
+      <h3 id="new"><code>itsy new</code></h3>
+      <pre tabindex="0" aria-label="Create a site"><code class="language-bash">itsy new [--starter|-s] &lt;directory&gt; [--skip-git]</code></pre>
+      <p>Create a minimal site with an initial Git commit on <code>main</code>. The destination must be empty; use <code>.</code> for the current directory.</p>
+      <dl class="file-list">
+        <dt><code>--starter</code>, <code>-s</code></dt><dd>Include example pages and team content.</dd>
+        <dt><code>--skip-git</code></dt><dd>Leave Git setup to you, for example when the site belongs inside a larger repository.</dd>
+      </dl>
+
+      <h3 id="dev"><code>itsy dev</code></h3>
+      <pre tabindex="0" aria-label="Run the development server"><code class="language-bash">itsy dev [--port &lt;number&gt;] [--lan|-l]</code></pre>
+      <p>Start the local server with live reload. It normally listens on loopback at port 3000 and tries the next port if needed. Press Ctrl-C to stop.</p>
+      <dl class="file-list">
+        <dt><code>--port</code></dt><dd>Use a fixed port instead of trying alternatives. Use <code>--port 0</code> to choose an available port.</dd>
+        <dt><code>--lan</code>, <code>-l</code></dt><dd>Allow full development access over HTTP on a trusted private or Tailscale IPv4 network. See <a href="/docs/development#lan-testing">testing on another device</a>.</dd>
+      </dl>
+
+      <h3 id="status"><code>itsy status</code></h3>
+      <pre tabindex="0" aria-label="Check site status"><code class="language-bash">itsy status</code></pre>
+      <p>Validate local configuration, templates, content, and Git state. If this branch has a saved destination, also check the remote site over SSH and compare deployed code and Blog content. The command does not publish changes.</p>
+
+      <h3 id="reset"><code>itsy reset</code></h3>
+      <pre tabindex="0" aria-label="Reset a local site"><code class="language-bash">itsy reset</code></pre>
+      <p>After confirmation, replace the local site's files and settings with a clean layout and homepage. Stop dev first. Git history and a private sibling backup are kept; the live site is unchanged.</p>
+    </section>
+
+    <section id="admin-and-email">
+      <h2>Admin and email</h2>
+      <h3 id="admin"><code>itsy admin</code></h3>
+      <pre tabindex="0" aria-label="Add an admin"><code class="language-bash">itsy admin [email]</code></pre>
+      <p>Add an admin to <code>admin.emails</code> in <code>itsy.config.json</code>, prompting for an address when omitted. Local access updates automatically. Commit and deploy to apply access on the live site. No invitation is sent. Edit <code>admin.emails</code> to view or remove access.</p>
+
+      <h3 id="email"><code>itsy email</code></h3>
+      <pre tabindex="0" aria-label="Configure email or render a preview"><code class="language-bash">itsy email
+itsy email preview &lt;sign-in|contact&gt;</code></pre>
+      <p>Set up Resend delivery and save credentials in the private <code>.env</code> file. The <code>preview</code> subcommand prints a sample HTML email from <code>mailers/</code> without sending it. For example, <code>itsy email preview contact</code> renders the contact message.</p>
+      <p>New sites can preview local email without delivery credentials. Restart dev after changing Contact or email-preview settings. See <a href="/docs/email">Email and contact forms</a>.</p>
+    </section>
+
+    <section id="deployment">
+      <h2>Set up and publish</h2>
+      <h3 id="setup"><code>itsy setup</code></h3>
+      <pre tabindex="0" aria-label="Install Itsy Server"><code class="language-bash">itsy setup</code></pre>
+      <p>Install Itsy Server on an existing supported Ubuntu LTS host over SSH. The command prompts for the server login. It does not provision a cloud server or configure your DNS. See <a href="/docs/deployment#server">server prerequisites</a>.</p>
+
+      <h3 id="deploy"><code>itsy deploy</code></h3>
+      <pre tabindex="0" aria-label="Publish the current branch"><code class="language-bash">itsy deploy [options]</code></pre>
+      <p>Publish the current Git branch's committed files. The first deployment asks for a destination and saves it for this branch in <code>itsy.config.json</code>. Deployment requires clean, committed source. In a larger repository, commit saved settings manually before deploying.</p>
+      <dl class="file-list">
+        <dt><code>--configure</code></dt><dd>Confirm and save changes to this branch's destination.</dd>
+        <dt><code>--target &lt;login&gt;</code></dt><dd>SSH destination, such as <code>root@example.com</code>, or an SSH alias.</dd>
+        <dt><code>--domain &lt;hosts&gt;</code></dt><dd>Comma-separated hostnames or HTTP IPv4 addresses.</dd>
+        <dt><code>--name &lt;name&gt;</code></dt><dd>Stable site identifier on the server.</dd>
+        <dt><code>--https</code></dt><dd>Enable automatic HTTPS. Domains must point to the host and inbound TCP ports 80 and 443 must be reachable.</dd>
+        <dt><code>--email &lt;address&gt;</code></dt><dd>Contact address for Let's Encrypt.</dd>
+        <dt><code>--agree-tos</code></dt><dd>Accept the Let's Encrypt terms.</dd>
+        <dt><code>--www-redirect</code></dt><dd>Redirect WWW to the primary domain. Defaults to true for a new destination; use <code>--www-redirect=false</code> to disable it.</dd>
+        <dt><code>--expected-ips &lt;ips&gt;</code></dt><dd>Comma-separated expected DNS destination IPs for NAT or proxy setups.</dd>
+        <dt><code>--with-content</code></dt><dd>Also publish reviewed local Blog changes. Pull from this exact destination first. Content conflicts require an explicit choice.</dd>
+      </dl>
+      <p>Normal deployment updates code and CSS while preserving existing live Blog posts and cover photos. See <a href="/docs/deployment">Server setup and deployment</a> and <a href="/docs/blog#blog-deployment">Blog content sync</a>.</p>
+
+      <h3 id="https"><code>itsy https</code></h3>
+      <pre tabindex="0" aria-label="Configure HTTPS"><code class="language-bash">itsy https [options]</code></pre>
+      <p>Configure HTTPS for an already deployed site using this branch's destination. It accepts the destination and HTTPS options listed above, including <code>--configure</code>, but does not upload site code. <code>--with-content</code> belongs to <code>itsy deploy</code> and is rejected here.</p>
+
+      <h3 id="pull"><code>itsy pull</code></h3>
+      <pre tabindex="0" aria-label="Pull live Blog content"><code class="language-bash">itsy pull</code></pre>
+      <p>Bring live Blog posts and referenced cover photos into the local site. Stop dev and commit local changes first. Review and commit the result afterward. Pull does not download templates, CSS, configuration, credentials, or sessions.</p>
+    </section>
+
+    <section id="server-management">
+      <h2>Manage deployed sites</h2>
+      <p>These commands connect over SSH and work from any directory. They do not need a local site or saved deployment settings. Replace <code>root@example.com</code> with your server login, or omit it to be prompted. The CLI and server must use a compatible protocol.</p>
+
+      <h3 id="server-list"><code>itsy server list</code></h3>
+      <pre tabindex="0" aria-label="List deployed sites"><code class="language-bash">itsy server list [ssh-target]
+
+# Example
+itsy server list root@example.com</code></pre>
+      <p>List registered sites, their names and branches, HTTP and HTTPS domains, redirects, and host indexing policies. This is a read-only inventory of the sites on that server.</p>
+
+      <h3 id="server-remove"><code>itsy server remove</code></h3>
+      <pre tabindex="0" aria-label="Remove a site's routing"><code class="language-bash">itsy server remove [ssh-target] [site-name]
+
+# Choose a site interactively
+itsy server remove root@example.com
+
+# Specify its site name
+itsy server remove root@example.com old-bookshop</code></pre>
+      <p>Take a site offline by unregistering its hostnames. Omit the site name to choose from the server's registered sites. Removal requires typing the exact site name and restarts the shared service, briefly affecting other sites.</p>
+      <p>Every release, content file, media file, session, and certificate stays on disk. Removal does not reclaim storage, and there is no automatic deletion or release-pruning command. If no HTTPS hostnames remain, automatic HTTPS is disabled while cached certificates are kept.</p>
+      <p>Retained content is not restored automatically by deploying the same site name again. Back up or pull the site before removal if you need to preserve its live content for a later deployment.</p>
+
+      <h3 id="server-indexing"><code>itsy server indexing</code></h3>
+      <pre tabindex="0" aria-label="Configure host indexing"><code class="language-bash">itsy server indexing [ssh-target] &lt;hostname&gt; &lt;noindex|allow&gt;
+
+itsy server indexing root@example.com staging.example.com noindex</code></pre>
+      <p>Set a registered hostname to <code>noindex, nofollow</code>, or use <code>allow</code> to add no restriction. Requires typing the exact hostname and restarts the shared service. Policies survive deployment, sync, and rollback. This controls search indexing, not access; see <a href="/docs/seo#indexing">staging and search engines</a>.</p>
+    </section>
+
+    <section id="backups-and-recovery">
+      <h2>Backups and recovery</h2>
+      <p>These commands use this branch's saved deployment destination. See <a href="/docs/recovery">Backups and recovery</a> for the recovery workflow.</p>
+
+      <h3 id="backup"><code>itsy backup</code></h3>
+      <pre tabindex="0" aria-label="Download a backup"><code class="language-bash">itsy backup &lt;backup-file&gt;
+
+itsy backup ../bookshop.itsy-backup</code></pre>
+      <p>Download a backup of the active code, configuration, CSS, Blog posts, and cover photos. Credentials, certificates, sessions, and custom app storage are excluded. The output file must not already exist. Keep it outside the site folder.</p>
+
+      <h3 id="rollback"><code>itsy rollback</code></h3>
+      <pre tabindex="0" aria-label="List or select a code release"><code class="language-bash">itsy rollback [--list] [release-id]</code></pre>
+      <p>Use <code>--list</code> to inspect retained releases. Without an ID, rollback selects the preceding release; supply an ID to select a particular one. After confirmation, it restores that release's code and CSS while keeping current live Blog content.</p>
+
+      <h3 id="restore"><code>itsy restore</code></h3>
+      <pre tabindex="0" aria-label="Restore a site backup"><code class="language-bash">itsy restore &lt;backup-file&gt;</code></pre>
+      <p>Replace live code and content with a backup after typed confirmation. Take a fresh backup first if you need to keep newer work. Restore and rollback preserve the server's current host indexing policy.</p>
+    </section>
+
+    <section id="updates">
+      <h2>Versions and updates</h2>
+      <h3 id="version"><code>itsy version</code></h3>
+      <pre tabindex="0" aria-label="Show the installed version"><code class="language-bash">itsy version</code></pre>
+      <p>Show the installed CLI version.</p>
+
+      <h3 id="update"><code>itsy update</code></h3>
+      <pre tabindex="0" aria-label="Update the local CLI"><code class="language-bash">itsy update</code></pre>
+      <p>Download and verify the latest CLI and its bundled Itsy Server binaries. Remote servers and project files are unchanged.</p>
+
+      <h3 id="update-server"><code>itsy update-server</code></h3>
+      <pre tabindex="0" aria-label="Update Itsy Server"><code class="language-bash">itsy update-server [--recover]</code></pre>
+      <p>Update this branch's saved server using the bundled executable, after confirmation. Every site on the host restarts briefly. Configuration, credentials, and site data are preserved; the command does not migrate data formats or change service units.</p>
+      <p><code>--recover</code> restores the executable after an interrupted upgrade. Check <a href="/docs/installation#server-updates">server compatibility and upgrade requirements</a> before updating.</p>
+    </section>
+    <nav class="guide-next" aria-label="Next guide"><a href="/docs/release-notes">Continue to Release notes</a></nav>
+  </article>
+</div>
+<script src="/js/prism.js" defer></script>
+<script src="/js/prism-go.js" defer></script>
+<script src="/js/guides.js" defer></script>
