@@ -449,13 +449,12 @@ Do not claim optional platforms work solely because they cross-compile.
 
 ### 3. Verify the real server workflow
 
-- [ ] Verify socket activation on a disposable Ubuntu server: fresh setup,
-  one-time standard-unit conversion, HTTP/HTTPS requests during deploy/update,
-  failed/interrupted conversion recovery and confirmed reinstall port ownership.
-  Review the shared host's existing GOMEMLIMIT drop-in before conversion; preserve
-  its resource policy. Native user-systemd smoke passed on November 14: HTTP and
-  verified HTTPS returned 200 after queuing through a 600 ms startup delay;
-  temporary units were removed. This does not establish production-unit acceptance.
+- [x] Verify socket activation using native systemd: fresh setup, confirmed
+  reinstall, standard/custom conversion and failed/interrupted recovery passed
+  in an isolated Ubuntu 24.04 container. The shared host was privately converted
+  with its memory policy intact. All 34 hostname checks passed; live HTTP/HTTPS
+  requests queued successfully across a controlled restart. See
+  [verification and remaining limits](socket-activation-verification.md).
 
 - [x] Obtain the disposable target, SSH identity, test domain/DNS and mail setup
   when needed. Keep credentials outside repository documents.
