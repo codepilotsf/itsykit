@@ -150,7 +150,9 @@ config. Setup transmits them to the privileged deployment transaction, which
 validates source ownership and final registered targets and reconciles only the
 selected site's rules. Host routing interprets the resulting validated map
 generically; no site-specific domain policy belongs in server code. Recovery
-retains current routing. See [deployment](deployment.md#domain-redirects).
+retains current routing. Omitted policy cannot clear existing custom redirects;
+the transaction rejects it before staging. An explicit empty map removes the
+last rule. See [deployment](deployment.md#domain-redirects).
 
 Build with scripts/build.sh, serially refreshing Contact and both embedded Linux
 servers before the CLI. Self-update verifies bounded platform/checksum downloads

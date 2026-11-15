@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -233,6 +234,17 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 			name := filepath.Base(filepath.Dir(filepath.Dir(root)))
 			if owner := c.SiteBranches[name]; owner != "" && owner != o.Branch {
 				return "", fmt.Errorf("hostname %s belongs to branch %s", domain, owner)
+			}
+		}
+	}
+	// Omission from an older client is not an explicit request to remove
+	// configured domain redirects. Reject before staging or changing anything.
+	if !o.keepRouting && o.DomainRedirects == nil {
+		parent := filepath.Join(m.DataDir, "sites", o.Name, "releases")
+		for from, to := range c.Redirects {
+			owned := o.Name != "" && filepath.Dir(c.Sites[from]) == parent
+			if from != "www."+to && (owned || slices.Contains(o.Domains, from)) {
+				return "", fmt.Errorf("this site has domain redirects; update your Itsy CLI and deploy with explicit domain_redirects settings before changing its routing")
 			}
 		}
 	}

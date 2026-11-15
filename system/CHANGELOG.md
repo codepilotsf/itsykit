@@ -6,6 +6,10 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Reject deployments that omit domain redirect settings when the selected site
+  has active custom redirects. Stale clients/configs cannot silently clear them;
+  an explicit empty `domain_redirects` object removes the final rule.
+
 - Declare domain redirects in `itsy.config.json` under each deployment branch's
   `domain_redirects` setting. Validate source ownership, reconcile additions and
   removals on deployment, and preserve other sites' routing. HTTP 308 retains
