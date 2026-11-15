@@ -1,6 +1,6 @@
 # Working on this ItsyKit site
 
-This is `website/` in the combined ItsyWeb CP Git repository. The CLI/server
+This is `website/` in the combined ItsyKit GitHub repository. The CLI/server
 source and generated starter live in sibling `../system/`. Paths in this
 guide are relative to `website/`; run `itsy` site commands here. Commit changes
 explicitly before deployment because the site is inside a larger repository.
