@@ -28,7 +28,7 @@ type DeploySettings struct {
 	Email           string            `json:"email"`
 	AgreeTOS        bool              `json:"agree_tos"`
 	WWWRedirect     bool              `json:"www_redirect"`
-	DomainRedirects map[string]string `json:"domain_redirects,omitempty"`
+	DomainRedirects map[string]string `json:"domain_redirects,omitzero"`
 	ExpectedIPs     []string          `json:"expected_ips,omitempty"`
 	Branch          string            `json:"-"`
 }
@@ -319,7 +319,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		}
 	}
 	text += " -name " + shellQuote(s.Name) + " -domain " + shellQuote(strings.Join(opts.Domains, ","))
-	if len(opts.DomainRedirects) > 0 {
+	if opts.DomainRedirects != nil {
 		rules, err := json.Marshal(opts.DomainRedirects)
 		if err != nil {
 			return err

@@ -24,7 +24,9 @@ do not include this change yet.
 The unreleased CLI and server also support permanent domain redirects declared
 in `itsy.config.json` under each branch's `domain_redirects` deployment setting.
 Deployment validates source ownership and reconciles the selected site's rules,
-including removals. Paths and queries are preserved. Public 0.22.0 does not
+including explicit removals. Deployments that omit redirect settings are rejected
+when custom rules are active, protecting them from stale clients and configs.
+Paths and queries are preserved. Public 0.22.0 does not
 support this setting. See [domain redirects](docs/agents/deployment.md#domain-redirects)
 for configuration and rollout requirements.
 

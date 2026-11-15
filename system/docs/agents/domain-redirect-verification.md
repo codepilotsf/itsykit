@@ -56,3 +56,27 @@ covered all 35 live hostnames before installation. After activation:
 Private pre/post host configs and detailed verification records are retained in
 `~/.local/state/itsykit-config-redirects-95pbj3cb/`. See the
 [deployment guide](deployment.md#domain-redirects) for future config changes.
+
+## Stale deployment regression and repair
+
+After the initial verification, a separate website deployment of `1196741`
+activated revision `20261115-012614-fbc134f732ea1bfca7135dd7`. Its older config
+omitted `domain_redirects`, which the first implementation treated as removal.
+The owner's report was reproduced: HTTPS on `itsyweb.dev` returned 200, while
+HTTP redirected to HTTPS on the old hostname.
+
+The current branch config was reapplied through `itsy https`, restoring the
+redirect at revision `20261115-012808-3f49f0719198cbe1ed54553a` while preserving
+the newer deployed website content. Fix `19a0f8a` makes missing/null redirect
+settings fail before staging whenever the selected site has custom redirects.
+An explicit empty map clears the final rule; the CLI transmits and preserves
+that distinction when saving config. No site-specific server rule was added.
+
+The fix passed the full tests, race suite, vet and canonical build and was
+installed through normal `itsy update-server`. The resulting Linux AMD64 server
+SHA-256 is `d7d76d78e311da24b62c3707f31bdbcbb5441b6cc418bd0304e248ee58e51d79`.
+All installed-site readiness checks passed. An actual HTTPS administration
+request omitting redirect settings was then rejected with the expected explicit
+configuration error. Host config bytes and service PID were unchanged by that
+rejected request. Detailed evidence is in the private artifact directory's
+`stale-deployment-guard/live-guard-verification.json`.

@@ -151,8 +151,12 @@ server ownership checks both apply. A branch cannot claim another branch's
 source domain or replace another site's routing.
 
 Ordinary deploy and `itsy https` reconcile the selected site's redirect rules
-from this configuration. Removing a rule removes its deployed redirect;
-unrelated sites' rules survive. A default WWW redirect goes directly to the
+from this configuration. Removing a rule entry removes its deployed redirect;
+to remove the last rule, retain an explicit `"domain_redirects": {}`. An absent
+or null setting is not permission to clear active custom redirects: activation
+fails before mutation and asks for a current CLI and explicit configuration.
+This also blocks stale configurations and clients that omit the new setting.
+Unrelated sites' rules survive. A default WWW redirect goes directly to the
 primary domain's configured final destination, while an explicit rule wins over
 the WWW preference. Code rollback and content restore retain the current routing
 policy. Site removal clears rules touching the removed hosts. The server's

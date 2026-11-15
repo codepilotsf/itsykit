@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -184,7 +185,7 @@ func TestDeploymentReconcilesDomainRedirects(t *testing.T) {
 		t.Fatal("default WWW rule introduced a chain")
 	}
 	// Removing declarations removes only this site's redirects, including aliases.
-	old.DomainRedirects = nil
+	old.DomainRedirects = map[string]string{}
 	if _, err := m.Apply(context.Background(), old); err != nil {
 		t.Fatal(err)
 	}
@@ -196,7 +197,7 @@ func TestDeploymentReconcilesDomainRedirects(t *testing.T) {
 		t.Fatal("configuration removal did not reconcile only the owning site", c.Redirects)
 	}
 	// A rule for an alias omitted from the domain list is removed as well.
-	current.DomainRedirects = nil
+	current.DomainRedirects = map[string]string{}
 	current.Domains = []string{"current.test"}
 	if _, err := m.Apply(context.Background(), current); err != nil {
 		t.Fatal(err)
@@ -207,6 +208,41 @@ func TestDeploymentReconcilesDomainRedirects(t *testing.T) {
 	}
 	if c.Redirects["alias.test"] != "" || c.Redirects["www.old.test"] != "old.test" {
 		t.Fatal(c.Redirects)
+	}
+}
+
+func TestDomainRedirectOmissionFailsBeforeMutation(t *testing.T) {
+	for _, httpsOnly := range []bool{false, true} {
+		t.Run(fmt.Sprint("httpsOnly=", httpsOnly), func(t *testing.T) {
+			m, o := fixture(t)
+			target := o
+			target.Name = "current"
+			target.Domains = []string{"current.test"}
+			if _, err := m.Apply(context.Background(), target); err != nil {
+				t.Fatal(err)
+			}
+			o.DomainRedirects = map[string]string{"example.test": "current.test"}
+			if _, err := m.Apply(context.Background(), o); err != nil {
+				t.Fatal(err)
+			}
+			before, err := os.ReadFile(m.ConfigPath)
+			if err != nil {
+				t.Fatal(err)
+			}
+			o.DomainRedirects = nil // An old client cannot declare routing intent.
+			if httpsOnly {
+				o.Archive = ""
+				o.HTTPS, o.Email, o.AgreeTOS = true, "dev@example.test", true
+			}
+			m.Restart = func(context.Context) error { t.Fatal("omitted settings reached activation"); return nil }
+			if _, err := m.Apply(context.Background(), o); err == nil || !strings.Contains(err.Error(), "update your Itsy CLI") {
+				t.Fatal("old client silently removed a configured redirect", err)
+			}
+			after, err := os.ReadFile(m.ConfigPath)
+			if err != nil || string(before) != string(after) {
+				t.Fatal("omitted settings changed host config", err)
+			}
+		})
 	}
 }
 
