@@ -16,20 +16,23 @@ import (
 	"itsy/internal/state"
 )
 
-// Upgrader swaps only the executable, not service policy or site data. The new
-// executable must validate the complete installed configuration before mutation.
+// Upgrader validates and swaps the executable without changing site data.
+// System upgrades also convert the exact original service to socket activation,
+// with the one-time conversion covered by the same recovery journal.
 type Upgrader struct {
 	Manager  Manager
 	Binary   string
 	Validate func(context.Context, string) error
+	sockets  *socketUpgrade
 }
 type upgradeJournal struct {
-	OldSHA string `json:"old_sha256"`
-	NewSHA string `json:"new_sha256"`
+	OldSHA          string `json:"old_sha256"`
+	NewSHA          string `json:"new_sha256"`
+	SocketMigration bool   `json:"socket_activation,omitempty"`
 }
 
 func SystemUpgrader() Upgrader {
-	return Upgrader{Manager: System(), Binary: "/usr/local/bin/flea-server", Validate: func(ctx context.Context, path string) error {
+	return Upgrader{Manager: System(), Binary: "/usr/local/bin/flea-server", sockets: systemSocketUpgrade(), Validate: func(ctx context.Context, path string) error {
 		output, err := exec.CommandContext(ctx, path, "-validate", "-config", "/etc/flea/server.json").CombinedOutput()
 		if err != nil {
 			return fmt.Errorf("new server cannot load installed sites: %w: %s", err, output)
@@ -117,15 +120,27 @@ func (u Upgrader) Upgrade(ctx context.Context, candidate, expected string) error
 	if err != nil {
 		return err
 	}
+	migrateSockets := false
+	if u.sockets != nil {
+		migrateSockets, err = u.sockets.prepare(ctx, c)
+		if err != nil {
+			return err
+		}
+	}
 	if err = atomicWrite(u.previous(), old, 0700); err != nil {
 		return err
 	}
-	journal, _ := json.Marshal(upgradeJournal{binaryHash(old), binaryHash(next)})
+	journal, _ := json.Marshal(upgradeJournal{OldSHA: binaryHash(old), NewSHA: binaryHash(next), SocketMigration: migrateSockets})
 	if err = atomicWrite(upgradePending(u.Manager.ConfigPath), journal, 0600); err != nil {
 		return err
 	}
 	if err = atomicWrite(u.Binary, next, 0755); err == nil {
-		err = u.Manager.Restart(ctx)
+		if migrateSockets {
+			err = u.sockets.apply(ctx)
+		}
+		if err == nil {
+			err = u.Manager.Restart(ctx)
+		}
 		if err == nil {
 			err = u.Manager.Verify(ctx, c, allDomains(c))
 		}
@@ -184,6 +199,14 @@ func (u Upgrader) recoverLocked(ctx context.Context) error {
 	hash := binaryHash(current)
 	if hash != journal.OldSHA && hash != journal.NewSHA {
 		return fmt.Errorf("server changed independently; recovery stopped")
+	}
+	if journal.SocketMigration {
+		if u.sockets == nil {
+			return fmt.Errorf("socket activation recovery requires the installed system upgrader")
+		}
+		if err = u.sockets.restore(ctx); err != nil {
+			return err
+		}
 	}
 	if err = atomicWrite(u.Binary, previous, 0755); err != nil {
 		return err

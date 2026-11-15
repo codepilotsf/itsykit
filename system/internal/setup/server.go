@@ -307,6 +307,6 @@ func printSiteReview(out io.Writer, target string, info admin.SiteSummary) {
 	if info.Retained != "" {
 		fmt.Fprintf(out, "Retained files: %s\n", info.Retained)
 	}
-	fmt.Fprintln(out, "\nThis only unregisters routing; it deletes no files. Releases, content, media,\nsessions and certificates stay on disk. Removal rewrites the shared server\nconfig and restarts the service, so other sites are briefly unavailable. When no\nHTTPS hostnames remain afterwards, automatic HTTPS is disabled; cached\ncertificates stay on disk.")
+	fmt.Fprintln(out, "\nThis only unregisters routing; it deletes no files. Releases, content, media,\nsessions and certificates stay on disk. Removal rewrites the shared server\nconfig and restarts the service. With socket activation, new connections queue\nthrough the restart; other installations are briefly unavailable. When no\nHTTPS hostnames remain afterwards, automatic HTTPS is disabled; cached\ncertificates stay on disk.")
 	fmt.Fprintln(out, "\nRetained files are not restored automatically. Re-deploying the same site name\nstarts from the current project and cannot recover content left behind. Back it\nup or pull it before removing the site if a later deployment must keep it.")
 }

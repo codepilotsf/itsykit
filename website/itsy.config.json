@@ -27,7 +27,11 @@
         "https": true,
         "email": "sean@codepilot.com",
         "agree_tos": true,
-        "www_redirect": true
+        "www_redirect": true,
+        "domain_redirects": {
+          "fleacms.com": "itsykit.dev",
+          "www.fleacms.com": "itsykit.dev"
+        }
       },
       "t3/reframe-flea-html-focus": {
         "target": "root@fleacms.com",
@@ -36,7 +40,10 @@
         "https": true,
         "email": "sean@codepilot.com",
         "agree_tos": true,
-        "www_redirect": false
+        "www_redirect": false,
+        "domain_redirects": {
+          "itsyweb.dev": "itsykit.dev"
+        }
       }
     }
   }

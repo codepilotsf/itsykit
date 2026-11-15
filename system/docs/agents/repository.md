@@ -22,6 +22,11 @@ ordering, and review follow-ups. Keep it current when those responsibilities cha
 - `internal/host/indexing.go`: exact-host indexing enforcement and static crawl diagnostics.
 - `internal/admin/indexing.go` and `internal/setup/indexing.go`: reviewed SSH host-policy changes and inspection.
 - `internal/setup/`: interactive SSH bootstrap, installer, and systemd unit.
+- `internal/serverunit/`: canonical systemd service/socket units shared by setup
+  and updates, plus the exact original service for one-time conversion/recovery.
+- `internal/host/activation.go`: strict systemd listener handoff for managed serving.
+- `internal/admin/socket_upgrade.go`: journal-covered conversion of the standard
+  original service to socket activation; never overwrites customized units.
 - `internal/serverbundle/`: compressed embedded Linux servers and verified extraction.
 - `internal/setup/deploy.go`: native SSH/SCP deployment and local deployment settings.
 - `internal/release/`: bounded, confined runtime-only archive packing and extraction.

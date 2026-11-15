@@ -6,6 +6,18 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Declare domain redirects in `itsy.config.json` under each deployment branch's
+  `domain_redirects` setting. Validate source ownership, reconcile additions and
+  removals on deployment, and preserve other sites' routing. HTTP 308 retains
+  escaped paths and queries; unknown hosts, self-redirects and chains are rejected.
+
+- Keep HTTP and HTTPS listening ports open across server restarts with systemd
+  socket activation. New connections queue during site deployments and executable
+  updates. Setup installs both units; update-server converts the standard original
+  service once, with journaled recovery. Customized units require manual review.
+  The first conversion briefly interrupts connections; slow restarts, full queues
+  and requests exceeding the shutdown deadline can still fail.
+
 ## 0.22.0 - 2026-11-14
 
 - Remove the page CMS, snips/extraction, collections and page media/metadata editing.

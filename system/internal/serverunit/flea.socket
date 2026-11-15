@@ -1,0 +1,12 @@
+[Unit]
+Description=ItsyWeb HTTP and HTTPS sockets
+
+[Socket]
+ListenStream=80
+ListenStream=443
+BindIPv6Only=both
+Accept=no
+FlushPending=no
+
+[Install]
+WantedBy=sockets.target

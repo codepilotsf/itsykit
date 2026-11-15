@@ -19,6 +19,9 @@ func downloadFixture(t *testing.T) string {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := os.Chmod(root, 0700); err != nil {
+		t.Fatal(err)
+	}
 	dir := filepath.Join(root, "0.7.0")
 	if err := os.Mkdir(dir, 0755); err != nil {
 		t.Fatal(err)

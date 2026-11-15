@@ -12,6 +12,22 @@ It requires protocol 30. Existing page-CMS sites must be explicitly converted
 with verified backups before upgrading their shared server; there is no automatic
 conversion. Blog posts, cover photos and ordinary source CSS remain supported.
 
+The unreleased source uses systemd socket activation on managed servers: new
+connections wait through deployment and server restarts while ports 80/443 stay
+open. Setup installs the socket unit, and `itsy update-server` converts an
+unmodified original service once. The first conversion briefly closes the ports;
+custom service units and overrides need manual review. This reduces disruption,
+but long restarts, full queues and long-running requests can still cause errors.
+See [server upgrades](docs/recovery.md#server-upgrades). Public 0.22.0 downloads
+do not include this change yet.
+
+The unreleased CLI and server also support permanent domain redirects declared
+in `itsy.config.json` under each branch's `domain_redirects` deployment setting.
+Deployment validates source ownership and reconciles the selected site's rules,
+including removals. Paths and queries are preserved. Public 0.22.0 does not
+support this setting. See [domain redirects](docs/agents/deployment.md#domain-redirects)
+for configuration and rollout requirements.
+
 ## Source layout
 
 This guide describes `system/` in the combined ItsyWeb repository. Run its
@@ -1049,9 +1065,10 @@ remain configured. A hostname already assigned to another site is refused.
 Omitting a previous alias does not delete it. Changing aliases/removing sites is
 currently a manual host configuration task.
 
-There is a brief interruption while the single service restarts. If activation
-or certificate verification fails, ItsyWeb restores the previous configuration
-and restarts it. Concurrent operations are locked. Prior releases are retained,
+On socket-activated installations, new connections queue while the single service
+restarts; older direct-binding installations briefly close their ports. If
+activation or certificate verification fails, ItsyWeb restores the previous
+configuration and restarts it. Concurrent operations are locked. Prior releases are retained,
 and the previous successful configuration is saved as
 `/etc/flea/server.previous.json`. Failed staged releases are retained too;
 automatic pruning and a user-facing rollback command remain future work.
@@ -1188,13 +1205,16 @@ servers from the same source. Plain `go build` does not refresh embedded servers
 and is not the supported installation build. See [RELEASING.md](docs/agents/releasing.md).
 
 Setup installs `/usr/local/bin/flea-server`, `/etc/flea/server.json`, and
-`/etc/systemd/system/flea.service`. It creates a dedicated non-login `flea`
-account and `/var/lib/flea`. The service starts at boot and restarts on failure.
+`/etc/systemd/system/flea.service` and `flea.socket`. It creates a dedicated
+non-login `flea` account and `/var/lib/flea`. Both units start at boot; systemd
+keeps the web listeners open across service restarts. The server inherits them
+without a low-port bind capability. The service restarts on failure.
 Setup verifies systemd activity and HTTP readiness before reporting success.
 Before changing the server, the installer checks TCP and UDP ports 80 and 443
 on IPv4 and IPv6. It refuses occupied ports unless every listener is verified as
-the existing ItsyWeb systemd main process during a confirmed reinstall. Unknown
-process owners or failed port checks also stop installation; other services are never stopped.
+the existing ItsyWeb systemd main process or its verified canonical systemd socket
+unit during a confirmed reinstall. Unknown process owners or failed port checks
+also stop installation; other services are never stopped.
 
 Setup connects as root; enter just the hostname or IP. When the server binary
 and configuration already exist, it warns that all sites will go offline and
@@ -1308,10 +1328,10 @@ the managed sites installed on the server and enter one by its exact name.
 It only stops routing:
 site files stay under `/var/lib/flea/sites/<name>` and cached certificates stay
 under `/var/lib/flea/certs`. Removal rewrites the shared server config and
-restarts the service, so other sites are briefly unavailable; their routing and
-settings are preserved, except that when no HTTPS hostnames remain afterwards,
-automatic HTTPS is disabled while cached certificates stay on disk. Retained
-files are not restored automatically: re-deploying the same site name starts from
+restarts the service; new connections queue on socket-activated installations.
+Other sites' routing and settings are preserved, except that when no HTTPS
+hostnames remain afterwards, automatic HTTPS is disabled while cached certificates
+stay on disk. Retained files are not restored automatically: re-deploying the same site name starts from
 the current project and cannot recover content left behind, so back up or pull
 the site first if a later deployment must keep its current content. An interrupted
 removal is recovered with `sudo flea-server -recover`. Both commands reject
