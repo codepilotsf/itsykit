@@ -21,10 +21,10 @@ description: Build simple websites in familiar HTML and CSS. Itsy covers local d
       <section class="demo-stage" id="example-html" aria-labelledby="view-html" data-tab-panel>
         <div class="demo-pane source-pane">
           <div class="pane-bar example-source-bar">{icon file}<span data-example-file>site/index.html</span><button class="demo-replay" type="button" hidden data-demo-replay>Replay</button></div>
-          <pre class="source-code" tabindex="0" aria-label="Example page HTML"><code data-demo-source><span class="syntax-tag">&lt;main&gt;</span>
+          <pre class="source-code" tabindex="0" aria-label="Example page HTML"><code data-demo-source>&#123;render /navigation&#125;
+<span class="syntax-tag">&lt;main&gt;</span>
   <span class="syntax-tag">&lt;h1&gt;</span><span data-example-source>Hello, web.</span><span class="syntax-tag">&lt;/h1&gt;</span>
   <span class="syntax-tag">&lt;p&gt;</span><span data-example-source-description>A small site, simply made.</span><span class="syntax-tag">&lt;/p&gt;</span>
-  &#123;render /navigation&#125;
   <span class="syntax-tag">&lt;footer&gt;</span>
     <span class="syntax-tag">&lt;small&gt;</span>Made with Itsy.<span class="syntax-tag">&lt;/small&gt;</span>
   <span class="syntax-tag">&lt;/footer&gt;</span>
@@ -33,13 +33,13 @@ description: Build simple websites in familiar HTML and CSS. Itsy covers local d
         <div class="demo-pane preview-pane" aria-label="Example rendered website">
           <div class="pane-bar preview-bar"><span class="preview-address" data-example-address>http://localhost:3000</span></div>
           <div class="example-page">
-            <p class="example-title" data-example-title>Hello, web.</p>
-            <p class="example-description" data-example-description>A small site, simply made.</p>
             <nav class="example-links" aria-label="Example website pages">
               <button type="button" disabled data-example-page="home" aria-current="page">Home</button>
               <button type="button" disabled data-example-page="about">About</button>
               <button type="button" disabled data-example-page="contact">Contact</button>
             </nav>
+            <p class="example-title" data-example-title>Hello, web.</p>
+            <p class="example-description" data-example-description>A small site, simply made.</p>
             <footer class="example-footer"><small>Made with Itsy.</small></footer>
           </div>
         </div>
@@ -49,10 +49,10 @@ description: Build simple websites in familiar HTML and CSS. Itsy covers local d
         <div class="demo-pane source-pane">
           <div class="pane-bar example-source-bar">{icon file}<span>site/index.html</span><button class="demo-replay" type="button" hidden data-demo-replay>Replay</button></div>
           <div class="demo-command"><code><span class="syntax-tag">$</span> itsy dev</code><span>localhost:3000</span></div>
-          <pre class="source-code" tabindex="0" aria-label="Save an HTML edit to reload the local preview"><code><span class="syntax-tag">&lt;main&gt;</span>
+          <pre class="source-code" tabindex="0" aria-label="Save an HTML edit to reload the local preview"><code>&#123;render /navigation&#125;
+<span class="syntax-tag">&lt;main&gt;</span>
   <span class="syntax-tag">&lt;h1&gt;</span><span data-edit-title><span data-edit-value>Hello, again.</span></span><span class="syntax-tag">&lt;/h1&gt;</span>
   <span class="syntax-tag">&lt;p&gt;</span>A small site, simply made.<span class="syntax-tag">&lt;/p&gt;</span>
-  &#123;render /navigation&#125;
   <span class="syntax-tag">&lt;footer&gt;</span>
     <span class="syntax-tag">&lt;small&gt;</span>Made with Itsy.<span class="syntax-tag">&lt;/small&gt;</span>
   <span class="syntax-tag">&lt;/footer&gt;</span>
@@ -62,9 +62,9 @@ description: Build simple websites in familiar HTML and CSS. Itsy covers local d
         <div class="demo-pane preview-pane" aria-label="Example live-reloading website">
           <div class="pane-bar preview-bar"><span class="preview-address">http://localhost:3000</span></div>
           <div class="example-page" data-develop-preview>
+            <nav class="example-links" aria-label="Local example website pages"><span>Home</span><span>About</span><span>Contact</span></nav>
             <p class="example-title" data-develop-title>Hello, again.</p>
             <p class="example-description">A small site, simply made.</p>
-            <nav class="example-links" aria-label="Local example website pages"><span>Home</span><span>About</span><span>Contact</span></nav>
             <footer class="example-footer"><small>Made with Itsy.</small></footer>
           </div>
         </div>
@@ -84,9 +84,9 @@ description: Build simple websites in familiar HTML and CSS. Itsy covers local d
         <div class="demo-pane preview-pane" aria-label="Example published website">
           <div class="pane-bar preview-bar"><span class="publish-lock" data-publish-lock>{icon lock-keyhole}</span><span class="preview-address" data-publish-address>https://example.com</span></div>
           <div class="example-page" data-publish-preview>
+            <nav class="example-links" aria-label="Published example website pages"><span>Home</span><span>About</span><span>Contact</span></nav>
             <p class="example-title">Hello, again.</p>
             <p class="example-description">A small site, simply made.</p>
-            <nav class="example-links" aria-label="Published example website pages"><span>Home</span><span>About</span><span>Contact</span></nav>
             <footer class="example-footer"><small>Made with Itsy.</small></footer>
           </div>
         </div>
@@ -130,9 +130,9 @@ Edit the HTML and CSS in `site/`.</code></pre>
       </div>
       <div class="agent-file" id="index-file" aria-labelledby="file-index" data-tab-panel>
         <div class="pane-bar">{icon file}<span>site/index.html</span></div>
-        <pre tabindex="0" aria-label="Example index page"><code>&lt;h1&gt;Hello, web.&lt;/h1&gt;
-&lt;p&gt;A small website, in plain HTML.&lt;/p&gt;
-&#123;render /navigation&#125;</code></pre>
+        <pre tabindex="0" aria-label="Example index page"><code>&#123;render /navigation&#125;
+&lt;h1&gt;Hello, web.&lt;/h1&gt;
+&lt;p&gt;A small website, in plain HTML.&lt;/p&gt;</code></pre>
       </div>
     </div>
     <div class="agent-explanation">

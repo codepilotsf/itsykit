@@ -45,7 +45,7 @@
   .example-title { margin:0 0 12px; font-size:2rem; line-height:1.2; letter-spacing:-.035em; font-weight:700; }
   .example-description { margin:0 0 20px; font-size:1rem; line-height:1.6; color:var(--darker); }
   .example-footer { margin-top:28px; color:var(--dark); font-size:.85rem; }
-  .example-links { display:flex; flex-wrap:wrap; gap:22px; }
+  .example-links { display:flex; flex-wrap:wrap; gap:22px; margin-bottom:20px; }
   .example-links button,.example-links > span { display:inline; min-height:28px; margin:0; padding:0; border:0; border-radius:0; background:none; color:#174fc7; font:inherit; font-size:1rem; font-weight:400; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
   .example-links > span { cursor:default; }
   .example-links button:hover:not(:disabled) { color:var(--black); filter:none; }
