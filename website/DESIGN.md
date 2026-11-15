@@ -94,7 +94,7 @@ Actions and hero view controls use the default radius. Large demonstrations use 
 
 **Code panes:** the hero demonstration uses a single outer frame with adjoining source and result panes, without nested card borders or decorative window dots. Source remains scrollable with a filename or terminal label. Syntax accents are restrained and line numbers are decorative. Copy controls use a 44px target and announce success through the shared copy script.
 
-**Example preview:** native HTML, clearly labeled as an example. The eight-line source places shared navigation before `<main>`, which contains the heading, description and footer. All three rendered previews show navigation above the page content. Its local buttons change both the source and the preview without navigating the visitor away. The displayed port follows Itsy's actual default. The filename bar stays clear of playback controls.
+**Example preview:** native HTML, clearly labeled as an example. The ten-line source wraps shared navigation in `<header>` before `<main>`, which contains the heading, description and footer. All three rendered previews show navigation above the page content. Its local buttons change both the source and the preview without navigating the visitor away. The displayed port follows Itsy's actual default. The filename bar stays clear of playback controls.
 
 **File tabs:** selected filenames use pale blue. Desktop arrow navigation is vertical, matching the file tree; phone navigation is horizontal, matching its reflow.
 
