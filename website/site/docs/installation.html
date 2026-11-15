@@ -9,27 +9,27 @@ description: Install the CLI once, then use it to create, preview, and publish y
   <article class="docs-content">
     <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
-      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <a class="guide-breadcrumb" href="/docs">Itsy Guides</a>
       <h1>Installation and updates</h1>
       <p>Install the CLI once, then use it to create, preview, and publish your sites.</p>
     </header>
 
 <section id="installation">
   <h2>Install</h2>
-<p>Downloads support Apple Silicon macOS and x86-64 Linux.</p><div class="copy-code"><pre tabindex="0" aria-label="Install ItsyWeb"><code class="language-bash">curl -fsSL https://itsyweb.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div><p>Run this command in Bash or Zsh. It checks the download and installs <code>itsy</code> in <code>~/.local/bin</code>. The installer configures PATH in your shell's startup files, preserving their existing contents. <strong>Open a new terminal when it finishes</strong>, then <a href="/docs#create-a-site">create your first site</a>. To keep using this terminal, run the optional PATH command printed by the installer.</p>
-<p>For a different directory, run <code>export ITSY_INSTALL_DIR="/absolute/path"</code> first. For other shells or startup files the installer cannot update, follow its diagnostic to finish setup. No Go, Node, or database is needed to run ItsyWeb.</p>
-<p>You can also download the <a href="https://itsyweb.dev/releases/0.22.0/itsy-darwin-arm64">Mac binary</a>, <a href="https://itsyweb.dev/releases/0.22.0/itsy-linux-amd64">Linux binary</a>, and <a href="https://itsyweb.dev/releases/0.22.0/SHA256SUMS">checksums</a> directly.</p>
+<p>Downloads support Apple Silicon macOS and x86-64 Linux.</p><div class="copy-code"><pre tabindex="0" aria-label="Install Itsy"><code class="language-bash">curl -fsSL https://itsykit.dev/install.sh | bash</code></pre><button type="button" class="copy-button" aria-label="Copy the install command"><span class="copy-icon-default" aria-hidden="true">{icon copy}</span><span class="copy-icon-done" aria-hidden="true">{icon check}</span></button></div><p>Run this command in Bash or Zsh. It checks the download and installs <code>itsy</code> in <code>~/.local/bin</code>. The installer configures PATH in your shell's startup files, preserving their existing contents. <strong>Open a new terminal when it finishes</strong>, then <a href="/docs#create-a-site">create your first site</a>. To keep using this terminal, run the optional PATH command printed by the installer.</p>
+<p>For a different directory, run <code>export ITSY_INSTALL_DIR="/absolute/path"</code> first. For other shells or startup files the installer cannot update, follow its diagnostic to finish setup. No Go, Node, or database is needed to run Itsy.</p>
+<p>You can also download the <a href="https://itsykit.dev/releases/0.22.0/itsy-darwin-arm64">Mac binary</a>, <a href="https://itsykit.dev/releases/0.22.0/itsy-linux-amd64">Linux binary</a>, and <a href="https://itsykit.dev/releases/0.22.0/SHA256SUMS">checksums</a> directly.</p>
 <p>0.22.0 is the current public test release. The Mac binary is ad-hoc signed, not notarized; clean-machine testing remains in progress.</p>
 </section>
 
 <section id="updates">
   <h2>Update the CLI</h2>
-<pre tabindex="0" aria-label="Update ItsyWeb"><code class="language-bash">itsy update</code></pre><p>This updates your local command and bundled servers. It leaves your project files intact.</p>
+<pre tabindex="0" aria-label="Update Itsy"><code class="language-bash">itsy update</code></pre><p>This updates your local command and bundled Itsy Server binaries. It leaves your project files intact.</p>
 </section>
 
 <section id="server-updates">
-  <h2>Update an existing server</h2>
-<p>From a site with that server saved as its deployment destination, run:</p><pre tabindex="0" aria-label="Update the shared server"><code class="language-bash">itsy update-server</code></pre><p>This is separate from a CLI update. It asks before briefly restarting every site on the host. Comment metadata and Blog-only storage require server protocol 30, supplied by 0.22.0. Existing page-CMS sites must first be explicitly converted with verified backups; the server upgrade validates all installed sites and does not convert them.</p>
+  <h2>Update Itsy Server</h2>
+<p>From a site with that server saved as its deployment destination, run:</p><pre tabindex="0" aria-label="Update Itsy Server"><code class="language-bash">itsy update-server</code></pre><p>This is separate from a CLI update. It asks before updating Itsy Server and briefly restarting every site on the host. Comment metadata and Blog-only storage require server protocol 30, supplied by 0.22.0. Existing page-CMS sites must first be explicitly converted with verified backups; the Itsy Server upgrade validates all installed sites and does not convert them.</p>
 </section>
 
 <section id="from-flea">

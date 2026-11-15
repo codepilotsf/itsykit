@@ -24,7 +24,7 @@
   .site-header .ui-button { background:var(--brand-2); color:var(--hero-ink); border-color:var(--brand-2); }
   .site-header > nav { --container-max:1200px; --container-padding:0 var(--page-gutter); min-height:66px; column-gap:16px; }
   .wordmark { display:inline-flex; align-items:center; text-decoration:none; }
-  .itsy-logo { display:block; width:176px; height:auto; max-width:100%; }
+  .itsy-logo { display:block; width:132px; height:auto; max-width:100%; }
   .site-links > a { text-decoration:none; font-size:.85rem; font-weight:600; }
   .site-links { flex-shrink:0; }
   ::selection { background:var(--accent); color:var(--black); }
@@ -78,7 +78,7 @@
   }
   @media (max-width:640px) {
     .site-header > nav { min-height:68px; }
-    .itsy-logo { width:141px; height:auto; }
+    .itsy-logo { width:110px; height:auto; }
     .site-links { gap:14px; }
     .site-links .ui-button { padding:10px 12px; min-height:42px; font-size:.75rem; gap:8px; }
     .site-links > a { font-size:.78rem; }
@@ -96,7 +96,7 @@
     .copy-button { top:8px; right:8px; }
   }
   @media (max-width:360px) {
-    .site-header .itsy-logo { width:122px; height:auto; }
+    .site-header .itsy-logo { width:104px; height:auto; }
     .site-header .container { --container-padding:0 16px; }
     .site-links { gap:10px; }
     .site-links .ui-button { padding-inline:10px; }

@@ -1,11 +1,11 @@
-# ItsyWeb
+# ItsyKit
 
-ItsyWeb keeps its Go framework and public website in one repository:
+ItsyKit keeps its Go framework and public website in one repository:
 
 ```text
-itsyweb/
+itsykit/
   system/   Go CLI, server, starter templates and framework documentation
-  website/  Current itsyweb.dev website and public documentation
+  website/  Current itsykit.dev website and public documentation
 ```
 
 - [Framework development and usage](system/README.md)

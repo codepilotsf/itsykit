@@ -69,9 +69,19 @@ for (let j = 0; j < y.length - 1; j++) for (let i = 0; i < x.length - 1; i++) {
 }
 if (!cells.length) throw Error('No selected lettering found');
 const x0 = Math.min(...cells.map(c => c[0])), y0 = Math.min(...cells.map(c => c[1]));
-const w = Math.max(...cells.map(c => c[2])) - x0, h = Math.max(...cells.map(c => c[3])) - y0;
+const h = Math.max(...cells.map(c => c[3])) - y0;
 const pathData = (selection, dx = x0, dy = y0) => selection.map(([a, b, c, d]) => `M${a-dx} ${b-dy}h${c-a}v${d-b}h${a-c}Z`).join('');
-const geometry = pathData(cells);
+// Preserve the approved Itsy letterforms; draw Kit in the same square-step grammar.
+// These are font-independent contours, never a substituted bitmap font.
+const itsy = cells.filter(c => c[2] <= 1105);
+const iw = Math.max(...itsy.map(c => c[2])) - x0;
+const kitX = iw + 18;
+const k = 'M0 0H50V88H73V65H96V42H119V19H142V0H193V42H170V65H147V88H124V111H101V133H124V155H147V177H170V199H193V221H142V199H119V177H96V155H73V133H50V221H0Z';
+const i = 'M0 0H50V47H0ZM0 68H50V221H0Z';
+const tCells = cells.filter(c => c[0] >= 651 && c[2] <= 768);
+const w = kitX + 193 + 18 + 50 + 18 + 117;
+const geometry = pathData(itsy);
+const kitGeometry = `<g transform="translate(${kitX} 0)"><path d="${k}"/><path transform="translate(211 0)" d="${i}"/><path transform="translate(279 0)" d="${pathData(tCells, 651, y0)}"/></g>`;
 const theme = fs.readFileSync('site/css/theme.css', 'utf8');
 const token = name => {
   const found = theme.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`));
@@ -79,22 +89,19 @@ const token = name => {
   return found[1];
 };
 const navy = token('brand-2'), pale = token('hero-ink'), ice = token('accent');
-const svg = (ink, label = 'ItsyWeb') => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-labelledby="title"><title id="title">${label}</title><path fill="${ink}" d="${geometry}"/></svg>\n`;
+const svg = ink => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-labelledby="title"><title id="title">ItsyKit</title><g fill="${ink}"><path d="${geometry}"/>${kitGeometry}</g></svg>\n`;
 fs.writeFileSync('site/images/logo.svg', svg(navy));
 fs.writeFileSync('site/images/logo-light.svg', svg(pale));
 
-// The gap between y and W is explicit in the approved specimen.
-const itsy = cells.filter(c => c[2] <= 1105);
-const iw = Math.max(...itsy.map(c => c[2])) - x0;
 const ih = Math.max(...itsy.map(c => c[3])) - y0;
 const scale = 58 / iw, tx = 3, ty = (64 - ih * scale) / 2;
 fs.writeFileSync('site/images/favicon.svg', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title"><title id="title">Itsy</title><rect width="64" height="64" rx="8" fill="${pale}"/><path fill="${navy}" transform="translate(${tx} ${ty}) scale(${scale})" d="${pathData(itsy)}"/></svg>\n`);
 const provenance = {
-  origin: 'Owner-selected option 5, Small Assembly, using the lettering only; no separate mark.',
+  origin: 'Owner-selected option 5, Small Assembly, renamed ItsyKit with lettering only; no separate mark.',
   source,
-  approval: 'Use number 5 without the mark; retain site theme colours; favicon uses the Itsy lettering.',
-  method: 'Font-independent rectilinear SVG contours reconstructed from long edges of the approved raster lettering. No font substitution or runtime image processing.',
-  bounds: [x0, y0, x0 + w, y0 + h],
+  approval: 'Rename the brand ItsyKit, retain the 8-bit lettering and theme colours, and make the logo a little smaller. Favicon remains Itsy.',
+  method: 'Approved Itsy contours reconstructed from the raster; Kit drawn as matching square-step SVG letterforms, reusing the approved t. No font substitution or runtime image processing.',
+  bounds: [0, 0, w, h],
   itsyBounds: [x0, y0, x0 + iw, y0 + ih],
   size: { width: w, height: h },
   colors: { navy, pale, ice },

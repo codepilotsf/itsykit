@@ -1,11 +1,11 @@
-# Working on this ItsyWeb site
+# Working on this ItsyKit site
 
 This is `website/` in the combined ItsyWeb CP Git repository. The CLI/server
 source and generated starter live in sibling `../system/`. Paths in this
 guide are relative to `website/`; run `itsy` site commands here. Commit changes
 explicitly before deployment because the site is inside a larger repository.
 Preserve both saved branch deployment mappings in `itsy.config.json`; `main`
-targets fleacms.com and `t3/reframe-flea-html-focus` targets itsyweb.dev. This
+targets fleacms.com and `t3/reframe-flea-html-focus` targets itsykit.dev with its existing aliases. This
 repository move does not authorize deploying or changing those mappings.
 
 Read README.md before changing templates. Preserve existing custom layouts,
@@ -46,7 +46,7 @@ ordinary image/video tags and source-controlled assets in site/. Developer CSS
 and theme tokens remain in site/css/. Blog retains its post editor and cover
 uploads; page editing and browser theme controls are removed.
 
-This website requires ItsyWeb 0.22.0 or newer, as described in README.md.
+This website requires Itsy 0.22.0 or newer, as described in README.md.
 Protocol 30 and a matching server are prerequisites for deployment. Existing
 page-CMS sites require an explicitly approved, backed-up conversion first.
 Do not deploy or upgrade a server as part of local maintenance.

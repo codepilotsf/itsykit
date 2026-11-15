@@ -9,14 +9,14 @@ description: Create pages, share markup, and bring JSON data into your HTML.
   <article class="docs-content">
     <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
-      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <a class="guide-breadcrumb" href="/docs">Itsy Guides</a>
       <h1>Pages, layouts and data</h1>
       <p>Create pages, share markup, and bring JSON data into your HTML.</p>
     </header>
 
 <section id="templates">
   <h2>Pages and URLs</h2>
-<p>ItsyWeb turns the HTML files in <code>site/</code> into pages. The file's location determines its URL, so there are no routes to register. The homepage uses <code>index.html</code>, and other page URLs leave off the file extension:</p>
+<p>Itsy turns the HTML files in <code>site/</code> into pages. The file's location determines its URL, so there are no routes to register. The homepage uses <code>index.html</code>, and other page URLs leave off the file extension:</p>
 <div class="directory-tree" aria-label="Site files and their public URLs">
   <div class="directory-tree-heading"><span>Project files</span><span>Public URL</span></div>
   <ul>
@@ -40,7 +40,7 @@ description: Create pages, share markup, and bring JSON data into your HTML.
 
 <section id="layouts">
   <h2>Layouts</h2>
-<p><code>site/main.layout.html</code> supplies the document around each page. Put the shared header, navigation, and footer here so you can update them in one place. ItsyWeb inserts the requested page at <code>&#123;slot&#125;</code>:</p><pre tabindex="0" aria-label="The layout slot"><code class="language-markup">&lt;header&gt;Little Bookshop&lt;/header&gt;
+<p><code>site/main.layout.html</code> supplies the document around each page. Put the shared header, navigation, and footer here so you can update them in one place. Itsy inserts the requested page at <code>&#123;slot&#125;</code>:</p><pre tabindex="0" aria-label="The layout slot"><code class="language-markup">&lt;header&gt;Little Bookshop&lt;/header&gt;
 &lt;main&gt;&#123;slot&#125;&lt;/main&gt;
 &lt;footer&gt;Independent books. Curious readers.&lt;/footer&gt;</code></pre><p>This illustrates the shared pieces. When editing the generated layout, keep its HTML document and shared navigation. Blog’s admin templates retain their own authentication and CSRF controls.</p>
 <p>A page uses <code>main.layout.html</code> automatically. If part of your site needs a different wrapper, create <code>site/shop.layout.html</code> with its own <code>&#123;slot&#125;</code>. Select it with a page settings comment before any markup:</p><pre tabindex="0" aria-label="Select a custom layout"><code class="language-markup">&lt;!-- itsy
@@ -50,7 +50,7 @@ layout: /shop.layout.html
 
 <section id="partials">
   <h2>Partials</h2>
-<p>Use a partial for a piece of HTML that appears in more than one place, such as opening hours or a newsletter sign-up link. Save it in an underscore-prefixed file, such as <code>site/_hours.html</code>. Include it in a page or layout with:</p><pre tabindex="0" aria-label="Render a partial"><code class="language-markup">&#123;render hours&#125;</code></pre><p>The render name leaves off the underscore and <code>.html</code>. ItsyWeb looks beside the template containing the instruction, so <code>&#123;render hours&#125;</code> in a root-level page includes <code>site/_hours.html</code>. For a partial in another folder, use a path from the site root: <code>&#123;render /shared/hours&#125;</code> includes <code>site/shared/_hours.html</code>.</p>
+<p>Use a partial for a piece of HTML that appears in more than one place, such as opening hours or a newsletter sign-up link. Save it in an underscore-prefixed file, such as <code>site/_hours.html</code>. Include it in a page or layout with:</p><pre tabindex="0" aria-label="Render a partial"><code class="language-markup">&#123;render hours&#125;</code></pre><p>The render name leaves off the underscore and <code>.html</code>. Itsy looks beside the template containing the instruction, so <code>&#123;render hours&#125;</code> in a root-level page includes <code>site/_hours.html</code>. For a partial in another folder, use a path from the site root: <code>&#123;render /shared/hours&#125;</code> includes <code>site/shared/_hours.html</code>.</p>
 </section>
 
 <section id="data">
@@ -73,7 +73,7 @@ layout: /shop.layout.html
 <section id="page-details">
   <h2>Page titles and descriptions</h2>
 <p>The page title is used in the browser tab, while the description gives search engines a summary of the page. Each page can have its own values, separate from its visible heading and body text.</p>
-<p>This settings syntax requires ItsyWeb 0.22.0 or newer and server protocol 30.</p>
+<p>This settings syntax requires Itsy 0.22.0 or newer and server protocol 30.</p>
 <p>Put each page's title and description in one leading settings comment, before any markup. If the page uses a custom layout, include that setting in the same comment:</p>
 <pre tabindex="0" aria-label="Visit page settings"><code class="language-markup">&lt;!-- itsy
 title: Visit the bookshop

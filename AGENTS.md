@@ -1,4 +1,4 @@
-# Working on ItsyWeb
+# Working on ItsyKit
 
 This CP Git repository has two sibling projects:
 

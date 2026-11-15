@@ -1,13 +1,13 @@
 {
-  "origin": "Owner-selected option 5, Small Assembly, using the lettering only; no separate mark.",
+  "origin": "Owner-selected option 5, Small Assembly, renamed ItsyKit with lettering only; no separate mark.",
   "source": "design/logo-exploration-20261114/small-assembly.png",
-  "approval": "Use number 5 without the mark; retain site theme colours; favicon uses the Itsy lettering.",
-  "method": "Font-independent rectilinear SVG contours reconstructed from long edges of the approved raster lettering. No font substitution or runtime image processing.",
+  "approval": "Rename the brand ItsyKit, retain the 8-bit lettering and theme colours, and make the logo a little smaller. Favicon remains Itsy.",
+  "method": "Approved Itsy contours reconstructed from the raster; Kit drawn as matching square-step SVG letterforms, reusing the approved t. No font substitution or runtime image processing.",
   "bounds": [
-    526,
-    262,
-    1672,
-    535
+    0,
+    0,
+    980,
+    273
   ],
   "itsyBounds": [
     526,
@@ -16,7 +16,7 @@
     535
   ],
   "size": {
-    "width": 1146,
+    "width": 980,
     "height": 273
   },
   "colors": {

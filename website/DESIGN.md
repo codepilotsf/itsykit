@@ -1,5 +1,5 @@
 ---
-name: ItsyWeb
+name: ItsyKit
 description: Navy and ice, readable HTML, and a complete path from source to HTTPS.
 colors:
   navy: "#142b43"
@@ -47,13 +47,13 @@ components:
     height: "48px"
 ---
 
-# Design system: ItsyWeb
+# Design system: ItsyKit
 
 ## Overview
 
 **Creative North Star: "One simple project, from source to live"**
 
-The approved design uses the 8-bit ItsyWeb vector wordmark without a separate mark, Inter interface typography and the navy/ice identity. Real HTML examples carry the visual focus. Pale reading surfaces separate explanations from the dark source and hosting demonstrations.
+The approved design uses the 8-bit ItsyKit vector wordmark without a separate mark, Inter interface typography and the navy/ice identity. Real HTML examples carry the visual focus. Pale reading surfaces separate explanations from the dark source and hosting demonstrations.
 
 **Key Characteristics:**
 
@@ -94,7 +94,7 @@ Actions and hero view controls use the default radius. Large demonstrations use 
 
 **Code panes:** the hero demonstration uses a single outer frame with adjoining source and result panes, without nested card borders or decorative window dots. Source remains scrollable with a filename or terminal label. Syntax accents are restrained and line numbers are decorative. Copy controls use a 44px target and announce success through the shared copy script.
 
-**Example preview:** native HTML, clearly labeled as an example. The eight-line source shows a heading, description, shared navigation and footer, matching the rendered example. Its local buttons change both the source and the preview without navigating the visitor away. The displayed port follows ItsyWeb's actual default. A 44px Replay control in the filename bar becomes Skip typing during playback.
+**Example preview:** native HTML, clearly labeled as an example. The eight-line source shows a heading, description, shared navigation and footer, matching the rendered example. Its local buttons change both the source and the preview without navigating the visitor away. The displayed port follows Itsy's actual default. A 44px Replay control in the filename bar becomes Skip typing during playback.
 
 **File tabs:** selected filenames use pale blue. Desktop arrow navigation is vertical, matching the file tree; phone navigation is horizontal, matching its reflow.
 
@@ -109,4 +109,4 @@ Actions and hero view controls use the default radius. Large demonstrations use 
 - Do preserve documentation's reading structure and native disclosure.
 - Don't turn the homepage's composition into a requirement for every page.
 - Don't invent benchmarks, customer claims or a public source-repository link.
-- Don't imply that server setup provisions a cloud VM or that a coding agent is embedded in ItsyWeb.
+- Don't imply that server setup provisions a cloud VM or that a coding agent is embedded in Itsy.

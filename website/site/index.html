@@ -1,6 +1,6 @@
 <!-- itsy
 title: Plain HTML. Superpowers included.
-description: Build simple websites in familiar HTML and CSS. ItsyWeb covers local development, server setup, deployment and automatic HTTPS, with instructions for coding agents.
+description: Build simple websites in familiar HTML and CSS. Itsy covers local development, server setup, deployment and automatic HTTPS, with instructions for coding agents.
 -->
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero-inner container">
@@ -26,7 +26,7 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
   <span class="syntax-tag">&lt;p&gt;</span><span data-example-source-description>A small site, simply made.</span><span class="syntax-tag">&lt;/p&gt;</span>
   &#123;render /navigation&#125;
   <span class="syntax-tag">&lt;footer&gt;</span>
-    <span class="syntax-tag">&lt;small&gt;</span>Made with ItsyWeb.<span class="syntax-tag">&lt;/small&gt;</span>
+    <span class="syntax-tag">&lt;small&gt;</span>Made with Itsy.<span class="syntax-tag">&lt;/small&gt;</span>
   <span class="syntax-tag">&lt;/footer&gt;</span>
 <span class="syntax-tag">&lt;/main&gt;</span></code></pre>
         </div>
@@ -40,7 +40,7 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
               <button type="button" disabled data-example-page="about">About</button>
               <button type="button" disabled data-example-page="contact">Contact</button>
             </nav>
-            <footer class="example-footer"><small>Made with ItsyWeb.</small></footer>
+            <footer class="example-footer"><small>Made with Itsy.</small></footer>
           </div>
         </div>
         <div class="demo-caption"><p><strong>Write the page.</strong> Ordinary HTML, with shared pieces where you need them.</p><a href="#example-develop" data-demo-next>See it reload {icon arrow-right}</a></div>
@@ -54,7 +54,7 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
   <span class="syntax-tag">&lt;p&gt;</span>A small site, simply made.<span class="syntax-tag">&lt;/p&gt;</span>
   &#123;render /navigation&#125;
   <span class="syntax-tag">&lt;footer&gt;</span>
-    <span class="syntax-tag">&lt;small&gt;</span>Made with ItsyWeb.<span class="syntax-tag">&lt;/small&gt;</span>
+    <span class="syntax-tag">&lt;small&gt;</span>Made with Itsy.<span class="syntax-tag">&lt;/small&gt;</span>
   <span class="syntax-tag">&lt;/footer&gt;</span>
 <span class="syntax-tag">&lt;/main&gt;</span></code></pre>
           <p class="demo-status" data-develop-status>Saved · browser reloaded</p>
@@ -65,10 +65,10 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
             <p class="example-title" data-develop-title>Hello, again.</p>
             <p class="example-description">A small site, simply made.</p>
             <nav class="example-links" aria-label="Local example website pages"><span>Home</span><span>About</span><span>Contact</span></nav>
-            <footer class="example-footer"><small>Made with ItsyWeb.</small></footer>
+            <footer class="example-footer"><small>Made with Itsy.</small></footer>
           </div>
         </div>
-        <div class="demo-caption"><p><strong>Save a file. See the change.</strong> <a href="/docs/installation">Install ItsyWeb</a> for Apple Silicon Mac or x86-64 Linux, then <code>itsy new my-site</code>.</p><a href="#example-publish" data-demo-next>Take it live {icon arrow-right}</a></div>
+        <div class="demo-caption"><p><strong>Save a file. See the change.</strong> <a href="/docs/installation">Install Itsy</a> for Apple Silicon Mac or x86-64 Linux, then <code>itsy new my-site</code>.</p><a href="#example-publish" data-demo-next>Take it live {icon arrow-right}</a></div>
       </section>
       <section class="demo-stage" id="example-publish" aria-labelledby="view-publish" data-tab-panel>
         <div class="demo-pane source-pane">
@@ -87,7 +87,7 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
             <p class="example-title">Hello, again.</p>
             <p class="example-description">A small site, simply made.</p>
             <nav class="example-links" aria-label="Published example website pages"><span>Home</span><span>About</span><span>Contact</span></nav>
-            <footer class="example-footer"><small>Made with ItsyWeb.</small></footer>
+            <footer class="example-footer"><small>Made with Itsy.</small></footer>
           </div>
         </div>
         <div class="demo-caption"><p><strong>Your site. Your server. HTTPS included.</strong> Bring an Ubuntu server, SSH access and a domain. Point DNS to your server and open ports 80 and 443 for automatic certificates and renewal.</p><a href="/docs/deployment">Setup and deployment {icon arrow-up-right}</a></div>
@@ -125,7 +125,7 @@ description: Build simple websites in familiar HTML and CSS. ItsyWeb covers loca
         <div class="pane-bar">{icon file}<span>AGENTS.md</span></div>
         <pre tabindex="0" aria-label="Illustrative project instructions"><code><span class="syntax-comment"># Coding agent instructions</span>
 
-This is an ItsyWeb project.
+This is an Itsy project.
 Edit the HTML and CSS in `site/`.</code></pre>
       </div>
       <div class="agent-file" id="index-file" aria-labelledby="file-index" data-tab-panel>
@@ -144,12 +144,12 @@ Edit the HTML and CSS in `site/`.</code></pre>
 
 <section class="hosting-section" id="system" aria-labelledby="hosting-title">
   <div class="hosting-grid container">
-    <div class="section-heading"><h2 id="hosting-title">The website still needs to run somewhere.</h2><p>Writing the HTML is only part of the job. ItsyWeb includes the local tools, the web server and the way to deploy. One executable, with no Go, Node or Python runtime or database to install by hand.</p><a class="quiet-link" href="/docs/deployment">Set up and deploy {icon arrow-up-right}</a></div>
+    <div class="section-heading"><h2 id="hosting-title">The website still needs to run somewhere.</h2><p>Writing the HTML is only part of the job. Itsy includes the local tools, Itsy Server and the way to deploy. One executable, with no Go, Node or Python runtime or database to install by hand.</p><a class="quiet-link" href="/docs/deployment">Set up and deploy {icon arrow-up-right}</a></div>
     <dl class="hosting-details">
       <div><dt>Preview as you work</dt><dd><code>itsy dev</code> reloads the browser when you save. Use LAN mode to check the site on your phone.</dd></div>
-      <div><dt>Set up an Ubuntu host</dt><dd>Bring a supported Ubuntu LTS server, SSH access and a domain. <code>itsy setup</code> installs the bundled web server.</dd></div>
-      <div><dt>Deploy a Git branch</dt><dd>Publish committed files over SSH. Branches can have different destinations, and one server can host several sites.</dd></div>
-      <div><dt>Keep HTTPS running</dt><dd>With DNS pointing to your server and ports 80 and 443 open, ItsyWeb requests and renews Let’s Encrypt certificates. Optional <code>www</code> redirects are included.</dd></div>
+      <div><dt>Set up an Ubuntu host</dt><dd>Bring a supported Ubuntu LTS server, SSH access and a domain. <code>itsy setup</code> installs Itsy Server.</dd></div>
+      <div><dt>Deploy a Git branch</dt><dd>Publish committed files over SSH. Branches can have different destinations, and one Itsy Server can host several sites.</dd></div>
+      <div><dt>Keep HTTPS running</dt><dd>With DNS pointing to your server and ports 80 and 443 open, Itsy Server requests and renews Let’s Encrypt certificates. Optional <code>www</code> redirects are included.</dd></div>
       <div><dt>Back up and recover</dt><dd>Download a site backup or return to an earlier code release with the same tool. <a href="/docs/recovery">Backups and recovery</a></dd></div>
     </dl>
   </div>

@@ -9,14 +9,14 @@ description: Publish your site to an Ubuntu server with automatic HTTPS.
   <article class="docs-content">
     <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
-      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <a class="guide-breadcrumb" href="/docs">Itsy Guides</a>
       <h1>Server setup and deployment</h1>
       <p>Publish your site to an Ubuntu server with automatic HTTPS.</p>
     </header>
 
 <section id="server">
-  <h2>Set up the server</h2>
-<p>You'll need a supported Ubuntu LTS server, SSH access, and a domain pointing to it. Allow inbound TCP ports 80 and 443, then run this from your computer:</p><pre tabindex="0" aria-label="Set up the server"><code class="language-bash">itsy setup</code></pre><p>Follow the prompts to install ItsyWeb on the server. One server can host several sites.</p>
+  <h2>Set up Itsy Server</h2>
+<p>You'll need a supported Ubuntu LTS server, SSH access, and a domain pointing to it. Allow inbound TCP ports 80 and 443, then run this from your computer:</p><pre tabindex="0" aria-label="Set up Itsy Server"><code class="language-bash">itsy setup</code></pre><p>Follow the prompts to install Itsy Server on your Ubuntu host. One Itsy Server can host several sites.</p>
 </section>
 
 <section id="deployment">
@@ -25,7 +25,7 @@ description: Publish your site to an Ubuntu server with automatic HTTPS.
 git add .
 git commit -m "Prepare site for publishing"
 itsy deploy</code></pre><p>The first deployment asks for the server, domain, and HTTPS preferences. It saves the destination for this Git branch in <code>itsy.config.json</code>. Commit the saved settings when prompted; in a larger repository, commit them manually and run deploy again.</p>
-<p>ItsyWeb publishes the committed files and manages the Let's Encrypt certificate and renewal.</p>
+<p>Itsy publishes the committed files. Itsy Server serves the site and manages the Let's Encrypt certificate and renewal.</p>
 </section>
 
 <section id="destinations">

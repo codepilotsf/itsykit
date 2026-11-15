@@ -1,6 +1,6 @@
 <!-- itsy
 title: Managed apps
-description: Add custom server-side behavior with a local executable that exchanges JSON with ItsyWeb.
+description: Add custom server-side behavior with a local executable that exchanges JSON with Itsy.
 -->
 <div class="docs-shell container">
   <aside class="docs-sidebar">
@@ -9,16 +9,16 @@ description: Add custom server-side behavior with a local executable that exchan
   <article class="docs-content">
     <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
-      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <a class="guide-breadcrumb" href="/docs">Itsy Guides</a>
       <h1>Managed apps</h1>
-      <p>Add custom server-side behavior with a local executable that exchanges JSON with ItsyWeb.</p>
+      <p>Add custom server-side behavior with a local executable that exchanges JSON with Itsy.</p>
     </header>
 
 <section id="apps">
   <h2>How apps fit</h2>
-<p>ItsyWeb serves the HTML and handles form protection. Your app handles its logic and returns data for the template. The bundled <a href="/docs/email">Contact app</a> uses this model; Blog has its own built-in content editor.</p>
+<p>Itsy Server serves the HTML and handles form protection. Your app handles its logic and returns data for the template. The bundled <a href="/docs/email">Contact app</a> uses this model; Blog has its own built-in content editor.</p>
 <figure class="app-flow">
-  <div class="app-flow-track" role="img" aria-label="An HTML form in the browser sends a POST to ItsyWeb. ItsyWeb checks CSRF and forwards the fields as JSON to your managed app's local JSON server. The app returns JSON data, which ItsyWeb renders into HTML for the browser.">
+  <div class="app-flow-track" role="img" aria-label="An HTML form in the browser sends a POST to Itsy Server. Itsy Server checks CSRF and forwards the fields as JSON to your managed app's local JSON server. The app returns JSON data, which Itsy renders into HTML for the browser.">
     <div class="app-flow-node" aria-hidden="true">
       <svg viewBox="0 0 40 40" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="6" width="34" height="28" rx="3"/><path d="M3 13h34M10 20h14M10 26h20"/></svg>
       <strong>HTML site</strong><span>In the browser</span>
@@ -28,7 +28,7 @@ description: Add custom server-side behavior with a local executable that exchan
       <div class="app-flow-link app-flow-return"><span>Rendered HTML</span><span class="app-flow-arrow"><svg viewBox="0 0 100 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h97m-5-5 5 5-5 5"/></svg></span></div>
     </div>
     <div class="app-flow-node app-flow-itsy" aria-hidden="true">
-      <strong>ItsyWeb</strong><span>Protects forms<br>Renders templates</span>
+      <strong>Itsy Server</strong><span>Protects forms<br>Renders templates</span>
     </div>
     <div class="app-flow-links" aria-hidden="true">
       <div class="app-flow-link"><span>JSON request</span><span class="app-flow-arrow"><svg viewBox="0 0 100 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6h97m-5-5 5 5-5 5"/></svg></span></div>
@@ -39,7 +39,7 @@ description: Add custom server-side behavior with a local executable that exchan
       <strong>JSON server</strong><span>Your managed app</span>
     </div>
   </div>
-  <figcaption>The app exchanges JSON with ItsyWeb. The browser receives HTML.</figcaption>
+  <figcaption>The app exchanges JSON with Itsy. The browser receives HTML.</figcaption>
 </figure>
 <p>Custom apps run as managed local executables. You provide their code and storage behavior.</p>
 </section>
@@ -54,12 +54,12 @@ description: Add custom server-side behavior with a local executable that exchan
     "darwin-arm64": "example-darwin-arm64",
     "linux-amd64": "example-linux-amd64"
   &#125;
-&#125;</code></pre><p>Include a binary for your development computer and server. Add the app to your existing configuration:</p><pre tabindex="0" aria-label="Register a managed app"><code class="language-json">&#123;"apps": &#123;"example": &#123;"mount": "/example"&#125;&#125;&#125;</code></pre><p>Create <code>site/example/index.html</code>. ItsyWeb launches the app and passes requests below this mount to it. Restart dev after rebuilding the executable or changing app settings.</p>
+&#125;</code></pre><p>Include a binary for your development computer and server. Add the app to your existing configuration:</p><pre tabindex="0" aria-label="Register a managed app"><code class="language-json">&#123;"apps": &#123;"example": &#123;"mount": "/example"&#125;&#125;&#125;</code></pre><p>Create <code>site/example/index.html</code>. Itsy launches the app and passes requests below this mount to it. Restart dev after rebuilding the executable or changing app settings.</p>
 </section>
 
 <section id="app-requests">
   <h2>Requests and template data</h2>
-<p>A custom app receives GET requests for pages that exist under its mount. A form POST needs <code>&#123;csrf&#125;</code> and sends its fields as flat JSON:</p><pre tabindex="0" aria-label="A form submission sent to the app"><code class="language-json">&#123;"name": "Sam"&#125;</code></pre><p>Repeated fields become arrays of strings. ItsyWeb strips the mount from the path: <code>/example/greet</code> calls <code>/greet</code>. Its own CSRF field is removed before forwarding.</p>
+<p>A custom app receives GET requests for pages that exist under its mount. A form POST needs <code>&#123;csrf&#125;</code> and sends its fields as flat JSON:</p><pre tabindex="0" aria-label="A form submission sent to the app"><code class="language-json">&#123;"name": "Sam"&#125;</code></pre><p>Repeated fields become arrays of strings. Itsy strips the mount from the path: <code>/example/greet</code> calls <code>/greet</code>. Its own CSRF field is removed before forwarding.</p>
 <p>Return <code>application/json</code>. A 200 response can supply template values:</p><pre tabindex="0" aria-label="A successful app response"><code class="language-json">&#123;"data": &#123;"message": "Hello, Sam"&#125;&#125;</code></pre><p>The page can display <code>&#123;example.data.message&#125;</code>. App data is escaped and never interpreted as template code.</p>
 <p>The response accepts six keys:</p>
 <dl class="file-list"><dt>data</dt><dd>An object of template values.</dd><dt>invalid</dt><dd>Field names mapped to validation messages.</dd><dt>error</dt><dd>A failure message for the page.</dd><dt>flash</dt><dd>Named messages for the rendered page.</dd><dt>redirect</dt><dd>A mount-relative path, such as <code>thank-you</code>.</dd><dt>session</dt><dd>A cookie instruction, described below.</dd></dl>
@@ -82,8 +82,8 @@ description: Add custom server-side behavior with a local executable that exchan
 
 <section id="custom-app-sessions">
   <h2>App-owned sessions</h2>
-<p>Your app owns session state. ItsyWeb passes the opaque session token in <code>X-Flea-Session</code>. On a successful response, set or rotate it with:</p><pre tabindex="0" aria-label="Set an app session"><code class="language-json">&#123;"session": &#123;"token": "&lt;your opaque token&gt;", "max_age": 86400&#125;&#125;</code></pre><p>Use a cookie-safe token of 16 to 512 characters and a lifetime of up to 30 days. Omit <code>session</code> to leave it unchanged, or return <code>session: null</code> to clear it.</p>
-<p>ItsyWeb handles the host-only, Secure, HttpOnly cookie. An app session does not grant admin access.</p>
+<p>Your app owns session state. Itsy passes the opaque session token in <code>X-Flea-Session</code>. On a successful response, set or rotate it with:</p><pre tabindex="0" aria-label="Set an app session"><code class="language-json">&#123;"session": &#123;"token": "&lt;your opaque token&gt;", "max_age": 86400&#125;&#125;</code></pre><p>Use a cookie-safe token of 16 to 512 characters and a lifetime of up to 30 days. Omit <code>session</code> to leave it unchanged, or return <code>session: null</code> to clear it.</p>
+<p>Itsy handles the host-only, Secure, HttpOnly cookie. An app session does not grant admin access.</p>
 <p>The provided storage directory survives deployments. It is private and excluded from site backups, so arrange backups for your app's data.</p>
 </section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/agents">Continue to Working with coding agents</a></nav>

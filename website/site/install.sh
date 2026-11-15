@@ -5,8 +5,8 @@ itsy_install() (
   set -euo pipefail
   umask 077
   local system arch file version expected actual destination stage='' locked=false
-  local base='https://itsyweb.dev/releases'
-  fail() { printf 'ItsyWeb: %s\n' "$1" >&2; exit 1; }
+  local base='https://itsykit.dev/releases'
+  fail() { printf 'Itsy: %s\n' "$1" >&2; exit 1; }
   command -v curl >/dev/null || fail 'Install curl, then run this command again.'
   case "$(uname -s)" in Darwin) system=darwin ;; Linux) system=linux ;; *) fail 'This installer supports macOS and Linux.' ;; esac
   case "$(uname -m)" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=amd64 ;; *) fail 'This processor is not supported.' ;; esac
@@ -51,8 +51,8 @@ itsy_install() (
   fetch --max-filesize 8192 --output "$stage/SHA256SUMS" "$base/$version/SHA256SUMS" || fail 'Could not retrieve release checksums.'
   [[ $(wc -c < "$stage/SHA256SUMS") -le 8192 ]] || fail 'Release checksum list is too large.'
   expected=$(awk -v name="$file" '$2 == name && NF == 2 {print $1}' "$stage/SHA256SUMS")
-  [[ "$expected" =~ ^[0-9a-f]{64}$ ]] || fail "ItsyWeb $version has no verified download for $system/$arch. See https://itsyweb.dev/docs for available platforms."
-  printf 'Downloading ItsyWeb %s…\n' "$version"
+  [[ "$expected" =~ ^[0-9a-f]{64}$ ]] || fail "Itsy $version has no verified download for $system/$arch. See https://itsykit.dev/docs for available platforms."
+  printf 'Downloading Itsy %s…\n' "$version"
   fetch --max-filesize 134217728 --output "$stage/itsy" "$base/$version/$file" || fail 'Download failed. Your existing CLI was not changed.'
   [[ $(wc -c < "$stage/itsy") -le 134217728 ]] || fail 'Download is too large.'
   actual=$(hash "$stage/itsy")
@@ -63,14 +63,14 @@ itsy_install() (
   ln -s itsy "$stage/flea" || fail 'Could not prepare the retired flea command.'
   mv -f -- "$stage/itsy" "$destination/itsy"
   mv -f -- "$stage/flea" "$destination/flea" || fail 'itsy is installed, but the retired flea command could not be replaced.'
-  printf '\nInstalled ItsyWeb %s in %s/itsy\n' "$version" "$destination"
+  printf '\nInstalled Itsy %s in %s/itsy\n' "$version" "$destination"
 
   # This Bash child cannot change the invoking shell's PATH. These guarded
   # entries configure future terminals; print an optional current-shell export.
   local profile login_profile quoted block marker
   local profiles=()
   path_failure() {
-    printf '\nItsyWeb is installed, but %s\n' "$1" >&2
+    printf '\nItsy is installed, but %s\n' "$1" >&2
     printf 'Fix the startup file and rerun the installer, or add %s to PATH in your shell.\n' "$destination" >&2
     exit 1
   }

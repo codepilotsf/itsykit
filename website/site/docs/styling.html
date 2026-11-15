@@ -9,7 +9,7 @@ description: Start with Prewind or use your own CSS. Add built-in Lucide icons d
   <article class="docs-content">
     <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
-      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <a class="guide-breadcrumb" href="/docs">Itsy Guides</a>
       <h1>CSS and icons</h1>
       <p>Start with Prewind or use your own CSS. Add built-in Lucide icons directly in your HTML.</p>
     </header>
@@ -28,7 +28,7 @@ h1 &#123;
 <section id="utilities">
   <h2>Prewind utilities</h2>
 <p><a href="https://prewind.dev">Prewind</a> is a CSS library with a reset and utility classes for layout, spacing, and color. The generated site includes version 1.3.1. We recommend it for its shared defaults and fluid spacing and type scales: you can style familiar HTML with a single stylesheet.</p>
-<blockquote class="styling-choice"><p><strong>Your CSS, your choice.</strong> You can remove Prewind and use plain CSS or any styling library you like. Prewind works especially well with ItsyWeb because neither needs a build step.</p></blockquote>
+<blockquote class="styling-choice"><p><strong>Your CSS, your choice.</strong> You can remove Prewind and use plain CSS or any styling library you like. Prewind works especially well with Itsy because neither needs a build step.</p></blockquote>
 <p>Prewind's fluid spacing and type scales adapt to the screen width. Theme tokens keep those sizes and your colors consistent across the site, and you can change them in <code>site/css/theme.css</code>.</p>
 <pre tabindex="0" aria-label="Use Prewind utilities"><code class="language-markup">&lt;section class="container py-xl"&gt;
   &lt;h1&gt;Visit the bookshop&lt;/h1&gt;
@@ -39,7 +39,7 @@ h1 &#123;
 <pre tabindex="0" aria-label="Load your own stylesheet"><code class="language-markup">&lt;link rel="stylesheet" href="/css/my-styles.css" /&gt;</code></pre>
 <p>If you want to keep the starter's other styles, leave the layout link in place and remove just this import from <code>site/css/global.css</code>:</p>
 <pre tabindex="0" aria-label="Prewind import to remove"><code class="language-css">@import url("https://unpkg.com/prewindcss@1.3.1");</code></pre>
-<p>Update the starter's utility classes and any CSS that depends on Prewind's tokens or reset to suit your replacement. Check other layouts, including <code>site/admin.layout.html</code>, if you want them to use it too. ItsyWeb works with whichever styling approach you choose.</p>
+<p>Update the starter's utility classes and any CSS that depends on Prewind's tokens or reset to suit your replacement. Check other layouts, including <code>site/admin.layout.html</code>, if you want them to use it too. Itsy works with whichever styling approach you choose.</p>
 </section>
 
 <section id="icons">
@@ -47,7 +47,7 @@ h1 &#123;
 <p>Lucide icon support is built in. <a href="https://lucide.dev/icons/">Browse and search the Lucide icon picker</a>, choose an icon, then use its lowercase, hyphenated name in a page, layout, or partial:</p>
 <pre tabindex="0" aria-label="Icon directives"><code class="language-markup">&#123;icon arrow-right&#125;
 &#123;icon search size="20" aria-label="Search"&#125;</code></pre>
-<p>ItsyWeb renders each icon as inline SVG. You don't need an icon script or package installation. Icons default to 24 × 24, with no fill and a 2px stroke that inherits the surrounding text color.</p>
+<p>Itsy renders each icon as inline SVG. You don't need an icon script or package installation. Icons default to 24 × 24, with no fill and a 2px stroke that inherits the surrounding text color.</p>
 <h3>Supported options</h3>
 <p>Use quoted attributes, with either single or double quotes:</p>
 <table>
@@ -73,7 +73,7 @@ h1 &#123;
 &lt;/button&gt;</code></pre>
 <h3>Downloads and offline use</h3>
 <p><code>itsy dev</code> downloads only the icons you reference into <code>itsy/icons/</code>, including new references when you save. Commit that cache so the site can use them offline. The browser uses the rendered SVG without making icon downloads.</p>
-<p>ItsyWeb currently uses Lucide 1.47.0, so icons added to the picker in newer releases may be unavailable. A missing icon is omitted and dev prints a warning. Check the name or connection, then save the template again to retry. <code>itsy status</code> reports missing icons but does not download them.</p>
+<p>Itsy currently uses Lucide 1.47.0, so icons added to the picker in newer releases may be unavailable. A missing icon is omitted and dev prints a warning. Check the name or connection, then save the template again to retry. <code>itsy status</code> reports missing icons but does not download them.</p>
 <p>The <code>&#123;icon&#125;</code> directive supports Lucide. You can use other icon sets through your own HTML or SVG.</p>
 </section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/development">Continue to Local development</a></nav>

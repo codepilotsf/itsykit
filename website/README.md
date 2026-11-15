@@ -1,10 +1,10 @@
-# ItsyWeb
+# ItsyKit
 
-<img src="site/images/logo.svg" alt="ItsyWeb" width="233" height="56">
+<img src="site/images/logo.svg" alt="ItsyKit" width="196" height="55">
 
 Write HTML. Skip the build pipeline.
 
-ItsyWeb adds layouts, partials, JSON data, and clean URLs to HTML files. The same
+Itsy adds layouts, partials, JSON data, and clean URLs to HTML files. The same
 command gives you live reload, SSH deployment, automatic HTTPS, and backups.
 Add Contact or Blog when you need them.
 
@@ -13,7 +13,7 @@ in [../system/](../system/README.md). Both share one repository.
 
 ## Framework requirement
 
-This website requires ItsyWeb 0.22.0 and server protocol 30 for comment metadata
+This website requires Itsy 0.22.0 and server protocol 30 for comment metadata
 and Blog-only content storage. Earlier installers cannot load it. Existing
 page-CMS sites need an explicitly approved conversion and verified backups before
 a shared-server upgrade. Keep historical release notes tied to their actual releases.
@@ -24,7 +24,7 @@ For a new site on the published test release, Apple Silicon macOS and x86-64
 Linux downloads are available through:
 
 ```sh
-curl -fsSL https://itsyweb.dev/install.sh | bash
+curl -fsSL https://itsykit.dev/install.sh | bash
 ```
 
 Run this command in Bash or Zsh, then open a new terminal. The installer configures
@@ -40,25 +40,25 @@ Open the Website URL printed in the terminal. Save a file to reload the page.
 Press Ctrl-C to stop. This is an existing site; preserve its custom layout and
 assets rather than copying the starter over it.
 
-To build a new site, follow [Getting Started](https://itsyweb.dev/docs).
-[Installation and updates](https://itsyweb.dev/docs/installation) covers PATH
+To build a new site, follow [Getting Started](https://itsykit.dev/docs).
+[Installation and updates](https://itsykit.dev/docs/installation) covers PATH
 setup and the current public testing limits.
 
 ## Find a guide
 
-Start with [pages, layouts and data](https://itsyweb.dev/docs/templates),
-[CSS and icons](https://itsyweb.dev/docs/styling), then
-[local development](https://itsyweb.dev/docs/development) and
-[deployment](https://itsyweb.dev/docs/deployment).
+Start with [pages, layouts and data](https://itsykit.dev/docs/templates),
+[CSS and icons](https://itsykit.dev/docs/styling), then
+[local development](https://itsykit.dev/docs/development) and
+[deployment](https://itsykit.dev/docs/deployment).
 
-For optional features, see [Contact and email](https://itsyweb.dev/docs/email), and
-[Blog](https://itsyweb.dev/docs/blog).
+For optional features, see [Contact and email](https://itsykit.dev/docs/email), and
+[Blog](https://itsykit.dev/docs/blog).
 
-The remaining guides cover [SEO](https://itsyweb.dev/docs/seo),
-[redirects](https://itsyweb.dev/docs/redirects),
-[managed apps](https://itsyweb.dev/docs/apps),
-[coding agents](https://itsyweb.dev/docs/agents), and
-[recovery](https://itsyweb.dev/docs/recovery).
+The remaining guides cover [SEO](https://itsykit.dev/docs/seo),
+[redirects](https://itsykit.dev/docs/redirects),
+[managed apps](https://itsykit.dev/docs/apps),
+[coding agents](https://itsykit.dev/docs/agents), and
+[recovery](https://itsykit.dev/docs/recovery).
 Use `itsy --help` or a command's `--help` for options.
 
 ## Project files

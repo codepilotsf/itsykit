@@ -9,7 +9,7 @@ description: Give search engines your production URLs and keep selected pages ou
   <article class="docs-content">
     <details class="docs-mobile"><summary>Guides</summary>{render /guides-nav}</details>
     <header>
-      <a class="guide-breadcrumb" href="/docs">ItsyWeb Guides</a>
+      <a class="guide-breadcrumb" href="/docs">Itsy Guides</a>
       <h1>Search engines and SEO</h1>
       <p>Give search engines your production URLs and keep selected pages out of search results.</p>
     </header>
@@ -20,7 +20,7 @@ description: Give search engines your production URLs and keep selected pages ou
   "seo": &#123;
     "url": "https://example.com"
   &#125;
-&#125;</code></pre><p>Use the production HTTPS origin, even while developing locally. ItsyWeb generates <code>/sitemap.xml</code>, advertises it in <code>/robots.txt</code>, and adds missing canonical tags.</p>
+&#125;</code></pre><p>Use the production HTTPS origin, even while developing locally. Itsy generates <code>/sitemap.xml</code>, advertises it in <code>/robots.txt</code>, and adds missing canonical tags.</p>
 <p>Your custom sitemap, robots file, or canonical markup takes precedence. Set ordinary page titles and descriptions in <a href="/docs/templates#page-details">leading page settings comments</a>; Blog posts use their title and excerpt.</p>
 </section>
 
@@ -43,7 +43,7 @@ description: Give search engines your production URLs and keep selected pages ou
 <section id="indexing">
   <h2>Keep staging out of search</h2>
 <p>Set a server policy for the staging hostname:</p><pre tabindex="0" aria-label="Keep a staging hostname out of search"><code class="language-bash">itsy server indexing root@your-server staging.example.com noindex</code></pre><p>Replace the server login and hostname with yours. The policy applies to that exact host and survives deployments. Use <code>allow</code> instead of <code>noindex</code> to remove the server's restriction.</p>
-<p>This command briefly restarts the shared server. It controls indexing, not access.</p>
+<p>This command briefly restarts Itsy Server. It controls indexing, not access.</p>
 </section>
     <nav class="guide-next" aria-label="Next guide"><a href="/docs/redirects">Continue to Migration redirects</a></nav>
   </article>

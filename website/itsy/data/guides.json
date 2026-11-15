@@ -7,7 +7,7 @@
       "chapters": [
         {
           "id": "installation",
-          "title": "1. Install ItsyWeb"
+          "title": "1. Install Itsy"
         },
         {
           "id": "create-a-site",
@@ -119,7 +119,7 @@
       "chapters": [
         {
           "id": "server",
-          "title": "Set up the server"
+          "title": "Set up Itsy Server"
         },
         {
           "id": "deployment",
@@ -292,7 +292,7 @@
         },
         {
           "id": "server-updates",
-          "title": "Update an existing server"
+          "title": "Update Itsy Server"
         },
         {
           "id": "from-flea",
@@ -348,7 +348,7 @@
     },
     {
       "url": "/docs/support",
-      "title": "About ItsyWeb and support",
+      "title": "About Itsy and support",
       "first": false,
       "chapters": [
         {
