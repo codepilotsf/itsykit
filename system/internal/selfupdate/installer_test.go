@@ -66,7 +66,7 @@ for ((i=1;i<=$#;i++)); do
   if [[ "${!i}" == --output ]]; then j=$((i+1)); output=${!j}; fi
 done
 url=${!#}
-[[ "$url" == https://itsyweb.dev/releases/* ]] || exit 1
+[[ "$url" == https://itsykit.dev/releases/* ]] || exit 1
 name=${url##*/}
 if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/$name"; fi
 `
@@ -78,7 +78,7 @@ if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/
 				t.Fatal(err)
 			}
 			cmd := exec.Command("bash", installer)
-			cmd.Env = append(os.Environ(), "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
+			cmd.Env = append(os.Environ(), "HOME="+dir, "SHELL=/bin/bash", "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
 			out, err := cmd.CombinedOutput()
 			if (err != nil) != (scenario.bad || scenario.missing || scenario.unsupported || scenario.name == "wrong version") {
 				t.Fatal(err, string(out))
@@ -91,7 +91,7 @@ if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/
 				if scenario.unsupported && !strings.Contains(string(out), "Linux ARM64 CLI downloads are no longer supported") {
 					t.Fatal("missing platform diagnostic", string(out))
 				}
-				if scenario.missing && !strings.Contains(string(out), "ItsyWeb 1.0.1 has no verified download for linux/amd64") {
+				if scenario.missing && !strings.Contains(string(out), "Itsy 1.0.1 has no verified download for linux/amd64") {
 					t.Fatal("missing platform diagnostic", string(out))
 				}
 			} else {
@@ -105,7 +105,7 @@ if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/
 				}
 				// Reinstalling is also safe and leaves no staging directories.
 				cmd = exec.Command("bash", installer)
-				cmd.Env = append(os.Environ(), "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
+				cmd.Env = append(os.Environ(), "HOME="+dir, "SHELL=/bin/bash", "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
 				if out, err = cmd.CombinedOutput(); err != nil {
 					t.Fatal(err, string(out))
 				}

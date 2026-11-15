@@ -138,6 +138,92 @@ func TestSavedHTTPSPreferenceKeepsOtherSites(t *testing.T) {
 	}
 }
 
+func TestDeploymentPreservesDomainRedirects(t *testing.T) {
+	m, old := fixture(t)
+	old.Domains = []string{"old.test", "www.old.test"}
+	old.Canonical = "old.test"
+	if _, err := m.Apply(context.Background(), old); err != nil {
+		t.Fatal(err)
+	}
+	current := old
+	current.Name = "current"
+	current.Domains = []string{"current.test", "alias.test"}
+	current.Canonical = ""
+	if _, err := m.Apply(context.Background(), current); err != nil {
+		t.Fatal(err)
+	}
+	c, _, err := host.Load(m.ConfigPath, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.Redirects = map[string]string{"old.test": "current.test", "www.old.test": "current.test", "alias.test": "current.test"}
+	data, _ := json.Marshal(c)
+	if err := os.WriteFile(m.ConfigPath, data, 0644); err != nil {
+		t.Fatal(err)
+	}
+	for _, o := range []Options{current, old} {
+		if _, err := m.Apply(context.Background(), o); err != nil {
+			t.Fatal(err)
+		}
+		c, _, err = host.Load(m.ConfigPath, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, from := range []string{"old.test", "www.old.test", "alias.test"} {
+			if c.Redirects[from] != "current.test" {
+				t.Fatalf("redeploy of %s lost redirect for %s: %+v", o.Name, from, c.Redirects)
+			}
+		}
+	}
+	old.Canonical = ""
+	if _, err := m.Apply(context.Background(), old); err != nil {
+		t.Fatal(err)
+	}
+	c, _, err = host.Load(m.ConfigPath, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Redirects["www.old.test"] != "current.test" {
+		t.Fatal("WWW preference removed an administrator-owned domain redirect")
+	}
+	delete(c.Redirects, "www.old.test")
+	data, _ = json.Marshal(c)
+	if err := os.WriteFile(m.ConfigPath, data, 0644); err != nil {
+		t.Fatal(err)
+	}
+	old.Canonical = "old.test"
+	if _, err := m.Apply(context.Background(), old); err != nil {
+		t.Fatal(err)
+	}
+	c, _, err = host.Load(m.ConfigPath, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Redirects["www.old.test"] != "current.test" {
+		t.Fatal("default WWW redirect introduced a redirect chain")
+	}
+}
+
+func TestWWWRedirectPreferenceCanStillBeDisabled(t *testing.T) {
+	m, o := fixture(t)
+	o.Domains = []string{"example.test", "www.example.test"}
+	o.Canonical = "example.test"
+	if _, err := m.Apply(context.Background(), o); err != nil {
+		t.Fatal(err)
+	}
+	o.Canonical = ""
+	if _, err := m.Apply(context.Background(), o); err != nil {
+		t.Fatal(err)
+	}
+	c, _, err := host.Load(m.ConfigPath, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Redirects["www.example.test"] != "" {
+		t.Fatal("WWW redirect preference remained enabled")
+	}
+}
+
 func TestActivationRollbackAndRecovery(t *testing.T) {
 	for _, failure := range []string{"restart", "verify", "recovery"} {
 		t.Run(failure, func(t *testing.T) {

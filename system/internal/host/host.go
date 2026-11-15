@@ -72,8 +72,8 @@ func load(configPath string, logger *log.Logger, sender mailer.Sender) (Config, 
 		return config, nil, err
 	}
 	for from, to := range config.Redirects {
-		if from != "www."+to || !ValidDomain(to) || config.Sites[from] == "" || config.Sites[from] != config.Sites[to] || config.Redirects[to] != "" {
-			return config, nil, fmt.Errorf("invalid WWW redirect %s to %s", from, to)
+		if !ValidDomain(from) || !ValidDomain(to) || from == to || config.Sites[from] == "" || config.Sites[to] == "" || config.Redirects[to] != "" {
+			return config, nil, fmt.Errorf("invalid host redirect %s to %s: use distinct registered domains and a destination without a redirect", from, to)
 		}
 	}
 	if err := validateIndexing(config); err != nil {

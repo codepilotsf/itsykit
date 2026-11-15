@@ -305,11 +305,26 @@ func (m Manager) applyLocked(ctx context.Context, o Options) (string, error) {
 	}
 	if !o.keepRouting {
 		if o.Canonical != "" {
-			c.Redirects["www."+o.Canonical] = o.Canonical
+			// A retired primary hostname can itself redirect to a new domain.
+			// Point its default WWW alias directly at that final destination.
+			www := "www." + o.Canonical
+			if existing := c.Redirects[www]; existing == "" || existing == o.Canonical {
+				target := o.Canonical
+				if next := c.Redirects[target]; next != "" {
+					target = next
+				}
+				c.Redirects[www] = target
+			}
 		} else {
 			for _, domain := range o.Domains {
-				delete(c.Redirects, domain)
-				delete(c.Redirects, "www."+domain)
+				// The deploy preference controls only the conventional WWW pair.
+				// Other domain redirects are administrator-owned host policy.
+				if strings.HasPrefix(domain, "www.") && c.Redirects[domain] == strings.TrimPrefix(domain, "www.") {
+					delete(c.Redirects, domain)
+				}
+				if c.Redirects["www."+domain] == domain {
+					delete(c.Redirects, "www."+domain)
+				}
 			}
 		}
 		if o.HTTPS {

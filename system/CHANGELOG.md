@@ -6,6 +6,11 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Allow permanent redirects between registered hostnames, including separate
+  sites, while preserving escaped paths and query strings. Reject unknown hosts,
+  self-redirects and chains. Keep administrator-owned domain redirects across
+  deployments; the WWW preference still controls the conventional WWW pair.
+
 - Keep HTTP and HTTPS listening ports open across server restarts with systemd
   socket activation. New connections queue during site deployments and executable
   updates. Setup installs both units; update-server converts the standard original

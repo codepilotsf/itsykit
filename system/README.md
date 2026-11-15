@@ -21,6 +21,12 @@ but long restarts, full queues and long-running requests can still cause errors.
 See [server upgrades](docs/recovery.md#server-upgrades). Public 0.22.0 downloads
 do not include this change yet.
 
+The unreleased host layer also supports administrator-configured permanent
+redirects between registered domains, including separate sites. These preserve
+paths and queries and survive site deployments. Public 0.22.0 supports only
+WWW-to-bare-domain redirects. See [domain redirects](docs/agents/deployment.md#domain-redirects)
+for configuration, validation and rollout requirements.
+
 ## Source layout
 
 This guide describes `system/` in the combined ItsyWeb repository. Run its

@@ -129,6 +129,9 @@ func redirectHTTPS(c Config, fallback http.Handler) http.Handler {
 		target := url.URL{Scheme: "https", Host: host, Path: r.URL.Path, RawPath: r.URL.RawPath, RawQuery: r.URL.RawQuery}
 		if canonical := c.Redirects[host]; canonical != "" {
 			target.Host = canonical
+			if !hasTLS(c, canonical) {
+				target.Scheme = "http"
+			}
 		}
 		http.Redirect(w, r, target.String(), http.StatusPermanentRedirect)
 	}))

@@ -125,6 +125,42 @@ this host policy. See [download hosting](download-hosting.md) for publication,
 verification and rollback boundaries. Never delete retained downloads to shrink a
 site archive, or include the store in site backups. The 256 MiB archive limit remains.
 
+### Domain redirects
+
+The unreleased host layer accepts administrator-owned `redirects` in
+`/etc/flea/server.json`, distinct from site-config path redirects. Both ends must
+be registered domain names in `sites`; they may belong to different managed
+sites. For a domain migration, merge rules such as:
+
+```json
+{
+  "redirects": {
+    "fleacms.com": "itsykit.dev",
+    "www.fleacms.com": "itsykit.dev",
+    "itsyweb.dev": "itsykit.dev"
+  }
+}
+```
+
+Rules return HTTP 308, preserve the escaped path and query, and use the
+destination's configured HTTP/HTTPS policy. The HTTP listener also goes directly
+to the final domain for HTTPS-enabled sources. Keep HTTPS enabled for retired
+domains so existing HTTPS links still have valid certificates. Health probes
+remain local to the requested host. Unknown sources/destinations, self-redirects,
+and chains/cycles are rejected; point every source directly at its final domain.
+Download URLs and ordinary pages follow the same redirect before serving content.
+
+General host redirects survive ordinary deployment, HTTPS changes and code
+rollback. The deploy WWW preference only enables/disables its conventional
+`www.example.com -> example.com` pair; it does not clear custom domain policy.
+When a primary hostname already redirects elsewhere, a newly enabled default WWW
+redirect points directly at the final destination. Site removal still clears
+redirects touching the removed hosts. Change host policy only with explicit
+authorization, a private config backup, the deployment lock, candidate validation,
+restart/readiness checks and rollback on failure. Public 0.22.0 and older server
+binaries accept only the conventional WWW pair; install a supporting server
+before adding general rules. This is not a new CLI redirect-management command.
+
 Deploy/https select only the current Git branch's saved destination from
 itsy.config.json's deploy.branches map. Use the actual branch name without a production
 label or environment question. Generate the internal remote site name from the
