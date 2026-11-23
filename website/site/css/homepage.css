@@ -29,10 +29,6 @@
   .source-code { position:relative; background:transparent; margin:0; padding:24px; font-size:.875rem; line-height:1.75; white-space:pre; border-radius:0; }
   .source-code code { font-size:inherit; color:inherit; }
   .example-source-bar { padding-block:0; }
-  .demo-replay { margin-left:auto; min-height:44px; padding:0 8px; border:0; border-radius:4px; background:transparent; color:var(--accent); font-size:.76rem; font-weight:600; white-space:nowrap; }
-  .demo-replay:hover:not(:disabled) { background:var(--hero-bg); filter:none; }
-  .demo-replay:focus-visible { outline-offset:-3px; }
-  .demo-replay[hidden] { display:none; }
   .typing-copy { position:absolute; top:24px; left:24px; pointer-events:none; }
   .typing-caret { display:inline-block; width:2px; height:1.1em; margin-left:2px; vertical-align:-.15em; background:var(--accent); }
   .demo-typing [data-demo-source],.demo-typing .example-page { opacity:0; }
@@ -45,7 +41,7 @@
   .example-title { margin:0 0 12px; font-size:2rem; line-height:1.2; letter-spacing:-.035em; font-weight:700; }
   .example-description { margin:0 0 20px; font-size:1rem; line-height:1.6; color:var(--darker); }
   .example-footer { margin-top:28px; color:var(--dark); font-size:.85rem; }
-  .example-links { display:flex; flex-wrap:wrap; gap:22px; }
+  .example-links { display:flex; flex-wrap:wrap; gap:22px; margin-bottom:20px; }
   .example-links button,.example-links > span { display:inline; min-height:28px; margin:0; padding:0; border:0; border-radius:0; background:none; color:#174fc7; font:inherit; font-size:1rem; font-weight:400; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
   .example-links > span { cursor:default; }
   .example-links button:hover:not(:disabled) { color:var(--black); filter:none; }

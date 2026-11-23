@@ -81,6 +81,24 @@ retain their ordering. Never mutate active code or prune retained content/media.
 Rollback selects code/CSS from per-site receipts and retains current Blog data.
 Backup/restore exclude secrets/sessions and validate bounds, identity and digest.
 Explicit executable upgrades preserve verified replacement and recovery safeguards.
+The one-time conversion of the exact original systemd unit is covered by the same
+upgrade journal; recovery restores the original service and removes the new socket
+unit. Customized units/overrides require manual review before conversion.
+
+### Production listeners
+
+`internal/serverunit` owns the canonical systemd service/socket files used by
+setup and updates. Systemd retains wildcard TCP listeners on 80/443 across
+`flea.service` restarts. The service requires `flea.socket` and starts with
+`-socket-activation`; `host` validates LISTEN_PID, exactly two distinct wildcard
+TCP listening descriptors and their ports, closes the originals after duplication,
+and clears activation metadata before launching apps. Invalid handoffs fail closed.
+Managed serving needs no bind capability; standalone `host.Run` still binds its
+configured listeners directly. TLS domain, certificate and Host/SNI policy stays
+in ItsyWeb. With no HTTPS domains, inherited :443 rejects TLS handshakes promptly.
+No proxy, additional application process or shared request state is introduced.
+Pending connections queue through restarts; in-flight requests retain the existing
+five-second shutdown window. Queue limits and client deadlines still apply.
 
 ### Blog content synchronization
 
@@ -126,6 +144,15 @@ SEO/redirects and exact host indexing remain independent policies; never derive
 production origins from requests, overwrite custom discovery/canonicals, discard
 host policy on deploy/recovery, or weaken Host/TLS readiness. Native fsnotify watches
 included directories with debounce and overflow recovery, never idle polling.
+
+Domain redirect declarations belong to the selected site's branch deployment
+config. Setup transmits them to the privileged deployment transaction, which
+validates source ownership and final registered targets and reconciles only the
+selected site's rules. Host routing interprets the resulting validated map
+generically; no site-specific domain policy belongs in server code. Recovery
+retains current routing. Omitted policy cannot clear existing custom redirects;
+the transaction rejects it before staging. An explicit empty map removes the
+last rule. See [deployment](deployment.md#domain-redirects).
 
 Build with scripts/build.sh, serially refreshing Contact and both embedded Linux
 servers before the CLI. Self-update verifies bounded platform/checksum downloads

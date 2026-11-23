@@ -26,9 +26,15 @@ whole-server previous config. It republishes code while retaining live Blog
 state and current host policy. Backup captures live overlays under deploy.lock;
 restore checks an expected state digest and requires explicit CLI confirmation.
 Keep credentials, certificates, sessions and deployment mappings out of backups.
-Upgrade validates pinned executable bytes, journals an executable-only swap and
-restores on failed restart/probes. Pending upgrades block deployments and saves.
-Do not add format or service-unit migrations under the guise of upgrading.
+Upgrade validates pinned executable bytes, journals the swap and restores on
+failed restart/probes. Pending upgrades block deployments and saves. The approved
+exception is one-time socket activation conversion of the exact original service
+with no overrides or existing socket unit. Journal this with the executable swap;
+on failure restore the original unit and remove the newly created socket unit
+before restarting the old executable. Refuse independently changed units during
+recovery. Customized units require manual review before replacement. Already
+converted installations receive executable-only updates. No general service-unit
+or data-format migration support is added.
 
 ### Remote setup
 
@@ -64,8 +70,10 @@ under /var/backups before recreating an empty installation; refuse symlinked
 paths and retain the service account. This is not an in-place upgrade.
 Before any reset/install changes, check TCP/UDP 80 and 443 on IPv4/IPv6.
 Only confirmed reinstall may exempt the systemd MainPID whose /proc executable
-is /usr/local/bin/flea-server. Reject unknown owners, other PIDs, and failed
-checks. Never stop another service. Recheck after stopping ItsyWeb.
+is /usr/local/bin/flea-server. PID 1 is also exempt for TCP only when the exact
+canonical flea.socket is active at its expected path, with no drop-ins or pending
+daemon reload. Reject unknown owners, other PIDs, UDP owners and failed checks.
+Never stop another service. Recheck after stopping ItsyWeb and its socket unit.
 
 The initial persistent host binds :80, uses /etc/flea/server.json,
 and has no sites by default. Config maps hostnames to absolute site roots.
@@ -73,7 +81,14 @@ It uses site.NewProductionServer: no development reload script/endpoint, watcher
 or icon fetching. Config/site edits require restart. TLS is opt-in per domain.
 Aliases for the same release must select the same content snapshot and share one
 loaded handler. Reject conflicting alias content paths instead of choosing arbitrarily.
-The non-root service receives only CAP_NET_BIND_SERVICE to bind low ports.
+Setup installs and enables flea.service and flea.socket. Systemd owns both web
+listeners and passes them to the non-root service, which has an empty capability
+bounding set and requires the socket unit. Restart only flea.service for ordinary
+activation, recovery and updates: restarting flea.socket closes the ports.
+The server validates the inherited descriptors without falling back to binding.
+Both ports remain reserved even with HTTPS disabled; TLS handshakes are then
+rejected promptly without issuing certificates. Standalone serving still binds
+directly without the activation flag. No proxy or second server process is added.
 Readiness probes wildcard listeners via loopback before setup succeeds; this
 does not verify public firewall access. Administrators must allow inbound TCP 80.
 Tests mock SSH/SCP, verify both Linux ELF builds, and exercise HTTP locally.
@@ -109,6 +124,57 @@ release stores outside site snapshots. Aliases must match; normal deployment kee
 this host policy. See [download hosting](download-hosting.md) for publication,
 verification and rollback boundaries. Never delete retained downloads to shrink a
 site archive, or include the store in site backups. The 256 MiB archive limit remains.
+
+### Domain redirects
+
+The unreleased CLI and server read domain redirect policy from the site's
+`itsy.config.json`, under `deploy.branches.<branch>.domain_redirects`. Merge the
+following fields into an existing branch entry, retaining its target, name,
+HTTPS, email and terms settings:
+
+```json
+{
+  "domain": "old.example",
+  "www_redirect": true,
+  "domain_redirects": {
+    "old.example": "new.example",
+    "www.old.example": "new.example"
+  }
+}
+```
+
+This is deployment configuration, not the top-level path `redirects` map. A
+source must be in that branch's domain list, including a WWW alias enabled by
+`www_redirect`. The destination must be a final, registered domain on the same
+server; it may belong to another site. CLI mapping validation and privileged
+server ownership checks both apply. A branch cannot claim another branch's
+source domain or replace another site's routing.
+
+Ordinary deploy and `itsy https` reconcile the selected site's redirect rules
+from this configuration. Removing a rule entry removes its deployed redirect;
+to remove the last rule, retain an explicit `"domain_redirects": {}`. An absent
+or null setting is not permission to clear active custom redirects: activation
+fails before mutation and asks for a current CLI and explicit configuration.
+This also blocks stale configurations and clients that omit the new setting.
+Unrelated sites' rules survive. A default WWW redirect goes directly to the
+primary domain's configured final destination, while an explicit rule wins over
+the WWW preference. Code rollback and content restore retain the current routing
+policy. Site removal clears rules touching the removed hosts. The server's
+`redirects` map is generated routing state, not the place to author site policy.
+
+Rules return HTTP 308, preserve escaped paths and queries, and follow the
+final destination's configured HTTP/HTTPS policy. Keep certificates enabled for
+retired domains. Health probes bypass public redirection. Unknown domains,
+self-redirects and chains/cycles are rejected; every source points directly at
+its final domain. Download URLs follow the same redirect as ordinary pages.
+
+Both an updated CLI and supporting Itsy Server are required. Public 0.22.0 CLI
+rejects the new deployment-config field; an older server rejects the optional
+`-domain-redirects` activation argument before mutation. Protocol 30 remains
+unchanged because the existing command contract is retained and unsupported
+new rules fail closed. No private domain names are embedded in the routing
+implementation. Use the normal reviewed deployment transaction, preserving
+configuration backups, locking, validation, readiness and rollback safeguards.
 
 Deploy/https select only the current Git branch's saved destination from
 itsy.config.json's deploy.branches map. Use the actual branch name without a production
@@ -238,8 +304,10 @@ but retained content is not restored automatically.
 Re-deploying the same stable name starts from the current project; because
 content lookup follows active routing, it cannot recover content left behind.
 Back up or pull the site before removal if a later deployment must keep its
-current content. Removal restarts the shared service, so other sites are briefly
-unavailable. No restore feature is added.
+current content. Removal restarts the shared service. On socket-activated
+installations, new connections queue through the restart; in-flight requests keep
+the existing five-second shutdown window. Long restarts, full queues and client
+deadlines can still cause errors. No restore feature is added.
 
 `itsy server` connects only over native SSH. Give the target explicitly, or omit
 it to be prompted for the server login; an SSH alias or bare host is kept as-is.
@@ -265,9 +333,10 @@ closed.
 
 Removal reuses the existing atomic config publication, recovery journal,
 restart/probe and failure rollback paths. The prior config is journaled to
-`deploy.pending.json` before replacement; a failure restores it. Because config
-activation restarts the shared service, other sites are briefly unavailable. An
-interrupted removal is recovered with `sudo flea-server -recover`, exactly like
+`deploy.pending.json` before replacement; a failure restores it. Config activation
+restarts only the shared service, preserving systemd's listening sockets on
+converted installations. An interrupted removal is recovered with
+`sudo flea-server -recover`, exactly like
 an interrupted deployment. Removing the last site is supported and probes generic
 server readiness. Removal never prunes retained content or media.
 

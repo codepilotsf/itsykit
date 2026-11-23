@@ -40,6 +40,7 @@ func main() {
 	version := flag.Bool("version", false, "print ItsyKit release version")
 	config := flag.String("config", "/etc/flea/server.json", "server JSON configuration")
 	check := flag.Bool("check", false, "check configuration and running server readiness")
+	socketActivation := flag.Bool("socket-activation", false, "require HTTP and HTTPS listening sockets from systemd")
 	protocol := flag.Bool("protocol", false, "print deployment protocol version")
 	mailStatus := flag.Bool("mail-status", false, "check server email configuration (root only)")
 	configureMail := flag.Bool("configure-mail", false, "save email settings from stdin (root only)")
@@ -55,6 +56,7 @@ func main() {
 	branch := flag.String("branch", "", "source Git branch")
 	commit := flag.String("commit", "", "source Git commit")
 	canonical := flag.String("canonical", "", "primary domain for WWW redirect")
+	domainRedirects := flag.String("domain-redirects", "", "deployment domain redirects as a JSON object")
 	flag.Parse()
 	if *version {
 		fmt.Println("ItsyKit " + buildinfo.Version)
@@ -182,7 +184,14 @@ func main() {
 					os.Exit(1)
 				}
 			}
-			revision, err = m.Apply(ctx, admin.Options{Sync: plan, Archive: *archive, Name: *name, Domains: admin.Domains(*domain), HTTPS: *https, Email: *email, AgreeTOS: *agree, Canonical: *canonical, Branch: *branch, Commit: *commit})
+			var redirects map[string]string
+			if *domainRedirects != "" {
+				if err := json.Unmarshal([]byte(*domainRedirects), &redirects); err != nil {
+					logger.Print("Invalid domain redirects: ", err)
+					os.Exit(1)
+				}
+			}
+			revision, err = m.Apply(ctx, admin.Options{Sync: plan, Archive: *archive, Name: *name, Domains: admin.Domains(*domain), HTTPS: *https, Email: *email, AgreeTOS: *agree, Canonical: *canonical, Branch: *branch, Commit: *commit, DomainRedirects: redirects})
 			if err == nil {
 				fmt.Printf("Activated release %s\n", revision)
 			}
@@ -225,6 +234,8 @@ func main() {
 		}
 	} else if *check {
 		err = host.Check(ctx, *config)
+	} else if *socketActivation {
+		err = host.RunSocketActivated(ctx, *config, logger)
 	} else {
 		err = host.Run(ctx, *config, logger)
 	}

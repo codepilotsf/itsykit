@@ -1,0 +1,26 @@
+[Unit]
+Description=ItsyWeb server
+After=network.target
+
+[Service]
+Type=exec
+User=flea
+Group=flea
+ExecStart=/usr/local/bin/flea-server -config /etc/flea/server.json
+EnvironmentFile=-/etc/flea/mail.env
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=10
+WorkingDirectory=/var/lib/flea
+NoNewPrivileges=true
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/flea/certs /var/lib/flea/sites /etc/flea/deploy.lock
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

@@ -68,6 +68,7 @@ func upgradeServer(ctx context.Context, root string, recover bool, in io.Reader,
 			return err
 		}
 		fmt.Fprintf(out, "Update the server on %s. All sites share this executable; a brief restart is required.\n", r.settings.Target)
+		fmt.Fprintln(out, "Standard installations will use socket activation to queue new connections during future restarts. The first conversion briefly closes the ports; customized service units require manual review.")
 		answer, err := ask(ctx, in, out, "Continue? (y/N)", "n")
 		if err != nil {
 			return err

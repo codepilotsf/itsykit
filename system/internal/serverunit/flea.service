@@ -1,20 +1,20 @@
 [Unit]
-Description=ItsyKit server
-After=network.target
+Description=ItsyWeb server
+Requires=flea.socket
+After=network.target flea.socket
 
 [Service]
 Type=exec
 User=flea
 Group=flea
-ExecStart=/usr/local/bin/flea-server -config /etc/flea/server.json
+ExecStart=/usr/local/bin/flea-server -config /etc/flea/server.json -socket-activation
 EnvironmentFile=-/etc/flea/mail.env
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=10
 WorkingDirectory=/var/lib/flea
 NoNewPrivileges=true
-AmbientCapabilities=CAP_NET_BIND_SERVICE
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true

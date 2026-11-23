@@ -20,16 +20,17 @@ import (
 
 // DeploySettings contains no secrets. Native SSH configuration owns credentials.
 type DeploySettings struct {
-	WithContent bool     `json:"-"`
-	Target      string   `json:"target"`
-	Domain      string   `json:"domain"`
-	Name        string   `json:"name"`
-	HTTPS       bool     `json:"https"`
-	Email       string   `json:"email"`
-	AgreeTOS    bool     `json:"agree_tos"`
-	WWWRedirect bool     `json:"www_redirect"`
-	ExpectedIPs []string `json:"expected_ips,omitempty"`
-	Branch      string   `json:"-"`
+	WithContent     bool              `json:"-"`
+	Target          string            `json:"target"`
+	Domain          string            `json:"domain"`
+	Name            string            `json:"name"`
+	HTTPS           bool              `json:"https"`
+	Email           string            `json:"email"`
+	AgreeTOS        bool              `json:"agree_tos"`
+	WWWRedirect     bool              `json:"www_redirect"`
+	DomainRedirects map[string]string `json:"domain_redirects,omitzero"`
+	ExpectedIPs     []string          `json:"expected_ips,omitempty"`
+	Branch          string            `json:"-"`
 }
 
 func Deploy(ctx context.Context, root string, s DeploySettings, httpsOnly bool, in io.Reader, out, errOut io.Writer) error {
@@ -66,7 +67,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 	if s.Name == "" {
 		s.Name = filepath.Base(root)
 	}
-	opts := admin.Options{Name: s.Name, Domains: s.domains(), HTTPS: s.HTTPS || httpsOnly, Email: s.Email, AgreeTOS: s.AgreeTOS, Branch: state.Branch, Commit: state.Commit}
+	opts := admin.Options{Name: s.Name, Domains: s.domains(), HTTPS: s.HTTPS || httpsOnly, Email: s.Email, AgreeTOS: s.AgreeTOS, Branch: state.Branch, Commit: state.Commit, DomainRedirects: s.DomainRedirects}
 	if s.WWWRedirect {
 		opts.Canonical = s.Domain
 	}
@@ -308,7 +309,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		if err = runCommand(ctx, command{name: "scp", args: args, in: in, out: out, errOut: errOut}); err != nil {
 			return fmt.Errorf("upload failed: %w", err)
 		}
-		text += " -deploy " + shellQuote(stage+"/site.tar.gz") + " -name " + shellQuote(s.Name)
+		text += " -deploy " + shellQuote(stage+"/site.tar.gz")
 		if planFile != "" {
 			args := append(append([]string{}, sshOptions...), "--", planFile, scpTarget+":"+stage+"/sync.json")
 			if e := runCommand(ctx, command{name: "scp", args: args, in: in, out: out, errOut: errOut}); e != nil {
@@ -317,7 +318,14 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			text += " -sync-plan " + shellQuote(stage+"/sync.json")
 		}
 	}
-	text += " -domain " + shellQuote(strings.Join(opts.Domains, ","))
+	text += " -name " + shellQuote(s.Name) + " -domain " + shellQuote(strings.Join(opts.Domains, ","))
+	if opts.DomainRedirects != nil {
+		rules, err := json.Marshal(opts.DomainRedirects)
+		if err != nil {
+			return err
+		}
+		text += " -domain-redirects " + shellQuote(string(rules))
+	}
 	text += " -branch " + shellQuote(state.Branch) + " -commit " + shellQuote(state.Commit)
 	if opts.Canonical != "" {
 		text += " -canonical " + shellQuote(opts.Canonical)

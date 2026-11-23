@@ -80,10 +80,33 @@ keeps the previous executable, journals the swap, restarts, and probes all sites
 Failed verification restores the prior executable. Interrupted upgrades block
 further deployments and content saves until `itsy update-server --recover` completes.
 
-This updates the executable only. It does not reset sites, migrate data formats,
-change SSH permissions, or replace customized systemd units. Incompatible site
-formats fail before replacement. Service-policy changes require administrator
-review. Keep backups and test upgrades on a disposable server first.
+On standard installations, the first update also converts the original systemd
+service to socket activation. This one-time conversion briefly closes the ports.
+The journal covers the executable and conversion together: failure restores the
+old executable and service and removes the newly installed socket unit. Recovery
+refuses to overwrite independently changed unit files. Later updates change only
+the executable and restart `flea.service`, leaving `flea.socket` running.
+
+Systemd keeps TCP ports 80 and 443 open and queues new connections while the
+server restarts. Requests already being served have the existing five-second
+graceful shutdown window. Slow restarts, full queues and client timeouts can still
+cause errors. Restarting or stopping `flea.socket` itself closes the ports.
+Both ports stay reserved even with HTTPS disabled; unconfigured TLS handshakes
+are rejected without requesting certificates.
+
+The conversion accepts only the exact original service with wildcard `:80`, no
+drop-ins and no existing socket unit. Customized units, overrides or listeners
+stop the update before replacement. An administrator must review those settings
+and install the supplied `internal/serverunit/flea.service` and `flea.socket`
+units manually, together with the new executable. Preserve resource limits and
+other intentional policy, stop the direct-binding service before starting the
+socket unit, reload systemd, enable/start both units and verify every site.
+Back up the previous executable and units first. This is a separate maintenance
+operation; do not bypass a pending upgrade journal or use setup to convert a host.
+
+Updates do not reset sites, migrate data formats, or change SSH permissions.
+Incompatible site formats fail before replacement. Keep backups and test upgrades
+on a disposable server first.
 
 Local automated tests cover failure and recovery paths. Live SSH/systemd upgrade,
 restore and power-loss behavior still need disposable-server verification.
@@ -105,10 +128,10 @@ starts from the current project and cannot recover content left behind. Back up
 or pull the site before removal if a later deployment must keep its current
 content. No restore command is added.
 
-Removal rewrites the shared server config and restarts the service, so other
-sites are briefly unavailable. Other sites' routing and ancillary entries are
-preserved. When no HTTPS hostnames remain afterwards, automatic HTTPS is disabled
-and cached certificates stay on disk.
+Removal rewrites the shared server config and restarts the service. On installations
+with socket activation, new connections queue through that restart. Other sites'
+routing and ancillary entries are preserved. When no HTTPS hostnames remain
+afterwards, automatic HTTPS is disabled and cached certificates stay on disk.
 
 Removal uses the same deployment/content lock, expected-state digest, recovery
 journal, restart/probe and rollback paths as deployment. If the site changed

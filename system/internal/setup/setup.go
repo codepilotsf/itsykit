@@ -17,13 +17,13 @@ import (
 	"time"
 
 	"itsy/internal/serverbundle"
+	"itsy/internal/serverunit"
 )
 
 //go:embed install.sh
 var installer string
 
-//go:embed flea.service
-var service string
+var service = serverunit.Service
 
 const defaultConfig = "{\n  \"listen\": \":80\",\n  \"sites\": {}\n}\n"
 const probe = `set -eu; . /etc/os-release; command -v systemctl >/dev/null; test -d /run/systemd/system; printf 'FLEA_SYSTEM=%s:%s:%s:%s\n' "$ID" "$VERSION_ID" "$(uname -m)" "$(id -u)"`
@@ -182,7 +182,7 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 			return fmt.Errorf("Setup cancelled. The existing installation was not changed.")
 		}
 	}
-	for name, body := range map[string]string{"install.sh": installer, "flea.service": service, "server.json": defaultConfig} {
+	for name, body := range map[string]string{"install.sh": installer, "flea.service": service, "flea.socket": serverunit.Socket, "server.json": defaultConfig} {
 		if err := os.WriteFile(filepath.Join(temp, name), []byte(body), 0600); err != nil {
 			return err
 		}
@@ -198,15 +198,15 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 	defer func() {
 		cleanup, stop := context.WithTimeout(context.Background(), 5*time.Second)
 		defer stop()
-		// Remove only the four files staged by this invocation, then the empty directory.
-		text := "rm -f -- " + shellQuote(stage+"/flea-server") + " " + shellQuote(stage+"/install.sh") + " " + shellQuote(stage+"/flea.service") + " " + shellQuote(stage+"/server.json") + "; rmdir -- " + shellQuote(stage)
+		// Remove only files staged by this invocation, then the empty directory.
+		text := "rm -f -- " + shellQuote(stage+"/flea-server") + " " + shellQuote(stage+"/install.sh") + " " + shellQuote(stage+"/flea.service") + " " + shellQuote(stage+"/flea.socket") + " " + shellQuote(stage+"/server.json") + "; rmdir -- " + shellQuote(stage)
 		args := append(append([]string{}, sshOptions...), "-T", "--", target, text)
 		_ = runCommand(cleanup, command{name: "ssh", args: args, out: io.Discard, errOut: io.Discard})
 	}()
 	fmt.Fprintln(out, "Uploading ItsyKit server...")
 	scpTarget := scpHost(target)
 	args := append([]string{}, sshOptions...)
-	args = append(args, "--", filepath.Join(temp, "flea-server"), filepath.Join(temp, "install.sh"), filepath.Join(temp, "flea.service"), filepath.Join(temp, "server.json"), scpTarget+":"+stage+"/")
+	args = append(args, "--", filepath.Join(temp, "flea-server"), filepath.Join(temp, "install.sh"), filepath.Join(temp, "flea.service"), filepath.Join(temp, "flea.socket"), filepath.Join(temp, "server.json"), scpTarget+":"+stage+"/")
 	if err := runCommand(ctx, command{name: "scp", args: args, in: in, out: out, errOut: errOut}); err != nil {
 		return fmt.Errorf("upload failed: %w", err)
 	}
@@ -222,7 +222,7 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 		return fmt.Errorf("server installation failed: %w", err)
 	}
 	fmt.Fprintln(out, "Checking ItsyKit service...")
-	verify := "systemctl is-active --quiet flea && /usr/local/bin/flea-server -config /etc/flea/server.json -check"
+	verify := "systemctl is-active --quiet flea.service flea.socket && /usr/local/bin/flea-server -config /etc/flea/server.json -check"
 	if err := ssh(verify, false, out); err != nil {
 		return fmt.Errorf("server installed but readiness check failed: %w", err)
 	}

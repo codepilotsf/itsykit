@@ -78,7 +78,7 @@ if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/
 				t.Fatal(err)
 			}
 			cmd := exec.Command("bash", installer)
-			cmd.Env = append(os.Environ(), "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
+			cmd.Env = append(os.Environ(), "HOME="+dir, "SHELL=/bin/bash", "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
 			out, err := cmd.CombinedOutput()
 			if (err != nil) != (scenario.bad || scenario.missing || scenario.unsupported || scenario.name == "wrong version") {
 				t.Fatal(err, string(out))
@@ -105,7 +105,7 @@ if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/
 				}
 				// Reinstalling is also safe and leaves no staging directories.
 				cmd = exec.Command("bash", installer)
-				cmd.Env = append(os.Environ(), "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
+				cmd.Env = append(os.Environ(), "HOME="+dir, "SHELL=/bin/bash", "PATH="+fake+":"+os.Getenv("PATH"), "FIXTURES="+fixtures, "FLEA_INSTALL_DIR="+destination)
 				if out, err = cmd.CombinedOutput(); err != nil {
 					t.Fatal(err, string(out))
 				}

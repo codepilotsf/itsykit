@@ -99,6 +99,14 @@ production HTTPS checks. Warn that LAN HTTP requires a trusted network; restart
 after network changes. Fail clearly when no private or Tailscale IPv4 address is available.
 The persistent host defaults to public HTTP
 port 80, with opt-in automatic HTTPS on port 443 per domain.
+Managed systemd serving uses `-socket-activation` and requires inherited wildcard
+TCP listening sockets on both ports for the current process. Clear activation
+metadata and make descriptors close-on-exec before starting managed apps. Never
+fall back to direct binding after a missing or invalid handoff. Standalone serving
+without this flag retains configured direct listeners. HTTPS domain and SNI/Host
+checks are unchanged; with HTTPS disabled, inherited :443 rejects handshakes.
+Service restarts keep the socket unit open, so new connections queue while the
+process restarts. Existing requests keep the five-second shutdown window.
 
 ## Email templates
 

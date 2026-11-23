@@ -1,6 +1,6 @@
 # Working on ItsyKit
 
-This CP Git repository has two sibling projects:
+This GitHub repository has two sibling projects:
 
 - `system/`: Go CLI/server, canonical starter, build scripts and framework docs.
   Read [system/AGENTS.md](system/AGENTS.md) before framework work.
