@@ -41,7 +41,7 @@ func robotsCrawlWarning(p *site.Project) string {
 		key, value, _ := strings.Cut(line, ":")
 		value = strings.TrimSpace(value)
 		if strings.EqualFold(strings.TrimSpace(key), "disallow") && (value == "/" || value == "/*" || value == "/*$") {
-			return "robots.txt contains a site-wide Disallow rule; affected crawlers cannot discover the noindex header. Review its user-agent groups and allow crawling. ItsyWeb leaves the file unchanged."
+			return "robots.txt contains a site-wide Disallow rule; affected crawlers cannot discover the noindex header. Review its user-agent groups and allow crawling. ItsyKit leaves the file unchanged."
 		}
 	}
 	return ""

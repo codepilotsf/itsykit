@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-const BaseURL = "https://itsyweb.dev/releases"
+const BaseURL = "https://itsykit.dev/releases"
 const maxBinary = 128 << 20
 
 var stableVersion = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$`)
@@ -35,11 +35,11 @@ type updater struct {
 func Run(ctx context.Context, current string, out io.Writer) error {
 	path, err := os.Executable()
 	if err != nil {
-		return fmt.Errorf("could not locate this ItsyWeb executable")
+		return fmt.Errorf("could not locate this ItsyKit executable")
 	}
 	path, err = filepath.EvalSymlinks(path)
 	if err != nil {
-		return fmt.Errorf("could not resolve this ItsyWeb executable")
+		return fmt.Errorf("could not resolve this ItsyKit executable")
 	}
 	client := &http.Client{Timeout: 2 * time.Minute, CheckRedirect: func(r *http.Request, via []*http.Request) error {
 		if r.URL.Scheme != "https" || len(via) >= 5 {
@@ -84,7 +84,7 @@ func newer(latest, current string) (bool, error) {
 	}
 	base := strings.SplitN(strings.SplitN(current, "+", 2)[0], "-", 2)[0]
 	if !stableVersion.MatchString(base) {
-		return false, fmt.Errorf("this build has an invalid version; reinstall from itsyweb.dev")
+		return false, fmt.Errorf("this build has an invalid version; reinstall from itsykit.dev")
 	}
 	a, b := strings.Split(latest, "."), strings.Split(base, ".")
 	for i := range a {
@@ -186,7 +186,7 @@ func (u updater) run(ctx context.Context, current string, out io.Writer) error {
 		if err := syncInstallation(root); err != nil {
 			return err
 		}
-		fmt.Fprintf(out, "ItsyWeb %s is already up to date.\nUse itsy for all commands from now on.\n", current)
+		fmt.Fprintf(out, "ItsyKit %s is already up to date.\nUse itsy for all commands from now on.\n", current)
 		return nil
 	}
 	name := "itsy-" + u.system + "-" + u.arch
@@ -201,14 +201,14 @@ func (u updater) run(ctx context.Context, current string, out io.Writer) error {
 	if _, err := rand.Read(token[:]); err != nil {
 		return err
 	}
-	temp := ".itsy-update-" + hex.EncodeToString(token[:])
+	temp := ".itsykit-update-" + hex.EncodeToString(token[:])
 	f, err := root.OpenFile(temp, os.O_CREATE|os.O_EXCL|os.O_RDWR, 0600)
 	if err != nil {
 		return fmt.Errorf("installation directory is not writable; reinstall in a user-owned directory")
 	}
 	defer root.Remove(temp)
 	defer f.Close()
-	fmt.Fprintf(out, "Downloading ItsyWeb %s…\n", version)
+	fmt.Fprintf(out, "Downloading ItsyKit %s…\n", version)
 	if err := u.download(ctx, version+"/"+name, f, maxBinary); err != nil {
 		return err
 	}
@@ -272,7 +272,7 @@ func (u updater) run(ctx context.Context, current string, out io.Writer) error {
 	if err := syncInstallation(root); err != nil {
 		return err
 	}
-	fmt.Fprintf(out, "Updated to ItsyWeb %s.\n\nRemote servers were not changed. From a site folder, run itsy update-server when ready.\n", version)
+	fmt.Fprintf(out, "Updated to ItsyKit %s.\n\nRemote servers were not changed. From a site folder, run itsy update-server when ready.\n", version)
 	return nil
 }
 
@@ -376,7 +376,7 @@ func verifyVersion(ctx context.Context, path, version string) error {
 	var output versionOutput
 	cmd.Stdout = &output
 	cmd.Stderr = io.Discard
-	if err := cmd.Run(); err != nil || strings.TrimSpace(output.String()) != "ItsyWeb "+version {
+	if err := cmd.Run(); err != nil || strings.TrimSpace(output.String()) != "ItsyKit "+version {
 		return fmt.Errorf("downloaded CLI could not verify its version; nothing was changed")
 	}
 	return nil

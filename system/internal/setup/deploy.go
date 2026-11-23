@@ -213,7 +213,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		}
 	}
 	if strings.Contains(output.String(), "FLEA_MISSING=1\n") {
-		fmt.Fprint(out, "\nItsyWeb isn't installed on this server yet.\nSetup will install the server and start its service.\n\n")
+		fmt.Fprint(out, "\nItsyKit isn't installed on this server yet.\nSetup will install the server and start its service.\n\n")
 		confirmed, err := confirmSetup(ctx, in, out)
 		if err != nil {
 			return err
@@ -228,7 +228,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 			if errors.Is(err, errHostKeyChanged) {
 				return err
 			}
-			return fmt.Errorf("ItsyWeb was installed, but the server check failed.\nPlease check the service before deploying again.")
+			return fmt.Errorf("ItsyKit was installed, but the server check failed.\nPlease check the service before deploying again.")
 		}
 		_, isRoot, err = parseProbe(output.String())
 		if err != nil {
@@ -236,7 +236,7 @@ func deployWithSetup(ctx context.Context, root string, s DeploySettings, httpsOn
 		}
 	}
 	if !strings.Contains(output.String(), release.Protocol+"\n") {
-		return fmt.Errorf("This server has an older or incomplete ItsyWeb installation.\nPlease update the server before deploying.")
+		return fmt.Errorf("This server has an older or incomplete ItsyKit installation.\nPlease update the server before deploying.")
 	}
 	if s.WithContent {
 		if httpsOnly {

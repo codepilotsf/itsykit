@@ -81,3 +81,6 @@ creation targets, hidden entries and symlinks. Git initialization, initial commi
 `--skip-git` and explicit reset/recovery safeguards remain unchanged. Dev loads and
 watches templates read-only apart from explicit icon caching, site-name/admin setup
 and session storage. There is no extraction or content reindexing transaction.
+
+New sites use the approved ItsyKit wordmark and browser/touch icons, matching
+the public website. Both public and admin layouts use the current asset version.

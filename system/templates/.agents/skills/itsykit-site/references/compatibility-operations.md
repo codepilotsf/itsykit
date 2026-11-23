@@ -12,13 +12,14 @@ exception verifies the update and installs `itsy` beside the old command, even
 when already current; it refuses to replace an unrelated existing `itsy`.
 Already released Flea binaries need two `flea update` runs: the first installs
 the renamed binary under the old name, the second installs `itsy`. Alternatively
-use the current installer at `https://itsyweb.dev/install.sh`.
+use the current installer at `https://itsykit.dev/install.sh`.
 
 The installer puts `itsy` in `~/.local/bin` and retains a relative `flea` symlink
 for the notice/update exception. `ITSY_INSTALL_DIR` selects another install
 directory; existing `FLEA_INSTALL_DIR` remains supported. A narrow read-only
-`.flea-update-* version` candidate probe still returns `FleaCMS <version>` for
-released updaters. This is not a working `flea version` alias.
+`.flea-update-* version` candidate probe still returns the historical version label for
+released updaters. Released `.itsy-update-* version` probes also keep their
+historical label; current candidates use `.itsykit-update-*`. This is not a working `flea version` alias.
 
 New sites use `itsy.config.json`, `itsy/` and `<!-- itsy` layout settings. Existing
 `.flea.config.json`, `flea/` and `<!-- flea` settings are supported without
@@ -32,10 +33,10 @@ Preserve server binary `/usr/local/bin/flea-server`, service/account `flea`,
 `/etc/flea`, `/var/lib/flea`, health path `/_flea/health`, protocol identifiers,
 cookies and locks. Keep `.flea-install.lock`, development
 locks, `flea-sync` baselines and recovery names; do not rename private state.
-Canonical release URLs use `https://itsyweb.dev/releases/` and `itsy-*` artifacts;
-legacy fleacms.com URLs and `flea-*` artifact aliases remain for released updaters.
+Canonical release URLs use `https://itsykit.dev/releases/` and `itsy-*` artifacts;
+Legacy release URLs and `flea-*` artifact aliases remain for released updaters.
 
-The page-CMS removal contract requires ItsyWeb 0.22.0 or newer and protocol 30
+The page-CMS removal contract requires ItsyKit 0.22.0 or newer and protocol 30
 (`FLEA_DEPLOY=30`). Public 0.21.0 uses protocol 29 and does not contain this
 contract. Earlier feature minimums (host indexing 27, SEO/redirects 28, naming
 29) do not relax this requirement. App protocol remains 2. Existing page-CMS

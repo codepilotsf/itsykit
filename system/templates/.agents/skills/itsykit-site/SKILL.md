@@ -1,9 +1,9 @@
 ---
-name: itsyweb-site
-description: Build or maintain ItsyWeb websites with the itsy CLI, plain HTML/JSON, Contact, optional Blog posts and cover photos, managed apps, migration redirects, SEO and content synchronization. Includes existing Flea sites; excludes CLI/server framework development.
+name: itsykit-site
+description: Build or maintain ItsyKit websites with the itsy CLI, plain HTML/JSON, Contact, optional Blog posts and cover photos, managed apps, migration redirects, SEO and content synchronization. Includes existing Flea sites; excludes CLI/server framework development.
 ---
 
-# Build an ItsyWeb website
+# Build an ItsyKit website
 
 Read the site's `AGENTS.md`, relevant README sections and installed version
 (`itsy version`). Inspect affected config, layouts, content and assets. Preserve
@@ -12,7 +12,7 @@ and explicit user choices take precedence; this skill grants no action permissio
 Resolve conflicting historical docs against the installed implementation. Roadmaps
 and `docs/agents/spec.md` include future plans, not just supported behavior.
 
-ItsyWeb was formerly FleaCMS. Use `itsy`, not retired `flea` commands. New sites
+Use `itsy`, not retired `flea` commands. New sites
 use `itsy.config.json`, `itsy/` and `<!-- itsy` page settings. Existing
 `.flea.config.json`, `flea/` and `<!-- flea` settings remain supported. Prefer the
 Itsy config and directory independently when present; otherwise use the legacy
@@ -22,7 +22,7 @@ new names; adapt paths to the selected existing layout.
 
 For installation, transition, deployment, pull or recovery, read
 [compatibility and operations](references/compatibility-operations.md).
-The page-CMS removal contract below requires ItsyWeb 0.22.0 or newer and
+The page-CMS removal contract below requires ItsyKit 0.22.0 or newer and
 server protocol 30. Earlier page-CMS sites need an explicitly approved conversion
 with verified backups before an upgrade. See the operations reference for
 compatibility and upgrade limits.
@@ -44,7 +44,7 @@ compatibility and upgrade limits.
 
 Read installed files explicitly; links do not load dependencies. Report missing
 skills and continue permitted work from available guidance. Do not fetch sibling
-copies or load Rails/Preflight application conventions for an ItsyWeb site.
+copies or load Rails/Preflight application conventions for an ItsyKit site.
 
 ## Content and direction
 

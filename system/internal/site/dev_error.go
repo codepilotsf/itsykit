@@ -43,8 +43,8 @@ type devErrorView struct {
 }
 
 func serveDevError(w http.ResponseWriter, r *http.Request, p *Project, code int, revision uint64, cause error) {
-	v := devErrorView{Code: code, Title: "Application error", Summary: "ItsyWeb found a problem in your site.", Path: r.URL.EscapedPath(), Method: r.Method,
-		Hint: "Check the error below and the dev terminal. Fix the template or configuration, then save. ItsyWeb will validate the site again automatically."}
+	v := devErrorView{Code: code, Title: "Application error", Summary: "ItsyKit found a problem in your site.", Path: r.URL.EscapedPath(), Method: r.Method,
+		Hint: "Check the error below and the dev terminal. Fix the template or configuration, then save. ItsyKit will validate the site again automatically."}
 	if r.Method == "HEAD" {
 		v.Method = "GET"
 	}
@@ -71,7 +71,7 @@ func serveDevError(w http.ResponseWriter, r *http.Request, p *Project, code int,
 		case strings.Contains(v.Detail, "route collision"):
 			v.Hint = "Two HTML files map to the same URL. Keep just one: about.html and about/index.html both become /about."
 		case strings.Contains(v.Detail, "expression") || strings.Contains(v.Detail, "directive"):
-			v.Hint = "Check the template expression. ItsyWeb uses dotted names such as {app.site_name}, {render footer} for partials, and balanced {#if} or {#each} blocks."
+			v.Hint = "Check the template expression. ItsyKit uses dotted names such as {app.site_name}, {render footer} for partials, and balanced {#if} or {#each} blocks."
 		}
 	}
 	if code == 405 {

@@ -12,7 +12,7 @@ source scripts/version.sh
 version=$(itsy_version)
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'Installer packages require a stable numeric version.' >&2; exit 1; }
 test -x bin/itsy
-[[ $(bin/itsy version) == "ItsyWeb $version" ]] || { echo 'Rebuild bin/itsy for this version first.' >&2; exit 1; }
+[[ $(bin/itsy version) == "ItsyKit $version" ]] || { echo 'Rebuild bin/itsy for this version first.' >&2; exit 1; }
 stage=$(mktemp -d "${TMPDIR:-/tmp}/flea-package.XXXXXX")
 trap 'rm -rf -- "$stage"' EXIT
 mkdir -p "$stage/root/usr/local/bin" dist

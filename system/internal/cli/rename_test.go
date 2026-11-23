@@ -20,8 +20,9 @@ func TestRetiredCommandStopsBeforeDispatch(t *testing.T) {
 
 func TestCanonicalAndReleasedUpdaterVersionProbes(t *testing.T) {
 	for _, tc := range []struct{ executable, want string }{
-		{"/tmp/itsy", "ItsyWeb "},
+		{"/tmp/itsy", "ItsyKit "},
 		{"/tmp/.itsy-update-123", "ItsyWeb "},
+		{"/tmp/.itsykit-update-123", "ItsyKit "},
 		{"/tmp/.flea-update-123", "FleaCMS "},
 	} {
 		var out, errOut bytes.Buffer
@@ -36,7 +37,7 @@ func TestRetiredUpdateDispatchesWithProminentNotice(t *testing.T) {
 	cancel() // Exercise dispatch without making a release request.
 	var out, errOut bytes.Buffer
 	code := RunExecutable(ctx, "/tmp/flea", []string{"update"}, &out, &errOut)
-	if code != 1 || !strings.Contains(errOut.String(), "FLEA HAS CHANGED TO ITSYWEB") || !strings.Contains(errOut.String(), "itsy update") || !strings.Contains(errOut.String(), "itsy:") {
+	if code != 1 || !strings.Contains(errOut.String(), "FLEA HAS CHANGED TO ITSYKIT") || !strings.Contains(errOut.String(), "itsy update") || !strings.Contains(errOut.String(), "itsy:") {
 		t.Fatalf("code=%d out=%q err=%q", code, out.String(), errOut.String())
 	}
 }

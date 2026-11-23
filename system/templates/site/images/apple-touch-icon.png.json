@@ -1,5 +1,6 @@
 {
-  "origin": "Owner-approved original ItsyWeb woven-loop mark on a fixed pale background.",
-  "method": "T3 browser canvas export of site/images/favicon.svg",
-  "approved": true
+  "origin": "Owner-selected 8-bit Itsy lettering on the fixed pale theme background.",
+  "source": "site/images/favicon.svg",
+  "method": "T3 browser Canvas render from SVG",
+  "approved_branding": true
 }

@@ -32,21 +32,21 @@ func extract(ctx context.Context, source fs.FS, arch, destination string) error 
 	name := "assets/itsy-server-linux-" + arch
 	sum, err := fs.ReadFile(source, name+".sha256")
 	if err != nil {
-		return fmt.Errorf("This ItsyWeb executable is missing its bundled server.\n\nRebuild from the ItsyWeb source with: bash scripts/build.sh\nOr install a complete ItsyWeb release.")
+		return fmt.Errorf("This ItsyKit executable is missing its bundled server.\n\nRebuild from the ItsyKit source with: bash scripts/build.sh\nOr install a complete ItsyKit release.")
 	}
 	expected := strings.TrimSpace(string(sum))
 	decoded, err := hex.DecodeString(expected)
 	if err != nil || len(decoded) != sha256.Size {
-		return fmt.Errorf("The bundled server checksum is invalid. Rebuild or reinstall ItsyWeb.")
+		return fmt.Errorf("The bundled server checksum is invalid. Rebuild or reinstall ItsyKit.")
 	}
 	compressed, err := source.Open(name + ".gz")
 	if err != nil {
-		return fmt.Errorf("The bundled server is missing. Rebuild or reinstall ItsyWeb.")
+		return fmt.Errorf("The bundled server is missing. Rebuild or reinstall ItsyKit.")
 	}
 	defer compressed.Close()
 	z, err := gzip.NewReader(compressed)
 	if err != nil {
-		return fmt.Errorf("The bundled server is damaged. Rebuild or reinstall ItsyWeb.")
+		return fmt.Errorf("The bundled server is damaged. Rebuild or reinstall ItsyKit.")
 	}
 	defer z.Close()
 	f, err := os.OpenFile(destination, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
@@ -67,7 +67,7 @@ func extract(ctx context.Context, source fs.FS, arch, destination string) error 
 		return fmt.Errorf("Could not unpack the bundled server: %w", err)
 	}
 	if n > limit || hex.EncodeToString(hash.Sum(nil)) != strings.ToLower(expected) {
-		return fmt.Errorf("The bundled server failed its integrity check. Rebuild or reinstall ItsyWeb.")
+		return fmt.Errorf("The bundled server failed its integrity check. Rebuild or reinstall ItsyKit.")
 	}
 	if err := f.Close(); err != nil {
 		return err

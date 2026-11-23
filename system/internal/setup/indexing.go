@@ -48,7 +48,7 @@ func serverIndexing(ctx context.Context, target, domain, mode string, in io.Read
 		if mode == "noindex" {
 			fmt.Fprintln(out, "Responses will send X-Robots-Tag: noindex, nofollow. Keep robots.txt crawlable so crawlers can discover it.")
 		} else {
-			fmt.Fprintln(out, "ItsyWeb will add no indexing restriction. Owner-authored headers and meta tags still apply.")
+			fmt.Fprintln(out, "ItsyKit will add no indexing restriction. Owner-authored headers and meta tags still apply.")
 		}
 		fmt.Fprintln(out, "This restarts the shared service; other sites are briefly unavailable.")
 		answer, err := ask(ctx, in, out, "Type the hostname to confirm", "")

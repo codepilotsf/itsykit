@@ -207,7 +207,7 @@ func TestSetupStages(t *testing.T) {
 				t.Fatalf("setup scratch remains: %s (%v)", scratch, statErr)
 			}
 			if failure == "" || failure == "reinstall" {
-				if err != nil || strings.Join(stages, ",") != "connect,extract,upload,install,check" || !strings.Contains(output.String(), "ItsyWeb server is running") {
+				if err != nil || strings.Join(stages, ",") != "connect,extract,upload,install,check" || !strings.Contains(output.String(), "ItsyKit server is running") {
 					t.Fatal(stages, err, output.String())
 				}
 			} else {

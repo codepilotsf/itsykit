@@ -37,7 +37,7 @@ func main() {
 	indexingMode := flag.String("indexing-mode", "", "noindex or allow")
 	removeSite := flag.String("remove-site", "", "unregister a managed site, retaining its files (root only)")
 	planPath := flag.String("sync-plan", "", "reviewed sync plan accompanying deployment")
-	version := flag.Bool("version", false, "print ItsyWeb release version")
+	version := flag.Bool("version", false, "print ItsyKit release version")
 	config := flag.String("config", "/etc/flea/server.json", "server JSON configuration")
 	check := flag.Bool("check", false, "check configuration and running server readiness")
 	protocol := flag.Bool("protocol", false, "print deployment protocol version")
@@ -57,7 +57,7 @@ func main() {
 	canonical := flag.String("canonical", "", "primary domain for WWW redirect")
 	flag.Parse()
 	if *version {
-		fmt.Println("ItsyWeb " + buildinfo.Version)
+		fmt.Println("ItsyKit " + buildinfo.Version)
 		return
 	}
 	logger := log.New(os.Stderr, "", 0)

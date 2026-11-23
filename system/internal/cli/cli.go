@@ -29,7 +29,7 @@ import (
 )
 
 const usage = `_________
- ItsyWeb
+ ItsyKit
 ‾‾‾‾‾‾‾‾‾
 Small websites. Plain HTML. Optional Blog.
 
@@ -46,7 +46,7 @@ Build your site
 
 Publish your site
   pull             Bring live Blog content and media into your local site
-  setup            Install ItsyWeb on your server
+  setup            Install ItsyKit on your server
   deploy           Publish the current Git branch
   rollback         Restore previous code, keeping live content
   backup           Download a complete site backup
@@ -74,7 +74,7 @@ const serverUsage = `Usage: itsy server list [ssh-target]
        itsy server remove [ssh-target] [site-name]
        itsy server indexing [ssh-target] <hostname> <noindex|allow>
 
-Inspect or configure sites installed on an ItsyWeb server over SSH. No local site,
+Inspect or configure sites installed on an ItsyKit server over SSH. No local site,
 Git repository or saved deployment settings are required. Omit the SSH target to
 be asked for the server login.
 
@@ -93,7 +93,7 @@ be asked for the server login.
            Keeps website files unchanged. Requires typing the exact hostname and
            restarts the shared service. Policies survive deploy, sync and rollback.
 
-All commands reject servers running an older ItsyWeb protocol; update the
+All commands reject servers running an older ItsyKit protocol; update the
 server first. Nothing is deleted or pruned.
 
 `
@@ -108,7 +108,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 	switch args[0] {
 	case "update":
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {
-			fmt.Fprint(out, "Usage: itsy update\n\nDownload and verify the latest CLI from fleacms.com.\nUpdates this executable and its bundled servers, without changing remote servers.\nNo site folder is required.\n\n")
+			fmt.Fprint(out, "Usage: itsy update\n\nDownload and verify the latest CLI from itsykit.dev.\nUpdates this executable and its bundled servers, without changing remote servers.\nNo site folder is required.\n\n")
 			return 0
 		}
 		if len(args) != 1 {
@@ -270,7 +270,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 			fmt.Fprintln(out)
 			return 0
 		}
-		fmt.Fprintln(out, "ItsyWeb "+buildinfo.Version)
+		fmt.Fprintln(out, "ItsyKit "+buildinfo.Version)
 		return 0
 	case "pull":
 		flags := flag.NewFlagSet("pull", flag.ContinueOnError)
@@ -354,7 +354,7 @@ func Run(ctx context.Context, args []string, out, errOut io.Writer) int {
 		flags := flag.NewFlagSet("setup", flag.ContinueOnError)
 		flags.SetOutput(errOut)
 		flags.Usage = func() {
-			fmt.Fprintln(flags.Output(), "Usage: itsy setup\n\nInstall ItsyWeb on your server over SSH.\nYou will be asked for the server address.")
+			fmt.Fprintln(flags.Output(), "Usage: itsy setup\n\nInstall ItsyKit on your server over SSH.\nYou will be asked for the server address.")
 			fmt.Fprintln(flags.Output())
 		}
 		if len(args) == 2 && (args[1] == "--help" || args[1] == "-h") {

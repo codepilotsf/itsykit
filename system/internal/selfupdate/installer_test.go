@@ -37,9 +37,9 @@ func TestInstallerOffline(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			payload := []byte("#!/bin/sh\nprintf 'ItsyWeb 1.0.1\\n'\n")
+			payload := []byte("#!/bin/sh\nprintf 'ItsyKit 1.0.1\\n'\n")
 			if scenario.name == "wrong version" {
-				payload = []byte("#!/bin/sh\nprintf 'ItsyWeb 0.0.0\\n'\n")
+				payload = []byte("#!/bin/sh\nprintf 'ItsyKit 0.0.0\\n'\n")
 			}
 			name := scenario.artifact
 			hash := fmt.Sprintf("%x", sha256.Sum256(payload))
@@ -66,7 +66,7 @@ for ((i=1;i<=$#;i++)); do
   if [[ "${!i}" == --output ]]; then j=$((i+1)); output=${!j}; fi
 done
 url=${!#}
-[[ "$url" == https://itsyweb.dev/releases/* ]] || exit 1
+[[ "$url" == https://itsykit.dev/releases/* ]] || exit 1
 name=${url##*/}
 if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/$name"; fi
 `
@@ -91,7 +91,7 @@ if [[ -n "$output" ]]; then cp "$FIXTURES/$name" "$output"; else cat "$FIXTURES/
 				if scenario.unsupported && !strings.Contains(string(out), "Linux ARM64 CLI downloads are no longer supported") {
 					t.Fatal("missing platform diagnostic", string(out))
 				}
-				if scenario.missing && !strings.Contains(string(out), "ItsyWeb 1.0.1 has no verified download for linux/amd64") {
+				if scenario.missing && !strings.Contains(string(out), "Itsy 1.0.1 has no verified download for linux/amd64") {
 					t.Fatal("missing platform diagnostic", string(out))
 				}
 			} else {

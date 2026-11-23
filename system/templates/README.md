@@ -1,4 +1,4 @@
-# ItsyWeb
+# ItsyKit
 
 New sites use `itsy.config.json`, `itsy/`, and `<!-- itsy` page settings.
 Existing `.flea.config.json`, `flea/`, and `<!-- flea` projects remain supported
@@ -6,7 +6,7 @@ without conversion. Keep using an existing site's selected files rather than
 creating a second layout. This runtime requires server protocol 30;
 run `itsy update-server` explicitly before deploying to an older server.
 
-Build pages with HTML, style them with CSS, and optionally manage Blog posts in the admin editor. ItsyWeb builds the server, and serves multiple sites with HTTPS directly.
+Build pages with HTML, style them with CSS, and optionally manage Blog posts in the admin editor. ItsyKit builds the server, and serves multiple sites with HTTPS directly.
 
 ## Getting started
 
@@ -14,7 +14,7 @@ The included Contact mini app uses a normal HTML form and `{csrf}`. Enable it
 only on sites that need it, as described below. Blog is an optional built-in content application, described below. Custom
 managed apps use validated local executable packages.
 
-For a new project, install ItsyWeb first, then run:
+For a new project, install ItsyKit first, then run:
 
 ```sh
 itsy new foobar
@@ -22,16 +22,16 @@ cd foobar
 itsy dev
 ```
 
-The planned installer is `curl -fsSL https://fleacms.com/install.sh | bash`.
-Install the public test release with `curl -fsSL https://fleacms.com/install.sh | bash`.
+The planned installer is `curl -fsSL https://itsykit.dev/install.sh | bash`.
+Install the public test release with `curl -fsSL https://itsykit.dev/install.sh | bash`.
 Downloads cover Apple Silicon macOS and x86-64 Linux. Linux ARM64 CLI downloads
 are discontinued; deploying to ARM64 Linux servers remains supported. See
-https://fleacms.com/docs#installation for PATH setup and testing limits.
+https://itsykit.dev/docs/installation for PATH setup and testing limits.
 This generated folder already is a site, so you can skip directly to `itsy dev`.
 
 Use `itsy new .` to create a site in the current empty directory. Named paths
 also accept existing empty directories. Hidden files and `.git` count as content;
-ItsyWeb refuses nonempty directories.
+ItsyKit refuses nonempty directories.
 
 `itsy new` creates a clean layout and ordinary HTML homepage. Use `itsy new --starter
 foobar` (or `-s`) for example pages, a six-person fictional team and a contact form.
@@ -43,7 +43,7 @@ all local files/settings except `.git`, including uploads, `.env`, customization
 and deployment destinations. Stop dev first. Original files remain in the private
 sibling backup path printed by the command. No commit or remote change is made.
 
-With ItsyWeb 0.19.0 and a matching protocol-27 client/server, staging indexing can be configured
+With ItsyKit 0.19.0 and a matching protocol-27 client/server, staging indexing can be configured
 outside this site: `itsy server indexing root@server staging.example.com noindex`.
 The hostname must already be registered. This sends a noindex/nofollow response
 header and survives deployments without an app flag or different templates.
@@ -82,7 +82,7 @@ reset remain protected while running. Stop older dev binaries manually once.
 For another device on the same trusted network, use `itsy dev --lan` (or `-l`)
 and open a printed Network or Hostname URL. Named URLs work when they resolve to
 the dev machine; Tailscale IPv4 connections are supported. Sign-in, editing, media, forms and reloads
-work there too. Email previews open on the computer running ItsyWeb; enter that code
+work there too. Email previews open on the computer running ItsyKit; enter that code
 on the other device. LAN mode uses unencrypted HTTP on private IPv4 networks.
 Do not forward the port. Allow it through your firewall if needed and restart dev
 after changing networks. Without the flag, access stays on this computer.
@@ -103,7 +103,7 @@ the changed HTML, data and assets together.
 
 New sites have an `Initial site` commit on `main`, unless created with
 `--skip-git`, without Git installed, or with a Git error reported during creation.
-ItsyWeb respects your Git identity, hooks and signing settings. To connect a blank
+ItsyKit respects your Git identity, hooks and signing settings. To connect a blank
 remote project, run:
 
 ```sh
@@ -129,7 +129,7 @@ No remote is configured automatically. There is no existing `origin` to rename.
 | `itsy/icons/` | Downloaded icon cache |
 | `itsy/runtime/` | Private, Git-ignored sessions and recovery files |
 | `mailers/` | Private email templates |
-| `.agents/skills/` | Shared core, design, Prewind and ItsyWeb authoring skills |
+| `.agents/skills/` | Shared core, design, Prewind and ItsyKit authoring skills |
 | `.agents/site-requirements.md` | Version-specific site requirements |
 | `itsy/skills/` | Focused Blog, Contact and import guides |
 
@@ -165,7 +165,7 @@ Private/internal paths, duplicate decoded sources, chains, loops and conflicts
 with active routes or managed app subtrees fail validation. Former Blog slugs
 can be listed explicitly. Update redirects when removing their destination.
 
-Ask the `itsyweb-site` skill to inventory the old website and prepare redirects,
+Ask the `itsykit-site` skill to inventory the old website and prepare redirects,
 or use `itsy/skills/import-brochure/SKILL.md` during a full import. Preserve old URL
 spellings and report URLs the crawl cannot discover or map. Run `itsy status`
 and verify each 301 and its final destination on a local server. This requires
@@ -232,7 +232,7 @@ production address is known:
 ```
 
 `url` must be an HTTPS origin without credentials, a subdirectory, query or
-fragment. ItsyWeb generates `/sitemap.xml` from public pages and published blog
+fragment. ItsyKit generates `/sitemap.xml` from public pages and published blog
 posts, plus `/robots.txt` with a production Sitemap line. Missing canonical tags
 are inserted into public responses without changing template files; HTML
 fragments use a canonical HTTP Link header. No external service is needed.
@@ -247,12 +247,12 @@ or googlebot noindex metadata also excludes a page from the sitemap.
 Custom `site/robots.txt`, `site/sitemap.xml` and canonical tags are preserved.
 Add the Sitemap line and manage exclusions yourself in custom discovery files.
 A page with a custom canonical enters the generated sitemap only when that
-canonical exactly matches its absolute production URL. ItsyWeb does not invent
+canonical exactly matches its absolute production URL. ItsyKit does not invent
 modification dates; beyond 50,000 URLs or 50 MiB, provide a custom sitemap index.
 
 Without `seo`, automatic SEO behavior is disabled. Setting a production URL does
 not register hosts, configure TLS or protect staging: keep the separate server
-indexing policy described above. A supporting ItsyWeb server executable is required;
+indexing policy described above. A supporting ItsyKit server executable is required;
 deploying this site's configuration alone does not upgrade it.
 
 ### Page content and metadata
@@ -407,7 +407,7 @@ page, where `contact.flash.notice` is available once. These are escaped values,
 not template source. Optional `email.from` overrides the configured sender;
 visitor email remains Reply-To. There is no old contact config/route alias.
 
-See https://fleacms.com/docs#custom-apps for the app model, the exact request and
+See https://itsykit.dev/docs/apps for the app model, the exact request and
 response JSON, custom managed app packages and app-owned sessions. Remote or
 registry-based app registration is not supported.
 
@@ -441,7 +441,7 @@ separate CSRF contracts; there is no page toolbar or public admin CSRF meta.
 
 ### Agent-assisted work
 
-Shared core, delivery, design, Prewind, ItsyWeb authoring and upstream Impeccable
+Shared core, delivery, design, Prewind, ItsyKit authoring and upstream Impeccable
 skills ship in `.agents/skills/`. Root `AGENTS.md` explicitly loads core and routes
 other work on demand. Conversation defaults yield to personal preferences;
 project requirements and permissions still apply. No personal instruction files
@@ -456,7 +456,7 @@ Focused guides ship in `itsy/skills/`:
 - **import-brochure**: import or redesign an existing brochure/portfolio site,
   preserving its content and navigation. Interactive: choose a direction (two mood
   boards or references) and approve a sample page before the full build.
-The shared **itsyweb-site** skill covers general authoring, real business
+The shared **itsykit-site** skill covers general authoring, real business
 content and verification, loading the same **prewind** and **design** skills used
 by other projects. Ongoing synchronization is not configured; installed source
 information is recorded in `.agents/skills-source.md`.

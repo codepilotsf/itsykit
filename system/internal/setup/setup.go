@@ -38,7 +38,7 @@ type command struct {
 }
 type runner func(context.Context, command) error
 
-var errHostKeyChanged = errors.New("The server's SSH identity has changed.\n\nConnection stopped to protect your site. This can happen after a server rebuild,\nbut it could also mean you are connecting to a different server.\nVerify the new fingerprint with your server provider before updating its saved\nentry in ~/.ssh/known_hosts. ItsyWeb has not removed or replaced the saved key.")
+var errHostKeyChanged = errors.New("The server's SSH identity has changed.\n\nConnection stopped to protect your site. This can happen after a server rebuild,\nbut it could also mean you are connecting to a different server.\nVerify the new fingerprint with your server provider before updating its saved\nentry in ~/.ssh/known_hosts. ItsyKit has not removed or replaced the saved key.")
 
 type sshErrorWriter struct {
 	out     io.Writer
@@ -168,12 +168,12 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 	reinstall := strings.Contains(probeOutput.String(), "FLEA_EXISTING=1\n")
 	// Verify the replacement before asking permission to reset a working server.
 	// Extraction failures must never lead to remote installation changes.
-	fmt.Fprintln(out, "\nPreparing bundled ItsyWeb server...")
+	fmt.Fprintln(out, "\nPreparing bundled ItsyKit server...")
 	if err := runCommand(ctx, command{name: "extract-server", args: []string{arch, filepath.Join(temp, "flea-server")}}); err != nil {
 		return err
 	}
 	if reinstall {
-		fmt.Fprint(out, "\nWARNING: ItsyWeb is already installed on this server.\nReinstalling will take ALL existing sites offline and replace the installation,\nincluding site configuration and certificates, with an empty installation.\nThe previous files will be kept in a root-only backup on the server.\nThere is no automatic undo.\n\n")
+		fmt.Fprint(out, "\nWARNING: ItsyKit is already installed on this server.\nReinstalling will take ALL existing sites offline and replace the installation,\nincluding site configuration and certificates, with an empty installation.\nThe previous files will be kept in a root-only backup on the server.\nThere is no automatic undo.\n\n")
 		answer, err := ask(ctx, in, out, "Type DESTROY to replace this installation (Enter cancels)", "")
 		if err != nil {
 			return err
@@ -203,14 +203,14 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 		args := append(append([]string{}, sshOptions...), "-T", "--", target, text)
 		_ = runCommand(cleanup, command{name: "ssh", args: args, out: io.Discard, errOut: io.Discard})
 	}()
-	fmt.Fprintln(out, "Uploading ItsyWeb server...")
+	fmt.Fprintln(out, "Uploading ItsyKit server...")
 	scpTarget := scpHost(target)
 	args := append([]string{}, sshOptions...)
 	args = append(args, "--", filepath.Join(temp, "flea-server"), filepath.Join(temp, "install.sh"), filepath.Join(temp, "flea.service"), filepath.Join(temp, "server.json"), scpTarget+":"+stage+"/")
 	if err := runCommand(ctx, command{name: "scp", args: args, in: in, out: out, errOut: errOut}); err != nil {
 		return fmt.Errorf("upload failed: %w", err)
 	}
-	fmt.Fprintln(out, "Installing ItsyWeb service...")
+	fmt.Fprintln(out, "Installing ItsyKit service...")
 	installCommand := "sh " + shellQuote(stage+"/install.sh") + " " + shellQuote(stage)
 	if reinstall {
 		installCommand += " --reinstall"
@@ -221,12 +221,12 @@ func runTarget(ctx context.Context, target string, in io.Reader, out, errOut io.
 	if err := ssh(installCommand, true, out); err != nil {
 		return fmt.Errorf("server installation failed: %w", err)
 	}
-	fmt.Fprintln(out, "Checking ItsyWeb service...")
+	fmt.Fprintln(out, "Checking ItsyKit service...")
 	verify := "systemctl is-active --quiet flea && /usr/local/bin/flea-server -config /etc/flea/server.json -check"
 	if err := ssh(verify, false, out); err != nil {
 		return fmt.Errorf("server installed but readiness check failed: %w", err)
 	}
-	fmt.Fprintf(out, "ItsyWeb server is running on %s (HTTP port 80).\nConfiguration: /etc/flea/server.json\nLocal readiness verified. Allow inbound TCP ports 80 and 443 for HTTP and HTTPS.\nNext: run itsy deploy -target %s -domain YOUR_DOMAIN from your site.\n", target, target)
+	fmt.Fprintf(out, "ItsyKit server is running on %s (HTTP port 80).\nConfiguration: /etc/flea/server.json\nLocal readiness verified. Allow inbound TCP ports 80 and 443 for HTTP and HTTPS.\nNext: run itsy deploy -target %s -domain YOUR_DOMAIN from your site.\n", target, target)
 	return nil
 }
 

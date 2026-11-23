@@ -63,7 +63,7 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 			if _, err := os.Stat(filepath.Join(root, "embed.go")); !os.IsNotExist(err) {
 				t.Fatal("embedding code must not be scaffolded")
 			}
-			for _, skill := range []string{"core", "task-delivery", "deepseek-orchestrator", "design", "prewind", "itsyweb-site"} {
+			for _, skill := range []string{"core", "task-delivery", "deepseek-orchestrator", "design", "prewind", "itsykit-site"} {
 				if _, err := os.Stat(filepath.Join(root, ".agents/skills", skill, "SKILL.md")); err != nil {
 					t.Fatalf("generated site missing shared skill %s: %v", skill, err)
 				}
@@ -76,6 +76,9 @@ func TestCreateCopiesEmbeddedTemplates(t *testing.T) {
 }
 
 func TestHelpWithoutSite(t *testing.T) {
+	if strings.Contains(usage, "ItsyWeb") || !strings.Contains(usage, "ItsyKit") {
+		t.Fatal("overview must use current product branding")
+	}
 	if !strings.HasSuffix(usage, "\n\n") {
 		t.Fatal("overview needs trailing blank line")
 	}
@@ -91,6 +94,9 @@ func TestHelpWithoutSite(t *testing.T) {
 			var out, errOut bytes.Buffer
 			if code := Run(context.Background(), []string{command, flag}, &out, &errOut); code != 0 || errOut.Len() != 0 || !strings.Contains(out.String(), "Usage: itsy "+command) || !strings.HasSuffix(out.String(), "\n\n") {
 				t.Fatalf("%s %s: code=%d stdout=%q stderr=%q", command, flag, code, out.String(), errOut.String())
+			}
+			if strings.Contains(out.String(), "ItsyWeb") || strings.Contains(out.String(), "FleaCMS") || strings.Contains(out.String(), "fleacms.com") {
+				t.Errorf("%s %s uses retired branding: %q", command, flag, out.String())
 			}
 		}
 	}

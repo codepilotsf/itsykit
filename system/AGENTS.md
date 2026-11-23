@@ -1,7 +1,7 @@
-# Working on ItsyWeb
+# Working on ItsyKit
 
-ItsyWeb (formerly FleaCMS) is a small Go website server using plain HTML, local assets and JSON.
-This is `system/` within the ItsyWeb repository; `templates/` is the canonical
+ItsyKit is a small Go website server using plain HTML, local assets and JSON.
+This is `system/` within the ItsyKit repository; `templates/` is the canonical
 starter. The current public website is the sibling `../website/`, with its own
 AGENTS.md. Paths and Go commands in this guide are relative to `system/`.
 
@@ -26,7 +26,7 @@ AGENTS.md. Paths and Go commands in this guide are relative to `system/`.
   support is not permission to add more.
 - Keep Go 1.26+, minimal dependencies and ordinary HTML/JSON. No npm/frontend
   build step. Do not add dependencies without a concrete need.
-- Preserve custom site layouts and the approved ItsyWeb mark and logo
+- Preserve custom site layouts and the approved ItsyKit mark and logo
   (`templates/site/images/mark.svg` and `logo.svg`). Framework fixes belong here.
   Ask for the current test site's path before modifying it; do not assume
   `../bookworm` is the site in scope.

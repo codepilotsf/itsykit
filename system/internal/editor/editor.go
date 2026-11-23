@@ -70,7 +70,7 @@ func New(o Options) *Handler {
 	return h
 }
 func emailMessage(email, code, host string) mailer.Message {
-	return mailer.Message{To: email, Subject: "Your ItsyWeb sign-in code", Text: fmt.Sprintf("Your sign-in code for %s is:\n\n%s\n\nIt expires in 10 minutes and can only be used once.\nIf you did not request it, ignore this email.", host, code), HTML: fmt.Sprintf(`<div style="font-family:Arial,sans-serif;font-size:16px;line-height:1.5"><p>Your sign-in code for %s is:</p><p style="font-family:monospace;font-size:36px;font-weight:700;letter-spacing:6px">%s</p><p>It expires in 10 minutes and can only be used once.</p><p>If you did not request it, ignore this email.</p></div>`, html.EscapeString(host), html.EscapeString(code))}
+	return mailer.Message{To: email, Subject: "Your ItsyKit sign-in code", Text: fmt.Sprintf("Your sign-in code for %s is:\n\n%s\n\nIt expires in 10 minutes and can only be used once.\nIf you did not request it, ignore this email.", host, code), HTML: fmt.Sprintf(`<div style="font-family:Arial,sans-serif;font-size:16px;line-height:1.5"><p>Your sign-in code for %s is:</p><p style="font-family:monospace;font-size:36px;font-weight:700;letter-spacing:6px">%s</p><p>It expires in 10 minutes and can only be used once.</p><p>If you did not request it, ignore this email.</p></div>`, html.EscapeString(host), html.EscapeString(code))}
 }
 func IsPath(path string) bool { return path == "/admin" || strings.HasPrefix(path, "/admin/") }
 

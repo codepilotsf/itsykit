@@ -15,7 +15,7 @@ import (
 	"itsy/internal/release"
 )
 
-// serverAdmin is an authenticated SSH session to an installed ItsyWeb host,
+// serverAdmin is an authenticated SSH session to an installed ItsyKit host,
 // independent of any local site, Git repository or saved deployment settings.
 type serverAdmin struct {
 	target string
@@ -114,12 +114,12 @@ func promptServerTarget(ctx context.Context, target string, in io.Reader, out io
 	if strings.TrimSpace(target) != "" {
 		return target, nil
 	}
-	answer, err := ask(ctx, in, out, "Server login (for example root@fleacms.com)", "")
+	answer, err := ask(ctx, in, out, "Server login (for example root@itsykit.dev)", "")
 	if err != nil {
 		return "", err
 	}
 	if strings.TrimSpace(answer) == "" {
-		return "", fmt.Errorf("enter a server login, for example root@fleacms.com")
+		return "", fmt.Errorf("enter a server login, for example root@itsykit.dev")
 	}
 	return answer, nil
 }
@@ -203,10 +203,10 @@ func withServerAdmin(ctx context.Context, target string, in io.Reader, out, errO
 	}
 	raw := probeOutput.String()
 	if strings.Contains(raw, "FLEA_MISSING=1") {
-		return fmt.Errorf("ItsyWeb isn't installed on %s.", target)
+		return fmt.Errorf("ItsyKit isn't installed on %s.", target)
 	}
 	if strings.Contains(raw, "FLEA_OUTDATED=1") || !strings.Contains(raw, release.Protocol+"\n") {
-		return fmt.Errorf("This server has an older or incomplete ItsyWeb installation.\nUpdate the server before managing its sites; this command does not rewrite remote configuration by hand.")
+		return fmt.Errorf("This server has an older or incomplete ItsyKit installation.\nUpdate the server before managing its sites; this command does not rewrite remote configuration by hand.")
 	}
 	root := strings.Contains(raw, "FLEA_UID=0\n")
 	return fn(serverAdmin{target: target, ssh: ssh, root: root})

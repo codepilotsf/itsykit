@@ -77,7 +77,7 @@ func Extract(input io.Reader, dest string) (Manifest, error) {
 	header := make([]byte, len(magic))
 	_, err := io.ReadFull(r, header)
 	if err != nil || string(header) != magic {
-		return m, fmt.Errorf("not an ItsyWeb backup")
+		return m, fmt.Errorf("not an ItsyKit backup")
 	}
 	// ReadSlice bounds an untrusted manifest before allocating a JSON document.
 	raw, err := r.ReadSlice('\n')

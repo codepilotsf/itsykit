@@ -1,9 +1,9 @@
 ---
 name: add-contact-form
-description: Add, enable or repair ItsyWeb's bundled Contact form on an existing ItsyWeb site. Use for requests such as "add a contact form", "create a contact page", "let visitors email us", or connecting a form to Resend. Covers configuration, exact field names, CSRF, feedback tokens and mail templates. Does not apply to arbitrary forms, uploads, newsletters or a contact page that only displays an address.
+description: Add, enable or repair ItsyKit's bundled Contact form on an existing ItsyKit site. Use for requests such as "add a contact form", "create a contact page", "let visitors email us", or connecting a form to Resend. Covers configuration, exact field names, CSRF, feedback tokens and mail templates. Does not apply to arbitrary forms, uploads, newsletters or a contact page that only displays an address.
 ---
 
-# Add a ItsyWeb Contact form
+# Add an ItsyKit Contact form
 
 Read the site's [README](../../../README.md) and [AGENTS](../../../AGENTS.md).
 Inspect Git status, existing Contact configuration, navigation and templates.
@@ -60,7 +60,7 @@ No `{app ...}` tag, old `contact` config or `/_flea/contact` alias is needed.
 ```
 
 `{csrf}` renders the **whole hidden `_csrf` input**, not a token value. Keep it
-inside the form as ordinary element content; ItsyWeb does not inject it for you.
+inside the form as ordinary element content; ItsyKit does not inject it for you.
 Do not alter admin CSRF controls, remove exact Origin checks or bypass login.
 Use a native URL-encoded POST, no multipart uploads or custom JSON endpoint.
 

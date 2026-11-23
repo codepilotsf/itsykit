@@ -3,7 +3,7 @@
 Use this for requests such as "index the old site and add migration redirects"
 or "find which URLs need 301s". Read the destination's local requirements and
 inspect the selected `itsy.config.json` (or existing `.flea.config.json`), public
-routes, existing redirects and installed ItsyWeb version. Keep writes in the
+routes, existing redirects and installed ItsyKit version. Keep writes in the
 selected config; never rename it during a migration. Confirm the source website
 and destination project if context does not identify them. A crawl is read-only;
 it does not authorize publishing a site.
@@ -42,7 +42,7 @@ Ask about ambiguous content decisions; do not send every removed page to `/` or
 guess replacements. Leave unrelated missing pages as 404s. Flatten existing
 redirect chains to their final replacement.
 
-ItsyWeb's supported config is a top-level JSON object mapping old paths to local
+ItsyKit's supported config is a top-level JSON object mapping old paths to local
 destination URLs, alongside `app`, never inside it:
 
 ```json

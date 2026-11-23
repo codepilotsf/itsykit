@@ -782,7 +782,7 @@ redirects in the same change.
 
 Run `itsy status`, then check each old URL locally without following redirects
 and confirm its `Location` leads directly to the intended content. The shared
-`itsyweb-site` skill can inventory the original website and prepare these mappings;
+`itsykit-site` skill can inventory the original website and prepare these mappings;
 the bundled `import-brochure` skill includes this step for imports. A crawl cannot
 discover orphaned URLs without additional sources such as analytics or an old
 URL list. Query-based legacy pages, such as `/?p=123`, need a separate migration

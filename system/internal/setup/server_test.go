@@ -125,7 +125,7 @@ func TestServerListPromptsForTarget(t *testing.T) {
 		case strings.Contains(text, "-O exit"):
 			return nil
 		case strings.Contains(text, "FLEA_UID"):
-			if !strings.Contains(text, "-- root@fleacms.com ") {
+			if !strings.Contains(text, "-- root@itsykit.dev ") {
 				t.Fatalf("prompted target not used: %q", text)
 			}
 			fmt.Fprint(c.out, "FLEA_UID=0\nFLEA_DEPLOY=30\n")
@@ -137,13 +137,13 @@ func TestServerListPromptsForTarget(t *testing.T) {
 		t.Fatal("unexpected command", text)
 		return nil
 	}
-	if err := serverList(context.Background(), "", strings.NewReader("root@fleacms.com\n"), &out, io.Discard, runner); err != nil {
+	if err := serverList(context.Background(), "", strings.NewReader("root@itsykit.dev\n"), &out, io.Discard, runner); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), "Server login (for example root@fleacms.com)") {
+	if !strings.Contains(out.String(), "Server login (for example root@itsykit.dev)") {
 		t.Fatalf("missing login prompt:\n%s", out.String())
 	}
-	if !strings.Contains(out.String(), "No sites are registered on root@fleacms.com") {
+	if !strings.Contains(out.String(), "No sites are registered on root@itsykit.dev") {
 		t.Fatalf("prompted target not reported:\n%s", out.String())
 	}
 }
@@ -230,7 +230,7 @@ func TestServerRemovePromptsForTargetAndSelectsByName(t *testing.T) {
 	if err := serverRemove(context.Background(), "", "", strings.NewReader("root@server\ndemo\ndemo\n"), &out, io.Discard, runner); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), "Server login (for example root@fleacms.com)") {
+	if !strings.Contains(out.String(), "Server login (for example root@itsykit.dev)") {
 		t.Fatalf("missing login prompt:\n%s", out.String())
 	}
 	if !strings.Contains(out.String(), "Managed sites on root@server:") || !strings.Contains(out.String(), "  demo  https example.test, www.example.test") {

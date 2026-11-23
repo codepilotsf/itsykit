@@ -6,6 +6,10 @@ During 0.x development, interfaces may change without backward compatibility.
 
 ## Unreleased
 
+- Use ItsyKit branding in CLI/server output, diagnostics and generated sites,
+  including the approved wordmark, favicons and bundled authoring guidance.
+  Preserve private version probes required by released updaters.
+
 ## 0.22.0 - 2026-11-14
 
 - Remove the page CMS, snips/extraction, collections and page media/metadata editing.

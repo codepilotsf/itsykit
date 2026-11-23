@@ -1,4 +1,4 @@
-# ItsyWeb site requirements
+# ItsyKit site requirements
 
 Read README.md and AGENTS.md. Preserve custom layouts, copy, assets and contracts.
 Use plain HTML/JSON, no frontend build step. `itsy new` is minimal; `--starter`

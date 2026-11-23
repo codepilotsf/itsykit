@@ -59,7 +59,7 @@ itsy_install() (
   [[ "$actual" == "$expected" ]] || fail 'Checksum did not match. Your existing CLI was not changed.'
   chmod 755 "$stage/itsy"
   "$stage/itsy" version > "$stage/version" || fail 'The downloaded CLI cannot run on this machine.'
-  [[ $(cat "$stage/version") == "ItsyWeb $version" ]] || fail 'The downloaded CLI has an unexpected version.'
+  [[ $(cat "$stage/version") == "ItsyKit $version" ]] || fail 'The downloaded CLI has an unexpected version.'
   ln -s itsy "$stage/flea" || fail 'Could not prepare the retired flea command.'
   mv -f -- "$stage/itsy" "$destination/itsy"
   mv -f -- "$stage/flea" "$destination/flea" || fail 'itsy is installed, but the retired flea command could not be replaced.'

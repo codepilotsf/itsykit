@@ -25,7 +25,7 @@ done
 bash scripts/bundle.sh "$stage"
 FLEA_REQUIRE_BUNDLE=1 "$GO_BINARY" test ./internal/serverbundle -count=1
 mkdir -p bin
-echo 'Building ItsyWeb with both servers bundled...'
+echo 'Building ItsyKit with both servers bundled...'
 GO_BINARY="$GO_BINARY" bash scripts/bundle-app.sh "$("$GO_BINARY" env GOOS)" "$("$GO_BINARY" env GOARCH)"
 FLEA_REQUIRE_APP_BUNDLE=1 "$GO_BINARY" test ./internal/appmanager ./internal/site -run 'TestManaged' -count=1
 "$GO_BINARY" build -trimpath -ldflags "$flags" -o "$stage/itsy" ./cmd/itsy

@@ -272,7 +272,7 @@ func (m *Manager) run(ctx context.Context, spec Spec, executable string, logger 
 		_ = m.once(ctx, spec, executable, logger)
 	}
 	if ctx.Err() == nil && logger != nil {
-		m.logf(logger, spec.Name, "could not stay running. Other pages remain available; restart ItsyWeb after checking the app.")
+		m.logf(logger, spec.Name, "could not stay running. Other pages remain available; restart ItsyKit after checking the app.")
 	}
 }
 

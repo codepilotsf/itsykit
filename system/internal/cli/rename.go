@@ -19,12 +19,17 @@ func RunExecutable(ctx context.Context, executable string, args []string, out, e
 		fmt.Fprintln(out, "FleaCMS "+buildinfo.Version)
 		return 0
 	}
+	// Released Itsy updaters also verify candidates using their original label.
+	if strings.HasPrefix(name, ".itsy-update-") && len(args) == 1 && args[0] == "version" {
+		fmt.Fprintln(out, "ItsyWeb "+buildinfo.Version)
+		return 0
+	}
 	if name == "flea" {
 		if len(args) == 1 && args[0] == "update" {
-			fmt.Fprint(errOut, "\nFLEA HAS CHANGED TO ITSYWEB\n\nThe CLI command is now itsy. This update installs itsy on this computer.\nFrom now on, please use itsy. For future updates, run itsy update.\n\n")
+			fmt.Fprint(errOut, "\nFLEA HAS CHANGED TO ITSYKIT\n\nThe CLI command is now itsy. This update installs itsy on this computer.\nFrom now on, please use itsy. For future updates, run itsy update.\n\n")
 			return Run(ctx, args, out, errOut)
 		}
-		fmt.Fprint(errOut, "Flea is now ItsyWeb. From now on, please use itsy.\nIf itsy is not installed yet, run flea update.\n")
+		fmt.Fprint(errOut, "Flea is now ItsyKit. From now on, please use itsy.\nIf itsy is not installed yet, run flea update.\n")
 		return 2
 	}
 	return Run(ctx, args, out, errOut)

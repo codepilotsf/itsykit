@@ -1,5 +1,5 @@
 [Unit]
-Description=ItsyWeb server
+Description=ItsyKit server
 After=network.target
 
 [Service]

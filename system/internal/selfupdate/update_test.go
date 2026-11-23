@@ -253,14 +253,19 @@ func TestRenamedExecutableMigration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	releaseVersion := strings.TrimSpace(strings.TrimPrefix(string(versionBytes), "ItsyWeb "))
-	probe := filepath.Join(dir, ".flea-update-old-client")
-	if err := os.WriteFile(probe, payload, 0755); err != nil {
-		t.Fatal(err)
-	}
-	probeOut, err := exec.Command(probe, "version").Output()
-	if err != nil || string(probeOut) != "FleaCMS "+releaseVersion+"\n" {
-		t.Fatal("released updater cannot verify candidate", string(probeOut), err)
+	releaseVersion := strings.TrimSpace(strings.TrimPrefix(string(versionBytes), "ItsyKit "))
+	for _, probe := range []struct{ name, label string }{
+		{".flea-update-old-client", "FleaCMS"},
+		{".itsy-update-old-client", "ItsyWeb"},
+	} {
+		path := filepath.Join(dir, probe.name)
+		if err := os.WriteFile(path, payload, 0755); err != nil {
+			t.Fatal(err)
+		}
+		probeOut, err := exec.Command(path, "version").Output()
+		if err != nil || string(probeOut) != probe.label+" "+releaseVersion+"\n" {
+			t.Fatal("released updater cannot verify candidate", string(probeOut), err)
+		}
 	}
 	target := filepath.Join(dir, "flea")
 	if err := os.WriteFile(target, payload, 0755); err != nil {

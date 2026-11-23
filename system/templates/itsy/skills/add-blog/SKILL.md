@@ -1,9 +1,9 @@
 ---
 name: add-blog
-description: Add, enable or customize ItsyWeb's built-in Blog on an existing ItsyWeb site. Use for requests such as "add a blog", "let's create a blog", "set up a blog", or authoring blog posts and templates. Covers app configuration, post JSON, available template values and the admin editor. Does not apply to a static article page or a full-site redesign.
+description: Add, enable or customize ItsyKit's built-in Blog on an existing ItsyKit site. Use for requests such as "add a blog", "let's create a blog", "set up a blog", or authoring blog posts and templates. Covers app configuration, post JSON, available template values and the admin editor. Does not apply to a static article page or a full-site redesign.
 ---
 
-# Add a ItsyWeb Blog
+# Add an ItsyKit Blog
 
 Read the site's [README](../../../README.md) and [AGENTS](../../../AGENTS.md).
 Inspect Git status, configuration, templates and content before editing. Preserve
@@ -14,7 +14,7 @@ require a full-site design interview.
 
 ## Enable and connect
 
-Blog requires ItsyWeb 0.15.0 or newer and a matching server. Check `itsy version`;
+Blog requires ItsyKit 0.15.0 or newer and a matching server. Check `itsy version`;
 do not assume the public download channel includes Blog yet.
 
 Merge this fragment into `itsy.config.json`, preserving all other fields:
@@ -32,7 +32,7 @@ Fresh matching-version sites include these templates and the authenticated
 `site/admin/blog.html` and `site/admin/blog-edit.html`. For an older site, generate
 a disposable matching-version site with `itsy new NAME --skip-git` outside the
 working project. Copy only the missing Blog/admin templates and incorporate their
-Blog CSS; the matching ItsyWeb runtime supplies `/admin/assets/blog.js`. Preserve
+Blog CSS; the matching ItsyKit runtime supplies `/admin/assets/blog.js`. Preserve
 the template's script reference, the site's layout and existing admin
 authentication/CSRF/version controls. Never reset the existing site or
 replace its entire layout/styles. Add the listing link to the existing navigation

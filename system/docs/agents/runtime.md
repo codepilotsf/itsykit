@@ -4,11 +4,14 @@ Implementation requirements linked from [AGENTS.md](../../AGENTS.md).
 Read this when the task touches this subsystem. Paths in prose and code are
 relative to the repository root unless stated otherwise.
 
-The command is `itsy`. Invoking the retired name `flea` prints the rename notice
+The product is ItsyKit and the command is `itsy`. Normal help, version, setup,
+update and diagnostic output use ItsyKit. Invoking the retired name `flea` prints the rename notice
 and returns usage status 2 without dispatching. Only exact `flea update` remains
 active: show the prominent rename notice, verify the update and install `itsy`,
 even when already current. A private `.flea-update-* version` probe retains the
 exact old version response required by released updaters; it performs no writes.
+Released `.itsy-update-* version` probes similarly retain their historical label.
+New updater candidates use `.itsykit-update-*` and verify `ItsyKit <version>`.
 See [installation](../installation.md) for the two-step path from old binaries.
 
 New sites use `itsy.config.json` and `itsy/`. Existing `.flea.config.json`

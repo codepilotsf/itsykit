@@ -150,7 +150,7 @@ func SelectDeployment(ctx context.Context, root string, overrides DeploySettings
 			if err = saveDeploymentConfig(root, c); err != nil {
 				return s, err
 			}
-			fmt.Fprintf(out, "\nSaved your SSH username in %s.\nItsyWeb will offer to commit this change before deploying.\n", sitefiles.ResolveAt(root, sitefiles.ConfigName))
+			fmt.Fprintf(out, "\nSaved your SSH username in %s.\nItsyKit will offer to commit this change before deploying.\n", sitefiles.ResolveAt(root, sitefiles.ConfigName))
 		}
 		s.Branch = state.Branch
 		return s, nil

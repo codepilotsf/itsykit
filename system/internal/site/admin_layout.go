@@ -17,7 +17,7 @@ func (s *Server) AdminSettings() (AdminAccess, error) {
 	return a, nil
 }
 
-// Admin templates are site-owned ItsyWeb HTML, compiled with the normal layout.
+// Admin templates are site-owned ItsyKit HTML, compiled with the normal layout.
 // They are excluded from public routes and can only be selected by editor state.
 func (p *Project) buildAdminLayout() error {
 	p.adminTemplates = map[string]*template.Template{}
@@ -53,7 +53,7 @@ func (s *Server) RenderAdmin(mode string, data map[string]any) ([]byte, error) {
 	}
 	t := p.adminTemplates[name]
 	if t == nil {
-		return nil, fmt.Errorf("missing admin/%s.html; copy the admin directory from a fresh ItsyWeb site", name)
+		return nil, fmt.Errorf("missing admin/%s.html; copy the admin directory from a fresh ItsyKit site", name)
 	}
 	return p.renderWithBody(t, "/admin", data)
 }
